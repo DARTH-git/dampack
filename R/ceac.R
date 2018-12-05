@@ -3,9 +3,8 @@
 #' \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 #' curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 #' @param wtp Numeric vector with willingness-to-pay (WTP) thresholds
-#' @param outcomes Matrix with the model outputs. The outcomes must be ordered
-#' in such a way that for each strategy the cost must appear first then the
-#' effectiveness.
+#' @param costs Matrix with the costs for each simulation (rows) and strategy (columns).
+#' @param effectiveness Matrix with the effectiveness for each simulation (rows) and strategy (columns)
 #' @param strategies String vector with the name of the strategies
 #' @keywords cost-effectiveness acceptability curves
 #' @section Details:
@@ -16,16 +15,26 @@
 #' @import reshape2
 #'
 #' @export
-ceac <- function(wtp, outcomes, strategies = NULL){
-  # todo:
-  # check that outcomes has even number of columns
-  # check that strategies has length ncol(outcomes)
-  # better to provide effectiveness and cost separately? then we can index by sim
-  # Create scalar with number of simulations
-  n.sim <- nrow(outcomes)
-  # Create scalar with number of strategies (i.e. number of columns of
-  # `outcomes` divided by two)
-  n.strategies <- ncol(outcomes)/2
+ceac <- function(wtp, costs, effectiveness, strategies = NULL){
+  # argument checks and defining other variables
+  # costs and effectiveness have same number of rows
+  n.sim.costs <- nrow(costs)
+  n.sim.effectiveness <- nrow(effectiveness)
+  if (n.sim.costs != n.sim.effectiveness) {
+    stop('The number of rows of the cost and benefit matrices is different and must be the same.')
+  }
+  # define n.sim (could be either n.sim.costs or n.sim.effectiveness)
+  n.sim <- n.sim.costs
+
+  # costs and effectiveness have same number of columns
+  n.strategies.costs <- ncol(costs)
+  n.strategies.effectiveness <- ncol(effectiveness)
+  if (n.strategies.costs != n.strategies.effectiveness) {
+    stop('The number of columns of the cost and benefit matrices is different and must be the same.')
+  }
+  # define n.strat (could be either n.sim.costs or n.sim.effectiveness)
+  n.strategies <- n.strategies.costs
+
   # If the name of the strategies is not provided, generate a generic vector
   # with strategy names
   if (is.null(strategies)) {
@@ -35,13 +44,10 @@ ceac <- function(wtp, outcomes, strategies = NULL){
   NHB <- array(0, dim = c(n.sim, n.strategies))
   colnames(NHB) <- strategies
   cea <- array(0, dim = c(length(wtp), n.strategies))
-  # Vector to index costs
-  costInd <- seq(1, 2*n.strategies, by = 2)
-  # Vector to index effectiveness
-  effInd  <- seq(2, 2*n.strategies, by = 2)
 
   for (l in 1:length(wtp)) {
-    NHB <-  outcomes[, effInd] - outcomes[, costInd]/wtp[l] # Effectiveness minus Costs, with vector indexing
+    NHB <-  effectiveness - costs/wtp[l] # Effectiveness minus Costs, with vector indexing
+    # find best strategy for each simulation
     Max.NHB <- max.col(NHB)
     opt <- table(Max.NHB)
     cea[l, as.numeric(names(opt))] <- opt/n.sim
@@ -49,9 +55,8 @@ ceac <- function(wtp, outcomes, strategies = NULL){
   cea <- data.frame(cbind(wtp, cea))
   colnames(cea) <- c("WTP", strategies)
 
-  ceac <- melt(cea, id.vars = "WTP")
-  colnames(ceac)[2] <- "Strategy"
+  ceac <- melt(cea, id.vars = "WTP", variable.name = "Strategy")
   # Return a data frame of class ceac
-  class(ceac) <- "ceac"
+  class(ceac) <- c("data.frame", "ceac")
   return(ceac)
 }

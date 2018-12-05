@@ -4,14 +4,14 @@
 \alias{ceac}
 \title{Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-ceac(wtp, outcomes, strategies = NULL)
+ceac(wtp, costs, effectiveness, strategies = NULL)
 }
 \arguments{
 \item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
 
-\item{outcomes}{Matrix with the model outputs. The outcomes must be ordered
-in such a way that for each strategy the cost must appear first then the
-effectiveness.}
+\item{costs}{Matrix with the costs for each simulation (rows) and strategy (columns).}
+
+\item{effectiveness}{Matrix with the effectiveness for each simulation (rows) and strategy (columns)}
 
 \item{strategies}{String vector with the name of the strategies}
 }

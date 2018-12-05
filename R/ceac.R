@@ -63,11 +63,11 @@ ceac <- function(wtp, costs, effectiveness, strategies = NULL){
   cea.df <- data.frame(cbind(wtp, cea), stringsAsFactors = FALSE)
   colnames(cea.df) <- c("WTP", strategies)
 
-  ceac <- melt(cea.df, id.vars = "WTP", variable.name = "Strategy")
+  ceac <- melt(cea.df, id.vars = "WTP", variable.name = "Strategy", value.name="Proportion")
   # replace factors with strings
   ceac$Strategy <- as.character(ceac$Strategy)
 
   # Return a data frame of class ceac
-  class(ceac) <- c("data.frame", "ceac")
+  class(ceac) <- c("ceac", "data.frame")
   return(ceac)
 }

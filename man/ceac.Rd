@@ -26,9 +26,9 @@ curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 \section{Details}{
 
 \code{ceac} computes the probability of each of the strategies being
-cost-effective at each \code{wtp} threshold.
+cost-effective (optimal?) at each \code{wtp} threshold.
 }
-
 \keyword{acceptability}
 \keyword{cost-effectiveness}
 \keyword{curves}
+

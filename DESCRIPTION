@@ -10,7 +10,8 @@ License: GPL
 Encoding: UTF-8
 Imports:
   reshape2,
-  matrixStats
+  matrixStats,
+  ggplot2
 LazyData: true
 RoxygenNote: 6.0.1
 Suggests: testthat

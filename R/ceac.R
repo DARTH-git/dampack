@@ -9,7 +9,7 @@
 #' @keywords cost-effectiveness acceptability curves
 #' @section Details:
 #' \code{ceac} computes the probability of each of the strategies being
-#' cost-effective at each \code{wtp} threshold.
+#' cost-effective (optimal?) at each \code{wtp} threshold.
 #' @return ceac A melted data frame with each strategy's probability of being
 #' cost-effective at each WTP threshold.
 #' @import reshape2

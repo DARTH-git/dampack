@@ -35,31 +35,38 @@ ceac <- function(wtp, costs, effectiveness, strategies = NULL){
   # define n.strat (could be either n.sim.costs or n.sim.effectiveness)
   n.strategies <- n.strategies.costs
 
-  # make sure strategies is the same length as the number of columns
-  if (n.strategies != length(strategies)) {
-    stop('The number of columns in the cost and effectiveness matrices is different from the number of strategies provided')
-  }
   # If the name of the strategies is not provided, generate a generic vector
   # with strategy names
   if (is.null(strategies)) {
     strategies <- paste(rep("Strategy_", n.strategies), seq(1, n.strategies), sep = "")
+  } else {
+    # make sure strategies is the same length as the number of columns
+    if (n.strategies != length(strategies)) {
+      stop('The number of columns in the cost and effectiveness matrices is different from the number of strategies provided')
+    }
   }
-  # Matrix to store NHB for each strategy
-  NHB <- array(0, dim = c(n.sim, n.strategies))
-  colnames(NHB) <- strategies
-  cea <- array(0, dim = c(length(wtp), n.strategies))
+
+  # number of willingness to pay thresholds
+  n.wtps <- length(wtp)
+
+  # Matrix to store probability optimal for each strategy
+  cea <- matrix(0, nrow = n.wtps, ncol = n.strategies)
+  colnames(cea) <- strategies
 
   for (l in 1:length(wtp)) {
-    NHB <-  effectiveness - costs/wtp[l] # Effectiveness minus Costs, with vector indexing
+    nhb <-  effectiveness - costs/wtp[l] # Effectiveness minus Costs, with vector indexing
     # find best strategy for each simulation
-    Max.NHB <- max.col(NHB)
-    opt <- table(Max.NHB)
+    max.nhb <- max.col(nhb)
+    opt <- table(max.nhb)
     cea[l, as.numeric(names(opt))] <- opt/n.sim
   }
-  cea <- data.frame(cbind(wtp, cea))
-  colnames(cea) <- c("WTP", strategies)
+  cea.df <- data.frame(cbind(wtp, cea), stringsAsFactors = FALSE)
+  colnames(cea.df) <- c("WTP", strategies)
 
-  ceac <- melt(cea, id.vars = "WTP", variable.name = "Strategy")
+  ceac <- melt(cea.df, id.vars = "WTP", variable.name = "Strategy")
+  # replace factors with strings
+  ceac$Strategy <- as.character(ceac$Strategy)
+
   # Return a data frame of class ceac
   class(ceac) <- c("data.frame", "ceac")
   return(ceac)

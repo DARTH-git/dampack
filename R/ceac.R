@@ -35,6 +35,10 @@ ceac <- function(wtp, costs, effectiveness, strategies = NULL){
   # define n.strat (could be either n.sim.costs or n.sim.effectiveness)
   n.strategies <- n.strategies.costs
 
+  # make sure strategies is the same length as the number of columns
+  if (n.strategies != length(strategies)) {
+    stop('The number of columns in the cost and effectiveness matrices is different from the number of strategies provided')
+  }
   # If the name of the strategies is not provided, generate a generic vector
   # with strategy names
   if (is.null(strategies)) {

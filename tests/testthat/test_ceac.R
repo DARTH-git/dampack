@@ -8,7 +8,6 @@ costs <- matrix(c(30, 20, 100,
                      10, 10, 5),
                    byrow = TRUE,
                    nrow = 2)
-
 effectiveness <- matrix(c(20, 10, 50,
                           2, 11, 3),
                         byrow = TRUE,

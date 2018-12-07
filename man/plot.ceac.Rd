@@ -4,8 +4,9 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, ..., title = "Cost-Effectiveness Acceptability Curves",
-  txtsize = 12, currency = "$")
+\method{plot}{ceac}(x, ...,
+  title = "Cost-Effectiveness Acceptability Curves", txtsize = 12,
+  currency = "$")
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -32,7 +33,7 @@ Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
 \code{ceac} computes the probability of each of the strategies being
 cost-effective at each \code{wtp} value.
 }
+
 \keyword{acceptability}
 \keyword{cost-effectiveness}
 \keyword{curves}
-

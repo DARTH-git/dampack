@@ -2,7 +2,7 @@ context("ceac")
 library(dampack)
 
 ## test data
-wtp <- c(0, 100000, 200000)
+wtp <- c(50000, 100000, 200000)
 strategies <- c("good", "bad", "worse")
 costs <- matrix(c(3e4, 2e4, 1e3,
                   1e4, 1e4, 5e3),

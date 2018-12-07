@@ -14,6 +14,6 @@ Imports:
     ggplot2,
     scales
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1
 Suggests:
     testthat

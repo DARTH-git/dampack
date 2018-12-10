@@ -3,9 +3,6 @@
 #' \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 #' curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 #' @param wtp Numeric vector with willingness-to-pay (WTP) thresholds
-#' @param costs Matrix with the costs for each simulation (rows) and strategy (columns).
-#' @param effectiveness Matrix with the effectiveness for each simulation (rows) and strategy (columns)
-#' @param strategies String vector with the name of the strategies
 #' @keywords cost-effectiveness acceptability curves
 #' @section Details:
 #' \code{ceac} computes the probability of each of the strategies being
@@ -15,36 +12,17 @@
 #' @import reshape2
 #'
 #' @export
-ceac <- function(wtp, costs, effectiveness, strategies = NULL){
-  # argument checks and defining other variables
-  # costs and effectiveness have same number of rows
-  n.sim.costs <- nrow(costs)
-  n.sim.effectiveness <- nrow(effectiveness)
-  if (n.sim.costs != n.sim.effectiveness) {
-    stop('The number of rows of the cost and benefit matrices is different and must be the same.')
+ceac <- function(wtp, psa_results){
+  # check that psa_results has class 'psa'
+  if (!inherits(psa_results, "psa_results")) {
+    stop(paste0("The psa results parameter must be an object of class `psa_results`.\n",
+                "Please run the psa_results() function to create this object."))
   }
-  # define n.sim (could be either n.sim.costs or n.sim.effectiveness)
-  n.sim <- n.sim.costs
-
-  # costs and effectiveness have same number of columns
-  n.strategies.costs <- ncol(costs)
-  n.strategies.effectiveness <- ncol(effectiveness)
-  if (n.strategies.costs != n.strategies.effectiveness) {
-    stop('The number of columns of the cost and benefit matrices is different and must be the same.')
-  }
-  # define n.strat (could be either n.sim.costs or n.sim.effectiveness)
-  n.strategies <- n.strategies.costs
-
-  # If the name of the strategies is not provided, generate a generic vector
-  # with strategy names
-  if (is.null(strategies)) {
-    strategies <- paste(rep("Strategy_", n.strategies), seq(1, n.strategies), sep = "")
-  } else {
-    # make sure strategies is the same length as the number of columns
-    if (n.strategies != length(strategies)) {
-      stop('The number of columns in the cost and effectiveness matrices is different from the number of strategies provided')
-    }
-  }
+  strategies <- psa_results$strategies
+  n.strategies <- psa_results$n.strategies
+  effectiveness <- psa_results$effectiveness
+  cost <- psa_results$cost
+  n.sim <- psa_results$n.sim
 
   # number of willingness to pay thresholds
   n.wtps <- length(wtp)
@@ -57,7 +35,7 @@ ceac <- function(wtp, costs, effectiveness, strategies = NULL){
   frontv <- rep(0, n.wtps)
 
   for (l in 1:length(wtp)) {
-    nhb <-  effectiveness - costs/wtp[l] # Effectiveness minus Costs, with vector indexing
+    nhb <-  effectiveness - cost/wtp[l] # Effectiveness minus cost, with vector indexing
     # find best strategy for each simulation
     max.nhb <- max.col(nhb)
     opt <- table(max.nhb)

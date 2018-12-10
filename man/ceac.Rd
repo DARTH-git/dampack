@@ -4,16 +4,10 @@
 \alias{ceac}
 \title{Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-ceac(wtp, costs, effectiveness, strategies = NULL)
+ceac(wtp, psa_results)
 }
 \arguments{
 \item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
-
-\item{costs}{Matrix with the costs for each simulation (rows) and strategy (columns).}
-
-\item{effectiveness}{Matrix with the effectiveness for each simulation (rows) and strategy (columns)}
-
-\item{strategies}{String vector with the name of the strategies}
 }
 \value{
 ceac A melted data frame with each strategy's probability of being

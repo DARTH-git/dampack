@@ -8,7 +8,7 @@ psa_results <- function(cost, effectiveness, strategies=NULL){
   # argument checking
   # argument checks and defining other variables
   # costs and effectiveness have same number of rows
-  n.sim.costs <- nrow(costs)
+  n.sim.costs <- nrow(cost)
   n.sim.effectiveness <- nrow(effectiveness)
   if (n.sim.costs != n.sim.effectiveness) {
     stop('The number of rows of the cost and benefit matrices is different and must be the same.')

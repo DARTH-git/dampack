@@ -8,7 +8,7 @@ test_that("ceac has all methods we'd expect", {
   expect_equal(current_methods, expected_methods)
 })
 
-# test class creation creation
+# test class creation
 
 ## setup
 source('load_test_data.R')

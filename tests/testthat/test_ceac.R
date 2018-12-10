@@ -1,17 +1,7 @@
 context("ceac")
 library(dampack)
 
-## test data
-wtp <- c(50000, 100000, 200000)
-strategies <- c("good", "bad", "worse")
-costs <- matrix(c(3e4, 2e4, 1e3,
-                  1e4, 1e4, 5e3),
-                   byrow = TRUE,
-                   nrow = 2)
-effectiveness <- matrix(c(20, 10, 50,
-                          2, 11, 3),
-                        byrow = TRUE,
-                        nrow = 2)
+source('load_test_data.R')
 
 ## tests
 

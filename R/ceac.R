@@ -49,9 +49,12 @@ ceac <- function(wtp, costs, effectiveness, strategies = NULL){
   # number of willingness to pay thresholds
   n.wtps <- length(wtp)
 
-  # Matrix to store probability optimal for each strategy
+  # matrices to store probability optimal for each strategy (cea)
   cea <- matrix(0, nrow = n.wtps, ncol = n.strategies)
   colnames(cea) <- strategies
+
+  # vector to store strategy at the cost-effectiveness acceptability frontier
+  frontv <- rep(0, n.wtps)
 
   for (l in 1:length(wtp)) {
     nhb <-  effectiveness - costs/wtp[l] # Effectiveness minus Costs, with vector indexing
@@ -59,13 +62,32 @@ ceac <- function(wtp, costs, effectiveness, strategies = NULL){
     max.nhb <- max.col(nhb)
     opt <- table(max.nhb)
     cea[l, as.numeric(names(opt))] <- opt/n.sim
-  }
-  cea.df <- data.frame(cbind(wtp, cea), stringsAsFactors = FALSE)
-  colnames(cea.df) <- c("WTP", strategies)
 
-  ceac <- melt(cea.df, id.vars = "WTP", variable.name = "Strategy", value.name="Proportion")
+    # calculate point on CEAF
+    # the strategy with the highest expected NHB
+    frontv[l] <- which.max(colMeans(nhb))
+  }
+
+  # make cea df
+  cea.df <- data.frame(wtp, cea, strategies[frontv], stringsAsFactors = FALSE)
+  colnames(cea.df) <- c("WTP", strategies, "fstrat")
+
+  # make ceaf df
+
+  ceac <- reshape2::melt(cea.df, id.vars = c("WTP", "fstrat"),
+               variable.name = "Strategy", value.name = "Proportion")
+
+  # boolean for on frontier or not
+  ceac$On_Frontier <- (ceac$fstrat == ceac$Strategy)
+
+  # drop fstrat column
+  ceac$fstrat <- NULL
+
   # replace factors with strings
   ceac$Strategy <- as.character(ceac$Strategy)
+
+  # order by WTP
+  ceac <- ceac[order(ceac$WTP), ]
 
   # Return a data frame of class ceac
   class(ceac) <- c("ceac", "data.frame")

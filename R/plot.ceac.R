@@ -18,6 +18,7 @@
 #'
 #' @export
 plot.ceac <- function(x, ...,
+                      frontier = FALSE,
                       title = "Cost-Effectiveness Acceptability Curves",
                       txtsize = 12,
                       currency = "$"){
@@ -25,7 +26,7 @@ plot.ceac <- function(x, ...,
   prop_name <- "Proportion"
   strat_name <- "Strategy"
   x$WTP_thou <- x[, wtp_name]/1000
-  ggplot(data = x, aes_(x = as.name("WTP_thou"),
+  p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
                            y = as.name(prop_name),
                           color = as.name(strat_name),
                           shape = as.name(strat_name))) +
@@ -44,4 +45,11 @@ plot.ceac <- function(x, ...,
           axis.title.y = element_text(face = "bold", size = txtsize),
           axis.text.y = element_text(size = txtsize),
           axis.text.x = element_text(size = txtsize))
+  if (frontier) {
+    front <- x[x$On_Frontier, ]
+    p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),
+                                           y = as.name(prop_name)),
+                        shape = 0, size = 3, stroke = 1.2, color = "black")
+  }
+  p
 }

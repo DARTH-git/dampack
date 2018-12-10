@@ -19,7 +19,7 @@
 #'
 #' @export
 plot.ceac <- function(x, ...,
-                      frontier = FALSE,
+                      frontier = TRUE,
                       title = "Cost-Effectiveness Acceptability Curves",
                       txtsize = 12,
                       currency = "$"){
@@ -36,6 +36,7 @@ plot.ceac <- function(x, ...,
     ggtitle(title) +
     scale_colour_hue(l = 50) +
     scale_x_continuous(breaks = number_ticks(20)) +
+    scale_y_continuous(limits = c(0, 1)) +
     xlab(paste("Willingness to Pay (Thousand ", currency, "/QALY)", sep = "")) +
     ylab("Pr Cost-Effective") +
     theme_bw() +

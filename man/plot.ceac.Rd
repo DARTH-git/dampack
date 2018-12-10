@@ -15,6 +15,8 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{...}{additional arguments to plot (not used)}
 
+\item{frontier}{Whether to plot acceptability frontier}
+
 \item{title}{String with graph's title}
 
 \item{txtsize}{number with text size}

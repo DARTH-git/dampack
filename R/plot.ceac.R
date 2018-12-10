@@ -5,6 +5,7 @@
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
 #' @param ... additional arguments to plot (not used)
+#' @param frontier Whether to plot acceptability frontier
 #' @param title String with graph's title
 #' @param txtsize number with text size
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
@@ -14,7 +15,7 @@
 #' \code{ceac} computes the probability of each of the strategies being
 #' cost-effective at each \code{wtp} value.
 #' @return ceac.gg A \code{ggplot2} object with the CEAC
-#' @import ggplot2 scales
+#' @import ggplot2
 #'
 #' @export
 plot.ceac <- function(x, ...,

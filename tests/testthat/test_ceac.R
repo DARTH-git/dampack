@@ -12,7 +12,7 @@ test_that("ceac has all methods we'd expect", {
 
 ## setup
 source('load_test_data.R')
-psa_obj <- psa_results(costs, effectiveness, strategies)
+psa_obj <- psa(costs, effectiveness, strategies)
 
 test_that("result has classes 'data.frame' and 'ceac'", {
   c <- ceac(wtp, psa_obj)
@@ -21,7 +21,7 @@ test_that("result has classes 'data.frame' and 'ceac'", {
 })
 
 test_that("handles missing strategy", {
-  psa_missing <- psa_results(costs, effectiveness)
+  psa_missing <- psa(costs, effectiveness)
   c_missing <- ceac(wtp, psa_missing)
   expected_generic_strat <- c("Strategy_1", "Strategy_2", "Strategy_3")
   obtained_generic_strat <- sort(unique(c_missing$Strategy))

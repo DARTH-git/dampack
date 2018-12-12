@@ -4,7 +4,7 @@
 \alias{ceac}
 \title{Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-ceac(wtp, psa_results)
+ceac(wtp, psa)
 }
 \arguments{
 \item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}

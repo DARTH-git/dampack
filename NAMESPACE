@@ -3,6 +3,6 @@
 S3method(plot,ceac)
 S3method(summary,ceac)
 export(ceac)
-export(psa_results)
+export(psa)
 import(ggplot2)
 import(reshape2)

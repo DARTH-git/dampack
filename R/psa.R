@@ -4,7 +4,7 @@
 #' @param effectiveness Matrix with the effectiveness for each simulation (rows) and strategy (columns)
 #' @param strategies String vector with the name of the strategies
 #' @export
-psa_results <- function(cost, effectiveness, strategies=NULL){
+psa <- function(cost, effectiveness, strategies=NULL){
   # argument checking
   # argument checks and defining other variables
   # costs and effectiveness have same number of rows
@@ -42,7 +42,7 @@ psa_results <- function(cost, effectiveness, strategies=NULL){
                   "strategies" = strategies,
                   "n.strategies" = n.strategies,
                   "n.sim" = n.sim)
-  class(psa_obj) <- "psa_results"
+  class(psa_obj) <- "psa"
   return(psa_obj)
 }
 

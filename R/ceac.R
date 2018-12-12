@@ -12,17 +12,17 @@
 #' @import reshape2
 #'
 #' @export
-ceac <- function(wtp, psa_results){
-  # check that psa_results has class 'psa'
-  if (!inherits(psa_results, "psa_results")) {
-    stop(paste0("The psa results parameter must be an object of class `psa_results`.\n",
-                "Please run the psa_results() function to create this object."))
+ceac <- function(wtp, psa){
+  # check that psa has class 'psa'
+  if (!inherits(psa, "psa")) {
+    stop(paste0("The psa results parameter must be an object of class `psa`.\n",
+                "Please run the psa() function to create this object."))
   }
-  strategies <- psa_results$strategies
-  n.strategies <- psa_results$n.strategies
-  effectiveness <- psa_results$effectiveness
-  cost <- psa_results$cost
-  n.sim <- psa_results$n.sim
+  strategies <- psa$strategies
+  n.strategies <- psa$n.strategies
+  effectiveness <- psa$effectiveness
+  cost <- psa$cost
+  n.sim <- psa$n.sim
 
   # number of willingness to pay thresholds
   n.wtps <- length(wtp)

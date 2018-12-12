@@ -1,4 +1,4 @@
-context('psa_results')
+context('psa')
 library(dampack)
 
 # test the class
@@ -13,8 +13,8 @@ effectiveness <- rbind(c(100, 50, 900),
                        c(56, 89, 700))
 strategies <- c("test", "notest", "treat")
 
-test_that('psa_results returns correct object', {
-  psa_obj <- psa_results(costs, effectiveness, strategies)
+test_that('psa returns correct object', {
+  psa_obj <- psa(costs, effectiveness, strategies)
   expect_equal(psa_obj$cost, costs)
   expect_equal(psa_obj$effectiveness, effectiveness)
   expect_equal(psa_obj$strategies, strategies)

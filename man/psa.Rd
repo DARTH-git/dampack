@@ -4,7 +4,7 @@
 \alias{psa}
 \title{An object to hold PSA results.}
 \usage{
-psa(cost, effectiveness, strategies = NULL)
+psa(cost, effectiveness, strategies = NULL, currency = "$")
 }
 \arguments{
 \item{cost}{Matrix with the cost for each simulation (rows) and strategy (columns).}

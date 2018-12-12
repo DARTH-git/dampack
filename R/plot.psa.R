@@ -1,48 +1,71 @@
+#' Plot the psa object
+#'
+#' @param x the psa object
+#' @param ... further arguments to plot (not used)
+#' @param center plot the mean cost and effectiveness for each strategy. defaults to TRUE
+#' @param ellipse plot an ellipse around each strategy. defaults to TRUE
+#'
 #' @importFrom ellipse ellipse
-#' @import plyr
+#' @import dplyr
+#' @import reshape2
+#' @import ggplot2
+#' @importFrom scales dollar_format
 #' @export
-plot.psa <- function(psa) {
-  strategies <- psa$strategies
-  n.strategies <- psa$n.strategies
-  effectiveness <- psa$effectiveness
-  cost <- psa$cost
-  n.sim <- psa$n.sim
+plot.psa <- function(x, ...,
+                     center = TRUE, ellipse = TRUE) {
+  effectiveness <- x$effectiveness
+  cost <- x$cost
+  strategies <- x$strategies
+  currency <- x$currency
 
   # expect that effectiveness and costs have strategy column names
-  df.cost  <- melt(cost, variable.name = "Strategy")
-  levels(df.cost$Strategy) <- strategies
-  df.effect <- melt(effectiveness, variable.name = "Strategy")
-  levels(df.effect$Strategy) <- strategies
-  CE <- cbind(df.cost, df.effect[, 2])
-  colnames(CE) <- c("Strategy", "Cost", "Effectiveness")
+  df.cost <- suppressMessages( # removes confusing 'No id variables; using all as measure variables'
+    melt(cost, variable.name = "Strategy",
+         factorsAsStrings=TRUE,
+         value.name = "Cost")
+  )
+  df.effect <- suppressMessages(
+    melt(effectiveness, variable.name = "Strategy",
+         factorsAsStrings=TRUE,
+         value.name = "Effectiveness")
+  )
+  ce_df <- data.frame("Strategy" = df.cost$Strategy,
+                   "Cost" = df.cost$Cost,
+                   "Effectiveness" = df.effect$Effectiveness)
 
-  # Ellipses code
-  df_ell <- data.frame() #create an empty dataframe
-  # for each level in df$groups
-  for(g in levels(CE$Strategy)) {
-    # create 100 points per variable around the mean of each group
-    df_ell <- rbind(df_ell,
-                    cbind(as.data.frame(with(CE[CE$Strategy == g,],
-                                             ellipse(cor(Effectiveness, Cost),
-                                                     scale = c(sd(Effectiveness), sd(Cost)),
-                                                     centre = c(mean(Effectiveness), mean(Cost)))
-                    )), group = g))
+  psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
+    geom_point(size = 0.7, alpha = 0.2, shape = 21)
+
+  # define strategy-specific means for the center of the ellipse
+  if (center) {
+    strat_means <- ce_df %>%
+      group_by(.data$Strategy) %>%
+      summarize(Cost.mean = mean(.data$Cost),
+                Eff.mean = mean(.data$Effectiveness))
+    psa_plot <- psa_plot +
+      geom_point(data = strat_means, aes_string(x = "Eff.mean", y = "Cost.mean"), size = 8)
   }
-  Means <- ddply(CE,.(Strategy), summarise,
-                 N = length(Cost),
-                 Cost.mean = mean(Cost),
-                 Eff.mean = mean(Effectiveness))
-  #Define ggplot object
-  ggplot(CE, aes(x = Effectiveness, y = Cost, color = Strategy)) +
-    geom_point(size = 0.7, alpha = 0.2, shape = 21) +
-    geom_point(data = Means, aes(x = Eff.mean, y = Cost.mean, shape = Strategy),
-               size = 8, fill = "white") +
-    # geom_text(data = Means,aes(x = Eff.mean, y = Cost.mean, label = 1:length(strategies)), size = 5, colour = "gray", alpha = 1) +
-    geom_path(data = df_ell, aes(x = x, y = y, colour = group), size = 1, linetype = 2, alpha = 1) + # draw ellipse lines
-    ggtitle("Cost-Effectiveness Scatterplot") +
+
+  if (ellipse) {
+    # make points for ellipse plotting
+    df_list_ell <- lapply(strategies, function (s) {
+      strat_specific_df <- ce_df[ce_df$Strategy == s, ]
+      els <-  with(strat_specific_df,
+                   ellipse(cor(Effectiveness, Cost),
+                           scale = c(sd(Effectiveness), sd(Cost)),
+                           centre = c(mean(Effectiveness), mean(Cost))))
+      data.frame(els, group=s, stringsAsFactors = FALSE)
+    })
+    df_ell <- bind_rows(df_list_ell)
+    # draw ellipse lines
+    psa_plot <- psa_plot + geom_path(data = df_ell,
+                                     aes_string(x = "x", y = "y", colour = "group"),
+                                     size = 1, linetype = 2, alpha = 1)
+  }
+
+  # these layers are used for all psa plots
+  psa_plot + ggtitle("Cost-Effectiveness Scatterplot") +
     scale_colour_discrete(l = 50) +  # Use a slightly darker palette than normal
-    # scale_y_continuous(labels = dollar) +
-    # scale_x_continuous(breaks =number_ticks(6)) +
-    theme_bw() +
-    theme(legend.position = "bottom")
+    scale_y_continuous(labels = dollar_format(prefix = currency)) +
+    scale_x_continuous(breaks = number_ticks(6)) + theme_bw()
 }

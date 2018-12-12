@@ -14,10 +14,9 @@
 #' @export
 ceac <- function(wtp, psa){
   # check that psa has class 'psa'
-  if (!inherits(psa, "psa")) {
-    stop(paste0("The psa results parameter must be an object of class `psa`.\n",
-                "Please run the psa() function to create this object."))
-  }
+  check_psa_object(psa)
+
+  # define needed variables
   strategies <- psa$strategies
   n.strategies <- psa$n.strategies
   effectiveness <- psa$effectiveness

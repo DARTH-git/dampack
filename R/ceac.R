@@ -3,6 +3,7 @@
 #' \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 #' curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 #' @param wtp Numeric vector with willingness-to-pay (WTP) thresholds
+#' @param psa A psa object from \code{psa}
 #' @keywords cost-effectiveness acceptability curves
 #' @section Details:
 #' \code{ceac} computes the probability of each of the strategies being

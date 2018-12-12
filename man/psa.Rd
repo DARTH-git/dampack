@@ -12,6 +12,8 @@ psa(cost, effectiveness, strategies = NULL, currency = "$")
 \item{effectiveness}{Matrix with the effectiveness for each simulation (rows) and strategy (columns)}
 
 \item{strategies}{String vector with the name of the strategies}
+
+\item{currency}{symbol for the currency being used (ex. "$", "£")}
 }
 \description{
 An object to hold PSA results.

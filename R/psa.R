@@ -3,6 +3,8 @@
 #' @param cost Matrix with the cost for each simulation (rows) and strategy (columns).
 #' @param effectiveness Matrix with the effectiveness for each simulation (rows) and strategy (columns)
 #' @param strategies String vector with the name of the strategies
+#' @param currency symbol for the currency being used (ex. "$", "£")
+#'
 #' @export
 psa <- function(cost, effectiveness, strategies=NULL, currency = "$"){
   # argument checking
@@ -22,7 +24,7 @@ psa <- function(cost, effectiveness, strategies=NULL, currency = "$"){
   n.sim <- n.sim.costs
 
   # costs and effectiveness have same number of columns
-  n.strategies.costs <- ncol(costs)
+  n.strategies.costs <- ncol(cost)
   n.strategies.effectiveness <- ncol(effectiveness)
   if (n.strategies.costs != n.strategies.effectiveness) {
     stop('The number of columns of the cost and benefit matrices is different and must be the same.')

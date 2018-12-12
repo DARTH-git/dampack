@@ -1,11 +1,11 @@
 
 #' summary function for the ceac object
 #'
-#' @param ceac_obj object returned from the \code{ceac} function
+#' @param object object returned from the \code{ceac} function
 #' @param ... further arguments (not used)
 #' @export
-summary.ceac <- function(ceac_obj, ...){
-  front <- ceac_obj[ceac_obj$On_Frontier == TRUE, ]
+summary.ceac <- function(object, ...){
+  front <- object[object$On_Frontier == TRUE, ]
   n.wtps <- nrow(front)
   strat_on_front <- front$Strategy
   lagged_strat <- c(strat_on_front[-1], strat_on_front[n.wtps])

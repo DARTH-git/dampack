@@ -8,6 +8,8 @@ ceac(wtp, psa)
 }
 \arguments{
 \item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
+
+\item{psa}{A psa object from \code{psa}}
 }
 \value{
 ceac A melted data frame with each strategy's probability of being

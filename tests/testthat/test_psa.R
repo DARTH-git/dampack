@@ -2,7 +2,11 @@ context('psa')
 library(dampack)
 
 # test the class
-# todo
+test_that("psa has all methods we'd expect", {
+  current_methods <- as.vector(methods(class = psa))
+  expected_methods <- c("plot.psa", "print.psa")
+  expect_equal(current_methods, expected_methods)
+})
 
 # class creation
 
@@ -13,20 +17,39 @@ effectiveness <- data.frame(rbind(c(100, 50, 900),
                        c(56, 89, 700)))
 strategies <- c("test", "notest", "treat")
 names(costs) <- names(effectiveness) <- strategies
-
+psa_small <- psa(costs, effectiveness, strategies)
 test_that('psa returns correct object', {
-  psa_obj <- psa(costs, effectiveness, strategies)
-  expect_equal(psa_obj$cost, costs)
-  expect_equal(psa_obj$effectiveness, effectiveness)
-  expect_equal(psa_obj$strategies, strategies)
-  expect_equal(psa_obj$n.strategies, 3)
-  expect_equal(psa_obj$n.sim, 2)
+  expect_equal(psa_small$cost, costs)
+  expect_equal(psa_small$effectiveness, effectiveness)
+  expect_equal(psa_small$strategies, strategies)
+  expect_equal(psa_small$n.strategies, 3)
+  expect_equal(psa_small$n.sim, 2)
 })
 
 ## methods
-context("ceac")
 
-## setup
+# plot
 source('load_test_data.R')
-psa_obj <- psa(costs, effectiveness, strategies)
+psa_big <- psa(costs, effectiveness, strategies)
+test_that('plot.psa runs', {
+  plot(psa_big)
+  plot(psa_big, center=FALSE)
+  plot(psa_big, ellipse=FALSE)
+  plot(psa_big, center=FALSE, ellipse=FALSE)
+})
 
+# print
+# use small example from above
+test_that("print.psa returns correct output", {
+  msg <- capture.output(print(psa_small))
+  expected <- c("",
+                "PSA object ",
+                "------------------------------------------------- ",
+                "cost: a data frame with 2 rows and 3 columns. ",
+                "currency: $ ",
+                "effectiveness: a data frame with 2 rows and 3 columns. ",
+                "number of strategies (n.strategies): 3 ",
+                "number of simulations (n.sim): 2 " ,
+                "strategies: test, notest, treat  ")
+  expect_equal(msg, expected)
+})

@@ -48,9 +48,9 @@ psa <- function(cost, effectiveness, strategies=NULL, currency = "$"){
   psa_obj <- list("cost" = cost,
                   "currency" = currency,
                   "effectiveness" = effectiveness,
-                  "strategies" = strategies,
                   "n.strategies" = n.strategies,
-                  "n.sim" = n.sim)
+                  "n.sim" = n.sim,
+                  "strategies" = strategies)
   class(psa_obj) <- "psa"
   return(psa_obj)
 }

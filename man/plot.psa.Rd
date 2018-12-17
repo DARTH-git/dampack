@@ -4,7 +4,8 @@
 \alias{plot.psa}
 \title{Plot the psa object}
 \usage{
-\method{plot}{psa}(x, ..., center = TRUE, ellipse = TRUE)
+\method{plot}{psa}(x, ..., center = TRUE, ellipse = TRUE,
+  title = "Cost-Effectiveness Scatterplot", alpha = 0.2)
 }
 \arguments{
 \item{x}{the psa object}
@@ -14,6 +15,11 @@
 \item{center}{plot the mean cost and effectiveness for each strategy. defaults to TRUE}
 
 \item{ellipse}{plot an ellipse around each strategy. defaults to TRUE}
+
+\item{title}{title for the plot}
+
+\item{alpha}{opacity of the scatterplot points.
+0 is completely transparent, 1 is completely opaque}
 }
 \description{
 Plot the psa object

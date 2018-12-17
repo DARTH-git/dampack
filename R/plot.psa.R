@@ -4,6 +4,9 @@
 #' @param ... further arguments to plot (not used)
 #' @param center plot the mean cost and effectiveness for each strategy. defaults to TRUE
 #' @param ellipse plot an ellipse around each strategy. defaults to TRUE
+#' @param title title for the plot
+#' @param alpha opacity of the scatterplot points.
+#' 0 is completely transparent, 1 is completely opaque
 #'
 #' @importFrom ellipse ellipse
 #' @import dplyr
@@ -12,7 +15,8 @@
 #' @importFrom scales dollar_format
 #' @export
 plot.psa <- function(x, ...,
-                     center = TRUE, ellipse = TRUE) {
+                     center = TRUE, ellipse = TRUE, title="Cost-Effectiveness Scatterplot",
+                     alpha = 0.2) {
   effectiveness <- x$effectiveness
   cost <- x$cost
   strategies <- x$strategies
@@ -34,7 +38,7 @@ plot.psa <- function(x, ...,
                    "Effectiveness" = df.effect$Effectiveness)
 
   psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
-    geom_point(size = 0.7, alpha = 0.2, shape = 21)
+    geom_point(size = 0.7, alpha = alpha, shape = 21)
 
   # define strategy-specific means for the center of the ellipse
   if (center) {
@@ -43,7 +47,9 @@ plot.psa <- function(x, ...,
       summarize(Cost.mean = mean(.data$Cost),
                 Eff.mean = mean(.data$Effectiveness))
     psa_plot <- psa_plot +
-      geom_point(data = strat_means, aes_string(x = "Eff.mean", y = "Cost.mean"), size = 8)
+      geom_point(data = strat_means,
+                 aes_string(x = "Eff.mean", y = "Cost.mean", fill = "Strategy"),
+                 size = 8, shape = 21, color = "black")
   }
 
   if (ellipse) {
@@ -64,8 +70,9 @@ plot.psa <- function(x, ...,
   }
 
   # these layers are used for all psa plots
-  psa_plot + ggtitle("Cost-Effectiveness Scatterplot") +
+  psa_plot + ggtitle(title) +
     scale_colour_discrete(l = 50) +  # Use a slightly darker palette than normal
+    scale_fill_discrete(l = 50) +
     scale_y_continuous(labels = dollar_format(prefix = currency)) +
     scale_x_continuous(breaks = number_ticks(6)) + theme_bw()
 }

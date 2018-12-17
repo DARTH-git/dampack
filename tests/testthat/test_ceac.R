@@ -5,7 +5,7 @@ library(dampack)
 test_that("ceac has all methods we'd expect", {
   current_methods <- as.vector(methods(class = ceac))
   expected_methods <- c("plot.ceac", "summary.ceac")
-  expect_equal(current_methods, expected_methods)
+  expect_setequal(current_methods, expected_methods)
 })
 
 # test class creation
@@ -14,7 +14,7 @@ test_that("ceac has all methods we'd expect", {
 source('load_test_data.R')
 psa_obj <- psa(costs, effectiveness, strategies)
 
-test_that("result has classes 'data.frame' and 'ceac'", {
+test_that("result has class 'ceac'", {
   c <- ceac(wtp, psa_obj)
   expect_true(inherits(c, "data.frame"))
   expect_true(inherits(c, "ceac"))
@@ -34,10 +34,8 @@ test_that("handles missing strategy", {
 ## summary
 test_that("message is correct in summary.ceac", {
   c <- ceac(wtp, psa_obj)
-  msg <- capture.output(summary(c))
-  expected <- c("There was one switch in the optimal strategy.",
-                "At WTP = 51000 the optimal strategy changed from Radio to Chemo")
-  expect_equal(expected, msg)
+  sum_df <- summary(c)
+  expect_equal(sum_df$cost_eff_strat, c("Radio", "Chemo"))
 })
 
 ## plot
@@ -45,6 +43,6 @@ test_that("plot.ceac produces ggplot object", {
   ceac_obj <- ceac(wtp, psa_obj)
   gf <- plot(ceac_obj, frontier = TRUE)
   expect_true(inherits(gf, "ggplot"))
-  gnof <- plot(ceac_obj, rontier = FALSE)
+  gnof <- plot(ceac_obj, frontier = FALSE)
   expect_true(inherits(gnof, "ggplot"))
 })

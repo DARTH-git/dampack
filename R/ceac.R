@@ -67,6 +67,9 @@ ceac <- function(wtp, psa){
   # order by WTP
   ceac <- ceac[order(ceac$WTP), ]
 
+  # remove rownames
+  rownames(ceac) <- NULL
+
   # Return a data frame of class ceac
   class(ceac) <- c("ceac", "data.frame")
   return(ceac)

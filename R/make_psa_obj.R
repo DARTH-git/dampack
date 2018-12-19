@@ -45,12 +45,12 @@ make_psa_obj <- function(cost, effectiveness, strategies=NULL, currency = "$"){
   # define cost and effectiveness column names using strategies
   names(cost) <- names(effectiveness) <- strategies
   # define psa as a named list
-  psa_obj <- list("cost" = cost,
-                  "currency" = currency,
-                  "effectiveness" = effectiveness,
-                  "n.strategies" = n.strategies,
+  psa_obj <- list("n.strategies" = n.strategies,
+                  "strategies" = strategies,
                   "n.sim" = n.sim,
-                  "strategies" = strategies)
+                  "cost" = cost,
+                  "effectiveness" = effectiveness,
+                  "currency" = currency)
   class(psa_obj) <- "psa"
   return(psa_obj)
 }

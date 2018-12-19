@@ -45,11 +45,11 @@ test_that("print.psa returns correct output", {
   expected <- c("",
                 "PSA object ",
                 "------------------------------------------------- ",
-                "cost: a data frame with 2 rows and 3 columns. ",
-                "currency: $ ",
-                "effectiveness: a data frame with 2 rows and 3 columns. ",
                 "number of strategies (n.strategies): 3 ",
-                "number of simulations (n.sim): 2 " ,
-                "strategies: test, notest, treat  ")
+                "strategies: test, notest, treat  ",
+                "number of simulations (n.sim): 2 ",
+                "cost: a data frame with 2 rows and 3 columns. ",
+                "effectiveness: a data frame with 2 rows and 3 columns. ",
+                "currency: $ ")
   expect_equal(msg, expected)
 })

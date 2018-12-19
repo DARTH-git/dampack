@@ -54,9 +54,18 @@ plot.ceac <- function(x, ...,
     diff_strat <- setdiff(old_strat, strat_to_keep)
     n_diff_strat <- length(diff_strat)
     if (n_diff_strat > 0) {
+      # report strategies filtered out
       cat('filtered out ', n_diff_strat, ' strategies with max prob below ', min_prob, ':\n',
-          paste(diff_strat, collapse=","), sep="")
+          paste(diff_strat, collapse=","), '\n', sep="")
+
+      # report if any filtered strategies are on the frontier
+      df_filt <- filter(x, .data$Strategy %in% diff_strat & .data$On_Frontier)
+      if (nrow(df_filt) > 0) {
+        cat(paste0('WARNING - some strategies that were filtered out are on the frontier:\n',
+                   paste(unique(df_filt$Strategy), collapse=","), '\n'))
+      }
     }
+
     # filter dataframe
     x <- filter(x, .data$Strategy %in% strat_to_keep)
   }

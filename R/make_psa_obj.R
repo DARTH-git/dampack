@@ -6,7 +6,7 @@
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'
 #' @export
-psa <- function(cost, effectiveness, strategies=NULL, currency = "$"){
+make_psa_obj <- function(cost, effectiveness, strategies=NULL, currency = "$"){
   # argument checking
   orig_cost_name <- deparse(substitute(cost))
   orig_eff_name <- deparse(substitute(effectiveness))

@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{ceac}(x, ..., frontier = TRUE,
   title = "Cost-Effectiveness Acceptability Curves", txtsize = 12,
-  currency = "$", threshold = 0)
+  currency = "$", min_prob = 0)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -23,8 +23,8 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{currency}{String with currency used in the cost-effectiveness analysis (CEA).}
 
-\item{threshold}{minimum probability to show strategy in plot.
-For example, if the threshold is 0.05, only strategies that ever
+\item{min_prob}{minimum probability to show strategy in plot.
+For example, if the min_prob is 0.05, only strategies that ever
 exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
 with many strategies.
 

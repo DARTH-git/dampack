@@ -20,7 +20,7 @@ print.psa <- function(x, ..., all_strat = FALSE) {
   cat("number of strategies (n.strategies):", x$n.strategies, "\n")
   cat("number of simulations (n.sim):", x$n.sim, "\n")
   n_trunc <- 5
-  if (all_strat | x$n.strategies < n_trunc) {
+  if (all_strat | (x$n.strategies <= n_trunc)) {
     s2print <- x$strategies
     msg <- ""
   } else {

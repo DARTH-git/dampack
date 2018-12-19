@@ -9,8 +9,8 @@
 #' @param title String with graph's title
 #' @param txtsize number with text size
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
-#' @param threshold minimum probability to show strategy in plot.
-#' For example, if the threshold is 0.05, only strategies that ever
+#' @param min_prob minimum probability to show strategy in plot.
+#' For example, if the min_prob is 0.05, only strategies that ever
 #' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
 #' with many strategies.
 #'
@@ -29,24 +29,24 @@ plot.ceac <- function(x, ...,
                       title = "Cost-Effectiveness Acceptability Curves",
                       txtsize = 12,
                       currency = "$",
-                      threshold = 0){
+                      min_prob = 0){
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"
   x$WTP_thou <- x[, wtp_name]/1000
 
-  # removing strategies with probabilities always below `threshold`
+  # removing strategies with probabilities always below `min_prob`
   # get group-wise max probability
-  if (threshold > 0) {
+  if (min_prob > 0) {
     max_prob <- x %>%
       group_by(.data$Strategy) %>%
       summarize(maxpr = max(.data$Proportion)) %>%
-      filter(.data$maxpr >= threshold)
+      filter(.data$maxpr >= min_prob)
     strat_to_keep <- max_prob$Strategy
     if (length(strat_to_keep) == 0) {
       stop(
-        paste('no strategies remaining. you may want to lower your threshold value (currently ',
-              threshold, ")", sep="")
+        paste('no strategies remaining. you may want to lower your min_prob value (currently ',
+              min_prob, ")", sep="")
       )
     }
     # report filtered out strategies
@@ -54,7 +54,7 @@ plot.ceac <- function(x, ...,
     diff_strat <- setdiff(old_strat, strat_to_keep)
     n_diff_strat <- length(diff_strat)
     if (n_diff_strat > 0) {
-      cat('filtered out ', n_diff_strat, ' strategies with max prob below ', threshold, ':\n',
+      cat('filtered out ', n_diff_strat, ' strategies with max prob below ', min_prob, ':\n',
           paste(diff_strat, collapse=","), sep="")
     }
     # filter dataframe

@@ -3,7 +3,7 @@ library(dampack)
 
 # test the class
 test_that("psa has all methods we'd expect", {
-  current_methods <- as.vector(methods(class = psa))
+  current_methods <- as.vector(methods(class = "psa"))
   expected_methods <- c("plot.psa", "print.psa")
   expect_equal(current_methods, expected_methods)
 })
@@ -17,7 +17,7 @@ effectiveness <- data.frame(rbind(c(100, 50, 900),
                        c(56, 89, 700)))
 strategies <- c("test", "notest", "treat")
 names(costs) <- names(effectiveness) <- strategies
-psa_small <- psa(costs, effectiveness, strategies)
+psa_small <- make_psa_obj(costs, effectiveness, strategies)
 test_that('psa returns correct object', {
   expect_equal(psa_small$cost, costs)
   expect_equal(psa_small$effectiveness, effectiveness)
@@ -30,7 +30,7 @@ test_that('psa returns correct object', {
 
 # plot
 source('load_test_data.R')
-psa_big <- psa(costs, effectiveness, strategies)
+psa_big <- make_psa_obj(costs, effectiveness, strategies)
 test_that('plot.psa runs', {
   plot(psa_big)
   plot(psa_big, center=FALSE)

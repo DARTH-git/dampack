@@ -35,15 +35,15 @@ ceac <- function(wtp, psa){
   frontv <- rep(0, n.wtps)
 
   for (l in 1:length(wtp)) {
-    nhb <-  effectiveness - cost/wtp[l] # Effectiveness minus cost, with vector indexing
+    nmb <-  wtp[l]*effectiveness - cost # net monetary benefit at wtp[l]
     # find best strategy for each simulation
-    max.nhb <- max.col(nhb)
-    opt <- table(max.nhb)
+    max.nmb <- max.col(nmb)
+    opt <- table(max.nmb)
     cea[l, as.numeric(names(opt))] <- opt/n.sim
 
     # calculate point on CEAF
-    # the strategy with the highest expected NHB
-    frontv[l] <- which.max(colMeans(nhb))
+    # the strategy with the highest expected nmb
+    frontv[l] <- which.max(colMeans(nmb))
   }
 
   # make cea df

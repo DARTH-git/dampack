@@ -19,7 +19,10 @@ Depends:
 Imports:
     reshape2,
     matrixStats,
-    ggplot2
+    ggplot2,
+    ellipse,
+    dplyr,
+    scales
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests:

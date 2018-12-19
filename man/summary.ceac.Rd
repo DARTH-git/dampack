@@ -4,10 +4,10 @@
 \alias{summary.ceac}
 \title{summary function for the ceac object}
 \usage{
-\method{summary}{ceac}(ceac_obj, ...)
+\method{summary}{ceac}(object, ...)
 }
 \arguments{
-\item{ceac_obj}{object returned from the \code{ceac} function}
+\item{object}{object returned from the \code{ceac} function}
 
 \item{...}{further arguments (not used)}
 }

@@ -4,9 +4,9 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, ..., frontier = FALSE,
+\method{plot}{ceac}(x, ..., frontier = TRUE,
   title = "Cost-Effectiveness Acceptability Curves", txtsize = 12,
-  currency = "$")
+  currency = "$", min_prob = 0)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -21,7 +21,13 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{txtsize}{number with text size}
 
-\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
+\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).}
+
+\item{min_prob}{minimum probability to show strategy in plot.
+For example, if the min_prob is 0.05, only strategies that ever
+exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
+with many strategies.
+
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 }
 \value{

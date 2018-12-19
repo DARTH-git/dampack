@@ -9,6 +9,11 @@
 #' @param title String with graph's title
 #' @param txtsize number with text size
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#' @param min_prob minimum probability to show strategy in plot.
+#' For example, if the min_prob is 0.05, only strategies that ever
+#' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
+#' with many strategies.
+#'
 #' Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
 #' @keywords cost-effectiveness acceptability curves
 #' @section Details:
@@ -16,17 +21,54 @@
 #' cost-effective at each \code{wtp} value.
 #' @return ceac.gg A \code{ggplot2} object with the CEAC
 #' @import ggplot2
+#' @import dplyr
 #'
 #' @export
 plot.ceac <- function(x, ...,
-                      frontier = FALSE,
+                      frontier = TRUE,
                       title = "Cost-Effectiveness Acceptability Curves",
                       txtsize = 12,
-                      currency = "$"){
+                      currency = "$",
+                      min_prob = 0){
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"
   x$WTP_thou <- x[, wtp_name]/1000
+
+  # removing strategies with probabilities always below `min_prob`
+  # get group-wise max probability
+  if (min_prob > 0) {
+    max_prob <- x %>%
+      group_by(.data$Strategy) %>%
+      summarize(maxpr = max(.data$Proportion)) %>%
+      filter(.data$maxpr >= min_prob)
+    strat_to_keep <- max_prob$Strategy
+    if (length(strat_to_keep) == 0) {
+      stop(
+        paste('no strategies remaining. you may want to lower your min_prob value (currently ',
+              min_prob, ")", sep="")
+      )
+    }
+    # report filtered out strategies
+    old_strat <- unique(x$Strategy)
+    diff_strat <- setdiff(old_strat, strat_to_keep)
+    n_diff_strat <- length(diff_strat)
+    if (n_diff_strat > 0) {
+      # report strategies filtered out
+      cat('filtered out ', n_diff_strat, ' strategies with max prob below ', min_prob, ':\n',
+          paste(diff_strat, collapse=","), '\n', sep="")
+
+      # report if any filtered strategies are on the frontier
+      df_filt <- filter(x, .data$Strategy %in% diff_strat & .data$On_Frontier)
+      if (nrow(df_filt) > 0) {
+        cat(paste0('WARNING - some strategies that were filtered out are on the frontier:\n',
+                   paste(unique(df_filt$Strategy), collapse=","), '\n'))
+      }
+    }
+
+    # filter dataframe
+    x <- filter(x, .data$Strategy %in% strat_to_keep)
+  }
   p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
                            y = as.name(prop_name),
                           color = as.name(strat_name),
@@ -36,6 +78,7 @@ plot.ceac <- function(x, ...,
     ggtitle(title) +
     scale_colour_hue(l = 50) +
     scale_x_continuous(breaks = number_ticks(20)) +
+    scale_y_continuous(limits = c(0, 1)) +
     xlab(paste("Willingness to Pay (Thousand ", currency, "/QALY)", sep = "")) +
     ylab("Pr Cost-Effective") +
     theme_bw() +

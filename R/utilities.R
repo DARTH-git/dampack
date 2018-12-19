@@ -12,3 +12,4 @@ number_ticks <- function(n) {
     pretty(limits, n)
   }
 }
+

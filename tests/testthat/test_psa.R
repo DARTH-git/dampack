@@ -1,4 +1,4 @@
-context('psa')
+context("psa")
 library(dampack)
 
 # test the class
@@ -18,24 +18,24 @@ effectiveness <- data.frame(rbind(c(100, 50, 900),
 strategies <- c("test", "notest", "treat")
 names(costs) <- names(effectiveness) <- strategies
 psa_small <- make_psa_obj(costs, effectiveness, strategies)
-test_that('psa returns correct object', {
+test_that("psa returns correct object", {
   expect_equal(psa_small$cost, costs)
   expect_equal(psa_small$effectiveness, effectiveness)
   expect_equal(psa_small$strategies, strategies)
-  expect_equal(psa_small$n.strategies, 3)
-  expect_equal(psa_small$n.sim, 2)
+  expect_equal(psa_small$n_strategies, 3)
+  expect_equal(psa_small$n_sim, 2)
 })
 
 ## methods
 
 # plot
-source('load_test_data.R')
+source("load_test_data.R")
 psa_big <- make_psa_obj(costs, effectiveness, strategies)
-test_that('plot.psa runs', {
+test_that("plot.psa runs", {
   plot(psa_big)
-  plot(psa_big, center=FALSE)
-  plot(psa_big, ellipse=FALSE)
-  plot(psa_big, center=FALSE, ellipse=FALSE)
+  plot(psa_big, center = FALSE)
+  plot(psa_big, ellipse = FALSE)
+  plot(psa_big, center = FALSE, ellipse = FALSE)
 })
 
 # print
@@ -45,9 +45,9 @@ test_that("print.psa returns correct output", {
   expected <- c("",
                 "PSA object ",
                 "------------------------------------------------- ",
-                "number of strategies (n.strategies): 3 ",
+                "number of strategies (n_strategies): 3 ",
                 "strategies: test, notest, treat  ",
-                "number of simulations (n.sim): 2 ",
+                "number of simulations (n_sim): 2 ",
                 "cost: a data frame with 2 rows and 3 columns. ",
                 "effectiveness: a data frame with 2 rows and 3 columns. ",
                 "currency: $ ")

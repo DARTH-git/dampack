@@ -1,5 +1,5 @@
 
-source('tests/testthat/load_test_data.R')
+source("tests/testthat/load_test_data.R")
 
 psa_big <- make_psa_obj(costs, effectiveness, strategies)
 
@@ -9,11 +9,10 @@ summary(psa_big)
 
 plot(psa_big)
 
-ca <- ceac(wtp, psa_obj)
+ca <- ceac(wtp, psa_big)
 
 print(ca)
 
 summary(ca)
 
 plot(ca, min_prob = 0.5)
-

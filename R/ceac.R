@@ -19,27 +19,27 @@ ceac <- function(wtp, psa){
 
   # define needed variables
   strategies <- psa$strategies
-  n.strategies <- psa$n.strategies
+  n_strategies <- psa$n_strategies
   effectiveness <- psa$effectiveness
   cost <- psa$cost
-  n.sim <- psa$n.sim
+  n_sim <- psa$n_sim
 
   # number of willingness to pay thresholds
-  n.wtps <- length(wtp)
+  n_wtps <- length(wtp)
 
   # matrices to store probability optimal for each strategy (cea)
-  cea <- matrix(0, nrow = n.wtps, ncol = n.strategies)
+  cea <- matrix(0, nrow = n_wtps, ncol = n_strategies)
   colnames(cea) <- strategies
 
   # vector to store strategy at the cost-effectiveness acceptability frontier
-  frontv <- rep(0, n.wtps)
+  frontv <- rep(0, n_wtps)
 
   for (l in 1:length(wtp)) {
-    nmb <-  wtp[l]*effectiveness - cost # net monetary benefit at wtp[l]
+    nmb <-  wtp[l] * effectiveness - cost # net monetary benefit at wtp[l]
     # find best strategy for each simulation
     max.nmb <- max.col(nmb)
     opt <- table(max.nmb)
-    cea[l, as.numeric(names(opt))] <- opt/n.sim
+    cea[l, as.numeric(names(opt))] <- opt / n_sim
 
     # calculate point on CEAF
     # the strategy with the highest expected nmb

@@ -7,14 +7,14 @@
 #'
 #' @export
 print.psa <- function(x, ..., all_strat = FALSE) {
-  cat('\n')
+  cat("\n")
   cat("PSA object", "\n")
   cat("-------------------------------------------------", "\n")
 
   # cost
-  cat("number of strategies (n.strategies):", x$n.strategies, "\n")
+  cat("number of strategies (n_strategies):", x$n_strategies, "\n")
   n_trunc <- 5
-  if (all_strat | (x$n.strategies <= n_trunc)) {
+  if (all_strat | (x$n_strategies <= n_trunc)) {
     s2print <- x$strategies
     msg <- ""
   } else {
@@ -23,7 +23,7 @@ print.psa <- function(x, ..., all_strat = FALSE) {
   }
   s_collapsed <- paste(s2print, collapse = ", ")
   cat("strategies:", s_collapsed, msg, "\n")
-  cat("number of simulations (n.sim):", x$n.sim, "\n")
+  cat("number of simulations (n_sim):", x$n_sim, "\n")
   cat("cost: a data frame with", nrow(x$cost), "rows and", ncol(x$cost), "columns.", "\n")
   cat("effectiveness: a data frame with",
       nrow(x$effectiveness), "rows and",

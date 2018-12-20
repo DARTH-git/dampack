@@ -15,39 +15,41 @@ make_psa_obj <- function(cost, effectiveness, strategies=NULL, currency = "$"){
 
   # argument checks and defining other variables
   # costs and effectiveness have same number of rows
-  n.sim.costs <- nrow(cost)
-  n.sim.effectiveness <- nrow(effectiveness)
-  if (n.sim.costs != n.sim.effectiveness) {
-    stop('The number of rows of the cost and benefit matrices is different and must be the same.')
+  n_sim_costs <- nrow(cost)
+  n_sim_effectiveness <- nrow(effectiveness)
+  if (n_sim_costs != n_sim_effectiveness) {
+    stop("The number of rows of the cost and benefit matrices is different and must be the same.")
   }
-  # define n.sim (could be either n.sim.costs or n.sim.effectiveness)
-  n.sim <- n.sim.costs
+  # define n_sim (could be either n_sim_costs or n_sim_effectiveness)
+  n_sim <- n_sim_costs
 
   # costs and effectiveness have same number of columns
-  n.strategies.costs <- ncol(cost)
-  n.strategies.effectiveness <- ncol(effectiveness)
-  if (n.strategies.costs != n.strategies.effectiveness) {
-    stop('The number of columns of the cost and benefit matrices is different and must be the same.')
+  n_strategies_costs <- ncol(cost)
+  n_strategies_effectiveness <- ncol(effectiveness)
+  if (n_strategies_costs != n_strategies_effectiveness) {
+    stop("The number of columns of the cost and benefit matrices is different and must be the same.")
   }
-  # define n.strat (could be either n.sim.costs or n.sim.effectiveness)
-  n.strategies <- n.strategies.costs
+  # define n.strat (could be either n_sim_costs or n_sim_effectiveness)
+  n_strategies <- n_strategies_costs
 
   # If the name of the strategies is not provided, generate a generic vector
   # with strategy names
   if (is.null(strategies)) {
-    strategies <- paste(rep("Strategy_", n.strategies), seq(1, n.strategies), sep = "")
+    strategies <- paste(rep("Strategy_", n_strategies), seq(1, n_strategies), sep = "")
   } else {
     # make sure strategies is the same length as the number of columns
-    if (n.strategies != length(strategies)) {
-      stop('The number of columns in the cost and effectiveness matrices is different from the number of strategies provided')
+    if (n_strategies != length(strategies)) {
+      stop(
+        paste0("The number of columns in the cost and effectiveness",
+               "matrices is different from the number of strategies provided"))
     }
   }
   # define cost and effectiveness column names using strategies
   names(cost) <- names(effectiveness) <- strategies
   # define psa as a named list
-  psa_obj <- list("n.strategies" = n.strategies,
+  psa_obj <- list("n_strategies" = n_strategies,
                   "strategies" = strategies,
-                  "n.sim" = n.sim,
+                  "n_sim" = n_sim,
                   "cost" = cost,
                   "effectiveness" = effectiveness,
                   "currency" = currency)

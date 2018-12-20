@@ -33,7 +33,7 @@ plot.ceac <- function(x, ...,
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"
-  x$WTP_thou <- x[, wtp_name]/1000
+  x$WTP_thou <- x[, wtp_name] / 1000
 
   # removing strategies with probabilities always below `min_prob`
   # get group-wise max probability
@@ -45,8 +45,8 @@ plot.ceac <- function(x, ...,
     strat_to_keep <- max_prob$Strategy
     if (length(strat_to_keep) == 0) {
       stop(
-        paste('no strategies remaining. you may want to lower your min_prob value (currently ',
-              min_prob, ")", sep="")
+        paste("no strategies remaining. you may want to lower your min_prob value (currently ",
+              min_prob, ")", sep = "")
       )
     }
     # report filtered out strategies
@@ -55,14 +55,14 @@ plot.ceac <- function(x, ...,
     n_diff_strat <- length(diff_strat)
     if (n_diff_strat > 0) {
       # report strategies filtered out
-      cat('filtered out ', n_diff_strat, ' strategies with max prob below ', min_prob, ':\n',
-          paste(diff_strat, collapse=","), '\n', sep="")
+      cat("filtered out ", n_diff_strat, " strategies with max prob below ", min_prob, ":\n",
+          paste(diff_strat, collapse = ","), "\n", sep = "")
 
       # report if any filtered strategies are on the frontier
       df_filt <- filter(x, .data$Strategy %in% diff_strat & .data$On_Frontier)
       if (nrow(df_filt) > 0) {
-        cat(paste0('WARNING - some strategies that were filtered out are on the frontier:\n',
-                   paste(unique(df_filt$Strategy), collapse=","), '\n'))
+        cat(paste0("WARNING - some strategies that were filtered out are on the frontier:\n",
+                   paste(unique(df_filt$Strategy), collapse = ","), "\n"))
       }
     }
 
@@ -79,7 +79,7 @@ plot.ceac <- function(x, ...,
     scale_colour_hue(l = 50) +
     scale_x_continuous(breaks = number_ticks(20)) +
     scale_y_continuous(limits = c(0, 1)) +
-    xlab(paste("Willingness to Pay (Thousand ", currency, "/QALY)", sep = "")) +
+    xlab(paste("Willingness to Pay (Thousand ", currency, "/ QALY)", sep = "")) +
     ylab("Pr Cost-Effective") +
     theme_bw() +
     common_theme(txtsize)

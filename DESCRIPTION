@@ -23,7 +23,8 @@ Imports:
     ellipse,
     dplyr,
     scales
+Suggests:
+    testthat,
+    lintr
 LazyData: true
 RoxygenNote: 6.1.1
-Suggests:
-    testthat

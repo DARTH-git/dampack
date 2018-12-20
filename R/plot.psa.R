@@ -26,12 +26,12 @@ plot.psa <- function(x, ...,
   # expect that effectiveness and costs have strategy column names
   df.cost <- suppressMessages( # removes confusing 'No id variables; using all as measure variables'
     melt(cost, variable.name = "Strategy",
-         factorsAsStrings=TRUE,
+         factorsAsStrings = TRUE,
          value.name = "Cost")
   )
   df.effect <- suppressMessages(
     melt(effectiveness, variable.name = "Strategy",
-         factorsAsStrings=TRUE,
+         factorsAsStrings = TRUE,
          value.name = "Effectiveness")
   )
   ce_df <- data.frame("Strategy" = df.cost$Strategy,
@@ -61,7 +61,7 @@ plot.psa <- function(x, ...,
                    ellipse(cor(Effectiveness, Cost),
                            scale = c(sd(Effectiveness), sd(Cost)),
                            centre = c(mean(Effectiveness), mean(Cost))))
-      data.frame(els, group=s, stringsAsFactors = FALSE)
+      data.frame(els, group = s, stringsAsFactors = FALSE)
     })
     df_ell <- bind_rows(df_list_ell)
     # draw ellipse lines

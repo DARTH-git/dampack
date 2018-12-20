@@ -11,7 +11,7 @@ test_that("ceac has all methods we'd expect", {
 # test class creation
 
 ## setup
-source('load_test_data.R')
+source("load_test_data.R")
 psa_obj <- make_psa_obj(costs, effectiveness, strategies)
 
 test_that("result has class 'ceac'", {

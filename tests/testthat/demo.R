@@ -17,3 +17,6 @@ summary(ca)
 
 plot(ca, min_prob = 0.5)
 
+# evpi
+evpi <- calc_evpi(wtp, psa_big)
+plot(evpi)

@@ -23,7 +23,6 @@ plot.evpi <- function(x, ...,
   x$WTP_thou <- x$WTP/1000
   ggplot(data = x,
          aes_(x = as.name("WTP_thou"), y = as.name("EVPI"))) +
-    geom_point() +
     geom_line() +
     ggtitle(title) +
     scale_x_continuous(labels = comma, breaks = number_ticks(20))+

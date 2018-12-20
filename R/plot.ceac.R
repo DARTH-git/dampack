@@ -82,13 +82,7 @@ plot.ceac <- function(x, ...,
     xlab(paste("Willingness to Pay (Thousand ", currency, "/QALY)", sep = "")) +
     ylab("Pr Cost-Effective") +
     theme_bw() +
-    theme(legend.title = element_text(size = txtsize),
-          legend.text = element_text(size = txtsize - 3),
-          title = element_text(face = "bold", size = 14),
-          axis.title.x = element_text(face = "bold", size = txtsize),
-          axis.title.y = element_text(face = "bold", size = txtsize),
-          axis.text.y = element_text(size = txtsize),
-          axis.text.x = element_text(size = txtsize))
+    common_theme(txtsize)
   if (frontier) {
     front <- x[x$On_Frontier, ]
     p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),

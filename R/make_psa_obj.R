@@ -58,7 +58,7 @@ make_psa_obj <- function(cost, effectiveness, strategies=NULL, currency = "$"){
 check_psa_object <- function(psa) {
   if (!inherits(psa, "psa")) {
     stop(paste0("The psa results parameter must be an object of class `psa`.\n",
-                "Please run the psa() function to create this object."))
+                "Please run the make_psa() function to create this object."))
   }
 }
 

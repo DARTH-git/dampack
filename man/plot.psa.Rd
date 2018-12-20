@@ -5,7 +5,8 @@
 \title{Plot the psa object}
 \usage{
 \method{plot}{psa}(x, ..., center = TRUE, ellipse = TRUE,
-  title = "Cost-Effectiveness Scatterplot", alpha = 0.2)
+  title = "Cost-Effectiveness Scatterplot", alpha = 0.2,
+  txtsize = 12)
 }
 \arguments{
 \item{x}{the psa object}
@@ -20,6 +21,8 @@
 
 \item{alpha}{opacity of the scatterplot points.
 0 is completely transparent, 1 is completely opaque}
+
+\item{txtsize}{base textsize}
 }
 \description{
 Plot the psa object

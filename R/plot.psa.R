@@ -7,6 +7,7 @@
 #' @param title title for the plot
 #' @param alpha opacity of the scatterplot points.
 #' 0 is completely transparent, 1 is completely opaque
+#' @param txtsize base textsize
 #'
 #' @importFrom ellipse ellipse
 #' @import dplyr
@@ -16,7 +17,7 @@
 #' @export
 plot.psa <- function(x, ...,
                      center = TRUE, ellipse = TRUE, title="Cost-Effectiveness Scatterplot",
-                     alpha = 0.2) {
+                     alpha = 0.2, txtsize=12) {
   effectiveness <- x$effectiveness
   cost <- x$cost
   strategies <- x$strategies
@@ -74,5 +75,5 @@ plot.psa <- function(x, ...,
     scale_colour_discrete(l = 50) +  # Use a slightly darker palette than normal
     scale_fill_discrete(l = 50) +
     scale_y_continuous(labels = dollar_format(prefix = currency)) +
-    scale_x_continuous(breaks = number_ticks(6)) + theme_bw()
+    scale_x_continuous(breaks = number_ticks(6)) + common_theme(txtsize)
 }

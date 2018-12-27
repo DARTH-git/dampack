@@ -4,7 +4,7 @@ library(dampack)
 # test the class
 test_that("psa has all methods we'd expect", {
   current_methods <- as.vector(methods(class = "psa"))
-  expected_methods <- c("plot.psa", "print.psa")
+  expected_methods <- c("plot.psa", "print.psa", "summary.psa")
   expect_equal(current_methods, expected_methods)
 })
 
@@ -52,4 +52,16 @@ test_that("print.psa returns correct output", {
                 "effectiveness: a data frame with 2 rows and 3 columns. ",
                 "currency: $ ")
   expect_equal(msg, expected)
+})
+
+# summary
+test_that("summary.psa returns correct output", {
+  # no sds
+  expected_df <- data.frame("Strategy" = strategies,
+                            "Cost" = colMeans(costs),
+                            "Effect" = colMeans(effectiveness),
+                            stringsAsFactors = FALSE,
+                            row.names = NULL)
+  calc_df <- summary(psa_small)
+  expect_equal(expected = expected_df, calc_df)
 })

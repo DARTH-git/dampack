@@ -5,7 +5,6 @@
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
 #' @param ... additional arguments to plot (not used)
-#' @param frontier Whether to plot acceptability frontier
 #' @param title String with graph's title
 #' @param txtsize integer. base font size
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
@@ -16,7 +15,6 @@
 #' todo: type checking.
 #' @export
 plot.icers <- function(x, ...,
-                      frontier = TRUE,
                       title = "",
                       txtsize = 12,
                       currency = "$",

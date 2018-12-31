@@ -4,9 +4,8 @@
 \alias{plot.icers}
 \title{Plot of ICERs}
 \usage{
-\method{plot}{icers}(x, ..., frontier = TRUE, title = "",
-  txtsize = 12, currency = "$", effect_units = "QALYs",
-  label = FALSE)
+\method{plot}{icers}(x, ..., title = "", txtsize = 12,
+  currency = "$", effect_units = "QALYs", label = FALSE)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -14,8 +13,6 @@ function \code{ceac} with each strategy's probability of being
 cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{...}{additional arguments to plot (not used)}
-
-\item{frontier}{Whether to plot acceptability frontier}
 
 \item{title}{String with graph's title}
 

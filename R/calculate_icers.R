@@ -10,7 +10,8 @@
 calculate_icers <- function(cost, effect, strategies) {
   # todo: check data is in correct format
 
-  df <- data.frame("Strategy" = strategies, "Cost" = cost, "Effect" = effect)
+  df <- data.frame("Strategy" = strategies, "Cost" = cost, "Effect" = effect,
+                   stringsAsFactors = FALSE)
   coln <- colnames(df)
   nstrat <- nrow(df)
   # remove dominated strategies

@@ -1,4 +1,5 @@
-context("cea")
+context("calculate_icers")
+library(dampack)
 
 data("hund_strat")
 
@@ -19,11 +20,11 @@ strat <- c("E", "D", "C", "B", "A", "UC")
 icer <- calculate_icers(cost = cost, effect = effect, strategies = strat)
 
 test_that("calculate_icers returns correct object", {
-  expected_df <- data.frame("Strategy" = c("UC", "B", "D", "E", "A", "C"),
-                            "Cost" = c(5000, 10000, 35000, 55000, 12000, 25000),
-                            "Effect" = c(1, 2, 4, 5, 1.5, 3),
+  expected_df <- data.frame("Strategy" = c("UC", "B", "D", "E", "C", "A"),
+                            "Cost" = c(5000, 10000, 35000, 55000, 25000, 12000),
+                            "Effect" = c(1, 2, 4, 5, 3, 1.5),
+                            "Status" = c("ref", "ND", "ND", "ND", "ED", "D"),
                             "ICER" = c(NA, 5000, 12500, 20000, NA, NA),
-                            "Status" = c("ND", "ND", "ND", "ND", "D", "ED"),
                             stringsAsFactors = FALSE)
   class(expected_df) <- c("icers", "data.frame")
   expect_equal(expected_df, icer)

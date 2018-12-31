@@ -29,8 +29,8 @@ test_that("psa returns correct object", {
 ## methods
 
 # plot
-source("load_test_data.R")
-psa_big <- make_psa_obj(costs, effectiveness, strategies)
+data("example_psa")
+psa_big <- make_psa_obj(example_psa$costs, example_psa$effectiveness, example_psa$strategies)
 test_that("plot.psa runs", {
   expect_silent({
     plot(psa_big)

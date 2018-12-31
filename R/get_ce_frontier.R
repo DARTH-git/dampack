@@ -1,15 +1,19 @@
-#' R functions to compute and plot CE Frontier ####
+#' Find the CEA frontier, up to a given WTP level, by
+#' identifying strategies with the highest NMB
+#'
+#' @details
+#' Originally written by Sze Suen on Feb 25, 2015.
+#' Modified by Fernando Alarid-Escudero and Caleb Easterly.
+#'
+#' If code is used, please cite the below paper:
+#'
+#' Suen S-C, Goldhaber-Fiebert JD. An Efficient,
+#           Noniterative Method of Identifying the Cost-Effectiveness Frontier.
+#           Med Decis Making. 2016
+#           https://www.ncbi.nlm.nih.gov/pubmed/25926282
+#'
 #' @export
-getFrontier <- function(CEmat, maxWTP = Inf, plot = TRUE){
-  # Name: getFrontier.R
-  # Goal: Find the CEA frontier, up to a given WTP level, by
-  #       identifying strategies with the highest NMB
-  # Originally written by: Sze Suen on Feb 25, 2015
-  # Citation: Suen S-C, Goldhaber-Fiebert JD. An Efficient,
-  #           Noniterative Method of Identifying the Cost-Effectiveness Frontier.
-  #           Med Decis Making. 2016
-  #           https://www.ncbi.nlm.nih.gov/pubmed/25926282
-  # Modified by: Fernando Alarid-Escudero on July 20, 2015
+get_ce_frontier <- function(ce_df, max_wtp = Inf){
   # Notes:
   #    ~Frontier strategies are displaced on the R output screen and
   #      plotted in red on the scatter plot.
@@ -21,7 +25,7 @@ getFrontier <- function(CEmat, maxWTP = Inf, plot = TRUE){
   #      Strategy number, costs, and QALYs.
   #
   #    ~User can specify the maximum willingness-to-pay level to
-  #      consider (maxWTP).  Can be Inf for infinity.
+  #      consider (max_wtp).  Can be Inf for infinity.
   #
   #    ~QALY-reducing strategies will be on the frontier if they save
   #      enough money (script assumes maximum willingness to save money
@@ -41,7 +45,7 @@ getFrontier <- function(CEmat, maxWTP = Inf, plot = TRUE){
   #
   # USER INPUTS:
   #inputFolder <- "CostEffectivenessFrontier_MDM/"
-  #maxWTP <- Inf        # any positive value or Inf
+  #max_wtp <- Inf        # any positive value or Inf
 
   ## Clean everythng from workspace
   #rm(list=ls())
@@ -49,11 +53,11 @@ getFrontier <- function(CEmat, maxWTP = Inf, plot = TRUE){
   ####################################################################
 
   # check for duplicated strategies
-  dups <- CEmat[c(duplicated(CEmat[, 2:3]) | duplicated(CEmat[, 2:3], fromLast = TRUE)), 1]
+  dups <- ce_df[c(duplicated(ce_df[, 2:3]) | duplicated(ce_df[, 2:3], fromLast = TRUE)), 1]
 
   # initialize some variables
   costsCol <- 2; qalyCol <- 3
-  numStrat <- nrow(CEmat)
+  numStrat <- nrow(ce_df)
 
   # find WTP levels to test so that all strategies on frontier will be captured
   # this means testing on either side of all NMB intersections, which are just all the pairwise ICERs
@@ -61,25 +65,25 @@ getFrontier <- function(CEmat, maxWTP = Inf, plot = TRUE){
   suppressWarnings(
     for (i in 1:numStrat) {
       indexStrat <- matrix(1, numStrat, 3)
-      indexStrat[, costsCol] <- indexStrat[, costsCol] * CEmat[i, costsCol]
-      indexStrat[, qalyCol] <- indexStrat[, qalyCol] * CEmat[i, qalyCol]
-      delCostQalys <- CEmat - indexStrat
+      indexStrat[, costsCol] <- indexStrat[, costsCol] * ce_df[i, costsCol]
+      indexStrat[, qalyCol] <- indexStrat[, qalyCol] * ce_df[i, qalyCol]
+      delCostQalys <- ce_df - indexStrat
       ICERmat[, i] <- delCostQalys[, costsCol] / delCostQalys[, qalyCol]
     }
   )
   intersections <- sort(unique(c(ICERmat)))
   intersections <- intersections[is.finite(intersections)]
-  WTPtestPoints <- c(0, intersections [intersections >= 0 & intersections <= maxWTP], maxWTP)
+  WTPtestPoints <- c(0, intersections [intersections >= 0 & intersections <= max_wtp], max_wtp)
 
   # Find the strategy with the max NMB at each of the WTP test points
   indiciesOfMax <- vector()
   NMBmat <- matrix(0, numStrat, length(WTPtestPoints))
   for (i in 1:length(WTPtestPoints) ) {
-    NMBmat[, i] <- (WTPtestPoints[i] * CEmat[, qalyCol]) - CEmat[, costsCol]
+    NMBmat[, i] <- (WTPtestPoints[i] * ce_df[, qalyCol]) - ce_df[, costsCol]
   }
-  if (is.infinite(maxWTP)) {
+  if (is.infinite(max_wtp)) {
     #WTP of infinity means costs are not considered
-    NMBmat[, length(WTPtestPoints)] = CEmat[, qalyCol] - (0 * CEmat[, costsCol]);
+    NMBmat[, length(WTPtestPoints)] = ce_df[, qalyCol] - (0 * ce_df[, costsCol]);
   }
   maxVals <- apply(NMBmat, 2, max)  #find strategy that maximizes NMB at each WTP
   for (i in 1:length(WTPtestPoints) ) {  #find all strategies that match max at each WTP
@@ -87,10 +91,10 @@ getFrontier <- function(CEmat, maxWTP = Inf, plot = TRUE){
   }
   v.frontier <- unique(indiciesOfMax)  #find strategy that maximizes NMB at each WTP
 
-  df.frontier <- cbind(CEmat, `On Frontier` = 0)
+  df.frontier <- cbind(ce_df, `On Frontier` = 0)
   df.frontier$`On Frontier`[v.frontier] <- 1
 
-  sprintf("Frontier is formed by strategies: %s", paste(sort(CEmat[v.frontier, 1]), collapse = ", "))
+  sprintf("Frontier is formed by strategies: %s", paste(sort(ce_df[v.frontier, 1]), collapse = ", "))
 
   class(df.frontier) <- c("frontier", "data.frame")
   return(df.frontier)
@@ -105,7 +109,7 @@ plot_frontier <- function(df.frontier,
 {
   # A function to plot CE frontier
   # USER INPUTS:
-  #   CEmat: A CE matrix arranged as: Col1: Strategy; Col2: Cost; Col3: Effectiveness
+  #   ce_df: A CE matrix arranged as: Col1: Strategy; Col2: Cost; Col3: Effectiveness
   # Create a dataframe from matrix
   colnames(df.frontier) <- c("Strategy", "Cost", "Effectiveness", "Frontier")
   n.strategies <- nrow(df.frontier)

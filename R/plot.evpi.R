@@ -28,6 +28,5 @@ plot.evpi <- function(x, ...,
     scale_x_continuous(labels = comma, breaks = number_ticks(20))+
     scale_y_continuous(labels = comma, breaks = number_ticks(6))+
     xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
-    ylab(paste("EVPI (", currency, ")", sep = "")) +
-    common_theme(txtsize)
+    ylab(paste("EVPI (", currency, ")", sep = ""))
 }

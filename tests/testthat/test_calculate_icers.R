@@ -2,12 +2,6 @@ context("cea")
 
 data("hund_strat")
 
-test_that("calc_cea runs", {
-  calculate_icers(cost = hund_strat$Cost,
-                  strategies = hund_strat$Strategy,
-                  effect = hund_strat$QALYs)
-})
-
 # test the class
 test_that("icers has all methods we'd expect", {
   current_methods <- as.vector(methods(class = "icers"))

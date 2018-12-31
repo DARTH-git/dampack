@@ -22,6 +22,5 @@ summary.psa <- function(object, ..., calc_sds = FALSE) {
                           stringsAsFactors = FALSE)
   }
   rownames(sum_psa) <- 1:nrow(sum_psa)
-  print(sum_psa)
-  return(invisible(sum_psa))
+  sum_psa
 }

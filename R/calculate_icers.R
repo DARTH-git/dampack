@@ -73,15 +73,15 @@ calculate_icers <- function(cost, effect, strategies) {
 
   # recompute icers without weakly dominated strategies
   nd_df_icers <- nd_df[!(nd_df$Strategy %in% dom), ] %>%
-    compute_icers() %>%
-    mutate(Status = "ND")
+    mutate(Status = "ND") %>%
+    compute_icers()
 
   # dominated and weakly dominated
   d_df <- df[df$Strategy %in% d, ] %>%
-    mutate(Status = "D", ICER = NA)
+    mutate(ICER = NA, Status = "D")
 
   ed_df <- df[df$Strategy %in% ed, ] %>%
-    mutate(Status = "ED", ICER = NA)
+    mutate(ICER = NA, Status = "ED")
 
   # when combining, sort so we have ref,ND,ED,D
   results <- bind_rows(d_df, ed_df, nd_df_icers) %>%

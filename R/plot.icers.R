@@ -22,8 +22,24 @@ plot.icers <- function(x, ...,
                       label = FALSE){
   # this is so non-dominated strategies are plotted last (on top)
   x <- arrange(x, .data$Status)
-  # status labels for the legend
-  legend_labs <- c("Dominated", "Extendedly Dominated", "Non-Dominated")
+
+  # change status text in data frame for plotting
+  d_name <- "Dominated"
+  ed_name <- "Weakly Dominated"
+  nd_name <- "Non-Dominated"
+
+  status_expand <- c("D" = d_name, "ED" = ed_name,
+                     "ND" = nd_name, "ref" = nd_name)
+  x$Status <- factor(status_expand[x$Status], ordered = TRUE,
+                     levels = c(d_name, ed_name, nd_name))
+
+  # plot colors and lines, by status
+  plot_cols <- c("Dominated" = "grey50",
+                 "Weakly Dominated" = "darkorange",
+                 "Non-Dominated" = "dodgerblue")
+  plot_lines <- c("Dominated" = "blank",
+                  "Weakly Dominated" = "blank",
+                  "Non-Dominated" = "solid")
 
   # names to refer to in aes_
   stat_name <- "Status"
@@ -36,10 +52,8 @@ plot.icers <- function(x, ...,
                               colour = as.name(stat_name))) +
     geom_point(alpha = 0.5) +
     geom_line(aes_(linetype = as.name(stat_name), group = as.name(stat_name))) +
-    scale_color_manual(name = strat_name, values = c("grey50", "darkorange", "dodgerblue"),
-                       labels = legend_labs) +
-    scale_linetype_manual(name = strat_name, values = c("blank", "blank", "solid"),
-                          labels = legend_labs) +
+    scale_color_manual(name = strat_name, values = plot_cols) +
+    scale_linetype_manual(name = strat_name, values = plot_lines) +
     labs(x = paste0("Effect (", effect_units, ")"),
          y = paste0("Cost (", currency, ")"),
          title = title) +

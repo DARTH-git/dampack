@@ -15,7 +15,6 @@ calculate_icers <- function(cost, effect, strategies) {
                    "Effect" = effect,
                    "Status" = "ND",
                    stringsAsFactors = FALSE)
-  coln <- colnames(df)
   nstrat <- nrow(df)
   # remove dominated strategies
   # dominated strategies have a higher cost and lower effect

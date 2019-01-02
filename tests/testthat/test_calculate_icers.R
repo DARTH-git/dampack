@@ -32,6 +32,6 @@ test_that("calculate_icers returns correct object", {
 
 ## methods
 # plot
-test_that("plot.psa runs", {
+test_that("plot.icers runs", {
   expect_silent(plot(icer))
 })

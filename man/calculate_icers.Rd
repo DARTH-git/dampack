@@ -14,5 +14,5 @@ calculate_icers(cost, effect, strategies)
 \item{strategies}{character vector of strategy names}
 }
 \description{
-function to calculate ICERS
+Adapted from https://miqdad.freeasinspeech.org.uk/icer_calculator/
 }

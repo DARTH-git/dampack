@@ -4,7 +4,7 @@
 \name{example_psa}
 \alias{example_psa}
 \title{Sample PSA data for testing}
-\format{An object of class \code{data.frame} with 10000 rows and 15 columns.}
+\format{An object of class \code{list} of length 4.}
 \usage{
 example_psa
 }

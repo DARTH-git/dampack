@@ -4,24 +4,24 @@ library(dampack)
 # test the class
 test_that("psa has all methods we'd expect", {
   current_methods <- as.vector(methods(class = "psa"))
-  expected_methods <- c("plot.psa", "print.psa")
-  expect_equal(current_methods, expected_methods)
+  expected_methods <- c("plot.psa", "print.psa", "summary.psa")
+  expect_setequal(current_methods, expected_methods)
 })
 
 # class creation
 
 ## setup
-costs <- data.frame(rbind(c(10e3, 20e3, 100e3),
+sm_costs <- data.frame(rbind(c(10e3, 20e3, 100e3),
                c(20e3, 40e3, 200e3)))
-effectiveness <- data.frame(rbind(c(100, 50, 900),
+sm_effectiveness <- data.frame(rbind(c(100, 50, 900),
                        c(56, 89, 700)))
-strategies <- c("test", "notest", "treat")
-names(costs) <- names(effectiveness) <- strategies
-psa_small <- make_psa_obj(costs, effectiveness, strategies)
+sm_strategies <- c("test", "notest", "treat")
+names(sm_costs) <- names(sm_effectiveness) <- sm_strategies
+psa_small <- make_psa_obj(sm_costs, sm_effectiveness, sm_strategies)
 test_that("psa returns correct object", {
-  expect_equal(psa_small$cost, costs)
-  expect_equal(psa_small$effectiveness, effectiveness)
-  expect_equal(psa_small$strategies, strategies)
+  expect_equal(psa_small$cost, sm_costs)
+  expect_equal(psa_small$effectiveness, sm_effectiveness)
+  expect_equal(psa_small$strategies, sm_strategies)
   expect_equal(psa_small$n_strategies, 3)
   expect_equal(psa_small$n_sim, 2)
 })
@@ -29,13 +29,15 @@ test_that("psa returns correct object", {
 ## methods
 
 # plot
-source("load_test_data.R")
-psa_big <- make_psa_obj(costs, effectiveness, strategies)
+data("example_psa")
+psa_big <- make_psa_obj(example_psa$costs, example_psa$effectiveness, example_psa$strategies)
 test_that("plot.psa runs", {
-  plot(psa_big)
-  plot(psa_big, center = FALSE)
-  plot(psa_big, ellipse = FALSE)
-  plot(psa_big, center = FALSE, ellipse = FALSE)
+  expect_silent({
+    plot(psa_big)
+    plot(psa_big, center = FALSE)
+    plot(psa_big, ellipse = FALSE)
+    plot(psa_big, center = FALSE, ellipse = FALSE)
+  })
 })
 
 # print
@@ -52,4 +54,16 @@ test_that("print.psa returns correct output", {
                 "effectiveness: a data frame with 2 rows and 3 columns. ",
                 "currency: $ ")
   expect_equal(msg, expected)
+})
+
+# summary
+test_that("summary.psa returns correct output", {
+  # no sds
+  expected_df <- data.frame("Strategy" = sm_strategies,
+                            "meanCost" = colMeans(sm_costs),
+                            "meanEffect" = colMeans(sm_effectiveness),
+                            stringsAsFactors = FALSE,
+                            row.names = NULL)
+  calc_df <- summary(psa_small)
+  expect_equal(expected = expected_df, calc_df)
 })

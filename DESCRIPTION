@@ -22,7 +22,8 @@ Imports:
     ggplot2,
     ellipse,
     dplyr,
-    scales
+    scales,
+    stringr
 Suggests:
     testthat,
     lintr

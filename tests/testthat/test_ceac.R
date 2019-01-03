@@ -4,15 +4,18 @@ library(dampack)
 # test the class
 test_that("ceac has all methods we'd expect", {
   current_methods <- as.vector(methods(class = ceac))
-  expected_methods <- c("plot.ceac", "summary.ceac")
+  expected_methods <- c("plot.ceac", "summary.ceac", "print.ceac", "head.ceac")
   expect_setequal(current_methods, expected_methods)
 })
 
 # test class creation
 
 ## setup
-source("load_test_data.R")
-psa_obj <- make_psa_obj(costs, effectiveness, strategies)
+data("example_psa")
+wtp <- example_psa$wtp
+psa_obj <- make_psa_obj(example_psa$costs,
+                        example_psa$effectiveness,
+                        example_psa$strategies)
 
 test_that("result has class 'ceac'", {
   c <- ceac(wtp, psa_obj)
@@ -21,7 +24,8 @@ test_that("result has class 'ceac'", {
 })
 
 test_that("handles missing strategy", {
-  psa_missing <- make_psa_obj(costs, effectiveness)
+  psa_missing <- make_psa_obj(example_psa$costs,
+                              example_psa$effectiveness)
   c_missing <- ceac(wtp, psa_missing)
   expected_generic_strat <- c("Strategy_1", "Strategy_2", "Strategy_3")
   obtained_generic_strat <- sort(unique(c_missing$Strategy))

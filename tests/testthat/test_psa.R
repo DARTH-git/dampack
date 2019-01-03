@@ -60,8 +60,8 @@ test_that("print.psa returns correct output", {
 test_that("summary.psa returns correct output", {
   # no sds
   expected_df <- data.frame("Strategy" = sm_strategies,
-                            "Cost" = colMeans(sm_costs),
-                            "Effect" = colMeans(sm_effectiveness),
+                            "meanCost" = colMeans(sm_costs),
+                            "meanEffect" = colMeans(sm_effectiveness),
                             stringsAsFactors = FALSE,
                             row.names = NULL)
   calc_df <- summary(psa_small)

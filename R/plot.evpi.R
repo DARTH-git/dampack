@@ -20,13 +20,14 @@ plot.evpi <- function(x, ...,
                       txtsize = 12,
                       currency = "$",
                       effect_units = "QALY"){
-  x$WTP_thou <- x$WTP/1000
+  x$WTP_thou <- x$WTP / 1000
   ggplot(data = x,
          aes_(x = as.name("WTP_thou"), y = as.name("EVPI"))) +
     geom_line() +
     ggtitle(title) +
-    scale_x_continuous(labels = comma, breaks = number_ticks(20))+
-    scale_y_continuous(labels = comma, breaks = number_ticks(6))+
+    scale_x_continuous(labels = comma, breaks = number_ticks(20)) +
+    scale_y_continuous(labels = comma, breaks = number_ticks(6)) +
     xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
-    ylab(paste("EVPI (", currency, ")", sep = ""))
+    ylab(paste("EVPI (", currency, ")", sep = "")) +
+    common_theme(txtsize)
 }

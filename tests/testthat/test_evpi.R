@@ -1,4 +1,4 @@
-context('evpi')
+context("evpi")
 library(dampack)
 
 
@@ -11,10 +11,10 @@ test_that("evpi has all methods we'd expect", {
 
 # test return object
 ## setup
-source("load_test_data.R")
-psa_obj <- make_psa_obj(costs, effectiveness, strategies)
+data("example_psa")
+psa_obj <- make_psa_obj(example_psa$costs, example_psa$effectiveness, example_psa$strategies)
 
-evpi_obj <- calc_evpi(wtp = wtp,
+evpi_obj <- calc_evpi(wtp = example_psa$wtp,
                       psa = psa_obj)
 
 # classes
@@ -30,7 +30,7 @@ test_that("return object has column names WTP and EVPI", {
 
 # calculation
 test_that("evpi is what we'd expect", {
-  nmb <-  wtp[1]*effectiveness - costs
+  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$costs
   d.star <- which.max(colMeans(nmb))
   loss <- nmb - nmb[, d.star]
   evpi <- mean(apply(loss, 1, max))

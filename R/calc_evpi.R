@@ -12,21 +12,21 @@
 #' @return evpi A data frame with the EVPI at each WTP threshold.
 #'
 #' @export
-calc_evpi <- function(wtp, psa, pop = 1){
+calc_evpi <- function(wtp, psa, pop = 1) {
   check_psa_object(psa)
   cost <- psa$cost
   effectiveness <- psa$effectiveness
-  if(ncol(effectiveness)<2){
+  if (ncol(effectiveness) < 2) {
     stop("You need at least two different strategies to compute EVPI.")
   }
   # number of wtp thresholds
-  n.wtps <- length(wtp)
+  n_wtps <- length(wtp)
   # vector to store evpi
-  evpi <- rep(0, n.wtps)
+  evpi <- rep(0, n_wtps)
   # Estimate the Loss matrix and EVPI at each WTP threshold
-  for(l in 1:n.wtps){
+  for (l in 1:n_wtps){
     # Compute NMB with vector indexing
-    nmb <-  wtp[l]*effectiveness - cost
+    nmb <-  wtp[l] * effectiveness - cost
     ## Find the optimal strategy with current info
     d.star <- which.max(colMeans(nmb))
     ## Calculate the opportunity loss from choosing d.star for each strategy

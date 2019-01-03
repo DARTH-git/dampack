@@ -18,4 +18,3 @@ Function for number of ticks in axis of \code{ggplot2} plots.
 Based on function \code{pretty}.
 }
 
-\keyword{ggplot2}

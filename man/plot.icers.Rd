@@ -5,7 +5,8 @@
 \title{Plot of ICERs}
 \usage{
 \method{plot}{icers}(x, ..., title = "", txtsize = 12,
-  currency = "$", effect_units = "QALYs", label = FALSE)
+  currency = "$", effect_units = "QALYs", label = c("frontier",
+  "all", "none"), label_max_char = 8, plot_frontier_only = FALSE)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -22,10 +23,13 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{effect_units}{string. unit of effectiveness}
 
-\item{label}{boolean. whether or not to label the strategies.
-may not be that useful when strategies have long names. Defaults to FALSE.
+\item{label}{whether to label strategies on the efficient frontier, all strategies, or none.
+defaults to frontier.}
 
-todo: type checking.}
+\item{label_max_char}{max number of characters to label the strategies - longer strategies will be
+truncated to save space.}
+
+\item{plot_frontier_only}{only plot the efficient frontier}
 }
 \description{
 Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.

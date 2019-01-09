@@ -15,22 +15,29 @@ sm_costs <- data.frame(rbind(c(10e3, 20e3, 100e3),
                c(20e3, 40e3, 200e3)))
 sm_effectiveness <- data.frame(rbind(c(100, 50, 900),
                        c(56, 89, 700)))
+sm_parameters <- data.frame(
+  "p1" = c(1, 2),
+  "p2" = c(2, 10)
+)
 sm_strategies <- c("test", "notest", "treat")
 names(sm_costs) <- names(sm_effectiveness) <- sm_strategies
-psa_small <- make_psa_obj(sm_costs, sm_effectiveness, sm_strategies)
+psa_small <- make_psa_obj(sm_costs, sm_effectiveness, sm_parameters, sm_strategies)
 test_that("psa returns correct object", {
   expect_equal(psa_small$cost, sm_costs)
   expect_equal(psa_small$effectiveness, sm_effectiveness)
   expect_equal(psa_small$strategies, sm_strategies)
   expect_equal(psa_small$n_strategies, 3)
   expect_equal(psa_small$n_sim, 2)
+  expect_equal(psa_small$parameters, sm_parameters)
+  expect_equal(psa_small$parnames, colnames(sm_parameters))
 })
 
 ## methods
 
 # plot
 data("example_psa")
-psa_big <- make_psa_obj(example_psa$costs, example_psa$effectiveness, example_psa$strategies)
+psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+                        example_psa$parameters, example_psa$strategies)
 test_that("plot.psa runs", {
   expect_silent({
     plot(psa_big)
@@ -52,6 +59,8 @@ test_that("print.psa returns correct output", {
                 "number of simulations (n_sim): 2 ",
                 "cost: a data frame with 2 rows and 3 columns. ",
                 "effectiveness: a data frame with 2 rows and 3 columns. ",
+                "parameters: a data frame with 2 rows and 2 columns ",
+                "parameter names (parnames):  p1, p2 ",
                 "currency: $ ")
   expect_equal(msg, expected)
 })

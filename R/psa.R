@@ -22,7 +22,7 @@ make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, curre
   n_sim_costs <- nrow(cost)
   n_sim_effectiveness <- nrow(effectiveness)
   n_sim_parameters <- nrow(parameters)
-  if ((n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs)) {
+  if ( (n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs) ) {
     stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
   }
 
@@ -222,6 +222,6 @@ print.psa <- function(x, ..., all_strat = FALSE) {
   cat("parameters: a data frame with",
       nrow(x$parameters), "rows and",
       ncol(x$parameters), "columns", "\n")
-  cat("parameter names (parnames): ", paste(x$parnames, collapse=", "), "\n")
+  cat("parameter names (parnames): ", paste(x$parnames, collapse = ", "), "\n")
   cat("currency:", x$currency, "\n")
 }

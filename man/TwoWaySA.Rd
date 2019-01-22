@@ -24,21 +24,21 @@ range1=NULL, the lower and upper bounds of the sample are used.}
 \item{range2}{Range of the second parameter of interest. Default: NULL range. If
 range2=NULL, the lower and upper bounds of the sample are used.}
 
-\item{poly.order}{Order of polynomial for the linear regression metamodel. 
+\item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}
 
-\item{maximize}{If \code{TRUE}, plot of strategy with maximum expected outcome 
+\item{maximize}{If \code{TRUE}, plot of strategy with maximum expected outcome
 (default); if \code{FALSE}, plot of strategy with minimum expected outcome}
 
 \item{txtsize}{Font size for ggplot graph. Default: 12}
 }
 \value{
-twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and 
+twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and
 \code{parm2} on the outcome of interest that can be posteriorly formatted
 with \code{ggplot2} function
 }
 \description{
-This function displays a two-way sensitivity analysis (TWSA) graph 
+This function displays a two-way sensitivity analysis (TWSA) graph
 by estimating a linear regression metamodel of a PSA for a given
 decision-analytic model
 }

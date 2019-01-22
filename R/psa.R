@@ -222,6 +222,6 @@ print.psa <- function(x, ..., all_strat = FALSE) {
   cat("parameters: a data frame with",
       nrow(x$parameters), "rows and",
       ncol(x$parameters), "columns", "\n")
-  cat("parameter names (parnames): ", paste(x$parnames, collapse=", "), "\n")
+  cat("parameter names (parnames): ", paste(x$parnames, collapse = ", "), "\n")
   cat("currency:", x$currency, "\n")
 }

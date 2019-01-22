@@ -12,14 +12,14 @@ metamod <- function(y, psa, parm, poly.order = 2) {
 
   # make sure parm is in parameter names
   if (!(parm %in% pnames)) {
-    stop('parm is not in the parameter names. misspelled?')
+    stop("parm is not in the parameter names. misspelled?")
   }
   other_parms <- pnames[-which(pnames == parm)]
 
   # define dependent variables
   # if the outcome is a single variable and not a data.frame, coerce
-  if (!inherits(y, 'data.frame')) {
-    warning('y is not a data frame - coercing')
+  if (!inherits(y, "data.frame")) {
+    warning("y is not a data frame - coercing")
     y <- as.data.frame(y)
   }
 
@@ -29,12 +29,12 @@ metamod <- function(y, psa, parm, poly.order = 2) {
 
   #Generate a formula by pasting column names for both dependent and independent variables.
   # Imposes a 1 level interaction
-  f <- as.formula(paste0('cbind(', paste(dep, collapse=','),
-                         ') ~ (','poly(', parm,',', poly.order,', raw=TRUE) + ',
-                         paste(other_parms, collapse=' + '), ')'))
+  f <- as.formula(paste0("cbind(", paste(dep, collapse = ","), ") ~ (",
+                         "poly(", parm, ",", poly.order, ", raw=TRUE) + ",
+                         paste(other_parms, collapse = " + "), ")"))
 
   #Run Multiple Multivariate Regression (MMR) Metamodel
-  metamodel <- lm(f, data=sim_data)
+  metamodel <- lm(f, data = sim_data)
   metamodel$call <- call("lm", formula = f, data = quote(sim_data))
   # for accessing later in predict
   metamodel$parm_of_int <- parm
@@ -58,19 +58,19 @@ predict.metamodel <- function(object, newdata = NULL) {
 
   parm <- object$parm_of_int
 
-  #Determine range of of the parameter
-  if (is.null(newdata)){ #If user does not define a range
+  # use range of parameter if user does not provide new data
+  if (is.null(newdata)){
     prange <- quantile(df[, parm], c(0.025, 0.975))
 
     # define 400 samples of parameter range
-    prange_400samp <- seq(prange[1], prange[2], length.out=400)
+    prange_400samp <- seq(prange[1], prange[2], length.out = 400)
 
     # Create data frame with all combinations between both parameters of interest
     newdata <- data.frame(prange_400samp)
     names(newdata) <- parm
   }
 
-  #Generate matrix to use for prediction
+  # Generate matrix to use for prediction
   # use the means of all parameters other than parameter of interest
   pdata <- data.frame(matrix(rep(colMeans(df)),
                                nrow = nrow(newdata),
@@ -92,7 +92,8 @@ predict.metamodel <- function(object, newdata = NULL) {
   class(tmp_obj) <- class(tmp_obj)[-1]
   outcome <- data.frame(predict(tmp_obj, newdata = pdata))
 
-  colnames(outcome) <- object$strategies #Name the predicted outcomes columns with strategies names
+  #Name the predicted outcomes columns with strategies names
+  colnames(outcome) <- object$strategies
 
   # join with parameter values
   outcome <- cbind(newdata, outcome)

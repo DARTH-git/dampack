@@ -22,6 +22,7 @@ metamod <- function(y, psa, parm, poly.order = 2) {
     warning('y is not a data frame - coercing')
     y <- as.data.frame(y)
   }
+
   dep <- colnames(y)
 
   sim_data <- data.frame(y, psa$parameters)
@@ -35,10 +36,17 @@ metamod <- function(y, psa, parm, poly.order = 2) {
   #Run Multiple Multivariate Regression (MMR) Metamodel
   metamodel <- lm(f, data=sim_data)
   metamodel$call <- call("lm", formula = f, data = quote(sim_data))
-  # # for accessing later in predict
+  # for accessing later in predict
   metamodel$parm_of_int <- parm
-  metamodel$strategies <- psa$strategies
-  class(metamodel) <- c("metamodel", "mlm", "lm")
+  metamodel$strategies <- dep
+
+  # class depends on number of dependent variables
+  if (length(dep) > 1){
+    # must have mlm class for predict
+    class(metamodel) <- c("metamodel", "mlm", "lm")
+  } else {
+    class(metamodel) <- c("metamodel", "lm")
+  }
   return(metamodel)
 }
 
@@ -69,7 +77,7 @@ predict.metamodel <- function(object, newdata = NULL) {
                                ncol = ncol(df),
                                byrow = T))
 
-  colnames(pdata) <- colnames(df) #Name data frame's columns with parameters' names
+  colnames(pdata) <- colnames(df) # Name data frame's columns with parameters' names
 
   # replace parameter of interest
   pdata[, parm] <- newdata
@@ -78,15 +86,16 @@ predict.metamodel <- function(object, newdata = NULL) {
   # we have to get a little hacky for the MLM
   # so predict.metamodel doesn't get called again
   # for some reason we can't call predict.mlm directly
+  # so we remove the first entry in the class vector (which is "metamodel")
+  # this way predict.lm will get called if there's only one outcome
   tmp_obj <- object
-  class(tmp_obj) <- c("mlm", "lm")
+  class(tmp_obj) <- class(tmp_obj)[-1]
   outcome <- data.frame(predict(tmp_obj, newdata = pdata))
 
-  strategies <- object$strategies
-  colnames(outcome) <- strategies #Name the predicted outcomes columns with strategies names
+  colnames(outcome) <- object$strategies #Name the predicted outcomes columns with strategies names
 
   # join with parameter values
-  outcome[, parm] <- newdata
+  outcome <- cbind(newdata, outcome)
 
   return(outcome)
 }

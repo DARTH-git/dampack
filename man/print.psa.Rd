@@ -4,15 +4,15 @@
 \alias{print.psa}
 \title{print a psa object}
 \usage{
-\method{print}{psa}(x, ..., all_strat = FALSE)
+\method{print}{psa}(x, all_strat = FALSE, ...)
 }
 \arguments{
 \item{x}{the psa object}
 
-\item{...}{further arguments to print (not used)}
-
 \item{all_strat}{whether or not to print the full list of strategies. defaults to FALSE, which truncates
 the strategy list to 5}
+
+\item{...}{further arguments to print (not used)}
 }
 \description{
 print a psa object

@@ -105,7 +105,6 @@ head.ceac <- function(x, n = 6L, ...){
 #' @param x Object of class \code{ceac}. A melted data frame produced by
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
-#' @param ... additional arguments to plot (not used)
 #' @param frontier Whether to plot acceptability frontier
 #' @param title String with graph's title
 #' @param txtsize number with text size
@@ -116,6 +115,9 @@ head.ceac <- function(x, n = 6L, ...){
 #' with many strategies.
 #'
 #' Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
+#'
+#' @param ... additional arguments to plot (not used)
+#'
 #' @keywords cost-effectiveness acceptability curves
 #' @section Details:
 #' \code{ceac} computes the probability of each of the strategies being
@@ -125,12 +127,13 @@ head.ceac <- function(x, n = 6L, ...){
 #' @import dplyr
 #'
 #' @export
-plot.ceac <- function(x, ...,
+plot.ceac <- function(x,
                       frontier = TRUE,
                       title = "Cost-Effectiveness Acceptability Curves",
                       txtsize = 12,
                       currency = "$",
-                      min_prob = 0){
+                      min_prob = 0,
+                      ...){
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"

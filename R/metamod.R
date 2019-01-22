@@ -5,6 +5,8 @@
 #' @param parm String with the name of the parameter of interest
 #' @param poly.order Order of polynomial for the linear regression metamodel.
 #' Default: 2
+#'
+#' @importFrom stats as.formula formula getCall lm
 #' @export
 metamod <- function(y, psa, parm, poly.order = 2) {
   # get parameter names
@@ -50,8 +52,15 @@ metamod <- function(y, psa, parm, poly.order = 2) {
   return(metamodel)
 }
 
+#' Predict from a metamodel
+#'
+#' @param object object with class "metamodel"
+#' @param newdata values for parameter of interest
+#' @param ... further arguments to \code{predict} (not used)
+#'
+#' @importFrom stats quantile predict
 #' @export
-predict.metamodel <- function(object, newdata = NULL) {
+predict.metamodel <- function(object, newdata = NULL, ...) {
   # hard to get original data, this is thanks to
   # https://stackoverflow.com/questions/22921765/way-to-extract-data-from-lm-object-before-function-is-applied
   df <- eval(getCall(object)$data, environment(formula(object)))

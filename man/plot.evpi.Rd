@@ -4,15 +4,12 @@
 \alias{plot.evpi}
 \title{Plot of Expected Value of Perfect Information (EVPI)}
 \usage{
-\method{plot}{evpi}(x, ...,
-  title = "Expected Value of Perfect Information", txtsize = 12,
-  currency = "$", effect_units = "QALY")
+\method{plot}{evpi}(x, title = "Expected Value of Perfect Information",
+  txtsize = 12, currency = "$", effect_units = "QALY", ...)
 }
 \arguments{
 \item{x}{object of class \code{evpi}, produced by function
 \code{\link{calc_evpi}}}
-
-\item{...}{further arguments to plot() (not used)}
 
 \item{title}{String with graph's title}
 
@@ -22,6 +19,8 @@
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
 \item{effect_units}{Units of effectiveness. Default: QALY}
+
+\item{...}{further arguments to plot() (not used)}
 }
 \value{
 A \code{ggplot2} object with the EVPI

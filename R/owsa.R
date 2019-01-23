@@ -4,21 +4,21 @@
 #' by estimating a linear regression metamodel of a PSA for a given
 #' decision-analytic model
 #'
-#' @param psa psa object
-#' @param parm String with the name of the parameter of interest
 #' @param newdata data frame with values of parameter of interest
-#' @param poly.order Order of polynomial for the linear regression metamodel.
-#' Default: 2
+#' @inheritParams metamod
 #' @keywords one-way sensitivity analysis; linear regression metamodel
 #' @return A dataframe with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}}
 #'
 #' @export
 owsa <- function(psa, parm, newdata = NULL,
+                 outcome = c("eff", "cost", "nhb", "nmb"),
+                 wtp = NULL,
+                 strategies = NULL,
                  poly.order = 2){
 
   #Run Multiple Multivariate Regression (MMR) Metamodel
-  mm <- metamod(psa$effectiveness, psa, parm, poly.order)
+  mm <- metamod(psa, parm, strategies, outcome, wtp, poly.order)
 
   # Predict Outcomes using MMMR Metamodel fit
   ow <- predict(mm, newdata)

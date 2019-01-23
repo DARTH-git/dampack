@@ -16,7 +16,7 @@ psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
                         example_psa$parameters, example_psa$strategies)
 
 test_that("metamod object has correct classes", {
-  mm <- metamod(psa_big$effectiveness, psa_big, "pFailChemo")
+  mm <- metamod(psa = psa_big, parm = "pFailChemo", outcome = "cost")
   expect_is(mm, "lm")
   expect_is(mm, "metamodel")
 })
@@ -25,7 +25,7 @@ test_that("metamod object has correct classes", {
 
 test_that("metamodel with one outcome", {
   # metamodel
-  mm <- metamod(data.frame(Chemo = psa_big$effectiveness$Chemo), psa_big, "pFailChemo")
+  mm <- metamod(psa = psa_big, parm = "pFailChemo", outcome = "cost", strategies = "Chemo")
   expect_is(mm, "lm")
   expect_is(mm, "metamodel")
 
@@ -36,7 +36,7 @@ test_that("metamodel with one outcome", {
 
 test_that("prediction with several outcomes", {
   # metamodel
-  mm <- metamod(psa_big$effectiveness, psa_big, "pFailChemo")
+  mm <- metamod(psa = psa_big, parm = "pFailChemo", outcome = "eff")
   expect_is(mm, "lm")
   expect_is(mm, "metamodel")
 

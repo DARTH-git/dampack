@@ -4,14 +4,19 @@
 \alias{metamod}
 \title{linear regression metamodeling}
 \usage{
-metamod(y, psa, parm, poly.order = 2)
+metamod(psa, parm, strategies = NULL, outcome = c("eff", "cost", "nhb",
+  "nmb"), wtp = NULL, poly.order = 2)
 }
 \arguments{
-\item{y}{data frame with the model outputs of interest}
-
 \item{psa}{psa object}
 
 \item{parm}{String with the name of the parameter of interest}
+
+\item{strategies}{vector of strategies to consider. the default (NULL) is that all strategies are considered. The}
+
+\item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
+
+\item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
 
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}

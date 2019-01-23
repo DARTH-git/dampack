@@ -4,7 +4,8 @@
 \alias{owsa}
 \title{One-way sensitivity analysis using linear regression metamodeling}
 \usage{
-owsa(psa, parm, newdata = NULL, poly.order = 2)
+owsa(psa, parm, newdata = NULL, outcome = c("eff", "cost", "nhb",
+  "nmb"), wtp = NULL, strategies = NULL, poly.order = 2)
 }
 \arguments{
 \item{psa}{psa object}
@@ -12,6 +13,12 @@ owsa(psa, parm, newdata = NULL, poly.order = 2)
 \item{parm}{String with the name of the parameter of interest}
 
 \item{newdata}{data frame with values of parameter of interest}
+
+\item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
+
+\item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
+
+\item{strategies}{vector of strategies to consider. the default (NULL) is that all strategies are considered. The}
 
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}

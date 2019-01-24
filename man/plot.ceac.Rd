@@ -4,16 +4,14 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, ..., frontier = TRUE,
+\method{plot}{ceac}(x, frontier = TRUE,
   title = "Cost-Effectiveness Acceptability Curves", txtsize = 12,
-  currency = "$", min_prob = 0)
+  currency = "$", min_prob = 0, ...)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
 function \code{ceac} with each strategy's probability of being
 cost-effective for each willingness-to-pay (WTP) threshold}
-
-\item{...}{additional arguments to plot (not used)}
 
 \item{frontier}{Whether to plot acceptability frontier}
 
@@ -29,6 +27,8 @@ exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
 with many strategies.
 
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
+
+\item{...}{additional arguments to plot (not used)}
 }
 \value{
 ceac.gg A \code{ggplot2} object with the CEAC

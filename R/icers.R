@@ -114,7 +114,6 @@ compute_icers <- function(non_d) {
 #' @param x Object of class \code{ceac}. A melted data frame produced by
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
-#' @param ... additional arguments to plot (not used)
 #' @param title String with graph's title
 #' @param txtsize integer. base font size
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
@@ -124,17 +123,19 @@ compute_icers <- function(non_d) {
 #' @param label_max_char max number of characters to label the strategies - longer strategies will be
 #' truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
+#' @param ... additional arguments to plot (not used)
 #'
 #' @importFrom stringr str_sub
 #' @export
-plot.icers <- function(x, ...,
+plot.icers <- function(x,
                        title = "",
                        txtsize = 12,
                        currency = "$",
                        effect_units = "QALYs",
                        label = c("frontier", "all", "none"),
                        label_max_char = 8,
-                       plot_frontier_only = FALSE){
+                       plot_frontier_only = FALSE,
+                       ...){
   # type checking
   label <- match.arg(label)
 

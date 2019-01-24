@@ -1,12 +1,19 @@
 #' linear regression metamodeling
 #'
-#' @param y data frame with the model outputs of interest
 #' @param psa psa object
 #' @param parm String with the name of the parameter of interest
+#' @param strategies vector of strategies to consider. the default (NULL) is that all strategies are considered. The
+#' @param outcome either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")
+#' @param wtp if outcome is NHB or NMB, must provide the willingness-to-pay threshold
 #' @param poly.order Order of polynomial for the linear regression metamodel.
 #' Default: 2
+#'
+#' @importFrom stats as.formula formula getCall lm
 #' @export
-metamod <- function(y, psa, parm, poly.order = 2) {
+metamod <- function(psa, parm, strategies = NULL,
+                    outcome = c("eff", "cost", "nhb", "nmb"),
+                    wtp = NULL,
+                    poly.order = 2) {
   # get parameter names
   pnames <- psa$parnames
 
@@ -17,19 +24,58 @@ metamod <- function(y, psa, parm, poly.order = 2) {
   other_parms <- pnames[-which(pnames == parm)]
 
   # define dependent variables
-  # if the outcome is a single variable and not a data.frame, coerce
-  if (!inherits(y, "data.frame")) {
-    warning("y is not a data frame - coercing")
-    y <- as.data.frame(y)
+  outcome <- match.arg(outcome)
+
+  ## make sure wtp is not null if nmb or nhb
+  if ( (outcome == "nmb" | outcome == "nhb") & is.null(wtp) ) {
+    stop("wtp must be provided if nmb or nhb is the outcome to be modeled")
+  }
+
+  # define y, the outcome matrix
+  if (outcome == "eff") {
+    y <- psa$effectiveness
+  }
+  if (outcome == "cost") {
+    y <- psa$cost
+  }
+  if (outcome == "nhb") {
+    y <- psa$effectiveness - psa$cost / wtp
+  }
+  if (outcome == "nmb") {
+    y <- psa$effectiveness * wtp - psa$cost
+  }
+
+  # restrict to strategies of interest
+  strat <- psa$strategies
+
+  if (!is.null(strategies)) {
+    ## make sure all subset strats are in strat
+    if (all(strategies %in% strat)) {
+      y <- y[, strategies, drop = FALSE]
+    } else {
+      wrong_strats <- setdiff(strategies, strat)
+      errmsg <- paste0("these are not in psa$strategies: ",
+                       paste(wrong_strats, collapse = ","))
+      stop(errmsg)
+    }
   }
 
   dep <- colnames(y)
 
+  # data frame to pass to lm
   sim_data <- data.frame(y, psa$parameters)
 
   #Generate a formula by pasting column names for both dependent and independent variables.
   # Imposes a 1 level interaction
-  f <- as.formula(paste0("cbind(", paste(dep, collapse = ","), ") ~ (",
+  # if there's only one outcome, don't cbind
+  n_out <- length(dep)
+  if (n_out > 1) {
+    bind_txt <- c("cbind(", ")")
+  } else {
+    bind_txt <- c("", "")
+  }
+
+  f <- as.formula(paste0(bind_txt[1], paste(dep, collapse = ","), bind_txt[2], " ~ (",
                          "poly(", parm, ",", poly.order, ", raw=TRUE) + ",
                          paste(other_parms, collapse = " + "), ")"))
 
@@ -50,8 +96,15 @@ metamod <- function(y, psa, parm, poly.order = 2) {
   return(metamodel)
 }
 
+#' Predict from a metamodel
+#'
+#' @param object object with class "metamodel"
+#' @param newdata values for parameter of interest
+#' @param ... further arguments to \code{predict} (not used)
+#'
+#' @importFrom stats quantile predict
 #' @export
-predict.metamodel <- function(object, newdata = NULL) {
+predict.metamodel <- function(object, newdata = NULL, ...) {
   # hard to get original data, this is thanks to
   # https://stackoverflow.com/questions/22921765/way-to-extract-data-from-lm-object-before-function-is-applied
   df <- eval(getCall(object)$data, environment(formula(object)))

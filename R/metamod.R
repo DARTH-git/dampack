@@ -111,12 +111,15 @@ metamod <- function(psa, parm, strategies = NULL,
 #' Predict from a metamodel
 #'
 #' @param object object with class "metamodel"
-#' @param newdata values for parameter of interest
+#' @param newdata values for parameter of interest. if NULL,
+#' parameter values from the middle 95% are used. The number of samples
+#' from this range is determined by \code{nsamp}
+#' @param nsamp number of samples from range
 #' @param ... further arguments to \code{predict} (not used)
 #'
 #' @importFrom stats quantile predict
 #' @export
-predict.metamodel <- function(object, newdata = NULL, ...) {
+predict.metamodel <- function(object, newdata = NULL, nsamp = 400, ...) {
   # hard to get original data, this is thanks to
   # https://stackoverflow.com/questions/22921765/way-to-extract-data-from-lm-object-before-function-is-applied
   df <- eval(getCall(object)$data, environment(formula(object)))
@@ -125,19 +128,19 @@ predict.metamodel <- function(object, newdata = NULL, ...) {
   nparm <- length(parm)
 
   # use range of parameter if user does not provide new data
-  pranges_100samp <- vector(mode = "list", length = nparm)
+  pranges_samp <- vector(mode = "list", length = nparm)
 
   if (is.null(newdata)){
     for (i in 1:nparm) {
       ith_parm <- parm[i]
       prange <- quantile(df[, ith_parm], c(0.025, 0.975))
 
-      # define 400 samples of parameter range
-      pranges_100samp[[i]] <- seq(prange[1], prange[2], length.out = 100)
+      # define samples from parameter range
+      pranges_samp[[i]] <- seq(prange[1], prange[2], length.out = nsamp)
     }
 
     # Create data frame with all combinations between both parameters of interest
-    newdata <- data.frame(expand.grid(pranges_100samp))
+    newdata <- data.frame(expand.grid(pranges_samp))
     names(newdata) <- parm
   }
 

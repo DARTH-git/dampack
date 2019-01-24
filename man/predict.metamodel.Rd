@@ -4,12 +4,16 @@
 \alias{predict.metamodel}
 \title{Predict from a metamodel}
 \usage{
-\method{predict}{metamodel}(object, newdata = NULL, ...)
+\method{predict}{metamodel}(object, newdata = NULL, nsamp = 400, ...)
 }
 \arguments{
 \item{object}{object with class "metamodel"}
 
-\item{newdata}{values for parameter of interest}
+\item{newdata}{values for parameter of interest. if NULL,
+parameter values from the middle 95% are used. The number of samples
+from this range is determined by \code{nsamp}}
+
+\item{nsamp}{number of samples from range}
 
 \item{...}{further arguments to \code{predict} (not used)}
 }

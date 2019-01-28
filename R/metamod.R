@@ -18,10 +18,10 @@ metamod <- function(psa, parm, strategies = NULL,
   pnames <- psa$parnames
 
   # make sure parm is in parameter names
-  if (!(parm %in% pnames)) {
+  if (!all(parm %in% pnames)) {
     stop("parm is not in the parameter names. misspelled?")
   }
-  other_parms <- pnames[-which(pnames == parm)]
+  other_parms <- pnames[-match(parm, pnames)]
 
   # define dependent variables
   outcome <- match.arg(outcome)
@@ -75,9 +75,21 @@ metamod <- function(psa, parm, strategies = NULL,
     bind_txt <- c("", "")
   }
 
-  f <- as.formula(paste0(bind_txt[1], paste(dep, collapse = ","), bind_txt[2], " ~ (",
-                         "poly(", parm, ",", poly.order, ", raw=TRUE) + ",
-                         paste(other_parms, collapse = " + "), ")"))
+  # build formula
+  ## beginning
+  fbeg <- paste0(bind_txt[1], paste(dep, collapse = ","), bind_txt[2], " ~ ")
+
+  ## parameters of interest
+  fparm <- ""
+  for (p in parm) {
+    fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
+  }
+
+  ## ending
+  fend <- paste(other_parms, collapse = " + ")
+
+  ## combine
+  f <- as.formula(paste0(fbeg, fparm, fend))
 
   #Run Multiple Multivariate Regression (MMR) Metamodel
   metamodel <- lm(f, data = sim_data)
@@ -99,27 +111,36 @@ metamod <- function(psa, parm, strategies = NULL,
 #' Predict from a metamodel
 #'
 #' @param object object with class "metamodel"
-#' @param newdata values for parameter of interest
+#' @param newdata values for parameter of interest. if NULL,
+#' parameter values from the middle 95% are used. The number of samples
+#' from this range is determined by \code{nsamp}
+#' @param nsamp number of samples from range
 #' @param ... further arguments to \code{predict} (not used)
 #'
 #' @importFrom stats quantile predict
 #' @export
-predict.metamodel <- function(object, newdata = NULL, ...) {
+predict.metamodel <- function(object, newdata = NULL, nsamp = 400, ...) {
   # hard to get original data, this is thanks to
   # https://stackoverflow.com/questions/22921765/way-to-extract-data-from-lm-object-before-function-is-applied
   df <- eval(getCall(object)$data, environment(formula(object)))
 
   parm <- object$parm_of_int
+  nparm <- length(parm)
 
   # use range of parameter if user does not provide new data
-  if (is.null(newdata)){
-    prange <- quantile(df[, parm], c(0.025, 0.975))
+  pranges_samp <- vector(mode = "list", length = nparm)
 
-    # define 400 samples of parameter range
-    prange_400samp <- seq(prange[1], prange[2], length.out = 400)
+  if (is.null(newdata)){
+    for (i in 1:nparm) {
+      ith_parm <- parm[i]
+      prange <- quantile(df[, ith_parm], c(0.025, 0.975))
+
+      # define samples from parameter range
+      pranges_samp[[i]] <- seq(prange[1], prange[2], length.out = nsamp)
+    }
 
     # Create data frame with all combinations between both parameters of interest
-    newdata <- data.frame(prange_400samp)
+    newdata <- data.frame(expand.grid(pranges_samp))
     names(newdata) <- parm
   }
 
@@ -133,7 +154,9 @@ predict.metamodel <- function(object, newdata = NULL, ...) {
   colnames(pdata) <- colnames(df) # Name data frame's columns with parameters' names
 
   # replace parameter of interest
-  pdata[, parm] <- newdata
+  for (p in parm) {
+    pdata[, p] <- newdata[, p]
+  }
 
   # Predict Outcomes using MMMR Metamodel fit
   # we have to get a little hacky for the MLM

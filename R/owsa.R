@@ -32,12 +32,25 @@ owsa <- function(psa, parm, newdata = NULL,
 #'
 #' @param x an owsa object
 #' @param txtsize base text size in the plot
+#' @param col either full-color ("full") or black and white ("bw")
+#' @param ptype plot type. either point or line.
+#' @param title plot title.
+#' @param n_x_ticks number of axis ticks on the x axis
+#' @param n_y_ticks number of axis ticks on the y axis
+#' @param size either point size (ptype = "point") or line size (ptype = "line")
 #' @param ... further arguments to \code{plot.owsa} (not used)
 #'
 #' @importFrom reshape2 melt
 #' @import ggplot2
 #' @export
-plot.owsa <- function(x, txtsize = 12, ...) {
+plot.owsa <- function(x, txtsize = 12,
+                      col = c("full", "bw"),
+                      ptype = c("line", "point"),
+                      title = "",
+                      n_x_ticks = 6,
+                      n_y_ticks = 6,
+                      size = 1,
+                      ...) {
   # get parameter name
   parm <- colnames(x)[1]
 
@@ -45,14 +58,32 @@ plot.owsa <- function(x, txtsize = 12, ...) {
   outcome <- melt(x, id.vars = parm, variable.name = "Strategy")
 
   owsa <- ggplot(data = outcome,
-                 aes_(x = as.name(parm), y = as.name("value"), color = as.name("Strategy"))) +
-    geom_line() +
-    ggtitle("One-way sensitivity analysis") +
+                 aes_(x = as.name(parm), y = as.name("value"),
+                      color = as.name("Strategy"))) +
+    ggtitle(title) +
     xlab(parm) +
     ylab("E[Outcome]") +
-    scale_colour_hue("Strategy", l = 50) +
-    scale_x_continuous(breaks = number_ticks(6)) + #Adjust for number of ticks in x axis
-    scale_y_continuous(breaks = number_ticks(6)) +
+    scale_x_continuous(breaks = number_ticks(n_x_ticks)) +
+    scale_y_continuous(breaks = number_ticks(n_y_ticks)) +
     common_theme(txtsize)
+
+  # ptype
+  ptype <- match.arg(ptype)
+  if (ptype == "line") {
+    owsa <- owsa + geom_line(aes_(linetype = as.name("Strategy")), size = size)
+  }
+  if (ptype == "point") {
+    owsa <- owsa + geom_point(aes_(shape = as.name("Strategy")), size = size)
+  }
+
+  # color - could move this to separate function
+  col <- match.arg(col)
+  if (col == "full") {
+    owsa <- owsa + scale_colour_hue("Strategy", l = 50)
+  }
+  if (col == "bw") {
+    owsa <- owsa + scale_color_grey("Strategy", start = 0.3)
+  }
+
   return(owsa)
 }

@@ -4,12 +4,26 @@
 \alias{plot.owsa}
 \title{Plot a sensitivity analysis}
 \usage{
-\method{plot}{owsa}(x, txtsize = 12, ...)
+\method{plot}{owsa}(x, txtsize = 12, col = c("full", "bw"),
+  ptype = c("line", "point"), title = "", n_x_ticks = 6,
+  n_y_ticks = 6, size = 1, ...)
 }
 \arguments{
 \item{x}{an owsa object}
 
 \item{txtsize}{base text size in the plot}
+
+\item{col}{either full-color ("full") or black and white ("bw")}
+
+\item{ptype}{plot type. either point or line.}
+
+\item{title}{plot title.}
+
+\item{n_x_ticks}{number of axis ticks on the x axis}
+
+\item{n_y_ticks}{number of axis ticks on the y axis}
+
+\item{size}{either point size (ptype = "point") or line size (ptype = "line")}
 
 \item{...}{further arguments to \code{plot.owsa} (not used)}
 }

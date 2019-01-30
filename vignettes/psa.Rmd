@@ -1,6 +1,6 @@
 ---
 title: "Probabilistic Sensitivity Analysis: Basic Usage"
-author: "Fernando Alarid-Escudero, Caleb Easterly, and the DARTH Team"
+author: "Fernando Alarid-Escudero, Caleb Easterly, Eva Enns, and the DARTH Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -12,62 +12,127 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 6,
+  fig.align = "center"
 )
 ```
 
-# Outline
+The probabilistic sensitivity analysis object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` object from an existing PSA, and what can be done once the PSA object is created in `dampack`.
 
-- how to read in PSA data
-- how to create the psa object
-- viewing the psa object
-- steps after PSA object is created
+## Probability Sensitivity Analysis: An Introduction
 
+**theoretical background and stuff here**
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+## PSA in dampack
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+First, we need to load the `dampack` package.
+```{r}
+library(dampack)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+## Read in data
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+**explanation of data here?**
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+The PSA object is created using the function `make_psa_obj`. We can see the types of data we need by examining what arguments this function takes.
 
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r}
+args(make_psa_obj)
 ```
 
-Also a quote using `>`:
+To see more information, you can write `?make_psa_obj` in the R console. 
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+As the arguments (and the help text) show, we need the `cost`, `effectiveness`, `strategies` (optional), and `currency` (also optional). 
+
+There is example data provided with dampack that allows us to illustrate the required structure of each of these parts of a PSA.
+
+```{r}
+data("example_psa")
+```
+
+We can see the structure of the object with `str()`:
+```{r}
+str(example_psa)
+```
+
+We can ignore the `wtp` part for now. The other parts of the `example_psa` object are:
+
+- `strategies`: a list of three strategy names
+```{r}
+example_psa$strategies
+```
+
+- `costs`: a data frame of the cost of carrying out each strategy. The columns are the strategies and the
+rows are the PSA samples (of which there were 10,000).
+```{r}
+head(example_psa$costs)
+```
+
+Note that the columns have names that suggest the strategy and the units. This is, however, not necessary. It is *critical* that the vector of strategies (`example_psa$strategies`) and the columns of the `cost` and `effectiveness` dataframes be in the same order, though.
+
+- `effectiveness`: a data frame of the effects of carrying out each strategy, with the same structure as `costs`
+```{r}
+head(example_psa$effectiveness)
+```
+
+Now, let's make the PSA object:
+
+```{r}
+psa_obj <- make_psa_obj(cost = example_psa$costs,
+                        effectiveness = example_psa$effectiveness,
+                        strategies = example_psa$strategies,
+                        currency = "$")
+str(psa_obj)
+```
+
+## Scatterplot
+
+**explanation here**
+
+```{r fig.width = 7, fig.height = 5, fig.align = "center"}
+plot(psa_obj)
+```
+
+## Cost-effectiveness acceptability curve
+
+**explanation here**
+
+```{r}
+ceac_obj <- ceac(wtp = example_psa$wtp, psa = psa_obj)
+head(ceac_obj)
+```
+
+We can get the summary of the cost-effective strategy in each range of willingness-to-pay:
+
+```{r}
+summary(ceac_obj)
+```
+
+We can also plot the cost-effectiveness acceptability curve.
+
+```{r}
+plot(ceac_obj, frontier = TRUE)
+plot(ceac_obj, frontier = FALSE)
+```
+
+
+## Expected Value of Perfect Information
+
+**explanation here**
+
+```{r}
+evpi <- calc_evpi(wtp = example_psa$wtp, psa = psa_obj)
+head(evpi)
+plot(evpi)
+```
+
+## Expected loss curves
+
+**explanation here**
+
+```{r}
+elc <- calc_elc(wtp = example_psa$wtp, psa = psa_obj)
+head(elc)
+plot(elc, n_x_ticks = 8, n_y_ticks = 6)
+```

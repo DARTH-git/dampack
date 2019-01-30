@@ -46,6 +46,8 @@ calc_elc <- function(wtp, psa) {
 #' @param frontier indicate the frontier (also the expected value of perfect information)
 #' @param n_y_ticks number of axis ticks on the y axis
 #' @param n_x_ticks number of axis ticks on the x axis
+#' @param col either full-color ("full") or black-and-white ("bw")
+#' @param lsize line size. defaults to 1.
 #'
 #' @keywords expected loss
 #' @return A \code{ggplot2} object with the expected loss
@@ -62,7 +64,9 @@ plot.elc <- function(x, ...,
                      log_y = TRUE,
                      frontier = TRUE,
                      n_y_ticks = 8,
-                     n_x_ticks = 20){
+                     n_x_ticks = 20,
+                     col = c("full", "bw"),
+                     lsize = 1) {
   # melt for plotting in ggplot
   wtp_name <- "WTP_thou"
   loss_name <- "value"
@@ -91,7 +95,7 @@ plot.elc <- function(x, ...,
                                    y = as.name(loss_name),
                                    color = as.name(strat_name))) +
     geom_point() +
-    geom_line() +
+    geom_line(aes_(linetype = as.name(strat_name)), size = lsize) +
     scale_x_continuous(breaks = number_ticks(n_x_ticks)) +
     scale_y_continuous(trans = tr,
                        labels = comma,
@@ -99,8 +103,17 @@ plot.elc <- function(x, ...,
     ggtitle(title) +
     xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
     ylab(paste0("Expected Loss (", currency, ")")) +
-    common_theme(txtsize) +
-    scale_color_hue(l = 50)
+    common_theme(txtsize)
+
+  # color
+  col <- match.arg(col)
+  if (col == "full") {
+    p <- p + scale_color_hue(l = 50)
+  }
+  if (col == "bw") {
+    p <- p + scale_color_grey(start = 0.35)
+  }
+
   if (frontier) {
     p <- p + geom_point(data = front, aes_(x = as.name(wtp_name),
                                            y = as.name(loss_name),
@@ -108,6 +121,7 @@ plot.elc <- function(x, ...,
                         size = 3, stroke = 1, color = "black") +
       scale_shape_manual(name = NULL, values = 0, labels = "Frontier & EVPI") +
       guides(color = guide_legend(order = 1),
+             linetype = guide_legend(order = 1),
              shape = guide_legend(order = 2))
   }
   return(p)

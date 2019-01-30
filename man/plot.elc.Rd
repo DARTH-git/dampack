@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{elc}(x, ..., title = "", txtsize = 12, currency = "$",
   effect_units = "QALY", log_y = TRUE, frontier = TRUE,
-  n_y_ticks = 8, n_x_ticks = 20)
+  n_y_ticks = 8, n_x_ticks = 20, col = c("full", "bw"), lsize = 1)
 }
 \arguments{
 \item{x}{object of class \code{elc}, produced by function
@@ -30,6 +30,10 @@ Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 \item{n_y_ticks}{number of axis ticks on the y axis}
 
 \item{n_x_ticks}{number of axis ticks on the x axis}
+
+\item{col}{either full-color ("full") or black-and-white ("bw")}
+
+\item{lsize}{line size. defaults to 1.}
 }
 \value{
 A \code{ggplot2} object with the expected loss

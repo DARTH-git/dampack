@@ -95,7 +95,6 @@ plot.elc <- function(x, ...,
                                    y = as.name(loss_name),
                                    color = as.name(strat_name))) +
     geom_point() +
-    geom_line(aes_(linetype = as.name(strat_name)), size = lsize) +
     scale_x_continuous(breaks = number_ticks(n_x_ticks)) +
     scale_y_continuous(trans = tr,
                        labels = comma,
@@ -108,10 +107,12 @@ plot.elc <- function(x, ...,
   # color
   col <- match.arg(col)
   if (col == "full") {
-    p <- p + scale_color_hue(l = 50)
+    p <- p + scale_color_hue(l = 50) +
+      geom_line(size = lsize)
   }
   if (col == "bw") {
-    p <- p + scale_color_grey(start = 0.35)
+    p <- p + scale_color_grey(start = 0.35) +
+      geom_line(aes_(linetype = as.name(strat_name)), size = lsize)
   }
 
   if (frontier) {

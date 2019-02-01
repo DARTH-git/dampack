@@ -23,6 +23,8 @@ test_that("calculate_icers returns correct object", {
   expected_df <- data.frame("Strategy" = c("UC", "B", "D", "E", "C", "A"),
                             "Cost" = c(5000, 10000, 35000, 55000, 25000, 12000),
                             "Effect" = c(1, 2, 4, 5, 3, 1.5),
+                            "Inc_Cost" = c(NA, 5000, 25000, 20000, NA, NA),
+                            "Inc_Effect" = c(NA, 1, 2, 1, NA, NA),
                             "ICER" = c(NA, 5000, 12500, 20000, NA, NA),
                             "Status" = c("ref", "ND", "ND", "ND", "ED", "D"),
                             stringsAsFactors = FALSE)

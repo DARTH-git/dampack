@@ -4,24 +4,23 @@
 #' by estimating a linear regression metamodel of a PSA for a given
 #' decision-analytic model
 #'
-#' @param newdata data frame with values of parameter of interest
 #' @inheritParams metamod
 #' @keywords one-way sensitivity analysis; linear regression metamodel
 #' @return A dataframe with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}}
 #'
 #' @export
-owsa <- function(psa, parm, newdata = NULL,
+owsa <- function(psa, parm = NULL, ranges = NULL,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
 
-  #Run Multiple Multivariate Regression (MMR) Metamodel
-  mm <- metamod(psa, parm, strategies, outcome, wtp, poly.order)
+  # create metamodel
+  mm <- metamod("oneway", psa, parm, strategies, outcome, wtp, poly.order)
 
   # Predict Outcomes using MMMR Metamodel fit
-  ow <- predict(mm, newdata)
+  ow <- predict(mm, ranges)
 
   # define classes
   class(ow) <- c("owsa", "data.frame")
@@ -49,20 +48,19 @@ plot.owsa <- function(x, txtsize = 12,
                       title = "",
                       n_x_ticks = 6,
                       n_y_ticks = 6,
+                      facet_scales = c("free_x", "free_y", "free", "fixed"),
+                      facet_nrow = 3,
+                      facet_ncol = 3,
                       size = 1,
                       ...) {
-  # get parameter name
-  parm <- colnames(x)[1]
-
-  #Reshape dataframe for ggplot
-  outcome <- melt(x, id.vars = parm, variable.name = "Strategy")
-
-  owsa <- ggplot(data = outcome,
-                 aes_(x = as.name(parm), y = as.name("value"),
-                      color = as.name("Strategy"))) +
+  scales <- match.arg(facet_scales)
+  owsa <- ggplot(data = x,
+                 aes_(x = as.name("pranges_samp"), y = as.name("outcome_val"),
+                      color = as.name("strategy"))) +
+    facet_wrap(facets = "parameter", scales = scales, nrow = facet_nrow, ncol = facet_ncol) +
     ggtitle(title) +
-    xlab(parm) +
     ylab("E[Outcome]") +
+    xlab("Parameter Values") +
     scale_x_continuous(breaks = number_ticks(n_x_ticks)) +
     scale_y_continuous(breaks = number_ticks(n_y_ticks)) +
     common_theme(txtsize)
@@ -70,19 +68,19 @@ plot.owsa <- function(x, txtsize = 12,
   # ptype
   ptype <- match.arg(ptype)
   if (ptype == "line") {
-    owsa <- owsa + geom_line(aes_(linetype = as.name("Strategy")), size = size)
+    owsa <- owsa + geom_line(aes_(linetype = as.name("strategy")), size = size)
   }
   if (ptype == "point") {
-    owsa <- owsa + geom_point(aes_(shape = as.name("Strategy")), size = size)
+    owsa <- owsa + geom_point(aes_(shape = as.name("strategy")), size = size)
   }
 
   # color - could move this to separate function
   col <- match.arg(col)
   if (col == "full") {
-    owsa <- owsa + scale_colour_hue("Strategy", l = 50)
+    owsa <- owsa + scale_colour_hue("strategy", l = 50)
   }
   if (col == "bw") {
-    owsa <- owsa + scale_color_grey("Strategy", start = 0.3)
+    owsa <- owsa + scale_color_grey("strategy", start = 0.3)
   }
 
   return(owsa)

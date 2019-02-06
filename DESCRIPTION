@@ -26,6 +26,8 @@ Imports:
     stringr
 Suggests:
     testthat,
-    lintr
+    lintr,
+    knitr
 LazyData: true
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr

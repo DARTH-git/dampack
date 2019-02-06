@@ -6,7 +6,8 @@
 \usage{
 \method{plot}{owsa}(x, txtsize = 12, col = c("full", "bw"),
   ptype = c("line", "point"), title = "", n_x_ticks = 6,
-  n_y_ticks = 6, size = 1, ...)
+  n_y_ticks = 6, facet_scales = c("free_x", "free_y", "free", "fixed"),
+  facet_nrow = 3, facet_ncol = 3, size = 1, ...)
 }
 \arguments{
 \item{x}{an owsa object}

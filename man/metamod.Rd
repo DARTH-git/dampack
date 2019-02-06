@@ -4,10 +4,13 @@
 \alias{metamod}
 \title{linear regression metamodeling}
 \usage{
-metamod(psa, parms = NULL, strategies = NULL, outcome = c("eff",
-  "cost", "nhb", "nmb"), wtp = NULL, poly.order = 2)
+metamod(analysis = c("oneway", "twoway"), psa, parms = NULL,
+  strategies = NULL, outcome = c("eff", "cost", "nhb", "nmb"),
+  wtp = NULL, type = "poly", poly.order = 2)
 }
 \arguments{
+\item{analysis}{either "oneway" or "twoway"}
+
 \item{psa}{psa object}
 
 \item{parms}{String with the name of the parameter of interest}
@@ -17,6 +20,8 @@ metamod(psa, parms = NULL, strategies = NULL, outcome = c("eff",
 \item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
 
 \item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
+
+\item{type}{type of metamodel}
 
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}

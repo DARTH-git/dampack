@@ -4,7 +4,7 @@
 \alias{twsa}
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
-twsa(psa, parm1, parm2, newdata = NULL, outcome = c("eff", "cost",
+twsa(psa, parm1, parm2, ranges = NULL, outcome = c("eff", "cost",
   "nhb", "nmb"), wtp = NULL, strategies = NULL, poly.order = 2)
 }
 \arguments{
@@ -13,8 +13,6 @@ twsa(psa, parm1, parm2, newdata = NULL, outcome = c("eff", "cost",
 \item{parm1}{String with the name of the first parameter of interest}
 
 \item{parm2}{String with the name of the second parameter of interest}
-
-\item{newdata}{data frame with values of parameter of interest}
 
 \item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
 

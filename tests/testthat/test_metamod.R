@@ -50,3 +50,10 @@ test_that("prediction with several outcomes", {
   expect_equal(colnames(pred),
                c("parameter", "strategy", "pranges_samp", "outcome_val"))
 })
+
+test_that("two-way metamodel", {
+  # metamodel
+  mm <- metamod(analysis = "twoway", parms = c("pFailChemo", "pFailRadio"),
+                psa = psa_big, outcome = "eff")
+  expect_is(mm, "metamodel")
+})

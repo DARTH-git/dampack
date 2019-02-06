@@ -1,21 +1,27 @@
 #' linear regression metamodeling
 #'
+#' @param analysis either "oneway" or "twoway"
 #' @param psa psa object
 #' @param parms String with the name of the parameter of interest
 #' @param strategies vector of strategies to consider. the default (NULL) is that all strategies are considered. The
 #' @param outcome either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")
 #' @param wtp if outcome is NHB or NMB, must provide the willingness-to-pay threshold
+#' @param type type of metamodel
 #' @param poly.order Order of polynomial for the linear regression metamodel.
 #' Default: 2
 #'
 #' @importFrom stats as.formula formula getCall lm
 #' @export
-metamod <- function(psa, parms = NULL, strategies = NULL,
+metamod <- function(analysis = c("oneway", "twoway"),
+                    psa, parms = NULL, strategies = NULL,
                     outcome = c("eff", "cost", "nhb", "nmb"),
                     wtp = NULL,
-                    poly.order = 2) {
+                    type = "poly", poly.order = 2) {
   # get parameter names
   pnames <- psa$parnames
+
+  # analysis
+  analysis <- match.arg(analysis)
 
   # make sure all of parms is in parameter names
   if (is.null(parms)) {
@@ -24,6 +30,8 @@ metamod <- function(psa, parms = NULL, strategies = NULL,
     wrong_p <- setdiff(p, pnames)
     stop(paste0("the following parameters are not valid: ",
                 paste(wrong_p, collapse = ",")))
+  } else if (length(parms) != 2 & analysis == "twoway") {
+    stop("If analysis == twoway, exactly 2 parms must be provided.")
   }
 
   # define dependent variables
@@ -67,36 +75,65 @@ metamod <- function(psa, parms = NULL, strategies = NULL,
   # list to hold linear models
   lms <- NULL
 
-  # loop over parameters
-  for (p in parms) {
-    # independent variables not of interest
-    other_parms <- pnames[-match(p, pnames)]
-
+  # analysis: either oneway or twoway
+  if (analysis == "oneway") {
+    # loop over parameters
+    for (p in parms) {
+      # loop over strategies
+      for (s in strategies) {
+        mod <- mm_run_reg(s, p, dat, pnames, type, poly.order)
+        mod$parm_of_int <- p
+        mod$strat <- s
+        lms[[p]][[s]] <- mod
+      }
+    }
+  }
+  if (analysis == "twoway") {
     # loop over strategies
     for (s in strategies) {
-      lm_form <- as.formula(
-        paste0(s, " ~ ",
-               paste0("poly(", p, ",", poly.order, ", raw=TRUE) + "),
-               paste(other_parms, collapse = " + "))
-      )
-
-      mod <- lm(lm_form, data = dat)
-      # makes the displayed formula more informative
-      mod$call <- call("lm", formula = lm_form, data = quote(dat))
+      mod <- mm_run_reg(s, parms, dat, pnames, type, poly.order)
       # for accessing later in predict
-      mod$parm_of_int <- p
+      mod$parm_of_int <- parms
       mod$strat <- s
-      lms[[p]][[s]] <- mod
+      lms[[s]] <- mod
     }
   }
 
   metamod <- list(outcome = outcome, mods = lms, wtp = wtp,
                   parms = parms, strategies = strategies,
-                  psa = psa)
+                  psa = psa, analysis = analysis)
   # define class
   class(metamod) <- "metamodel"
   return(metamod)
 }
+
+#' this should have just one parm of int
+#' when the analysis is one-way
+#'
+mm_run_reg <- function(dep, parms_of_int, dat, all_parms, type, poly.order) {
+  # build formula
+  ## dependent variable
+  fbeg <- paste0(dep, " ~ ")
+
+  ## parameters of interest
+  fparm <- ""
+  for (p in parms_of_int) {
+    fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
+  }
+
+  ## other parameters
+  other_parms <- all_parms[-match(parms_of_int, all_parms)]
+  fend <- paste(other_parms, collapse = " + ")
+
+  ## combine
+  f <- as.formula(paste0(fbeg, fparm, fend))
+
+  # run metamodel
+  metamodel <- lm(f, data = dat)
+  metamodel$call <- call("lm", formula = f, data = quote(dat))
+  return(metamodel)
+}
+
 
 #' Print metamodel
 #'
@@ -104,21 +141,20 @@ metamod <- function(psa, parms = NULL, strategies = NULL,
 #' @param ... further arguments to print
 #' @export
 print.metamodel <- function(x, ...) {
+  wtp <- x$wtp
   cat("metamodel object", "\n",
       "-------------------------", "\n",
       "a list of the following objects: ",
-      paste(names(x), collapse = ","), "\n",
+      paste(names(x), collapse = ", "), "\n",
       "\n",
       "some details: ", "\n",
       "-------------------------", "\n",
+      "analysis: this is a ", substr(x$analysis, 1, 3), "-way metamodel \n",
       "mods: a nested list of linear metamodels \n",
       "outcome: ", x$outcome, "\n",
-      "WTP: ", x$wtp, "\n",
-      "strategies: ", paste(x$strategies, collapse = ","), "\n",
-      "parameters modeled: ", paste(x$parms, collapse = ","), "\n",
-      "To access the linear model for strategy s and parameter p, ", "\n",
-      "type metamod$mods[[p]][[s]] at the console ",
-      "(where p and s are replaced with their respective strings).",
+      "WTP: ", ifelse(!is.null(wtp), wtp, "NA"), "\n",
+      "strategies: ", paste(x$strategies, collapse = ", "), "\n",
+      "parameters modeled: ", paste(x$parms, collapse = ", "), "\n",
       sep = "")
 }
 
@@ -128,12 +164,25 @@ print.metamodel <- function(x, ...) {
 #' @param ... further arguments to summary
 #' @export
 summary.metamodel <- function(object, ...) {
+  analysis <- object$analysis
   summary_df <- NULL
-  for (p in object$parms) {
+  if (analysis == "oneway") {
+    for (p in object$parms) {
+      for (s in object$strategies) {
+        lm_summary <- summary(object$mods[[p]][[s]])
+        r2 <- lm_summary$r.squared
+        df_new_row <- data.frame("parm" = p, "strat" = s, "rsquared" = r2)
+        summary_df <- rbind(summary_df, df_new_row)
+      }
+    }
+  }
+  if (analysis == "twoway") {
+    parms <- object$parms
     for (s in object$strategies) {
-      lm_summary <- summary(object$mods[[p]][[s]])
+      lm_summary <- summary(object$mods[[s]])
       r2 <- lm_summary$r.squared
-      df_new_row <- data.frame("parm" = p, "strat" = s, "rsquared" = r2)
+      df_new_row <- data.frame("parm1" = parms[1], "parm2" = parms[2],
+                               "strat" = s, "rsquared" = r2)
       summary_df <- rbind(summary_df, df_new_row)
     }
   }
@@ -165,13 +214,20 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   # strategies
   strats <- object$strategies
 
+  # analysis type
+  analysis <- object$analysis
+
   # data frame to be used in predict - mean values repeated
   # the values for the parameter of interest are replaced
   # in each pass through the loop
-  # Generate matrix to use for prediction
-  # use the means of all parameters other than parameter of interest
+  if (analysis == "oneway") {
+    pred_data_nrow <- nsamp
+  }
+  if (analysis == "twoway") {
+    pred_data_nrow <- nsamp ^ 2
+  }
   pdata <- data.frame(matrix(colMeans(psa_parmvals),
-                             nrow = nsamp,
+                             nrow = pred_data_nrow,
                              ncol = ncol(psa_parmvals),
                              byrow = T))
 
@@ -186,37 +242,67 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   }
 
   # predict outcomes from linear metamodels
-  ## make list to hold outcome dfs
-  outcome_dfs <- vector(mode = "list",
-                        length = length(strats) * length(q_parms))
-  counter <- 1
-  for (p in q_parms) {
-    p_range <- ranges[p]
-    if (is.null(p_range)) {
-      p_psa_vals <- psa_parmvals[, p]
-      prange <- quantile(p_psa_vals, c(0.025, 0.975))
+  if (analysis == "oneway") {
+    ## make list to hold outcome dfs
+    outcome_dfs <- vector(mode = "list",
+                          length = length(strats) * length(q_parms))
+    counter <- 1
+    for (p in q_parms) {
+      # define evenly spaced samples from parameter range
+      pranges_samp <- make_parm_seq(p, ranges, nsamp, psa_parmvals)
+
+      # create new data from pranges_samp
+      newdata <- data.frame(pranges_samp)
+
+      # replace values for parameter of interest
+      this_p_data <- pdata
+      this_p_data[, p] <- newdata
+
+      # predict values from linear model
+      # for each strategy
+      for (s in strats) {
+        mod <- mods[[p]][[s]]
+        outcome_dfs[[counter]] <- data.frame("parameter" = p, "strategy" = s,
+                                             "param_val" = newdata,
+                                             "outcome_val" = predict(mod, newdata = this_p_data),
+                                             stringsAsFactors = FALSE)
+        counter <- counter + 1
+      }
     }
-    # define evenly spaced samples from parameter range
-    pranges_samp <- seq(prange[1], prange[2], length.out = nsamp)
+  }
+  if (analysis == "twoway") {
+    outcome_dfs <- vector(mode = "list",
+                          length = length(strats))
+    counter <- 1
+    p1 <- psa_parms[1]
+    p2 <- psa_parms[2]
+    p1_samp <- make_parm_seq(p1, ranges, nsamp, psa_parmvals)
+    p2_samp <- make_parm_seq(p2, ranges, nsamp, psa_parmvals)
+    p1p2_data <- data.frame(expand.grid(p1_samp, p2_samp))
+    pdata[, c(p1, p2)] <- p1p2_data
 
-    # create new data from pranges_samp
-    newdata <- data.frame(pranges_samp)
-
-    # replace values for parameter of interest
-    this_p_data <- pdata
-    this_p_data[, p] <- newdata
-
-    # predict values from linear model
-    # for each strategy
     for (s in strats) {
-      mod <- mods[[p]][[s]]
-      outcome_dfs[[counter]] <- data.frame("parameter" = p, "strategy" = s,
-                            "param_val" = newdata,
-                            "outcome_val" = predict(mod, newdata = this_p_data),
-                            stringsAsFactors = FALSE)
+      mod <- mods[[s]]
+      outcome <- predict(mod, newdata = pdata)
+      outcome_df <- data.frame("p1" = pdata[, p1], "p2" = pdata[, p2],
+                                           "strategy" = s, "outcome_val" = outcome,
+                                           stringsAsFactors = FALSE)
+      names(outcome_df)[1:2] <- c(p1, p2)
+      outcome_dfs[[counter]] <- outcome_df
       counter <- counter + 1
     }
   }
   combined_df <- bind_rows(outcome_dfs)
   return(combined_df)
+}
+
+
+make_parm_seq <- function(p, ranges, nsamp, psa_parmvals) {
+  p_range <- ranges[p]
+  if (is.null(p_range)) {
+    p_psa_vals <- psa_parmvals[, p]
+    prange <- quantile(p_psa_vals, c(0.025, 0.975))
+  }
+  # define evenly spaced samples from parameter range
+  seq(prange[1], prange[2], length.out = nsamp)
 }

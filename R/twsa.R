@@ -15,18 +15,18 @@
 #' with \code{ggplot2} function
 #'
 #' @export
-twsa <- function(psa, parm1, parm2, newdata = NULL,
+twsa <- function(psa, parm1, parm2, ranges = NULL,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
   parms <- c(parm1, parm2)
 
-  #Run Multiple Multivariate Regression (MMR) Metamodel
-  mm <- metamod(psa, parms, strategies, outcome, wtp, poly.order)
+  # run metamodel
+  mm <- metamod("twoway", psa, parms, strategies, outcome, wtp, poly.order)
 
   # Predict Outcomes using MMMR Metamodel fit
-  tw <- predict(mm, newdata)
+  tw <- predict(mm, ranges)
 
   # define classes
   class(tw) <- c("twsa", "data.frame")
@@ -42,29 +42,29 @@ twsa <- function(psa, parm1, parm2, newdata = NULL,
 #' @param title Title for the plot
 #'
 #' @import ggplot2
+#' @import dplyr
 #' @export
 plot.twsa <- function(x, txtsize = 12, maximize = TRUE,
                       title = NULL, ...) {
-  # parm columns are 1 and 2
-  outcomes <- x[, -c(1, 2)]
-  outcome_names <- names(outcomes)
 
   # parameter names
   parms <- names(x)[c(1, 2)]
   parm1 <- parms[1]
   parm2 <- parms[2]
 
-  # Find optimal strategy in terms of maximum or minimum expected outcome
+  # get optimal strategy
+  # thanks to
+  # https://stackoverflow.com/questions/24237399/how-to-select-the-rows-with-maximum-values-in-each-group-with-dplyr
   if (maximize) {
-    optimal <- max.col(outcomes)
+    obj_fn <- which.max
   } else {
-    optimal <- max.col(-1 * outcomes)
+    obj_fn <- which.min
   }
-  # Add a variable with optimal startegy as factor
-  x$Strategy <- factor(optimal, labels = outcome_names)
-
-  ggplot(x, aes_(x = as.name(parm1), y = as.name(parm2))) +
-    geom_tile(aes_(fill = as.name("Strategy"))) +
+  opt_df <- x %>%
+    group_by(.data[[parm1]], .data[[parm2]]) %>%
+    slice(obj_fn(.data$outcome_val))
+  ggplot(opt_df, aes_(x = as.name(parm1), y = as.name(parm2))) +
+    geom_tile(aes_(fill = as.name("strategy"))) +
     theme_bw() +
     ggtitle(title) +
     scale_fill_discrete("Optimal Strategy: ", l = 50) +

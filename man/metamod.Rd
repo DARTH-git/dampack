@@ -4,13 +4,13 @@
 \alias{metamod}
 \title{linear regression metamodeling}
 \usage{
-metamod(psa, parm, strategies = NULL, outcome = c("eff", "cost", "nhb",
-  "nmb"), wtp = NULL, poly.order = 2)
+metamod(psa, parms = NULL, strategies = NULL, outcome = c("eff",
+  "cost", "nhb", "nmb"), wtp = NULL, poly.order = 2)
 }
 \arguments{
 \item{psa}{psa object}
 
-\item{parm}{String with the name of the parameter of interest}
+\item{parms}{String with the name of the parameter of interest}
 
 \item{strategies}{vector of strategies to consider. the default (NULL) is that all strategies are considered. The}
 

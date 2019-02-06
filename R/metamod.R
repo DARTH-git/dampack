@@ -1,7 +1,7 @@
 #' linear regression metamodeling
 #'
 #' @param psa psa object
-#' @param parm String with the name of the parameter of interest
+#' @param parms String with the name of the parameter of interest
 #' @param strategies vector of strategies to consider. the default (NULL) is that all strategies are considered. The
 #' @param outcome either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")
 #' @param wtp if outcome is NHB or NMB, must provide the willingness-to-pay threshold
@@ -10,24 +10,27 @@
 #'
 #' @importFrom stats as.formula formula getCall lm
 #' @export
-metamod <- function(psa, parm, strategies = NULL,
+metamod <- function(psa, parms = NULL, strategies = NULL,
                     outcome = c("eff", "cost", "nhb", "nmb"),
                     wtp = NULL,
                     poly.order = 2) {
   # get parameter names
   pnames <- psa$parnames
 
-  # make sure parm is in parameter names
-  if (!all(parm %in% pnames)) {
-    stop("parm is not in the parameter names. misspelled?")
+  # make sure all of parms is in parameter names
+  if (is.null(parms)) {
+    parms <- pnames
+  } else if (!all(parms %in% pnames)) {
+    wrong_p <- setdiff(p, pnames)
+    stop(paste0("the following parameters are not valid: ",
+                paste(wrong_p, collapse = ",")))
   }
-  other_parms <- pnames[-match(parm, pnames)]
 
   # define dependent variables
   outcome <- match.arg(outcome)
 
   ## make sure wtp is not null if nmb or nhb
-  if ( (outcome == "nmb" | outcome == "nhb") & is.null(wtp) ) {
+  if (is.null(wtp) & (outcome == "nmb" | outcome == "nhb")) {
     stop("wtp must be provided if nmb or nhb is the outcome to be modeled")
   }
 
@@ -45,134 +48,175 @@ metamod <- function(psa, parm, strategies = NULL,
     y <- psa$effectiveness * wtp - psa$cost
   }
 
-  # restrict to strategies of interest
+  # define strategies
   strat <- psa$strategies
 
-  if (!is.null(strategies)) {
-    ## make sure all subset strats are in strat
-    if (all(strategies %in% strat)) {
-      y <- y[, strategies, drop = FALSE]
-    } else {
-      wrong_strats <- setdiff(strategies, strat)
-      errmsg <- paste0("these are not in psa$strategies: ",
-                       paste(wrong_strats, collapse = ","))
-      stop(errmsg)
+  ## make sure all subset strats are in strat
+  if (is.null(strategies)) {
+    strategies <- strat
+  } else if (!all(strategies %in% strat)) {
+    wrong_strats <- setdiff(strategies, strat)
+    errmsg <- paste0("the following are not in psa$strategies: ",
+                     paste(wrong_strats, collapse = ","))
+    stop(errmsg)
+  }
+
+  # define data for linear model
+  dat <- data.frame(y, psa$parameters)
+
+  # list to hold linear models
+  lms <- NULL
+
+  # loop over parameters
+  for (p in parms) {
+    # independent variables not of interest
+    other_parms <- pnames[-match(p, pnames)]
+
+    # loop over strategies
+    for (s in strategies) {
+      lm_form <- as.formula(
+        paste0(s, " ~ ",
+               paste0("poly(", p, ",", poly.order, ", raw=TRUE) + "),
+               paste(other_parms, collapse = " + "))
+      )
+
+      mod <- lm(lm_form, data = dat)
+      # makes the displayed formula more informative
+      mod$call <- call("lm", formula = lm_form, data = quote(dat))
+      # for accessing later in predict
+      mod$parm_of_int <- p
+      mod$strat <- s
+      lms[[p]][[s]] <- mod
     }
   }
 
-  dep <- colnames(y)
+  metamod <- list(outcome = outcome, mods = lms, wtp = wtp,
+                  parms = parms, strategies = strategies,
+                  psa = psa)
+  # define class
+  class(metamod) <- "metamodel"
+  return(metamod)
+}
 
-  # data frame to pass to lm
-  sim_data <- data.frame(y, psa$parameters)
+#' Print metamodel
+#'
+#' @param x metamodel to print
+#' @param ... further arguments to print
+#' @export
+print.metamodel <- function(x, ...) {
+  cat("metamodel object", "\n",
+      "-------------------------", "\n",
+      "a list of the following objects: ",
+      paste(names(x), collapse = ","), "\n",
+      "\n",
+      "some details: ", "\n",
+      "-------------------------", "\n",
+      "mods: a nested list of linear metamodels \n",
+      "outcome: ", x$outcome, "\n",
+      "WTP: ", x$wtp, "\n",
+      "strategies: ", paste(x$strategies, collapse = ","), "\n",
+      "parameters modeled: ", paste(x$parms, collapse = ","), "\n",
+      "To access the linear model for strategy s and parameter p, ", "\n",
+      "type metamod$mods[[p]][[s]] at the console ",
+      "(where p and s are replaced with their respective strings).",
+      sep = "")
+}
 
-  #Generate a formula by pasting column names for both dependent and independent variables.
-  # Imposes a 1 level interaction
-  # if there's only one outcome, don't cbind
-  n_out <- length(dep)
-  if (n_out > 1) {
-    bind_txt <- c("cbind(", ")")
-  } else {
-    bind_txt <- c("", "")
+#' Summary of metamodel
+#'
+#' @param object metamodel to summarize
+#' @param ... further arguments to summary
+#' @export
+summary.metamodel <- function(object, ...) {
+  summary_df <- NULL
+  for (p in object$parms) {
+    for (s in object$strategies) {
+      lm_summary <- summary(object$mods[[p]][[s]])
+      r2 <- lm_summary$r.squared
+      df_new_row <- data.frame("parm" = p, "strat" = s, "rsquared" = r2)
+      summary_df <- rbind(summary_df, df_new_row)
+    }
   }
-
-  # build formula
-  ## beginning
-  fbeg <- paste0(bind_txt[1], paste(dep, collapse = ","), bind_txt[2], " ~ ")
-
-  ## parameters of interest
-  fparm <- ""
-  for (p in parm) {
-    fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
-  }
-
-  ## ending
-  fend <- paste(other_parms, collapse = " + ")
-
-  ## combine
-  f <- as.formula(paste0(fbeg, fparm, fend))
-
-  #Run Multiple Multivariate Regression (MMR) Metamodel
-  metamodel <- lm(f, data = sim_data)
-  metamodel$call <- call("lm", formula = f, data = quote(sim_data))
-  # for accessing later in predict
-  metamodel$parm_of_int <- parm
-  metamodel$strategies <- dep
-
-  # class depends on number of dependent variables
-  if (length(dep) > 1){
-    # must have mlm class for predict
-    class(metamodel) <- c("metamodel", "mlm", "lm")
-  } else {
-    class(metamodel) <- c("metamodel", "lm")
-  }
-  return(metamodel)
+  return(summary_df)
 }
 
 #' Predict from a metamodel
 #'
 #' @param object object with class "metamodel"
-#' @param newdata values for parameter of interest. if NULL,
-#' parameter values from the middle 95% are used. The number of samples
-#' from this range is determined by \code{nsamp}
-#' @param nsamp number of samples from range
+#' @param ranges A named list of the form c("parm" = c(0, 1), ...)
+#' that gives the ranges for the parameter of interest. If NULL,
+#' parameter values from the middle 95% of the PSA samples are used. The number of samples
+#' from this range is determined by \code{nsamp}.
+#' @param nsamp number of samples from ranges
 #' @param ... further arguments to \code{predict} (not used)
 #'
 #' @importFrom stats quantile predict
 #' @export
-predict.metamodel <- function(object, newdata = NULL, nsamp = 400, ...) {
-  # hard to get original data, this is thanks to
-  # https://stackoverflow.com/questions/22921765/way-to-extract-data-from-lm-object-before-function-is-applied
-  df <- eval(getCall(object)$data, environment(formula(object)))
+predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
+  # all parameters in psa
+  psa_parms <- object$parms
 
-  parm <- object$parm_of_int
-  nparm <- length(parm)
+  # get original psa parameter df
+  psa_parmvals <- object$psa$parameters
 
-  # use range of parameter if user does not provide new data
-  pranges_samp <- vector(mode = "list", length = nparm)
+  # set of linear models
+  mods <- object$mods
 
-  if (is.null(newdata)){
-    for (i in 1:nparm) {
-      ith_parm <- parm[i]
-      prange <- quantile(df[, ith_parm], c(0.025, 0.975))
+  # strategies
+  strats <- object$strategies
 
-      # define samples from parameter range
-      pranges_samp[[i]] <- seq(prange[1], prange[2], length.out = nsamp)
-    }
-
-    # Create data frame with all combinations between both parameters of interest
-    newdata <- data.frame(expand.grid(pranges_samp))
-    names(newdata) <- parm
-  }
-
+  # data frame to be used in predict - mean values repeated
+  # the values for the parameter of interest are replaced
+  # in each pass through the loop
   # Generate matrix to use for prediction
   # use the means of all parameters other than parameter of interest
-  pdata <- data.frame(matrix(rep(colMeans(df)),
-                               nrow = nrow(newdata),
-                               ncol = ncol(df),
-                               byrow = T))
+  pdata <- data.frame(matrix(colMeans(psa_parmvals),
+                             nrow = nsamp,
+                             ncol = ncol(psa_parmvals),
+                             byrow = T))
 
-  colnames(pdata) <- colnames(df) # Name data frame's columns with parameters' names
+  # Name data frame's columns with parameters' names
+  colnames(pdata) <- colnames(psa_parmvals)
 
-  # replace parameter of interest
-  for (p in parm) {
-    pdata[, p] <- newdata[, p]
+  # these are parameters that are included in ranges
+  if (is.null(ranges)) {
+    q_parms <- psa_parms
+  } else {
+    q_parms <- names(ranges)
   }
 
-  # Predict Outcomes using MMMR Metamodel fit
-  # we have to get a little hacky for the MLM
-  # so predict.metamodel doesn't get called again
-  # for some reason we can't call predict.mlm directly
-  # so we remove the first entry in the class vector (which is "metamodel")
-  # this way predict.lm will get called if there's only one outcome
-  tmp_obj <- object
-  class(tmp_obj) <- class(tmp_obj)[-1]
-  outcome <- data.frame(predict(tmp_obj, newdata = pdata))
+  # predict outcomes from linear metamodels
+  ## make list to hold outcome dfs
+  outcome_dfs <- vector(mode = "list",
+                        length = length(strats) * length(q_parms))
+  counter <- 1
+  for (p in q_parms) {
+    p_range <- ranges[p]
+    if (is.null(p_range)) {
+      p_psa_vals <- psa_parmvals[, p]
+      prange <- quantile(p_psa_vals, c(0.025, 0.975))
+    }
+    # define evenly spaced samples from parameter range
+    pranges_samp <- seq(prange[1], prange[2], length.out = nsamp)
 
-  #Name the predicted outcomes columns with strategies names
-  colnames(outcome) <- object$strategies
+    # create new data from pranges_samp
+    newdata <- data.frame(pranges_samp)
 
-  # join with parameter values
-  outcome <- cbind(newdata, outcome)
+    # replace values for parameter of interest
+    this_p_data <- pdata
+    this_p_data[, p] <- newdata
 
-  return(outcome)
+    # predict values from linear model
+    # for each strategy
+    for (s in strats) {
+      mod <- mods[[p]][[s]]
+      outcome_dfs[[counter]] <- data.frame("parameter" = p, "strategy" = s,
+                            "param_val" = newdata,
+                            "outcome_val" = predict(mod, newdata = this_p_data),
+                            stringsAsFactors = FALSE)
+      counter <- counter + 1
+    }
+  }
+  combined_df <- bind_rows(outcome_dfs)
+  return(combined_df)
 }

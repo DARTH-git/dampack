@@ -5,22 +5,22 @@
 #' decision-analytic model
 #'
 #' @inheritParams metamod
-#' @keywords one-way sensitivity analysis; linear regression metamodel
+#' @inheritParams predict.metamodel
 #' @return A dataframe with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}}
 #'
 #' @export
-owsa <- function(psa, parm = NULL, ranges = NULL,
+owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
 
   # create metamodel
-  mm <- metamod("oneway", psa, parm, strategies, outcome, wtp, poly.order)
+  mm <- metamod("oneway", psa, parms, strategies, outcome, wtp, poly.order)
 
   # Predict Outcomes using MMMR Metamodel fit
-  ow <- predict(mm, ranges)
+  ow <- predict(mm, ranges, nsamps)
 
   # define classes
   class(ow) <- c("owsa", "data.frame")
@@ -37,6 +37,12 @@ owsa <- function(psa, parm = NULL, ranges = NULL,
 #' @param n_x_ticks number of axis ticks on the x axis
 #' @param n_y_ticks number of axis ticks on the y axis
 #' @param size either point size (ptype = "point") or line size (ptype = "line")
+#' @param facet_scales whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
+#' more details.
+#' @param facet_ncol number of columns in plot facet.
+#' The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
+#' which determines the number of rows and columns automatically.
+#' @param facet_nrow number of rows in plot facet.
 #' @param ... further arguments to \code{plot.owsa} (not used)
 #'
 #' @importFrom reshape2 melt
@@ -49,8 +55,8 @@ plot.owsa <- function(x, txtsize = 12,
                       n_x_ticks = 6,
                       n_y_ticks = 6,
                       facet_scales = c("free_x", "free_y", "free", "fixed"),
-                      facet_nrow = 3,
-                      facet_ncol = 3,
+                      facet_nrow = NULL,
+                      facet_ncol = NULL,
                       size = 1,
                       ...) {
   scales <- match.arg(facet_scales)

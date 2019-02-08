@@ -3,19 +3,18 @@
 #' This function displays a two-way sensitivity analysis (TWSA) graph
 #' by estimating a linear regression metamodel of a PSA for a given
 #' decision-analytic model
-#' @param strategies String vector with the name of the strategies
 #' @param parm1 String with the name of the first parameter of interest
 #' @param parm2 String with the name of the second parameter of interest
 
-#' @inheritParams owsa
+#' @inheritParams metamod
+#' @inheritParams predict.metamodel
 #'
-#' @keywords two-way sensitivity analysis; linear regression metamodel
 #' @return twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and
-#' \code{parm2} on the outcome of interest that can be posteriorly formatted
-#' with \code{ggplot2} function
+#' \code{parm2} on the outcome of interest.
 #'
 #' @export
 twsa <- function(psa, parm1, parm2, ranges = NULL,
+                 nsamp = 100,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
@@ -26,7 +25,7 @@ twsa <- function(psa, parm1, parm2, ranges = NULL,
   mm <- metamod("twoway", psa, parms, strategies, outcome, wtp, poly.order)
 
   # Predict Outcomes using MMMR Metamodel fit
-  tw <- predict(mm, ranges)
+  tw <- predict(mm, ranges, nsamp)
 
   # define classes
   class(tw) <- c("twsa", "data.frame")

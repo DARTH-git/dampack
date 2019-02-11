@@ -27,7 +27,9 @@ Imports:
 Suggests:
     testthat,
     lintr,
-    knitr
+    knitr,
+    rmarkdown,
+    kableExtra
 LazyData: true
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

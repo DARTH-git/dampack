@@ -4,14 +4,14 @@
 \alias{summary.psa}
 \title{summarize a psa object across all simulations}
 \usage{
-\method{summary}{psa}(object, ..., calc_sds = FALSE)
+\method{summary}{psa}(object, calc_sds = FALSE, ...)
 }
 \arguments{
 \item{object}{the psa object}
 
-\item{...}{further arguments to summary (not used)}
-
 \item{calc_sds}{whether or not to calculate the standard deviations. Defaults to FALSE}
+
+\item{...}{further arguments to summary (not used)}
 }
 \description{
 summarize a psa object across all simulations

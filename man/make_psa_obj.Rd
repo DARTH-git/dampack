@@ -4,12 +4,16 @@
 \alias{make_psa_obj}
 \title{An object to hold PSA results.}
 \usage{
-make_psa_obj(cost, effectiveness, strategies = NULL, currency = "$")
+make_psa_obj(cost, effectiveness, parameters, strategies = NULL,
+  currency = "$")
 }
 \arguments{
 \item{cost}{Matrix with the cost for each simulation (rows) and strategy (columns).}
 
 \item{effectiveness}{Matrix with the effectiveness for each simulation (rows) and strategy (columns)}
+
+\item{parameters}{Data frame with values for each simulation (rows) and parameter (columns).
+The column names should be the parameter names}
 
 \item{strategies}{String vector with the name of the strategies}
 

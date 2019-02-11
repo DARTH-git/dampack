@@ -4,14 +4,12 @@
 \alias{plot.psa}
 \title{Plot the psa object}
 \usage{
-\method{plot}{psa}(x, ..., center = TRUE, ellipse = TRUE,
+\method{plot}{psa}(x, center = TRUE, ellipse = TRUE,
   title = "Cost-Effectiveness Scatterplot", alpha = 0.2,
-  txtsize = 12)
+  txtsize = 12, ...)
 }
 \arguments{
 \item{x}{the psa object}
-
-\item{...}{further arguments to plot (not used)}
 
 \item{center}{plot the mean cost and effectiveness for each strategy. defaults to TRUE}
 
@@ -23,6 +21,8 @@
 0 is completely transparent, 1 is completely opaque}
 
 \item{txtsize}{base textsize}
+
+\item{...}{further arguments to plot (not used)}
 }
 \description{
 Plot the psa object

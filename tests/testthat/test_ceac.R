@@ -13,8 +13,9 @@ test_that("ceac has all methods we'd expect", {
 ## setup
 data("example_psa")
 wtp <- example_psa$wtp
-psa_obj <- make_psa_obj(example_psa$costs,
+psa_obj <- make_psa_obj(example_psa$cost,
                         example_psa$effectiveness,
+                        example_psa$parameters,
                         example_psa$strategies)
 
 test_that("result has class 'ceac'", {
@@ -24,8 +25,9 @@ test_that("result has class 'ceac'", {
 })
 
 test_that("handles missing strategy", {
-  psa_missing <- make_psa_obj(example_psa$costs,
-                              example_psa$effectiveness)
+  psa_missing <- make_psa_obj(example_psa$cost,
+                              example_psa$effectiveness,
+                              example_psa$parameters)
   c_missing <- ceac(wtp, psa_missing)
   expected_generic_strat <- c("Strategy_1", "Strategy_2", "Strategy_3")
   obtained_generic_strat <- sort(unique(c_missing$Strategy))

@@ -12,7 +12,8 @@ test_that("evpi has all methods we'd expect", {
 # test return object
 ## setup
 data("example_psa")
-psa_obj <- make_psa_obj(example_psa$costs, example_psa$effectiveness, example_psa$strategies)
+psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+                        example_psa$parameters, example_psa$strategies)
 
 evpi_obj <- calc_evpi(wtp = example_psa$wtp,
                       psa = psa_obj)
@@ -30,7 +31,7 @@ test_that("return object has column names WTP and EVPI", {
 
 # calculation
 test_that("evpi is what we'd expect", {
-  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$costs
+  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$cost
   d.star <- which.max(colMeans(nmb))
   loss <- nmb - nmb[, d.star]
   evpi <- mean(apply(loss, 1, max))

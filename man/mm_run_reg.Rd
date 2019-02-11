@@ -2,12 +2,25 @@
 % Please edit documentation in R/metamod.R
 \name{mm_run_reg}
 \alias{mm_run_reg}
-\title{this should have just one parm of int
-when the analysis is one-way}
+\title{Build formula and run linear regression for metamodel}
 \usage{
-mm_run_reg(dep, parms_of_int, dat, all_parms, type, poly.order)
+mm_run_reg(dep, parms, dat, all_parms, type, poly.order)
+}
+\arguments{
+\item{dep}{dependent variable in regression}
+
+\item{parms}{String with the name of the parameter of interest}
+
+\item{dat}{data to use in regression}
+
+\item{all_parms}{all parms in PSA}
+
+\item{type}{type of metamodel}
+
+\item{poly.order}{Order of polynomial for the linear regression metamodel.
+Default: 2}
 }
 \description{
-this should have just one parm of int
-when the analysis is one-way
+Build formula and run linear regression for metamodel
 }
+\keyword{internal}

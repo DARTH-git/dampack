@@ -3,7 +3,7 @@
 #' @param analysis either "oneway" or "twoway"
 #' @param psa psa object
 #' @param parms String with the name of the parameter of interest
-#' @param strategies vector of strategies to consider. the default (NULL) is that all strategies are considered. The
+#' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
 #' @param outcome either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")
 #' @param wtp if outcome is NHB or NMB, must provide the willingness-to-pay threshold
 #' @param type type of metamodel
@@ -107,22 +107,25 @@ metamod <- function(analysis = c("oneway", "twoway"),
   return(metamod)
 }
 
-#' this should have just one parm of int
-#' when the analysis is one-way
-#'
-mm_run_reg <- function(dep, parms_of_int, dat, all_parms, type, poly.order) {
+#' Build formula and run linear regression for metamodel
+#' @param dep dependent variable in regression
+#' @param dat data to use in regression
+#' @param all_parms all parms in PSA
+#' @keywords internal
+#' @inheritParams metamod
+mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order) {
   # build formula
   ## dependent variable
   fbeg <- paste0(dep, " ~ ")
 
   ## parameters of interest
   fparm <- ""
-  for (p in parms_of_int) {
+  for (p in parms) {
     fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
   }
 
   ## other parameters
-  other_parms <- all_parms[-match(parms_of_int, all_parms)]
+  other_parms <- all_parms[-match(parms, all_parms)]
   fend <- paste(other_parms, collapse = " + ")
 
   ## combine
@@ -194,7 +197,7 @@ summary.metamodel <- function(object, ...) {
 #' @param object object with class "metamodel"
 #' @param ranges A named list of the form c("parm" = c(0, 1), ...)
 #' that gives the ranges for the parameter of interest. If NULL,
-#' parameter values from the middle 95% of the PSA samples are used. The number of samples
+#' parameter values from the middle 95\% of the PSA samples are used. The number of samples
 #' from this range is determined by \code{nsamp}.
 #' @param nsamp number of samples from ranges
 #' @param ... further arguments to \code{predict} (not used)
@@ -202,6 +205,21 @@ summary.metamodel <- function(object, ...) {
 #' @importFrom stats quantile predict
 #' @export
 predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
+  # type checking
+  ## make sure ranges is NULL or list
+  if (!is.null(ranges)) {
+    if (!inherits(ranges, "list")) {
+      stop("ranges must be a named list of vectors")
+    }
+
+    ## all elements of ranges must have length 2 or be NULL
+    for (i in ranges) {
+      if (!is.null(i) & length(i) != 2) {
+        stop("all entries in ranges must have length 2 or be NULL")
+      }
+    }
+  }
+
   # all parameters in psa
   psa_parms <- object$parms
 
@@ -229,7 +247,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   pdata <- data.frame(matrix(colMeans(psa_parmvals),
                              nrow = pred_data_nrow,
                              ncol = ncol(psa_parmvals),
-                             byrow = T))
+                             byrow = TRUE))
 
   # Name data frame's columns with parameters' names
   colnames(pdata) <- colnames(psa_parmvals)
@@ -238,7 +256,13 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   if (is.null(ranges)) {
     q_parms <- psa_parms
   } else {
+    # get parameters associated with ranges
     q_parms <- names(ranges)
+    if (!all(q_parms %in% psa_parms)) {
+      wrong_parms <- setdiff(q_parms, psa_parms)
+      stop(paste0("The following range names were not found in psa$parameters:\n",
+                  paste(wrong_parms, collapse = ", ")))
+    }
   }
 
   # predict outcomes from linear metamodels
@@ -249,10 +273,10 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
     counter <- 1
     for (p in q_parms) {
       # define evenly spaced samples from parameter range
-      pranges_samp <- make_parm_seq(p, ranges, nsamp, psa_parmvals)
+      param_val <- make_parm_seq(p, ranges, nsamp, psa_parmvals)
 
-      # create new data from pranges_samp
-      newdata <- data.frame(pranges_samp)
+      # create new data from param_val
+      newdata <- data.frame(param_val)
 
       # replace values for parameter of interest
       this_p_data <- pdata
@@ -296,13 +320,31 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   return(combined_df)
 }
 
-
+#' make a parameter sequence
+#'
+#' @param p parameter of interest
+#' @param ranges named vector of parameter ranges
+#' @param nsamp number of points from the range
+#' @param psa_parmvals sampled values from the PSA. used to calculate the
+#' range if none is supplied
+#' @keywords internal
 make_parm_seq <- function(p, ranges, nsamp, psa_parmvals) {
-  p_range <- ranges[p]
+  p_range <- ranges[[p]]
+
+  # define default range if necesary
+  p_psa_vals <- psa_parmvals[, p]
   if (is.null(p_range)) {
-    p_psa_vals <- psa_parmvals[, p]
-    prange <- quantile(p_psa_vals, c(0.025, 0.975))
+    p_range <- quantile(p_psa_vals, c(0.025, 0.975))
+  } else {
+    # throw warning if outside of psa range
+    psa_range <- range(p_psa_vals)
+    if (p_range[1] < psa_range[1] | p_range[2] > psa_range[2]) {
+      warning(paste0("The requested range for ", p, " is outside of the PSA range.\n",
+                     "requested range: [", paste(p_range, collapse = ","), "]\n",
+                     "PSA range: [", paste(psa_range, collapse = ", "), "]\n.",
+                     "Please interpret results with caution."))
+    }
   }
   # define evenly spaced samples from parameter range
-  seq(prange[1], prange[2], length.out = nsamp)
+  seq(p_range[1], p_range[2], length.out = nsamp)
 }

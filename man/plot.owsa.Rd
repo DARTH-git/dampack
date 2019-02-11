@@ -7,7 +7,7 @@
 \method{plot}{owsa}(x, txtsize = 12, col = c("full", "bw"),
   ptype = c("line", "point"), title = "", n_x_ticks = 6,
   n_y_ticks = 6, facet_scales = c("free_x", "free_y", "free", "fixed"),
-  facet_nrow = 3, facet_ncol = 3, size = 1, ...)
+  facet_nrow = NULL, facet_ncol = NULL, size = 1, ...)
 }
 \arguments{
 \item{x}{an owsa object}
@@ -23,6 +23,15 @@
 \item{n_x_ticks}{number of axis ticks on the x axis}
 
 \item{n_y_ticks}{number of axis ticks on the y axis}
+
+\item{facet_scales}{whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
+more details.}
+
+\item{facet_nrow}{number of rows in plot facet.}
+
+\item{facet_ncol}{number of columns in plot facet.
+The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
+which determines the number of rows and columns automatically.}
 
 \item{size}{either point size (ptype = "point") or line size (ptype = "line")}
 

@@ -4,33 +4,36 @@
 \alias{owsa}
 \title{One-way sensitivity analysis using linear regression metamodeling}
 \usage{
-owsa(psa, parm = NULL, ranges = NULL, outcome = c("eff", "cost",
-  "nhb", "nmb"), wtp = NULL, strategies = NULL, poly.order = 2)
+owsa(psa, parms = NULL, ranges = NULL, nsamps = 100,
+  outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
+  strategies = NULL, poly.order = 2)
 }
 \arguments{
 \item{psa}{psa object}
+
+\item{parms}{String with the name of the parameter of interest}
+
+\item{ranges}{A named list of the form c("parm" = c(0, 1), ...)
+that gives the ranges for the parameter of interest. If NULL,
+parameter values from the middle 95\% of the PSA samples are used. The number of samples
+from this range is determined by \code{nsamp}.}
+
+\item{nsamps}{number of samples to take from the ranges}
 
 \item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
 
 \item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
 
-\item{strategies}{vector of strategies to consider. the default (NULL) is that all strategies are considered. The}
+\item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}
 }
 \value{
 A dataframe with the results of the sensitivity analysis.
-Can be visualized with \code{\link{plot.owsa}}
+Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 }
 \description{
-This function displays a one-way sensitivity analysis (OWSA) graph
-by estimating a linear regression metamodel of a PSA for a given
-decision-analytic model
+This function uses a linear regression metamodel of a PSA for a given
+decision-analytic model to predict the desired outcome.
 }
-\keyword{analysis;}
-\keyword{linear}
-\keyword{metamodel}
-\keyword{one-way}
-\keyword{regression}
-\keyword{sensitivity}

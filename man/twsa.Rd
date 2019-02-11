@@ -4,8 +4,9 @@
 \alias{twsa}
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
-twsa(psa, parm1, parm2, ranges = NULL, outcome = c("eff", "cost",
-  "nhb", "nmb"), wtp = NULL, strategies = NULL, poly.order = 2)
+twsa(psa, parm1, parm2, ranges = NULL, nsamp = 100,
+  outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
+  strategies = NULL, poly.order = 2)
 }
 \arguments{
 \item{psa}{psa object}
@@ -14,28 +15,28 @@ twsa(psa, parm1, parm2, ranges = NULL, outcome = c("eff", "cost",
 
 \item{parm2}{String with the name of the second parameter of interest}
 
+\item{ranges}{A named list of the form c("parm" = c(0, 1), ...)
+that gives the ranges for the parameter of interest. If NULL,
+parameter values from the middle 95\% of the PSA samples are used. The number of samples
+from this range is determined by \code{nsamp}.}
+
+\item{nsamp}{number of samples from ranges}
+
 \item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
 
 \item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
 
-\item{strategies}{String vector with the name of the strategies}
+\item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}
 }
 \value{
 twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and
-\code{parm2} on the outcome of interest that can be posteriorly formatted
-with \code{ggplot2} function
+\code{parm2} on the outcome of interest.
 }
 \description{
 This function displays a two-way sensitivity analysis (TWSA) graph
 by estimating a linear regression metamodel of a PSA for a given
 decision-analytic model
 }
-\keyword{analysis;}
-\keyword{linear}
-\keyword{metamodel}
-\keyword{regression}
-\keyword{sensitivity}
-\keyword{two-way}

@@ -15,7 +15,7 @@ metamod(analysis = c("oneway", "twoway"), psa, parms = NULL,
 
 \item{parms}{String with the name of the parameter of interest}
 
-\item{strategies}{vector of strategies to consider. the default (NULL) is that all strategies are considered. The}
+\item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
 \item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
 

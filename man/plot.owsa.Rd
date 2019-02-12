@@ -5,8 +5,8 @@
 \title{Plot a sensitivity analysis}
 \usage{
 \method{plot}{owsa}(x, txtsize = 12, col = c("full", "bw"),
-  ptype = c("line", "point"), title = "", n_x_ticks = 6,
-  n_y_ticks = 6, facet_scales = c("free_x", "free_y", "free", "fixed"),
+  ptype = c("line", "point"), n_x_ticks = 6, n_y_ticks = 6,
+  facet_scales = c("free_x", "free_y", "free", "fixed"),
   facet_nrow = NULL, facet_ncol = NULL, size = 1, ...)
 }
 \arguments{
@@ -18,11 +18,9 @@
 
 \item{ptype}{plot type. either point or line.}
 
-\item{title}{plot title.}
+\item{n_x_ticks}{number of axis ticks}
 
-\item{n_x_ticks}{number of axis ticks on the x axis}
-
-\item{n_y_ticks}{number of axis ticks on the y axis}
+\item{n_y_ticks}{number of axis ticks}
 
 \item{facet_scales}{whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
 more details.}
@@ -35,7 +33,7 @@ which determines the number of rows and columns automatically.}
 
 \item{size}{either point size (ptype = "point") or line size (ptype = "line")}
 
-\item{...}{further arguments to \code{plot.owsa} (not used)}
+\item{...}{further arguments to plot (not used)}
 }
 \description{
 Plot a sensitivity analysis

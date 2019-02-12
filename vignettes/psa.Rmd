@@ -79,8 +79,9 @@ head(example_psa$effectiveness)
 Now, let's make the PSA object:
 
 ```{r}
-psa_obj <- make_psa_obj(cost = example_psa$costs,
+psa_obj <- make_psa_obj(cost = example_psa$cost,
                         effectiveness = example_psa$effectiveness,
+                        parameters = example_psa$parameters,
                         strategies = example_psa$strategies,
                         currency = "$")
 str(psa_obj)

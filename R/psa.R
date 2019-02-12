@@ -114,11 +114,9 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @param x the psa object
 #' @param center plot the mean cost and effectiveness for each strategy. defaults to TRUE
 #' @param ellipse plot an ellipse around each strategy. defaults to TRUE
-#' @param title title for the plot
 #' @param alpha opacity of the scatterplot points.
 #' 0 is completely transparent, 1 is completely opaque
-#' @param txtsize base textsize
-#' @param ... further arguments to plot (not used)
+#' @inheritParams add_common_aes
 #'
 #' @importFrom ellipse ellipse
 #' @import dplyr
@@ -127,8 +125,9 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @importFrom scales dollar_format
 #' @export
 plot.psa <- function(x,
-                     center = TRUE, ellipse = TRUE, title="Cost-Effectiveness Scatterplot",
-                     alpha = 0.2, txtsize=12, ...) {
+                     center = TRUE, ellipse = TRUE,
+                     alpha = 0.2, txtsize = 12, col = c("full", "bw"),
+                     n_x_ticks = 6, n_y_ticks = 6, ...) {
   effectiveness <- x$effectiveness
   cost <- x$cost
   strategies <- x$strategies
@@ -150,7 +149,8 @@ plot.psa <- function(x,
                       "Effectiveness" = df.effect$Effectiveness)
 
   psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
-    geom_point(size = 0.7, alpha = alpha, shape = 21)
+    geom_point(size = 0.7, alpha = alpha, shape = 21) +
+    ylab(paste("Cost (", currency, ")", sep = ""))
 
   # define strategy-specific means for the center of the ellipse
   if (center) {
@@ -181,12 +181,10 @@ plot.psa <- function(x,
                                      size = 1, linetype = 2, alpha = 1)
   }
 
-  # these layers are used for all psa plots
-  psa_plot + ggtitle(title) +
-    scale_colour_discrete(l = 50) +  # Use a slightly darker palette than normal
-    scale_fill_discrete(l = 50) +
-    scale_y_continuous(labels = dollar_format(prefix = currency)) +
-    scale_x_continuous(breaks = number_ticks(6)) + common_theme(txtsize)
+  # add common theme
+  col <- match.arg(col)
+  add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
+                 continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks)
 }
 
 #' print a psa object

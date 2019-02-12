@@ -42,7 +42,7 @@ test_that("evpi is what we'd expect", {
 
 ## plot
 test_that("plot.evpi has ggplot class", {
-  p <- plot(evpi_obj, title = "Title",
-             txtsize = 16, effect_units = "QALY", currency = "Dollars ($%$%)")
+  p <- plot(evpi_obj,
+            txtsize = 16, effect_units = "QALY", currency = "Dollars ($%$%)")
   expect_is(p, "ggplot")
 })

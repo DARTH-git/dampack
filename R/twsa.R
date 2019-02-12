@@ -35,16 +35,18 @@ twsa <- function(psa, parm1, parm2, ranges = NULL,
 #' Two-way sensitivity analysis plot
 #'
 #' @param x a twsa object
-#' @inheritParams plot.owsa
+#' @inheritParams add_common_aes
 #' @param maximize If \code{TRUE}, plot of strategy with maximum expected outcome
 #' (default); if \code{FALSE}, plot of strategy with minimum expected outcome
-#' @param title Title for the plot
 #'
 #' @import ggplot2
 #' @import dplyr
 #' @export
-plot.twsa <- function(x, txtsize = 12, maximize = TRUE,
-                      title = NULL, ...) {
+plot.twsa <- function(x, maximize = TRUE,
+                      col = c("full", "bw"),
+                      n_x_ticks = 6,
+                      n_y_ticks = 6,
+                      txtsize = 12, ...) {
 
   # parameter names
   parms <- names(x)[c(1, 2)]
@@ -62,14 +64,15 @@ plot.twsa <- function(x, txtsize = 12, maximize = TRUE,
   opt_df <- x %>%
     group_by(.data[[parm1]], .data[[parm2]]) %>%
     slice(obj_fn(.data$outcome_val))
-  ggplot(opt_df, aes_(x = as.name(parm1), y = as.name(parm2))) +
+  g <- ggplot(opt_df, aes_(x = as.name(parm1), y = as.name(parm2))) +
     geom_tile(aes_(fill = as.name("strategy"))) +
     theme_bw() +
-    ggtitle(title) +
-    scale_fill_discrete("Optimal Strategy: ", l = 50) +
-    scale_x_continuous(breaks = number_ticks(6)) +
-    scale_y_continuous(breaks = number_ticks(6)) +
     xlab(parm1) +
-    ylab(parm2) +
-    common_theme(txtsize)
+    ylab(parm2)
+  col <- match.arg(col)
+  add_common_aes(g, txtsize, col = col, col_aes = "fill",
+                 scale_name = "Strategy",
+                 continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks,
+                 n_y_ticks = n_y_ticks)
 }

@@ -4,9 +4,9 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, frontier = TRUE,
-  title = "Cost-Effectiveness Acceptability Curves", txtsize = 12,
-  currency = "$", min_prob = 0, ...)
+\method{plot}{ceac}(x, frontier = TRUE, txtsize = 12, currency = "$",
+  n_x_ticks = 10, n_y_ticks = 8, ylim = NULL, col = c("full",
+  "bw"), min_prob = 0, ...)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -15,11 +15,17 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{frontier}{Whether to plot acceptability frontier}
 
-\item{title}{String with graph's title}
-
-\item{txtsize}{number with text size}
+\item{txtsize}{base text size}
 
 \item{currency}{String with currency used in the cost-effectiveness analysis (CEA).}
+
+\item{n_x_ticks}{number of axis ticks}
+
+\item{n_y_ticks}{number of axis ticks}
+
+\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{col}{either full color or black and white}
 
 \item{min_prob}{minimum probability to show strategy in plot.
 For example, if the min_prob is 0.05, only strategies that ever
@@ -28,7 +34,7 @@ with many strategies.
 
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
-\item{...}{additional arguments to plot (not used)}
+\item{...}{further arguments to plot (not used)}
 }
 \value{
 ceac.gg A \code{ggplot2} object with the CEAC
@@ -42,6 +48,3 @@ Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
 cost-effective at each \code{wtp} value.
 }
 
-\keyword{acceptability}
-\keyword{cost-effectiveness}
-\keyword{curves}

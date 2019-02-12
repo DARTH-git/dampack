@@ -34,9 +34,6 @@ owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
 #' @param txtsize base text size in the plot
 #' @param col either full-color ("full") or black and white ("bw")
 #' @param ptype plot type. either point or line.
-#' @param title plot title.
-#' @param n_x_ticks number of axis ticks on the x axis
-#' @param n_y_ticks number of axis ticks on the y axis
 #' @param size either point size (ptype = "point") or line size (ptype = "line")
 #' @param facet_scales whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
 #' more details.
@@ -44,7 +41,7 @@ owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
 #' The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
 #' which determines the number of rows and columns automatically.
 #' @param facet_nrow number of rows in plot facet.
-#' @param ... further arguments to \code{plot.owsa} (not used)
+#' @inheritParams add_common_aes
 #'
 #' @importFrom reshape2 melt
 #' @import ggplot2
@@ -52,7 +49,6 @@ owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
 plot.owsa <- function(x, txtsize = 12,
                       col = c("full", "bw"),
                       ptype = c("line", "point"),
-                      title = "",
                       n_x_ticks = 6,
                       n_y_ticks = 6,
                       facet_scales = c("free_x", "free_y", "free", "fixed"),
@@ -65,12 +61,8 @@ plot.owsa <- function(x, txtsize = 12,
                  aes_(x = as.name("param_val"), y = as.name("outcome_val"),
                       color = as.name("strategy"))) +
     facet_wrap(facets = "parameter", scales = scales, nrow = facet_nrow, ncol = facet_ncol) +
-    ggtitle(title) +
     ylab("E[Outcome]") +
-    xlab("Parameter Values") +
-    scale_x_continuous(breaks = number_ticks(n_x_ticks)) +
-    scale_y_continuous(breaks = number_ticks(n_y_ticks)) +
-    common_theme(txtsize)
+    xlab("Parameter Values")
 
   # ptype
   ptype <- match.arg(ptype)
@@ -81,16 +73,12 @@ plot.owsa <- function(x, txtsize = 12,
     owsa <- owsa + geom_point(aes_(shape = as.name("strategy")), size = size)
   }
 
-  # color - could move this to separate function
   col <- match.arg(col)
-  if (col == "full") {
-    owsa <- owsa + scale_colour_hue("strategy", l = 50)
-  }
-  if (col == "bw") {
-    owsa <- owsa + scale_color_grey("strategy", start = 0.3)
-  }
-
-  return(owsa)
+  add_common_aes(owsa, txtsize, col = col, col_aes = "color",
+                 scale_name = "Strategy",
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 continuous = c("x", "y")) +
+    scale_linetype_discrete(name = "Strategy")
 }
 
 #' Tornado plot of a one-way sensitivity analysis
@@ -101,13 +89,14 @@ plot.owsa <- function(x, txtsize = 12,
 #' to \code{min_rel_diff}, which must be between 0 and 1. To disable filtering, set to 0.
 #' @param strategy the desired strategy
 #' @param txtsize base textsize
+#' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
-#'
-#' @importFrom scales trans_new
 #' @importFrom stats median reorder
 #' @import ggplot2
 #' @export
 owsa_tornado <- function(owsa, strategy, txtsize = 12, min_rel_diff = 0.01,
+                         col = c("full", "bw"),
+                         n_y_ticks = 8,
                          return = c("plot", "data")){
   # check that is owsa object
   if (!is_owsa(owsa)) {
@@ -134,28 +123,35 @@ owsa_tornado <- function(owsa, strategy, txtsize = 12, min_rel_diff = 0.01,
     filter(.data$rel_diff >= min_rel_diff) %>%
     arrange(-.data$abs_diff)
 
-  g <- ggplot(min_max, aes_(x = reorder(min_max$parameter, min_max$abs_diff))) +
-    geom_bar(aes_(y = as.name("outcome_val.low"), fill = "Low"),
-             stat = "identity") +
-    geom_bar(aes_(y = as.name("outcome_val.high"), fill = "High"),
-             stat = "identity") +
-    scale_y_continuous(trans = offset_trans(offset = avg)) +
-    scale_fill_discrete(name = "Parameter\nLevel") +
-    labs(x = "Parameter", y = "Outcome",
-         title = paste0("Strategy: ", strategy)) +
-    common_theme(txtsize) +
-    coord_flip()
-
   # return either plot or data
   ret <- match.arg(return)
   if (ret == "plot") {
+    g <- ggplot(min_max, aes_(x = reorder(min_max$parameter, min_max$abs_diff))) +
+      geom_bar(aes_(y = as.name("outcome_val.low"), fill = "Low"),
+               stat = "identity") +
+      geom_bar(aes_(y = as.name("outcome_val.high"), fill = "High"),
+               stat = "identity") +
+      labs(x = "Parameter", y = "Outcome",
+           title = paste0("Strategy: ", strategy)) +
+      coord_flip()
+
+    col <- match.arg(col)
+    g <- add_common_aes(g, txtsize, col = col, col_aes = "fill",
+                        scale_name = "Parameter\nLevel",
+                        continuous = "y",
+                        ytrans = offset_trans(offset = avg),
+                        n_y_ticks = n_y_ticks)
+
     return(g)
   } else {
     return(min_max)
   }
 }
 
-# transformation for owsa_tornado
+#' transformation for owsa_tornado
+#' @param offset the offset for the transformation (kind of the new 0)
+#' @keywords internal
+#' @importFrom scales trans_new
 offset_trans <- function(offset = 0) {
   trans_new(paste0("offset-", format(offset)),
             function(x) x - offset,
@@ -166,7 +162,7 @@ offset_trans <- function(offset = 0) {
 #'
 #' @param owsa An owsa object
 #' @param maximize whether to maximize (TRUE) or minimize the outcome
-#' @param txtsize base text size for the plot
+#' @inheritParams add_common_aes
 #' @param plot_const whether to plot parameters that don't lead to
 #' changes in optimal strategy as they vary.
 #' @param return either return a ggplot object \code{plot} or a data frame with
@@ -174,7 +170,11 @@ offset_trans <- function(offset = 0) {
 #'
 #' @import ggplot2
 #' @export
-owsa_opt_strat <- function(owsa, maximize = TRUE, txtsize = 12, plot_const = TRUE,
+owsa_opt_strat <- function(owsa, maximize = TRUE,
+                           col = c("full", "bw"),
+                           greystart = 0.2,
+                           greyend = 0.8,
+                           txtsize = 12, plot_const = TRUE,
                            return = c("plot", "data")) {
   # check that is owsa object
   if (!is_owsa(owsa)) {
@@ -206,13 +206,16 @@ owsa_opt_strat <- function(owsa, maximize = TRUE, txtsize = 12, plot_const = TRU
   opt_strat$strategy <- as.factor(opt_strat$strategy)
   g <- ggplot(opt_strat) +
     facet_wrap("parameter", scales = "free_x", ncol = 1) +
+    # a little bit hacky: rectangles with height 1
     geom_rect(aes_(xmin = as.name("pmin"), xmax = as.name("pmax"),
                    ymin = 0, ymax = 1,
                    fill = as.name("strategy")),
-              position = "identity") +
-    scale_fill_discrete(name = "Optimal Strategy: ",
-                        drop = FALSE) +
-    common_theme(txtsize) +
+              position = "identity")
+
+  col <- match.arg(col)
+  g <- add_common_aes(g, txtsize, scale_name = "Optimal Strategy: ",
+                      col, col_aes = "fill", continuous = "x") +
+    # these remove the meaningless y axis labels and text
     theme(axis.line.y = element_blank(),
           axis.text.y = element_blank(),
           axis.title.y = element_blank(),

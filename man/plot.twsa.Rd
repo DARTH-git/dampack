@@ -4,20 +4,24 @@
 \alias{plot.twsa}
 \title{Two-way sensitivity analysis plot}
 \usage{
-\method{plot}{twsa}(x, txtsize = 12, maximize = TRUE, title = NULL,
-  ...)
+\method{plot}{twsa}(x, maximize = TRUE, col = c("full", "bw"),
+  n_x_ticks = 6, n_y_ticks = 6, txtsize = 12, ...)
 }
 \arguments{
 \item{x}{a twsa object}
 
-\item{txtsize}{base text size in the plot}
-
 \item{maximize}{If \code{TRUE}, plot of strategy with maximum expected outcome
 (default); if \code{FALSE}, plot of strategy with minimum expected outcome}
 
-\item{title}{Title for the plot}
+\item{col}{either full color or black and white}
 
-\item{...}{further arguments to \code{plot.owsa} (not used)}
+\item{n_x_ticks}{number of axis ticks}
+
+\item{n_y_ticks}{number of axis ticks}
+
+\item{txtsize}{base text size}
+
+\item{...}{further arguments to plot (not used)}
 }
 \description{
 Two-way sensitivity analysis plot

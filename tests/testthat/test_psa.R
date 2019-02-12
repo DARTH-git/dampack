@@ -44,6 +44,7 @@ test_that("plot.psa runs", {
     plot(psa_big, center = FALSE)
     plot(psa_big, ellipse = FALSE)
     plot(psa_big, center = FALSE, ellipse = FALSE)
+    plot(psa_big, col = "bw")
   })
 })
 

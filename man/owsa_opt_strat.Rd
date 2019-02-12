@@ -4,15 +4,22 @@
 \alias{owsa_opt_strat}
 \title{plot the optimal strategy as the parameter values change}
 \usage{
-owsa_opt_strat(owsa, maximize = TRUE, txtsize = 12,
-  plot_const = TRUE, return = c("plot", "data"))
+owsa_opt_strat(owsa, maximize = TRUE, col = c("full", "bw"),
+  greystart = 0.2, greyend = 0.8, txtsize = 12, plot_const = TRUE,
+  return = c("plot", "data"))
 }
 \arguments{
 \item{owsa}{An owsa object}
 
 \item{maximize}{whether to maximize (TRUE) or minimize the outcome}
 
-\item{txtsize}{base text size for the plot}
+\item{col}{either full color or black and white}
+
+\item{greystart}{between 0 and 1. used in greyscale only. smaller numbers are lighter}
+
+\item{greyend}{between 0 and 1, greater than greystart.}
+
+\item{txtsize}{base text size}
 
 \item{plot_const}{whether to plot parameters that don't lead to
 changes in optimal strategy as they vary.}

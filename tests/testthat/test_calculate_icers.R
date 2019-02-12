@@ -33,7 +33,9 @@ test_that("calculate_icers returns correct object", {
 })
 
 ## methods
+
+big_icer <- calculate_icers(cost = hund_strat$Cost, effect = hund_strat$QALYs, strategies = hund_strat$Strategy)
 # plot
 test_that("plot.icers runs", {
-  expect_silent(plot(icer))
+  expect_silent(plot(big_icer))
 })

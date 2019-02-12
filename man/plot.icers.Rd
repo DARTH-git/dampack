@@ -4,18 +4,17 @@
 \alias{plot.icers}
 \title{Plot of ICERs}
 \usage{
-\method{plot}{icers}(x, title = "", txtsize = 12, currency = "$",
+\method{plot}{icers}(x, txtsize = 12, currency = "$",
   effect_units = "QALYs", label = c("frontier", "all", "none"),
-  label_max_char = 8, plot_frontier_only = FALSE, ...)
+  label_max_char = 8, plot_frontier_only = FALSE, alpha = 1,
+  n_x_ticks = 6, n_y_ticks = 6, ...)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
 function \code{ceac} with each strategy's probability of being
 cost-effective for each willingness-to-pay (WTP) threshold}
 
-\item{title}{String with graph's title}
-
-\item{txtsize}{integer. base font size}
+\item{txtsize}{base text size}
 
 \item{currency}{string. with currency used in the cost-effectiveness analysis (CEA).}
 
@@ -29,7 +28,13 @@ truncated to save space.}
 
 \item{plot_frontier_only}{only plot the efficient frontier}
 
-\item{...}{additional arguments to plot (not used)}
+\item{alpha}{opacity of points}
+
+\item{n_x_ticks}{number of axis ticks}
+
+\item{n_y_ticks}{number of axis ticks}
+
+\item{...}{further arguments to plot (not used)}
 }
 \description{
 Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.

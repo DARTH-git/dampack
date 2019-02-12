@@ -31,11 +31,17 @@ test_that("plot.owsa returns a ggplot object", {
 
 # test owsa tornado
 test_that("owsa_tornado", {
-  o <- owsa(psa_big, outcome = "nhb", wtp = 100000)
+  o <- owsa(psa_big, outcome = "nmb", wtp = 100000)
 
   # returning plot
   p <- owsa_tornado(o, strategy = "Chemo")
   expect_is(p, "ggplot")
+
+  # some parameters
+  p2 <- owsa_tornado(o, strategy = "Chemo", txtsize = 15,
+                     min_rel_diff = 0.1,
+                     col = "bw")
+  expect_is(p2, "ggplot")
 
   # returning data
   d <- owsa_tornado(o, strategy = "Chemo", return = "data")
@@ -43,6 +49,7 @@ test_that("owsa_tornado", {
   ## expect that muDieCancer has the highest relative difference
   max_param <- d$parameter[which.max(d$abs_diff)]
   expect_equal(max_param, "muDieCancer")
+
 })
 
 test_that("owsa_opt_strat", {

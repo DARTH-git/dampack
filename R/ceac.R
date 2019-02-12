@@ -86,8 +86,8 @@ ceac <- function(wtp, psa){
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
 #' @param frontier Whether to plot acceptability frontier
-#' @param title String with graph's title
-#' @param txtsize number with text size
+#' @inheritParams add_common_aes
+#'
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
 #' @param min_prob minimum probability to show strategy in plot.
 #' For example, if the min_prob is 0.05, only strategies that ever
@@ -96,9 +96,6 @@ ceac <- function(wtp, psa){
 #'
 #' Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
 #'
-#' @param ... additional arguments to plot (not used)
-#'
-#' @keywords cost-effectiveness acceptability curves
 #' @section Details:
 #' \code{ceac} computes the probability of each of the strategies being
 #' cost-effective at each \code{wtp} value.
@@ -109,9 +106,12 @@ ceac <- function(wtp, psa){
 #' @export
 plot.ceac <- function(x,
                       frontier = TRUE,
-                      title = "Cost-Effectiveness Acceptability Curves",
                       txtsize = 12,
                       currency = "$",
+                      n_x_ticks = 10,
+                      n_y_ticks = 8,
+                      ylim = NULL,
+                      col = c("full", "bw"),
                       min_prob = 0,
                       ...){
   wtp_name <- "WTP"
@@ -159,21 +159,18 @@ plot.ceac <- function(x,
                              shape = as.name(strat_name))) +
     geom_point() +
     geom_line() +
-    ggtitle(title) +
-    scale_colour_hue(l = 50) +
-    scale_x_continuous(breaks = number_ticks(20)) +
-    scale_y_continuous(limits = c(0, 1)) +
-    xlab(paste("Willingness to Pay (Thousand ", currency, "/ QALY)", sep = "")) +
-    ylab("Pr Cost-Effective") +
-    theme_bw() +
-    common_theme(txtsize)
+    xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
+    ylab("Pr Cost-Effective")
   if (frontier) {
     front <- x[x$On_Frontier, ]
     p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),
                                            y = as.name(prop_name)),
                         shape = 0, size = 3, stroke = 1.2, color = "black")
   }
-  p
+  col <- match.arg(col)
+  add_common_aes(p, txtsize, col = col, col_aes = "color",
+                 continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 ylim = ylim)
 }
 
 

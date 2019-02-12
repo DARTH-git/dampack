@@ -12,8 +12,8 @@ test_that("elc has all methods we'd expect", {
 # test return object
 ## setup
 data("example_psa")
-psa_obj <- make_psa_obj(example_psa$costs, example_psa$effectiveness, example_psa$strategies)
-
+psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+                        example_psa$parameters, example_psa$strategies)
 elc_obj <- calc_elc(wtp = example_psa$wtp,
                       psa = psa_obj)
 
@@ -32,7 +32,7 @@ test_that("return object has column names WTP and 'Frontier & EVPI'", {
 
 # calculation
 test_that("expected loss is what we'd expect", {
-  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$costs
+  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$cost
   max_str <- max.col(nmb)
   loss <- nmb[cbind(1:(psa_obj$n_sim), max_str)] - nmb
   exp_loss <- colMeans(loss)

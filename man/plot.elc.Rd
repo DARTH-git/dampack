@@ -4,19 +4,16 @@
 \alias{plot.elc}
 \title{Plot of Expected Loss Curves (ELC)}
 \usage{
-\method{plot}{elc}(x, ..., title = "", txtsize = 12, currency = "$",
+\method{plot}{elc}(x, txtsize = 12, currency = "$",
   effect_units = "QALY", log_y = TRUE, frontier = TRUE,
-  n_y_ticks = 8, n_x_ticks = 20, col = c("full", "bw"), lsize = 1)
+  n_y_ticks = 8, n_x_ticks = 20, col = c("full", "bw"), lsize = 1,
+  ...)
 }
 \arguments{
 \item{x}{object of class \code{elc}, produced by function
 \code{\link{calc_elc}}}
 
-\item{...}{further arguments to plot() (not used)}
-
-\item{title}{String with graph's title}
-
-\item{txtsize}{number with base text size}
+\item{txtsize}{base text size}
 
 \item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
@@ -25,15 +22,18 @@ Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
 \item{log_y}{take the base 10 log of the y axis}
 
-\item{frontier}{indicate the frontier (also the expected value of perfect information)}
+\item{frontier}{indicate the frontier (also the expected value of perfect information).
+To only plot the EVPI see \code{\link{calc_evpi}}.}
 
-\item{n_y_ticks}{number of axis ticks on the y axis}
+\item{n_y_ticks}{number of axis ticks}
 
-\item{n_x_ticks}{number of axis ticks on the x axis}
+\item{n_x_ticks}{number of axis ticks}
 
-\item{col}{either full-color ("full") or black-and-white ("bw")}
+\item{col}{either full color or black and white}
 
 \item{lsize}{line size. defaults to 1.}
+
+\item{...}{further arguments to plot (not used)}
 }
 \value{
 A \code{ggplot2} object with the expected loss
@@ -41,5 +41,3 @@ A \code{ggplot2} object with the expected loss
 \description{
 Plot of Expected Loss Curves (ELC)
 }
-\keyword{expected}
-\keyword{loss}

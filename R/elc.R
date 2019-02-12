@@ -36,28 +36,22 @@ calc_elc <- function(wtp, psa) {
 #'
 #' @param x object of class \code{elc}, produced by function
 #'  \code{\link{calc_elc}}
-#' @param ... further arguments to plot() (not used)
-#' @param title String with graph's title
-#' @param txtsize number with base text size
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
 #' @param effect_units Units of effectiveness. Default: QALY
 #' @param log_y take the base 10 log of the y axis
-#' @param frontier indicate the frontier (also the expected value of perfect information)
-#' @param n_y_ticks number of axis ticks on the y axis
-#' @param n_x_ticks number of axis ticks on the x axis
-#' @param col either full-color ("full") or black-and-white ("bw")
+#' @param frontier indicate the frontier (also the expected value of perfect information).
+#' To only plot the EVPI see \code{\link{calc_evpi}}.
 #' @param lsize line size. defaults to 1.
+#' @inheritParams add_common_aes
 #'
-#' @keywords expected loss
 #' @return A \code{ggplot2} object with the expected loss
 
 #' @importFrom reshape2 melt
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export
-plot.elc <- function(x, ...,
-                     title = "",
+plot.elc <- function(x,
                      txtsize = 12,
                      currency = "$",
                      effect_units = "QALY",
@@ -66,7 +60,8 @@ plot.elc <- function(x, ...,
                      n_y_ticks = 8,
                      n_x_ticks = 20,
                      col = c("full", "bw"),
-                     lsize = 1) {
+                     lsize = 1,
+                     ...) {
   # melt for plotting in ggplot
   wtp_name <- "WTP_thou"
   loss_name <- "value"
@@ -95,26 +90,25 @@ plot.elc <- function(x, ...,
                                    y = as.name(loss_name),
                                    color = as.name(strat_name))) +
     geom_point() +
-    scale_x_continuous(breaks = number_ticks(n_x_ticks)) +
-    scale_y_continuous(trans = tr,
-                       labels = comma,
-                       breaks = number_ticks(n_y_ticks))  +
-    ggtitle(title) +
     xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
-    ylab(paste0("Expected Loss (", currency, ")")) +
-    common_theme(txtsize)
+    ylab(paste0("Expected Loss (", currency, ")"))
 
   # color
   col <- match.arg(col)
+  ## change linetype too if color is black and white
   if (col == "full") {
-    p <- p + scale_color_hue(l = 50) +
+    p <- p +
       geom_line(size = lsize)
   }
   if (col == "bw") {
-    p <- p + scale_color_grey(start = 0.35) +
-      geom_line(aes_(linetype = as.name(strat_name)), size = lsize)
+    p <- p +
+      geom_line(aes_(linetype = as.name(strat_name)))
   }
 
+  p <- add_common_aes(p, txtsize, col = col, col_aes = "color",
+                      continuous = c("x", "y"),
+                      n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                      ytrans = tr)
   if (frontier) {
     p <- p + geom_point(data = front, aes_(x = as.name(wtp_name),
                                            y = as.name(loss_name),

@@ -123,8 +123,7 @@ compute_icers <- function(non_d) {
 #' @param x Object of class \code{ceac}. A melted data frame produced by
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
-#' @param title String with graph's title
-#' @param txtsize integer. base font size
+#' @inheritParams add_common_aes
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
 #' @param effect_units string. unit of effectiveness
 #' @param label whether to label strategies on the efficient frontier, all strategies, or none.
@@ -132,18 +131,20 @@ compute_icers <- function(non_d) {
 #' @param label_max_char max number of characters to label the strategies - longer strategies will be
 #' truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
-#' @param ... additional arguments to plot (not used)
+#' @param alpha opacity of points
 #'
 #' @importFrom stringr str_sub
 #' @export
 plot.icers <- function(x,
-                       title = "",
                        txtsize = 12,
                        currency = "$",
                        effect_units = "QALYs",
                        label = c("frontier", "all", "none"),
                        label_max_char = 8,
                        plot_frontier_only = FALSE,
+                       alpha = 1,
+                       n_x_ticks = 6,
+                       n_y_ticks = 6,
                        ...){
   # type checking
   label <- match.arg(label)
@@ -158,13 +159,10 @@ plot.icers <- function(x,
 
   status_expand <- c("D" = d_name, "ED" = ed_name,
                      "ND" = nd_name, "ref" = nd_name)
-  x$Status <- factor(status_expand[x$Status], ordered = TRUE,
+  x$Status <- factor(status_expand[x$Status], ordered = FALSE,
                      levels = c(d_name, ed_name, nd_name))
 
-  # plot colors and lines, by status
-  plot_cols <- c("Dominated" = "grey50",
-                 "Weakly Dominated" = "darkorange",
-                 "Efficient Frontier" = "dodgerblue")
+  # linetype
   plot_lines <- c("Dominated" = "blank",
                   "Weakly Dominated" = "blank",
                   "Efficient Frontier" = "solid")
@@ -184,15 +182,17 @@ plot.icers <- function(x,
 
   # make plot
   icer_plot <- ggplot(plt_data, aes_(x = as.name(eff_name), y = as.name(cost_name),
-                                     colour = as.name(stat_name))) +
-    geom_point(alpha = 0.5) +
+                                     shape = as.name(stat_name))) +
+    geom_point(alpha = alpha, size = 2) +
     geom_line(aes_(linetype = as.name(stat_name), group = as.name(stat_name))) +
-    scale_color_manual(name = strat_name, values = plot_cols) +
-    scale_linetype_manual(name = strat_name, values = plot_lines) +
+    scale_linetype_manual(name = NULL, values = plot_lines) +
+    scale_shape_discrete(name = NULL) +
     labs(x = paste0("Effect (", effect_units, ")"),
-         y = paste0("Cost (", currency, ")"),
-         title = title) +
-    common_theme(txtsize)
+         y = paste0("Cost (", currency, ")"))
+
+  icer_plot <- add_common_aes(icer_plot, txtsize, col = "none",
+                              continuous = c("x", "y"),
+                              n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks)
 
   # labeling
   if (label != "none") {
@@ -203,9 +203,22 @@ plot.icers <- function(x,
     if (label == "frontier") {
       lab_data <- plt_data[plt_data$Status == nd_name, ]
     }
+    # create nudge columns
+    range_x <- range(lab_data[, eff_name])
+    width_x <- range_x[2] - range_x[1]
+
+    range_y <- range(lab_data[, cost_name])
+    width_y <- range_y[2] - range_y[1]
+
+    nudge_x <- width_x / 50
+    nudge_y <- - width_y / 50
+
     icer_plot <- icer_plot +
-      geom_label(data = lab_data, aes_(label = as.name(strat_name)),
-                 hjust = "top", vjust = "left", size = 3, show.legend = FALSE)
+      geom_label(data = lab_data,
+                aes_(label = as.name(strat_name)),
+                nudge_x = nudge_x,
+                nudge_y = nudge_y,
+                size = 3, show.legend = FALSE)
   }
   return(icer_plot)
 }

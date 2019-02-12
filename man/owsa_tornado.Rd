@@ -5,7 +5,7 @@
 \title{Tornado plot of a one-way sensitivity analysis}
 \usage{
 owsa_tornado(owsa, strategy, txtsize = 12, min_rel_diff = 0.01,
-  return = c("plot", "data"))
+  col = c("full", "bw"), n_y_ticks = 8, return = c("plot", "data"))
 }
 \arguments{
 \item{owsa}{an owsa object}
@@ -17,6 +17,10 @@ owsa_tornado(owsa, strategy, txtsize = 12, min_rel_diff = 0.01,
 \item{min_rel_diff}{this function only plots
 parameters that lead to a relative change in the outcome greater than or equal
 to \code{min_rel_diff}, which must be between 0 and 1. To disable filtering, set to 0.}
+
+\item{col}{either full color or black and white}
+
+\item{n_y_ticks}{number of axis ticks}
 
 \item{return}{either return a ggplot object \code{plot} or a data frame with
 ranges of parameters for which each strategy is optimal.}

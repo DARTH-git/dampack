@@ -15,6 +15,8 @@
 #' will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.
 #' @param xlim,ylim vector of axis limits, or NULL, which sets limits automatically
 #' @param xtrans,ytrans transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.
+#' @param xexpand,yexpand padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
+#' Currently only used for TWSA.
 #' @param ... further arguments to plot (not used)
 #'
 #' @import ggplot2
@@ -34,6 +36,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                            ylim = NULL,
                            xtrans = "identity",
                            ytrans = "identity",
+                           xexpand = waiver(),
+                           yexpand = waiver(),
                            ...) {
   p <- gplot +
     theme_bw() +
@@ -73,7 +77,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
       scale_x_continuous(breaks = xb,
                          labels = labfun,
                          limits = xlim,
-                         trans = xtrans)
+                         trans = xtrans,
+                         expand = xexpand)
   }
   if ("y" %in% continuous) {
     if (!is.null(ybreaks)){
@@ -85,7 +90,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
       scale_y_continuous(breaks = yb,
                          labels = labfun,
                          limits = ylim,
-                         trans = ytrans)
+                         trans = ytrans,
+                         expand = yexpand)
   }
   return(p)
 }

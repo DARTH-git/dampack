@@ -9,7 +9,7 @@ add_common_aes(gplot, txtsize, scale_name = waiver(), col = c("none",
   greystart = 0.2, greyend = 0.8, continuous = c("none", "x", "y"),
   n_x_ticks = 6, n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL,
   xlim = NULL, ylim = NULL, xtrans = "identity",
-  ytrans = "identity", ...)
+  ytrans = "identity", xexpand = waiver(), yexpand = waiver(), ...)
 }
 \arguments{
 \item{gplot}{a ggplot object}
@@ -38,6 +38,9 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{xlim, ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
 \item{xtrans, ytrans}{transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.}
+
+\item{xexpand, yexpand}{padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
+Currently only used for TWSA.}
 
 \item{...}{further arguments to plot (not used)}
 }

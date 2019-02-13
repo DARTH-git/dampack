@@ -74,5 +74,7 @@ plot.twsa <- function(x, maximize = TRUE,
                  scale_name = "Strategy",
                  continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks,
-                 n_y_ticks = n_y_ticks)
+                 n_y_ticks = n_y_ticks,
+                 xexpand = c(0, 0),
+                 yexpand = c(0, 0))
 }

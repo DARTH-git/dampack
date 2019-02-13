@@ -39,8 +39,8 @@ test_that("owsa_tornado", {
 
   # some parameters
   p2 <- owsa_tornado(o, strategy = "Chemo", txtsize = 15,
-                     min_rel_diff = 0.1,
-                     col = "bw")
+                     min_rel_diff = 0.05,
+                     col = "bw", ylim = c(7e5, 2e6))
   expect_is(p2, "ggplot")
 
   # returning data

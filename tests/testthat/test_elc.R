@@ -54,4 +54,7 @@ test_that("plot.elc runs with several combinations of arguments", {
   expect_silent(plot(elc_obj, frontier = FALSE, log_y = TRUE))
   expect_silent(plot(elc_obj, frontier = TRUE, log_y = FALSE))
   expect_silent(plot(elc_obj, frontier = FALSE, log_y = FALSE))
+  expect_silent(plot(elc_obj, col = "bw"))
+  expect_silent(plot(elc_obj, ylim = c(1e3, 1e5), n_y_ticks = 10,
+                     log_y = FALSE, frontier = TRUE, col = "full", points = FALSE))
 })

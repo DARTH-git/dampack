@@ -4,14 +4,23 @@
 \alias{plot.elc}
 \title{Plot of Expected Loss Curves (ELC)}
 \usage{
-\method{plot}{elc}(x, txtsize = 12, currency = "$",
-  effect_units = "QALY", log_y = TRUE, frontier = TRUE,
-  n_y_ticks = 8, n_x_ticks = 20, col = c("full", "bw"), lsize = 1,
-  ...)
+\method{plot}{elc}(x, log_y = TRUE, frontier = TRUE, points = TRUE,
+  lsize = 1, txtsize = 12, currency = "$", effect_units = "QALY",
+  n_y_ticks = 8, n_x_ticks = 20, xbreaks = NULL, ybreaks = NULL,
+  xlim = NULL, ylim = NULL, col = c("full", "bw"), ...)
 }
 \arguments{
 \item{x}{object of class \code{elc}, produced by function
 \code{\link{calc_elc}}}
+
+\item{log_y}{take the base 10 log of the y axis}
+
+\item{frontier}{indicate the frontier (also the expected value of perfect information).
+To only plot the EVPI see \code{\link{calc_evpi}}.}
+
+\item{points}{whether to plot points on the curve (TRUE) or not (FALSE)}
+
+\item{lsize}{line size. defaults to 1.}
 
 \item{txtsize}{base text size}
 
@@ -20,18 +29,21 @@ Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
 \item{effect_units}{Units of effectiveness. Default: QALY}
 
-\item{log_y}{take the base 10 log of the y axis}
-
-\item{frontier}{indicate the frontier (also the expected value of perfect information).
-To only plot the EVPI see \code{\link{calc_evpi}}.}
-
 \item{n_y_ticks}{number of axis ticks}
 
 \item{n_x_ticks}{number of axis ticks}
 
-\item{col}{either full color or black and white}
+\item{xbreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 
-\item{lsize}{line size. defaults to 1.}
+\item{ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{col}{either full color or black and white}
 
 \item{...}{further arguments to plot (not used)}
 }

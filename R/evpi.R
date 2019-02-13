@@ -49,10 +49,10 @@ calc_evpi <- function(wtp, psa, pop = 1) {
 #' Plots the EVPI as a \code{ggplot2} object calculated with \code{\link{calc_evpi}}.
 #' @param x object of class \code{evpi}, produced by function
 #'  \code{\link{calc_evpi}}
-#' @inheritParams add_common_aes
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
 #' @param effect_units Units of effectiveness. Default: QALY
+#' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
 #' @return A \code{ggplot2} object with the EVPI
 #' @import ggplot2
@@ -61,12 +61,22 @@ calc_evpi <- function(wtp, psa, pop = 1) {
 plot.evpi <- function(x,
                       txtsize = 12,
                       currency = "$",
-                      effect_units = "QALY", ...){
+                      effect_units = "QALY",
+                      n_y_ticks = 8,
+                      n_x_ticks = 20,
+                      xbreaks = NULL,
+                      ybreaks = NULL,
+                      xlim = NULL,
+                      ylim = NULL,
+                      ...){
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
          aes_(x = as.name("WTP_thou"), y = as.name("EVPI"))) +
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
     ylab(paste("EVPI (", currency, ")", sep = ""))
-  add_common_aes(g, txtsize, continuous = c("x", "y"))
+  add_common_aes(g, txtsize, continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim)
 }

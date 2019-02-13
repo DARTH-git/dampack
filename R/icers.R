@@ -145,6 +145,10 @@ plot.icers <- function(x,
                        alpha = 1,
                        n_x_ticks = 6,
                        n_y_ticks = 6,
+                       xbreaks = NULL,
+                       ybreaks = NULL,
+                       xlim = NULL,
+                       ylim = NULL,
                        ...){
   # type checking
   label <- match.arg(label)
@@ -192,7 +196,9 @@ plot.icers <- function(x,
 
   icer_plot <- add_common_aes(icer_plot, txtsize, col = "none",
                               continuous = c("x", "y"),
-                              n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks)
+                              n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                              xbreaks = xbreaks, ybreaks = ybreaks,
+                              xlim = xlim, ylim = ylim)
 
   # labeling
   if (label != "none") {

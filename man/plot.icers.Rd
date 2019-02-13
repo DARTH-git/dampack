@@ -7,7 +7,8 @@
 \method{plot}{icers}(x, txtsize = 12, currency = "$",
   effect_units = "QALYs", label = c("frontier", "all", "none"),
   label_max_char = 8, plot_frontier_only = FALSE, alpha = 1,
-  n_x_ticks = 6, n_y_ticks = 6, ...)
+  n_x_ticks = 6, n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL,
+  xlim = NULL, ylim = NULL, ...)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -33,6 +34,16 @@ truncated to save space.}
 \item{n_x_ticks}{number of axis ticks}
 
 \item{n_y_ticks}{number of axis ticks}
+
+\item{xbreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
 \item{...}{further arguments to plot (not used)}
 }

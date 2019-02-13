@@ -5,7 +5,8 @@
 \title{Plot of Expected Value of Perfect Information (EVPI)}
 \usage{
 \method{plot}{evpi}(x, txtsize = 12, currency = "$",
-  effect_units = "QALY", ...)
+  effect_units = "QALY", n_y_ticks = 8, n_x_ticks = 20,
+  xbreaks = NULL, ybreaks = NULL, xlim = NULL, ylim = NULL, ...)
 }
 \arguments{
 \item{x}{object of class \code{evpi}, produced by function
@@ -17,6 +18,20 @@
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
 \item{effect_units}{Units of effectiveness. Default: QALY}
+
+\item{n_y_ticks}{number of axis ticks}
+
+\item{n_x_ticks}{number of axis ticks}
+
+\item{xbreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
 \item{...}{further arguments to plot (not used)}
 }

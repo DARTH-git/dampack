@@ -4,9 +4,10 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, frontier = TRUE, txtsize = 12, currency = "$",
-  n_x_ticks = 10, n_y_ticks = 8, ylim = NULL, col = c("full",
-  "bw"), min_prob = 0, ...)
+\method{plot}{ceac}(x, frontier = TRUE, currency = "$", min_prob = 0,
+  txtsize = 12, n_x_ticks = 10, n_y_ticks = 8, xbreaks = NULL,
+  ybreaks = NULL, ylim = NULL, xlim = NULL, col = c("full", "bw"),
+  ...)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}. A melted data frame produced by
@@ -15,24 +16,31 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 
 \item{frontier}{Whether to plot acceptability frontier}
 
-\item{txtsize}{base text size}
+\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
+Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)}
 
-\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).}
+\item{min_prob}{minimum probability to show strategy in plot.
+For example, if the min_prob is 0.05, only strategies that ever
+exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
+with many strategies.}
+
+\item{txtsize}{base text size}
 
 \item{n_x_ticks}{number of axis ticks}
 
 \item{n_y_ticks}{number of axis ticks}
 
+\item{xbreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
 \item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
+\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+
 \item{col}{either full color or black and white}
-
-\item{min_prob}{minimum probability to show strategy in plot.
-For example, if the min_prob is 0.05, only strategies that ever
-exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
-with many strategies.
-
-Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
 \item{...}{further arguments to plot (not used)}
 }
@@ -42,9 +50,7 @@ ceac.gg A \code{ggplot2} object with the CEAC
 \description{
 Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
 }
-\section{Details}{
-
+\details{
 \code{ceac} computes the probability of each of the strategies being
 cost-effective at each \code{wtp} value.
 }
-

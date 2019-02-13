@@ -127,7 +127,12 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 plot.psa <- function(x,
                      center = TRUE, ellipse = TRUE,
                      alpha = 0.2, txtsize = 12, col = c("full", "bw"),
-                     n_x_ticks = 6, n_y_ticks = 6, ...) {
+                     n_x_ticks = 6, n_y_ticks = 6,
+                     xbreaks = NULL,
+                     ybreaks = NULL,
+                     xlim = NULL,
+                     ylim = NULL,
+                     ...) {
   effectiveness <- x$effectiveness
   cost <- x$cost
   strategies <- x$strategies
@@ -184,7 +189,10 @@ plot.psa <- function(x,
   # add common theme
   col <- match.arg(col)
   add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
-                 continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks)
+                 continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim)
 }
 
 #' print a psa object

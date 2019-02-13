@@ -42,6 +42,7 @@ calc_elc <- function(wtp, psa) {
 #' @param log_y take the base 10 log of the y axis
 #' @param frontier indicate the frontier (also the expected value of perfect information).
 #' To only plot the EVPI see \code{\link{calc_evpi}}.
+#' @param points whether to plot points on the curve (TRUE) or not (FALSE)
 #' @param lsize line size. defaults to 1.
 #' @inheritParams add_common_aes
 #'
@@ -52,15 +53,20 @@ calc_elc <- function(wtp, psa) {
 #' @importFrom scales comma
 #' @export
 plot.elc <- function(x,
+                     log_y = TRUE,
+                     frontier = TRUE,
+                     points = TRUE,
+                     lsize = 1,
                      txtsize = 12,
                      currency = "$",
                      effect_units = "QALY",
-                     log_y = TRUE,
-                     frontier = TRUE,
                      n_y_ticks = 8,
                      n_x_ticks = 20,
+                     xbreaks = NULL,
+                     ybreaks = NULL,
+                     xlim = NULL,
+                     ylim = NULL,
                      col = c("full", "bw"),
-                     lsize = 1,
                      ...) {
   # melt for plotting in ggplot
   wtp_name <- "WTP_thou"
@@ -69,12 +75,15 @@ plot.elc <- function(x,
   x_melt <- melt(x,
                  id.vars = "WTP",
                  variable.name = strat_name)
+  # coerce strategy factor to character,
+  # so empty factors don't get put in the legend
+  x_melt$Strategy <- as.character(x_melt$Strategy)
   x_melt[, wtp_name] <- x_melt$WTP / 1000
 
   # split into on frontier and not on frontier
   fname <- "on_frontier"
   frontier_char <- "Frontier_EVPI"
-  on_frontier <- (x_melt[, strat_name] == frontier_char)
+  on_frontier <- x_melt[, strat_name] == frontier_char
   x_melt[, fname] <- on_frontier
   nofront <- x_melt[!on_frontier, ]
   front <- x_melt[on_frontier, ]
@@ -87,27 +96,31 @@ plot.elc <- function(x,
   }
 
   p <- ggplot(data = nofront, aes_(x = as.name(wtp_name),
-                                   y = as.name(loss_name),
-                                   color = as.name(strat_name))) +
-    geom_point() +
+                                   y = as.name(loss_name))) +
     xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
     ylab(paste0("Expected Loss (", currency, ")"))
+
+  if (points) {
+    p <- p + geom_point()
+  }
 
   # color
   col <- match.arg(col)
   ## change linetype too if color is black and white
   if (col == "full") {
     p <- p +
-      geom_line(size = lsize)
+      geom_line(size = lsize, aes_(color = as.name(strat_name)))
   }
   if (col == "bw") {
     p <- p +
       geom_line(aes_(linetype = as.name(strat_name)))
   }
 
-  p <- add_common_aes(p, txtsize, col = col, col_aes = "color",
+  p <- add_common_aes(p, txtsize, col = col, col_aes = c("color", "line"),
                       continuous = c("x", "y"),
                       n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                      xbreaks = xbreaks, ybreaks = ybreaks,
+                      xlim = xlim, ylim = ylim,
                       ytrans = tr)
   if (frontier) {
     p <- p + geom_point(data = front, aes_(x = as.name(wtp_name),

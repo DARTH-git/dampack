@@ -6,7 +6,8 @@
 \usage{
 \method{plot}{psa}(x, center = TRUE, ellipse = TRUE, alpha = 0.2,
   txtsize = 12, col = c("full", "bw"), n_x_ticks = 6,
-  n_y_ticks = 6, ...)
+  n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL, xlim = NULL,
+  ylim = NULL, ...)
 }
 \arguments{
 \item{x}{the psa object}
@@ -25,6 +26,16 @@
 \item{n_x_ticks}{number of axis ticks}
 
 \item{n_y_ticks}{number of axis ticks}
+
+\item{xbreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+
+\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
 \item{...}{further arguments to plot (not used)}
 }

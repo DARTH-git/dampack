@@ -7,8 +7,9 @@
 add_common_aes(gplot, txtsize, scale_name = waiver(), col = c("none",
   "full", "bw"), col_aes = c("fill", "color"), lval = 50,
   greystart = 0.2, greyend = 0.8, continuous = c("none", "x", "y"),
-  n_x_ticks = 6, n_y_ticks = 6, xlim = NULL, ylim = NULL,
-  xtrans = "identity", ytrans = "identity", ...)
+  n_x_ticks = 6, n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL,
+  xlim = NULL, ylim = NULL, xtrans = "identity",
+  ytrans = "identity", ...)
 }
 \arguments{
 \item{gplot}{a ggplot object}
@@ -30,6 +31,9 @@ add_common_aes(gplot, txtsize, scale_name = waiver(), col = c("none",
 \item{continuous}{which axes are continuous and should be modified by this function}
 
 \item{n_x_ticks, n_y_ticks}{number of axis ticks}
+
+\item{xbreaks, ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 
 \item{xlim, ylim}{vector of axis limits, or NULL, which sets limits automatically}
 

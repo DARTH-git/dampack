@@ -11,6 +11,8 @@
 #' @param greyend between 0 and 1, greater than greystart.
 #' @param continuous which axes are continuous and should be modified by this function
 #' @param n_x_ticks,n_y_ticks number of axis ticks
+#' @param xbreaks,ybreaks vector of axis breaks.
+#' will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.
 #' @param xlim,ylim vector of axis limits, or NULL, which sets limits automatically
 #' @param xtrans,ytrans transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.
 #' @param ... further arguments to plot (not used)
@@ -26,6 +28,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                            continuous = c("none", "x", "y"),
                            n_x_ticks = 6,
                            n_y_ticks = 6,
+                           xbreaks = NULL,
+                           ybreaks = NULL,
                            xlim = NULL,
                            ylim = NULL,
                            xtrans = "identity",
@@ -60,15 +64,25 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   continuous <- match.arg(continuous, several.ok = TRUE)
 
   if ("x" %in% continuous) {
+    if (!is.null(xbreaks)){
+      xb <- xbreaks
+    } else {
+      xb <- number_ticks(n_x_ticks)
+    }
     p <- p +
-      scale_x_continuous(breaks = number_ticks(n_x_ticks),
+      scale_x_continuous(breaks = xb,
                          labels = labfun,
                          limits = xlim,
                          trans = xtrans)
   }
   if ("y" %in% continuous) {
+    if (!is.null(ybreaks)){
+      yb <- ybreaks
+    } else {
+      yb <- number_ticks(n_y_ticks)
+    }
     p <- p +
-      scale_y_continuous(breaks = number_ticks(n_y_ticks),
+      scale_y_continuous(breaks = yb,
                          labels = labfun,
                          limits = ylim,
                          trans = ytrans)

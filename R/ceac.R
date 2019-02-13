@@ -86,17 +86,15 @@ ceac <- function(wtp, psa){
 #' function \code{ceac} with each strategy's probability of being
 #' cost-effective for each willingness-to-pay (WTP) threshold
 #' @param frontier Whether to plot acceptability frontier
-#' @inheritParams add_common_aes
-#'
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#'Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)
 #' @param min_prob minimum probability to show strategy in plot.
 #' For example, if the min_prob is 0.05, only strategies that ever
 #' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
 #' with many strategies.
+#' @inheritParams add_common_aes
 #'
-#' Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#'
-#' @section Details:
+#' @details
 #' \code{ceac} computes the probability of each of the strategies being
 #' cost-effective at each \code{wtp} value.
 #' @return ceac.gg A \code{ggplot2} object with the CEAC
@@ -106,13 +104,16 @@ ceac <- function(wtp, psa){
 #' @export
 plot.ceac <- function(x,
                       frontier = TRUE,
-                      txtsize = 12,
                       currency = "$",
+                      min_prob = 0,
+                      txtsize = 12,
                       n_x_ticks = 10,
                       n_y_ticks = 8,
+                      xbreaks = NULL,
+                      ybreaks = NULL,
                       ylim = NULL,
+                      xlim = NULL,
                       col = c("full", "bw"),
-                      min_prob = 0,
                       ...){
   wtp_name <- "WTP"
   prop_name <- "Proportion"
@@ -170,7 +171,8 @@ plot.ceac <- function(x,
   col <- match.arg(col)
   add_common_aes(p, txtsize, col = col, col_aes = "color",
                  continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
-                 ylim = ylim)
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 ylim = ylim, xlim = xlim)
 }
 
 

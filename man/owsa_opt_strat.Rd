@@ -4,14 +4,20 @@
 \alias{owsa_opt_strat}
 \title{plot the optimal strategy as the parameter values change}
 \usage{
-owsa_opt_strat(owsa, maximize = TRUE, col = c("full", "bw"),
-  greystart = 0.2, greyend = 0.8, txtsize = 12, plot_const = TRUE,
-  return = c("plot", "data"))
+owsa_opt_strat(owsa, maximize = TRUE, return = c("plot", "data"),
+  plot_const = TRUE, col = c("full", "bw"), greystart = 0.2,
+  greyend = 0.8, txtsize = 12, n_x_ticks = 10)
 }
 \arguments{
 \item{owsa}{An owsa object}
 
 \item{maximize}{whether to maximize (TRUE) or minimize the outcome}
+
+\item{return}{either return a ggplot object \code{plot} or a data frame with
+ranges of parameters for which each strategy is optimal.}
+
+\item{plot_const}{whether to plot parameters that don't lead to
+changes in optimal strategy as they vary.}
 
 \item{col}{either full color or black and white}
 
@@ -21,11 +27,7 @@ owsa_opt_strat(owsa, maximize = TRUE, col = c("full", "bw"),
 
 \item{txtsize}{base text size}
 
-\item{plot_const}{whether to plot parameters that don't lead to
-changes in optimal strategy as they vary.}
-
-\item{return}{either return a ggplot object \code{plot} or a data frame with
-ranges of parameters for which each strategy is optimal.}
+\item{n_x_ticks}{number of axis ticks}
 }
 \description{
 plot the optimal strategy as the parameter values change

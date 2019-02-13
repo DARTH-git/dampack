@@ -4,15 +4,19 @@
 \alias{owsa_tornado}
 \title{Tornado plot of a one-way sensitivity analysis}
 \usage{
-owsa_tornado(owsa, strategy, txtsize = 12, min_rel_diff = 0.01,
-  col = c("full", "bw"), n_y_ticks = 8, return = c("plot", "data"))
+owsa_tornado(owsa, strategy, return = c("plot", "data"), txtsize = 12,
+  min_rel_diff = 0.01, col = c("full", "bw"), n_y_ticks = 8,
+  ylim = NULL, ybreaks = NULL)
 }
 \arguments{
 \item{owsa}{an owsa object}
 
 \item{strategy}{the desired strategy}
 
-\item{txtsize}{base textsize}
+\item{return}{either return a ggplot object \code{plot} or a data frame with
+ranges of parameters for which each strategy is optimal.}
+
+\item{txtsize}{base text size}
 
 \item{min_rel_diff}{this function only plots
 parameters that lead to a relative change in the outcome greater than or equal
@@ -22,8 +26,10 @@ to \code{min_rel_diff}, which must be between 0 and 1. To disable filtering, set
 
 \item{n_y_ticks}{number of axis ticks}
 
-\item{return}{either return a ggplot object \code{plot} or a data frame with
-ranges of parameters for which each strategy is optimal.}
+\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{ybreaks}{vector of axis breaks.
+will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 }
 \description{
 Tornado plot of a one-way sensitivity analysis

@@ -5,9 +5,9 @@
 \title{Plot a sensitivity analysis}
 \usage{
 \method{plot}{owsa}(x, txtsize = 12, col = c("full", "bw"),
-  ptype = c("line", "point"), n_x_ticks = 6, n_y_ticks = 6,
   facet_scales = c("free_x", "free_y", "free", "fixed"),
-  facet_nrow = NULL, facet_ncol = NULL, size = 1, ...)
+  facet_nrow = NULL, facet_ncol = NULL, size = 1, n_x_ticks = 6,
+  n_y_ticks = 6, ...)
 }
 \arguments{
 \item{x}{an owsa object}
@@ -15,12 +15,6 @@
 \item{txtsize}{base text size in the plot}
 
 \item{col}{either full-color ("full") or black and white ("bw")}
-
-\item{ptype}{plot type. either point or line.}
-
-\item{n_x_ticks}{number of axis ticks}
-
-\item{n_y_ticks}{number of axis ticks}
 
 \item{facet_scales}{whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
 more details.}
@@ -31,7 +25,11 @@ more details.}
 The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
 which determines the number of rows and columns automatically.}
 
-\item{size}{either point size (ptype = "point") or line size (ptype = "line")}
+\item{size}{either point size (ptype = "point") and/or line size (ptype = "line")}
+
+\item{n_x_ticks}{number of axis ticks}
+
+\item{n_y_ticks}{number of axis ticks}
 
 \item{...}{further arguments to plot (not used)}
 }

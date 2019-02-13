@@ -45,6 +45,8 @@ test_that("plot.psa runs", {
     plot(psa_big, ellipse = FALSE)
     plot(psa_big, center = FALSE, ellipse = FALSE)
     plot(psa_big, col = "bw")
+    plot(psa_big, col = "bw", xbreaks = seq(0, 15), xlim = c(0, 15),
+         ylim = NULL, alpha = 1)
   })
 })
 

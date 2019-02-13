@@ -48,7 +48,14 @@ test_that("message is correct in summary.ceac", {
 test_that("plot.ceac produces ggplot object", {
   ceac_obj <- ceac(wtp, psa_obj)
   gf <- plot(ceac_obj, frontier = TRUE)
-  expect_true(inherits(gf, "ggplot"))
+  expect_is(gf, "ggplot")
+
   gnof <- plot(ceac_obj, frontier = FALSE)
-  expect_true(inherits(gnof, "ggplot"))
+  expect_is(gnof, "ggplot")
+
+  custom_breaks <- plot(ceac_obj, xbreaks = seq(0, 140))
+  expect_is(custom_breaks, "ggplot")
+
+  # black and white
+  expect_is(plot(ceac_obj, col = "bw"), "ggplot")
 })

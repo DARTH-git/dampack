@@ -15,11 +15,10 @@ Description: More about what it does (maybe more than one line)
 License: GPL
 Encoding: UTF-8
 Depends:
-    R (>= 3.3)
+    R (>= 3.3),
+    ggplot2
 Imports:
     reshape2,
-    matrixStats,
-    ggplot2,
     ellipse,
     dplyr,
     scales,

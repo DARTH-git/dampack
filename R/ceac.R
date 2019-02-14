@@ -1,18 +1,49 @@
 #### object ####
 
-#' Cost-Effectiveness Acceptability Curves (CEAC)
+#' Cost-Effectiveness Acceptability Curve (CEAC)
 #'
 #' \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 #' curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
+#'
 #' @param wtp Numeric vector with willingness-to-pay (WTP) thresholds
-#' @param psa A psa object from \code{psa}
+#' @param psa A psa object from \code{\link{make_psa_obj}}
 #' @keywords cost-effectiveness acceptability curves
-#' @section Details:
+#' @details
 #' \code{ceac} computes the probability of each of the strategies being
-#' cost-effective (optimal?) at each \code{wtp} threshold.
-#' @return ceac A melted data frame with each strategy's probability of being
-#' cost-effective at each WTP threshold.
-#' @import reshape2
+#' cost-effective at each \code{wtp} threshold. The returned object has classes
+#' \code{ceac} and \code{data.frame}, and has its own plot method (\code{\link{plot.ceac}}).
+#'
+#' @return An object of class \code{ceac} that can be visualized with \code{plot}.
+#'
+#' @examples
+#' # create a PSA object using make_psa_obj
+#' data("example_psa")
+#' # using with() for brevity
+#' psa_obj <- with(example_psa, make_psa_obj(cost, effectiveness, parameters, strategies))
+#'
+#' wtp <- seq(1e4, 1e5, by = 1e4)
+#' ceac_obj <- ceac(wtp, psa_obj)
+#' plot(ceac_obj) # see ?plot.ceac for options
+#'
+#' # this is most useful when there are many strategies
+#' # warnings are printed to describe strategies that
+#' # have been filtered out
+#' plot(ceac_obj, min_prob = 0.5)
+#'
+#' # standard ggplot layers can be used
+#' plot(ceac_obj) +
+#'     labs(title = "CEAC", y = "Pr(Cost-effective) at WTP")
+#'
+#' # the ceac object is also a data frame
+#' head(ceac_obj)
+#'
+#' # summary() tells us the regions of cost-effectiveness for each strategy
+#' summary(ceac_obj)
+#'
+#' @seealso
+#' \code{\link{plot.ceac}}, \code{\link{summary.ceac}}
+#'
+#' @importFrom reshape2 melt
 #'
 #' @export
 ceac <- function(wtp, psa){
@@ -29,16 +60,18 @@ ceac <- function(wtp, psa){
   # number of willingness to pay thresholds
   n_wtps <- length(wtp)
 
-  # matrices to store probability optimal for each strategy (cea)
+  # matrix to store probability optimal for each strategy
   cea <- matrix(0, nrow = n_wtps, ncol = n_strategies)
   colnames(cea) <- strategies
 
   # vector to store strategy at the cost-effectiveness acceptability frontier
   frontv <- rep(0, n_wtps)
 
-  for (l in 1:length(wtp)) {
-    nmb <-  wtp[l] * effectiveness - cost # net monetary benefit at wtp[l]
-    # find best strategy for each simulation
+  for (l in 1:n_wtps) {
+    # calculate net monetary benefit at wtp[l]
+    nmb <-  wtp[l] * effectiveness - cost
+
+    # find the distribution of optimal strategies
     max.nmb <- max.col(nmb)
     opt <- table(max.nmb)
     cea[l, as.numeric(names(opt))] <- opt / n_sim
@@ -49,13 +82,16 @@ ceac <- function(wtp, psa){
   }
 
   # make cea df
-  cea.df <- data.frame(wtp, cea, strategies[frontv], stringsAsFactors = FALSE)
+  cea.df <- data.frame(wtp, cea, strategies[frontv],
+                       stringsAsFactors = FALSE)
   colnames(cea.df) <- c("WTP", strategies, "fstrat")
 
-  # make ceaf df
-
-  ceac <- reshape2::melt(cea.df, id.vars = c("WTP", "fstrat"),
+  # make ceac df
+  ceac <- melt(cea.df, id.vars = c("WTP", "fstrat"),
                variable.name = "Strategy", value.name = "Proportion")
+
+  # replace factors with strings (melt creates factors)
+  ceac$Strategy <- as.character(ceac$Strategy)
 
   # boolean for on frontier or not
   ceac$On_Frontier <- (ceac$fstrat == ceac$Strategy)
@@ -63,29 +99,25 @@ ceac <- function(wtp, psa){
   # drop fstrat column
   ceac$fstrat <- NULL
 
-  # replace factors with strings
-  ceac$Strategy <- as.character(ceac$Strategy)
-
   # order by WTP
   ceac <- ceac[order(ceac$WTP), ]
 
   # remove rownames
   rownames(ceac) <- NULL
 
-  # Return a data frame of class ceac
+  # define classes
+  # defining data.frame as well allows the object to use print.data.frame, for example
   class(ceac) <- c("ceac", "data.frame")
+
   return(ceac)
 }
 
-#### methods ####
-
 #' Plot of Cost-Effectiveness Acceptability Curves (CEAC)
 #'
-#' Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
-#' @param x Object of class \code{ceac}. A melted data frame produced by
-#' function \code{ceac} with each strategy's probability of being
-#' cost-effective for each willingness-to-pay (WTP) threshold
-#' @param frontier Whether to plot acceptability frontier
+#' Plots the CEAC, using the object created by \code{\link{ceac}}.
+#'
+#' @param x Object of class \code{ceac}.
+#' @param frontier Whether to plot acceptability frontier (TRUE) or not (FALSE)
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
 #'Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)
 #' @param min_prob minimum probability to show strategy in plot.
@@ -94,10 +126,13 @@ ceac <- function(wtp, psa){
 #' with many strategies.
 #' @inheritParams add_common_aes
 #'
+#' @keywords internal
+#'
 #' @details
 #' \code{ceac} computes the probability of each of the strategies being
 #' cost-effective at each \code{wtp} value.
-#' @return ceac.gg A \code{ggplot2} object with the CEAC
+#' @return A \code{ggplot2} plot of the CEAC.
+#'
 #' @import ggplot2
 #' @import dplyr
 #'
@@ -176,10 +211,19 @@ plot.ceac <- function(x,
 }
 
 
-#' summary function for the ceac object
+#' Summarize a ceac
+#'
+#' Describes cost-effective strategies and their
+#' associated intervals of cost-effectiveness
 #'
 #' @param object object returned from the \code{ceac} function
 #' @param ... further arguments (not used)
+#' @return data frame showing the interval of cost effectiveness for each
+#' interval. The intervals are open on the right endpoint -
+#' i.e., [\code{range_min}, \code{range_max})
+#'
+#' @keywords internal
+#'
 #' @export
 summary.ceac <- function(object, ...){
   front <- object[object$On_Frontier == TRUE, ]

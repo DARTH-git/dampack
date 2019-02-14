@@ -2,7 +2,7 @@
 % Please edit documentation in R/ceac.R
 \name{summary.ceac}
 \alias{summary.ceac}
-\title{summary function for the ceac object}
+\title{Summarize a ceac}
 \usage{
 \method{summary}{ceac}(object, ...)
 }
@@ -11,6 +11,13 @@
 
 \item{...}{further arguments (not used)}
 }
-\description{
-summary function for the ceac object
+\value{
+data frame showing the interval of cost effectiveness for each
+interval. The intervals are open on the right endpoint -
+i.e., [\code{range_min}, \code{range_max})
 }
+\description{
+Describes cost-effective strategies and their
+associated intervals of cost-effectiveness
+}
+\keyword{internal}

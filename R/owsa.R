@@ -10,18 +10,46 @@
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 #'
 #' @export
-owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
+owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
 
-  # create metamodel
-  mm <- metamod("oneway", psa, parms,
-                strategies, outcome, wtp, poly.order)
+  if (inherits(sens, "psa")) {
+    # create metamodel
+    mm <- metamod("oneway", sens, parms,
+                  strategies, outcome, wtp, poly.order)
 
-  # predict outcomes using predict.metamodel
-  ow <- predict(mm, ranges, nsamps)
+    # predict outcomes using predict.metamodel
+    ow <- predict(mm, ranges, nsamps)
+  } else if (inherits(sens, "dsa_oneway")) {
+    params <- sens$params
+    eff <- sens$effectiveness
+    cost <- sens$cost
+    strategies <- sens$strategies
+    n_dsa <- sens$n_dsa
+    param_names <- names(params)
+
+    # calculate outcomes
+    # effectiveness, for now
+    outcome <- eff
+
+    # loop over dsa's and create ow
+    ow <- NULL
+    for (p in param_names) {
+      for (s in strategies) {
+        # maybe extract this out later - shared with predict.metamodel
+        new_df <- data.frame("parameter" = p, "strategy" = s,
+                             "param_val" = params[[p]],
+                             "outcome_val" = outcome[[p]][, s])
+        ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
+      }
+    }
+
+  } else {
+    stop("sens must have class 'psa' or 'dsa_oneway'")
+  }
 
   # define classes
   class(ow) <- c("owsa", "data.frame")

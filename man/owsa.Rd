@@ -4,13 +4,11 @@
 \alias{owsa}
 \title{One-way sensitivity analysis using linear regression metamodeling}
 \usage{
-owsa(psa, parms = NULL, ranges = NULL, nsamps = 100,
+owsa(sens, parms = NULL, ranges = NULL, nsamps = 100,
   outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
   strategies = NULL, poly.order = 2)
 }
 \arguments{
-\item{psa}{psa object}
-
 \item{parms}{String with the name of the parameter of interest}
 
 \item{ranges}{A named list of the form c("parm" = c(0, 1), ...)

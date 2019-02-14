@@ -6,7 +6,7 @@
 #' @param parm1 String with the name of the first parameter of interest
 #' @param parm2 String with the name of the second parameter of interest
 
-#' @inheritParams metamod
+#' @inheritParams metamodel
 #' @inheritParams predict.metamodel
 #'
 #' @return twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and
@@ -22,7 +22,7 @@ twsa <- function(psa, parm1, parm2, ranges = NULL,
   parms <- c(parm1, parm2)
 
   # run metamodel
-  mm <- metamod("twoway", psa, parms, strategies, outcome, wtp, poly.order)
+  mm <- metamodel("twoway", psa, parms, strategies, outcome, wtp, poly.order)
 
   # Predict Outcomes using MMMR Metamodel fit
   tw <- predict(mm, ranges, nsamp)

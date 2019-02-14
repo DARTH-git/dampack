@@ -12,7 +12,7 @@
 #'
 #' @importFrom stats as.formula formula getCall lm
 #' @export
-metamod <- function(analysis = c("oneway", "twoway"),
+metamodel <- function(analysis = c("oneway", "twoway"),
                     psa, parms = NULL, strategies = NULL,
                     outcome = c("eff", "cost", "nhb", "nmb"),
                     wtp = NULL,
@@ -99,12 +99,12 @@ metamod <- function(analysis = c("oneway", "twoway"),
     }
   }
 
-  metamod <- list(outcome = outcome, mods = lms, wtp = wtp,
+  metamodel <- list(outcome = outcome, mods = lms, wtp = wtp,
                   parms = parms, strategies = strategies,
                   psa = psa, analysis = analysis)
   # define class
-  class(metamod) <- "metamodel"
-  return(metamod)
+  class(metamodel) <- "metamodel"
+  return(metamodel)
 }
 
 #' Build formula and run linear regression for metamodel
@@ -112,7 +112,7 @@ metamod <- function(analysis = c("oneway", "twoway"),
 #' @param dat data to use in regression
 #' @param all_parms all parms in PSA
 #' @keywords internal
-#' @inheritParams metamod
+#' @inheritParams metamodel
 mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order) {
   # build formula
   ## dependent variable

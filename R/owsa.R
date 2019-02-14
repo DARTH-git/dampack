@@ -4,7 +4,7 @@
 #' decision-analytic model to predict the desired outcome.
 #'
 #' @param nsamps number of samples to take from the ranges
-#' @inheritParams metamod
+#' @inheritParams metamodel
 #' @inheritParams predict.metamodel
 #' @return A dataframe with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
@@ -17,7 +17,7 @@ owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
                  poly.order = 2){
 
   # create metamodel
-  mm <- metamod("oneway", psa, parms,
+  mm <- metamodel("oneway", psa, parms,
                 strategies, outcome, wtp, poly.order)
 
   # predict outcomes using predict.metamodel

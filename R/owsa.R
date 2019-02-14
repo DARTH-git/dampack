@@ -15,7 +15,7 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
-
+  outcome <- match.arg(outcome)
   if (inherits(sens, "psa")) {
     # create metamodel
     mm <- metamod("oneway", sens, parms,
@@ -33,7 +33,17 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
 
     # calculate outcomes
     # effectiveness, for now
-    outcome <- eff
+    if (outcome == "eff") {
+      y <- eff
+    } else if (outcome == "cost") {
+      y <- cost
+    } else {
+      y <- lapply(1:n_dsa, function(i) {
+        calculate_net_benefit(outcome, cost[[i]], eff[[i]], wtp)
+        }
+      )
+      names(y) <- param_names
+    }
 
     # loop over dsa's and create ow
     ow <- NULL
@@ -42,7 +52,7 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
         # maybe extract this out later - shared with predict.metamodel
         new_df <- data.frame("parameter" = p, "strategy" = s,
                              "param_val" = params[[p]],
-                             "outcome_val" = outcome[[p]][, s])
+                             "outcome_val" = y[[p]][, s])
         ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
       }
     }

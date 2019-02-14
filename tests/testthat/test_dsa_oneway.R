@@ -29,10 +29,13 @@ cs <- list("p1" = c1,
 # class creation
 dsa <- create_dsa_oneway(ps, es, strategies, cs)
 
+# class creation with just one parameter
+dsa <- create_dsa_oneway(p1, e1, strategies, c1)
+
 # print
 print(dsa)
 
 # plots
-o <- owsa(dsa)
+o <- owsa(dsa, outcome = "nmb", wtp = 1e5)
 owsa_tornado(o, strategy = "s2", min_rel_diff = -1)
 owsa_opt_strat(o)

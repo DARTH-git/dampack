@@ -4,13 +4,11 @@
 \alias{twsa}
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
-twsa(psa, parm1, parm2, ranges = NULL, nsamp = 100,
+twsa(sens, parm1 = NULL, parm2 = NULL, ranges = NULL, nsamp = 100,
   outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
   strategies = NULL, poly.order = 2)
 }
 \arguments{
-\item{psa}{psa object}
-
 \item{parm1}{String with the name of the first parameter of interest}
 
 \item{parm2}{String with the name of the second parameter of interest}

@@ -13,19 +13,49 @@
 #' \code{parm2} on the outcome of interest.
 #'
 #' @export
-twsa <- function(psa, parm1, parm2, ranges = NULL,
+twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
                  nsamp = 100,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
-  parms <- c(parm1, parm2)
 
-  # run metamodel
-  mm <- metamod("twoway", psa, parms, strategies, outcome, wtp, poly.order)
+  if (inherits(sens, "psa")) {
+    if (is.null(parm1) | is.null(parm2)) {
+      stop("if using psa object, both parm1 and parm2 must be provided")
+    }
 
-  # Predict Outcomes using MMMR Metamodel fit
-  tw <- predict(mm, ranges, nsamp)
+    parms <- c(parm1, parm2)
+
+    # run metamodel
+    mm <- metamod("twoway", sens, parms, strategies, outcome, wtp, poly.order)
+
+    # Predict Outcomes using MMMR Metamodel fit
+    tw <- predict(mm, ranges, nsamp)
+  } else if (inherits(sens, "dsa_twoway")) {
+    params <- sens$params
+    eff <- sens$effectiveness
+    cost <- sens$cost
+    strategies <- sens$strategies
+    n_dsa <- sens$n_dsa
+    param_names <- names(params)
+
+    # calculate outcomes
+    # effectiveness, for now
+    outcome <- eff
+
+    # loop over dsa's and create ow
+    tw <- NULL
+    for (s in strategies) {
+      # maybe extract this out later - shared with predict.metamodel
+      new_df <- data.frame("p1" = params[, param_names[1]], "p2" = params[, param_names[2]],
+                           "strategy" = s, "outcome_val" = outcome[, s])
+      tw <- rbind(tw, new_df, stringsAsFactors = FALSE)
+    }
+    names(tw)[1:2] <- param_names
+  } else {
+    stop("either a psa or dsa_twoway object must be provided")
+  }
 
   # define classes
   class(tw) <- c("twsa", "data.frame")

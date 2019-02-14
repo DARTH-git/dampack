@@ -16,13 +16,12 @@
 #' @return An object of class \code{ceac} that can be visualized with \code{plot}.
 #'
 #' @examples
-#' # create a PSA object using make_psa_obj
-#' data("example_psa")
-#' # using with() for brevity
-#' psa_obj <- with(example_psa, make_psa_obj(cost, effectiveness, parameters, strategies))
+#' # load psa object provided with package
+#' data("example_psa_obj")
 #'
+#' # define wtp threshold vector (can also use a single wtp)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' ceac_obj <- ceac(wtp, psa_obj)
+#' ceac_obj <- ceac(wtp, example_psa_obj)
 #' plot(ceac_obj) # see ?plot.ceac for options
 #'
 #' # this is most useful when there are many strategies

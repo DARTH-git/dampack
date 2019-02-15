@@ -36,10 +36,13 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{...}{further arguments to plot (not used)}
 }
 \value{
-A \code{ggplot2} object with the EVPI
+A \code{ggplot2} plot with the EVPI
 }
 \description{
-Plots the EVPI as a \code{ggplot2} object calculated with \code{\link{calc_evpi}}.
+Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
+}
+\seealso{
+\code{\link{calc_evpi}}
 }
 \keyword{expected}
 \keyword{information}

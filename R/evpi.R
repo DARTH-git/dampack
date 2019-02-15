@@ -9,8 +9,22 @@
 #' @section Details:
 #' \code{evpi} calculates the value of eliminating all the uncertainty of a
 #' cost-effectiveness analysis at each WTP threshold.
-#' @return evpi A data frame with the EVPI at each WTP threshold.
+#' @return A data frame and \code{evpi} object with the EVPI at each WTP threshold.
+#' @seealso \code{\link{plot.evpi}}, \code{\link{make_psa_obj}}
+#' @examples
+#' # load psa object provided with package
+#' data("example_psa_obj")
 #'
+#' # define wtp threshold vector (can also use a single wtp)
+#' wtp <- seq(1e4, 1e5, by = 1e4)
+#' evpi <- calc_evpi(wtp, example_psa_obj)
+#' plot(evpi) # see ?plot.evpi for options
+#'
+#' # can use plot options (# see ?plot.evpi for details)
+#' plot(evpi, effect_units = "QALE")
+#'
+#' # or can use ggplot layers
+#' plot(evpi) + ggtitle("Expected Value of Perfect Information")
 #' @export
 calc_evpi <- function(wtp, psa, pop = 1) {
   check_psa_object(psa)
@@ -25,10 +39,12 @@ calc_evpi <- function(wtp, psa, pop = 1) {
   evpi <- rep(0, n_wtps)
   # Estimate the Loss matrix and EVPI at each WTP threshold
   for (l in 1:n_wtps){
-    # Compute NMB with vector indexing
+    # Compute NMB at wtp[l]
     nmb <-  wtp[l] * effectiveness - cost
+
     ## Find the optimal strategy with current info
     d.star <- which.max(colMeans(nmb))
+
     ## Calculate the opportunity loss from choosing d.star for each strategy
     loss <- nmb - nmb[, d.star]
 
@@ -46,7 +62,9 @@ calc_evpi <- function(wtp, psa, pop = 1) {
 
 #' Plot of Expected Value of Perfect Information (EVPI)
 #'
-#' Plots the EVPI as a \code{ggplot2} object calculated with \code{\link{calc_evpi}}.
+#' @description
+#' Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
+#'
 #' @param x object of class \code{evpi}, produced by function
 #'  \code{\link{calc_evpi}}
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
@@ -54,7 +72,8 @@ calc_evpi <- function(wtp, psa, pop = 1) {
 #' @param effect_units Units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
-#' @return A \code{ggplot2} object with the EVPI
+#' @return A \code{ggplot2} plot with the EVPI
+#' @seealso \code{\link{calc_evpi}}
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export

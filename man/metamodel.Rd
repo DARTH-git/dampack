@@ -2,7 +2,7 @@
 % Please edit documentation in R/metamodel.R
 \name{metamodel}
 \alias{metamodel}
-\title{linear regression metamodeling}
+\title{Linear regression metamodeling}
 \usage{
 metamodel(analysis = c("oneway", "twoway"), psa, parms = NULL,
   strategies = NULL, outcome = c("eff", "cost", "nhb", "nmb"),
@@ -26,6 +26,25 @@ metamodel(analysis = c("oneway", "twoway"), psa, parms = NULL,
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}
 }
+\value{
+A metamodel object, which contains a list of metamodels and other relevant information.
+}
 \description{
-linear regression metamodeling
+This function estimates a linear regression metamodel for
+a given decision-analytic model by using the results of a probabilistic sensitivity analysis (PSA)
+}
+\details{
+The most important option is \code{analysis}, which can be either \code{"oneway"}
+or \code{twoway}. If \code{analysis == "oneway"}, a separate metamodel is created
+for each combination of the parameters in \code{parms} and strategies in \code{strategies}
+(by default, this is all strategies and parameters).
+
+If \code{analysis == "twoway"}, \code{parms} must be a vector of two parameters, and a metamodel
+is created with these two parameters for each strategy in \code{strategies}.
+}
+\seealso{
+\code{\link{predict.metamodel}},
+\code{\link{make_psa_obj}},
+\code{\link{owsa}},
+\code{\link{twsa}}
 }

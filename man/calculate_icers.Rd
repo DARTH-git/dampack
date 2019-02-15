@@ -2,7 +2,7 @@
 % Please edit documentation in R/icers.R
 \name{calculate_icers}
 \alias{calculate_icers}
-\title{function to calculate ICERS}
+\title{Calculate incremental cost-effectiveness ratios (ICERs)}
 \usage{
 calculate_icers(cost, effect, strategies)
 }
@@ -13,6 +13,54 @@ calculate_icers(cost, effect, strategies)
 
 \item{strategies}{character vector of strategy names}
 }
+\value{
+A data frame and \code{icers} object of strategies and their associated
+status, incremental cost, incremental effect, and ICER.
+}
 \description{
-Adapted from https://miqdad.freeasinspeech.org.uk/icer_calculator/
+This function takes in strategies and their associated cost and effect, assigns them
+one of three statuses (non-dominated, extended dominated, or dominated), and
+calculates the incremental cost-effectiveness ratios for the non-dominated strategies
+
+The cost-effectiveness frontier can be visualized with \code{plot}, which calls \code{\link{plot.icers}}.
+
+An efficent way to get from a probabilistic sensitivity analysis to an ICER table
+is by using \code{summary} on the PSA object and then using its columns as
+inputs to \code{calculate_icers}.
+}
+\examples{
+## Base Case
+# if you have a base case analysis, can use calculate_icers on that
+data(hund_strat)
+hund_icers <- calculate_icers(hund_strat$Cost,
+                              hund_strat$QALYs,
+                              hund_strat$Strategy)
+
+plot(hund_icers)
+# we have so many strategies that we may just want to plot the frontier
+plot(hund_icers, plot_frontier_only = TRUE)
+# see ?plot.icers for more options
+
+## Using a PSA object
+data(cdiff_psa)
+
+# summary() gives mean cost and effect for each strategy
+sum_cdiff <- summary(cdiff_psa)
+
+# calculate icers
+icers <- calculate_icers(sum_cdiff$meanCost,
+                         sum_cdiff$meanEffect,
+                         sum_cdiff$Strategy)
+icers
+
+# visualize
+plot(icers)
+
+# by default, only the frontier is labeled
+# if using a small number of strategies, you can label all the points
+# note that longer strategy names will get truncated
+plot(icers, label = "all")
+}
+\seealso{
+\code{\link{plot.icers}}
 }

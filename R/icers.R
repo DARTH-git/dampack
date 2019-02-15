@@ -1,11 +1,57 @@
-#' function to calculate ICERS
+#' Calculate incremental cost-effectiveness ratios (ICERs)
 #'
-#' Adapted from https://miqdad.freeasinspeech.org.uk/icer_calculator/
+#' @description
+#' This function takes in strategies and their associated cost and effect, assigns them
+#' one of three statuses (non-dominated, extended dominated, or dominated), and
+#' calculates the incremental cost-effectiveness ratios for the non-dominated strategies
+#'
+#' The cost-effectiveness frontier can be visualized with \code{plot}, which calls \code{\link{plot.icers}}.
+#'
+#' An efficent way to get from a probabilistic sensitivity analysis to an ICER table
+#' is by using \code{summary} on the PSA object and then using its columns as
+#' inputs to \code{calculate_icers}.
 #'
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
 #' @param strategies character vector of strategy names
 #'
+#' @return A data frame and \code{icers} object of strategies and their associated
+#' status, incremental cost, incremental effect, and ICER.
+#'
+#' @seealso \code{\link{plot.icers}}
+#'
+#' @examples
+#' ## Base Case
+#' # if you have a base case analysis, can use calculate_icers on that
+#' data(hund_strat)
+#' hund_icers <- calculate_icers(hund_strat$Cost,
+#'                               hund_strat$QALYs,
+#'                               hund_strat$Strategy)
+#'
+#' plot(hund_icers)
+#' # we have so many strategies that we may just want to plot the frontier
+#' plot(hund_icers, plot_frontier_only = TRUE)
+#' # see ?plot.icers for more options
+#'
+#' ## Using a PSA object
+#' data(cdiff_psa)
+#'
+#' # summary() gives mean cost and effect for each strategy
+#' sum_cdiff <- summary(cdiff_psa)
+#'
+#' # calculate icers
+#' icers <- calculate_icers(sum_cdiff$meanCost,
+#'                          sum_cdiff$meanEffect,
+#'                          sum_cdiff$Strategy)
+#' icers
+#'
+#' # visualize
+#' plot(icers)
+#'
+#' # by default, only the frontier is labeled
+#' # if using a small number of strategies, you can label all the points
+#' # note that longer strategy names will get truncated
+#' plot(icers, label = "all")
 #' @export
 calculate_icers <- function(cost, effect, strategies) {
   # todo: check data is in correct format

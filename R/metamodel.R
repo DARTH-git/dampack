@@ -1,4 +1,16 @@
-#' linear regression metamodeling
+#' Linear regression metamodeling
+#'
+#' @description This function estimates a linear regression metamodel for
+#' a given decision-analytic model by using the results of a probabilistic sensitivity analysis (PSA)
+#'
+#' @details
+#' The most important option is \code{analysis}, which can be either \code{"oneway"}
+#' or \code{twoway}. If \code{analysis == "oneway"}, a separate metamodel is created
+#' for each combination of the parameters in \code{parms} and strategies in \code{strategies}
+#' (by default, this is all strategies and parameters).
+#'
+#' If \code{analysis == "twoway"}, \code{parms} must be a vector of two parameters, and a metamodel
+#' is created with these two parameters for each strategy in \code{strategies}.
 #'
 #' @param analysis either "oneway" or "twoway"
 #' @param psa psa object
@@ -10,13 +22,22 @@
 #' @param poly.order Order of polynomial for the linear regression metamodel.
 #' Default: 2
 #'
+#' @return
+#' A metamodel object, which contains a list of metamodels and other relevant information.
+#'
+#' @seealso
+#' \code{\link{predict.metamodel}},
+#' \code{\link{make_psa_obj}},
+#' \code{\link{owsa}},
+#' \code{\link{twsa}}
+#'
 #' @importFrom stats as.formula formula getCall lm
 #' @export
 metamodel <- function(analysis = c("oneway", "twoway"),
-                    psa, parms = NULL, strategies = NULL,
-                    outcome = c("eff", "cost", "nhb", "nmb"),
-                    wtp = NULL,
-                    type = "poly", poly.order = 2) {
+                      psa, parms = NULL, strategies = NULL,
+                      outcome = c("eff", "cost", "nhb", "nmb"),
+                      wtp = NULL,
+                      type = "poly", poly.order = 2) {
   # get parameter names
   pnames <- psa$parnames
 
@@ -100,8 +121,8 @@ metamodel <- function(analysis = c("oneway", "twoway"),
   }
 
   metamodel <- list(outcome = outcome, mods = lms, wtp = wtp,
-                  parms = parms, strategies = strategies,
-                  psa = psa, analysis = analysis)
+                    parms = parms, strategies = strategies,
+                    psa = psa, analysis = analysis)
   # define class
   class(metamodel) <- "metamodel"
   return(metamodel)

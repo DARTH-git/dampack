@@ -53,6 +53,11 @@ calculate_icers <- function(cost, effect, strategies) {
     # number non-d
     n_non_d <- nrow(nd_df)
 
+    # if only two strategies left, we're done
+    if (n_non_d == 2) {
+      break
+    }
+
     # strategy identifiers for non-d
     nd_strat <- nd_df$Strategy
 

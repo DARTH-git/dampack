@@ -139,7 +139,8 @@ owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
                         ytrans = offset_trans(offset = avg),
                         n_y_ticks = n_y_ticks,
                         ybreaks = ybreaks,
-                        ylim = ylim)
+                        ylim = ylim) +
+      geom_hline(yintercept = avg, linetype = 3)
 
     return(g)
   } else {

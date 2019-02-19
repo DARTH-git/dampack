@@ -1,4 +1,6 @@
 # dampack
+[![Build Status](https://travis-ci.com/DARTH-git/dampack.svg?branch=master)](https://travis-ci.com/DARTH-git/dampack)
+
 Decision Analytic Modeling (DAM) package is a suite of functions for analyzing and visualing the health economic outputs of mathematical models
 
-[![Build Status](https://travis-ci.com/statnet/dampack.svg?token=ypQB5bq9ZyyYH6mo5HQe&branch=master)](https://travis-ci.com/statnet/dampack)
+Created and maintained by Fernando Alarid-Escudero ([@feralaes](https://github.com/feralaes)), Caleb Easterly ([@caleb-easterly](https://github.com/caleb-easterly)), and Eva Enns ([@evaenns](https://github.com/evaenns))

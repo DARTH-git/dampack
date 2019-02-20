@@ -203,7 +203,8 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
     filter(.data$outcome_val == obj_fun(.data$outcome_val)) %>%
     ungroup() %>%
     group_by(.data$parameter, .data$strategy) %>%
-    summarize(pmin = min(.data$param_val), pmax = max(.data$param_val))
+    summarize(pmin = min(.data$param_val), pmax = max(.data$param_val)) %>%
+    ungroup()
   if (!plot_const) {
     opt_strat <- opt_strat %>%
       group_by(.data$parameter) %>%

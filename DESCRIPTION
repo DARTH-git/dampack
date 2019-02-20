@@ -12,7 +12,7 @@ Authors@R: c(
   )
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: GPL
+License: file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 3.3),

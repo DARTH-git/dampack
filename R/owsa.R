@@ -84,7 +84,8 @@ plot.owsa <- function(x, txtsize = 12,
 #' @param owsa an owsa object
 #' @param min_rel_diff this function only plots
 #' parameters that lead to a relative change in the outcome greater than or equal
-#' to \code{min_rel_diff}, which must be between 0 and 1. To disable filtering, set to 0.
+#' to \code{min_rel_diff}, which must be between 0 and 1. The default (0) is that
+#' no strategies are filtered.
 #' @param strategy the desired strategy
 #' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
@@ -92,7 +93,7 @@ plot.owsa <- function(x, txtsize = 12,
 #' @import ggplot2
 #' @export
 owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
-                         txtsize = 12, min_rel_diff = 0.01,
+                         txtsize = 12, min_rel_diff = 0,
                          col = c("full", "bw"),
                          n_y_ticks = 8, ylim = NULL, ybreaks = NULL){
   # check that is owsa object

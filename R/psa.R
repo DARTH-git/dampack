@@ -11,7 +11,9 @@
 #' the \code{strategies} vector.
 #' @param parameters Data frame with values for each simulation (rows) and parameter (columns).
 #' The column names should be the parameter names
-#' @param strategies Vector with the names of the strategies
+#' @param strategies Vector with the names of the strategies. Due to requirements in
+#' certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
+#' with a warning.
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'
 #' @details
@@ -51,6 +53,7 @@
 #' # custom plot method; see ?plot.psa for options
 #' plot(psa)
 #'
+#' @importFrom stringr str_replace
 #' @export
 make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, currency = "$"){
   # argument checking
@@ -93,6 +96,18 @@ make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, curre
         paste0("The number of columns in the cost and effectiveness",
                "matrices is different from the number of strategies provided"))
     }
+    # replace spaces with underscores
+    new_strategies <- str_replace(strategies, " ", "_")
+    for (i in 1:n_strategies) {
+      old_strat <- strategies[i]
+      new_strat <- new_strategies[i]
+      if (new_strat != old_strat) {
+        warning(paste0("replacing space with underscore: ",
+                       old_strat, " is now ", new_strat))
+      }
+    }
+    # now replace old with new
+    strategies <- new_strategies
   }
   # define cost and effectiveness column names using strategies
   names(cost) <- names(effectiveness) <- strategies

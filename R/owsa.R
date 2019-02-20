@@ -100,6 +100,11 @@ owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
   if (!is_owsa(owsa)) {
     stop("must provide an owsa object created with owsa()")
   }
+
+  # range of min_rel_diff
+  if (min_rel_diff < 0 | min_rel_diff > 1) {
+    stop("min_rel_diff must be between 0 and 1")
+  }
   # filter to strategy
   owsa_filt <- owsa[owsa$strategy == strategy, ]
 

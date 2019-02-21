@@ -4,7 +4,7 @@
 \alias{calculate_icers}
 \title{Calculate incremental cost-effectiveness ratios (ICERs)}
 \usage{
-calculate_icers(cost, effect, strategies)
+calculate_icers(cost, effect, strategies, ref_strat = NULL)
 }
 \arguments{
 \item{cost}{vector of cost for each strategy}
@@ -12,6 +12,9 @@ calculate_icers(cost, effect, strategies)
 \item{effect}{vector of effect for each strategy}
 
 \item{strategies}{character vector of strategy names}
+
+\item{ref_strat}{reference strategy for the incremental comparison.
+the default (NULL) is the cheapest strategy.}
 }
 \value{
 A data frame and \code{icers} object of strategies and their associated

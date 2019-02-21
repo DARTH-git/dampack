@@ -14,6 +14,8 @@
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
 #' @param strategies character vector of strategy names
+#' @param ref_strat reference strategy for the incremental comparison.
+#' the default (NULL) is the cheapest strategy.
 #'
 #' @return A data frame and \code{icers} object of strategies and their associated
 #' status, incremental cost, incremental effect, and ICER.
@@ -53,7 +55,7 @@
 #' # note that longer strategy names will get truncated
 #' plot(icers, label = "all")
 #' @export
-calculate_icers <- function(cost, effect, strategies) {
+calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   # todo: check data is in correct format
   char_strat <- as.character(strategies)
 
@@ -70,6 +72,16 @@ calculate_icers <- function(cost, effect, strategies) {
   # dominated strategies have a higher cost and lower effect
   df <- df %>%
     arrange(.data$Cost, desc(.data$Effect))
+  # if we want a different reference strategy aside from lowest cost
+  if (!is.null(ref_strat)) {
+    if (!(ref_strat %in% df$Strategy)) {
+      stop(paste0("arg ref_strat (value: ", ref_strat, ") not present in data"))
+    }
+    df_ref <- filter(df, .data$Strategy == ref_strat)
+    df_other <- filter(df, .data$Strategy != ref_strat)
+    df <- rbind(df_ref, df_other)
+  }
+
   for (i in 1:(nstrat - 1)) {
     ith_effect <- df[i, "Effect"]
     for (j in (i + 1):nstrat) {
@@ -100,7 +112,7 @@ calculate_icers <- function(cost, effect, strategies) {
     n_non_d <- nrow(nd_df)
 
     # if only two strategies left, we're done
-    if (n_non_d == 2) {
+    if (n_non_d <= 2) {
       break
     }
 
@@ -139,6 +151,14 @@ calculate_icers <- function(cost, effect, strategies) {
   results <- bind_rows(d_df, ed_df, nd_df_icers) %>%
     arrange(desc(.data$Status), .data$Cost, desc(.data$Effect))
 
+  # put reference at the top
+  # if we want a different reference strategy aside from lowest cost
+  if (!is.null(ref_strat)) {
+    results_ref <- filter(results, .data$Strategy == ref_strat)
+    results_other <- filter(results, .data$Strategy != ref_strat)
+    results <- rbind(results_ref, results_other)
+  }
+
   # declare status for first entry to be 'ref'
   results[1, "Status"] <- "ref"
 
@@ -164,6 +184,8 @@ compute_icers <- function(non_d) {
       non_d[i, "Inc_Effect"] <- inc_effect
       non_d[i, "ICER"] <- inc_cost / inc_effect
     }
+  } else {
+    non_d[1, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
   }
   return(non_d)
 }

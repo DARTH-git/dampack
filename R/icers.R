@@ -192,17 +192,15 @@ compute_icers <- function(non_d) {
 
 #' Plot of ICERs
 #'
-#' Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
-#' @param x Object of class \code{ceac}. A melted data frame produced by
-#' function \code{ceac} with each strategy's probability of being
-#' cost-effective for each willingness-to-pay (WTP) threshold
+#' Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
+#' @param x Object of class \code{icers}.
 #' @inheritParams add_common_aes
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
 #' @param effect_units string. unit of effectiveness
 #' @param label whether to label strategies on the efficient frontier, all strategies, or none.
 #' defaults to frontier.
-#' @param label_max_char max number of characters to label the strategies - longer strategies will be
-#' truncated to save space.
+#' @param label_max_char max number of characters to label the strategies - if not NULL (the default)
+#' longer strategies are truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
 #' @param alpha opacity of points
 #'
@@ -213,7 +211,7 @@ plot.icers <- function(x,
                        currency = "$",
                        effect_units = "QALYs",
                        label = c("frontier", "all", "none"),
-                       label_max_char = 8,
+                       label_max_char = NULL,
                        plot_frontier_only = FALSE,
                        alpha = 1,
                        n_x_ticks = 6,
@@ -222,6 +220,8 @@ plot.icers <- function(x,
                        ybreaks = NULL,
                        xlim = NULL,
                        ylim = NULL,
+                       xexpand = expand_scale(0.1),
+                       yexpand = expand_scale(0.1),
                        ...){
   # type checking
   label <- match.arg(label)
@@ -271,11 +271,15 @@ plot.icers <- function(x,
                               continuous = c("x", "y"),
                               n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                               xbreaks = xbreaks, ybreaks = ybreaks,
-                              xlim = xlim, ylim = ylim)
+                              xlim = xlim, ylim = ylim,
+                              xexpand = xexpand, yexpand = yexpand)
 
   # labeling
   if (label != "none") {
-    plt_data[, strat_name] <- str_sub(plt_data[, strat_name], start = 1L, end = label_max_char)
+    if (!is.null(label_max_char)) {
+      plt_data[, strat_name] <- str_sub(plt_data[, strat_name],
+                                        start = 1L, end = label_max_char)
+    }
     if (label == "all") {
       lab_data <- plt_data
     }
@@ -290,7 +294,7 @@ plot.icers <- function(x,
     width_y <- range_y[2] - range_y[1]
 
     nudge_x <- width_x / 50
-    nudge_y <- - width_y / 50
+    nudge_y <- - width_y / 30
 
     icer_plot <- icer_plot +
       geom_label(data = lab_data,

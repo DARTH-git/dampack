@@ -6,14 +6,13 @@
 \usage{
 \method{plot}{icers}(x, txtsize = 12, currency = "$",
   effect_units = "QALYs", label = c("frontier", "all", "none"),
-  label_max_char = 8, plot_frontier_only = FALSE, alpha = 1,
+  label_max_char = NULL, plot_frontier_only = FALSE, alpha = 1,
   n_x_ticks = 6, n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL,
-  xlim = NULL, ylim = NULL, ...)
+  xlim = NULL, ylim = NULL, xexpand = expand_scale(0.1),
+  yexpand = expand_scale(0.1), ...)
 }
 \arguments{
-\item{x}{Object of class \code{ceac}. A melted data frame produced by
-function \code{ceac} with each strategy's probability of being
-cost-effective for each willingness-to-pay (WTP) threshold}
+\item{x}{Object of class \code{icers}.}
 
 \item{txtsize}{base text size}
 
@@ -24,8 +23,8 @@ cost-effective for each willingness-to-pay (WTP) threshold}
 \item{label}{whether to label strategies on the efficient frontier, all strategies, or none.
 defaults to frontier.}
 
-\item{label_max_char}{max number of characters to label the strategies - longer strategies will be
-truncated to save space.}
+\item{label_max_char}{max number of characters to label the strategies - if not NULL (the default)
+longer strategies are truncated to save space.}
 
 \item{plot_frontier_only}{only plot the efficient frontier}
 
@@ -45,8 +44,16 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 
 \item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
+\item{xexpand}{Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
+The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
+to see how to modify this.}
+
+\item{yexpand}{Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
+The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
+to see how to modify this.}
+
 \item{...}{further arguments to plot (not used)}
 }
 \description{
-Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
+Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
 }

@@ -24,12 +24,11 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
     # predict outcomes using predict.metamodel
     ow <- predict(mm, ranges, nsamps)
   } else if (inherits(sens, "dsa_oneway")) {
-    params <- sens$params
+    params <- sens$parameters
     eff <- sens$effectiveness
     cost <- sens$cost
     strategies <- sens$strategies
-    n_dsa <- sens$n_dsa
-    param_names <- names(params)
+    param_names <- sens$parnames
 
     # calculate outcomes
     # effectiveness, for now
@@ -38,11 +37,8 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
     } else if (outcome == "cost") {
       y <- cost
     } else {
-      y <- lapply(1:n_dsa, function(i) {
-        calculate_net_benefit(outcome, cost[[i]], eff[[i]], wtp)
-        }
-      )
-      names(y) <- param_names
+      y <- calculate_net_benefit(outcome, cost, eff, wtp)
+      names(y) <- strategies
     }
 
     # loop over dsa's and create ow
@@ -50,9 +46,14 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
     for (p in param_names) {
       for (s in strategies) {
         # maybe extract this out later - shared with predict.metamodel
-        new_df <- data.frame("parameter" = p, "strategy" = s,
-                             "param_val" = params[[p]],
-                             "outcome_val" = y[[p]][, s])
+        param_rows <- params$parameter == p
+        param_val <- params[param_rows, "parmval"]
+        outcome_val <- y[param_rows, s]
+
+        new_df <- data.frame("parameter" = p,
+                             "strategy" = s,
+                             "param_val" = param_val,
+                             "outcome_val" = outcome_val)
         ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
       }
     }

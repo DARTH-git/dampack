@@ -1,55 +1,77 @@
-#' create deterministic sensitivity analysis object
+#' Create deterministic sensitivity analysis object
 #'
-#' @param params parameter values associated with
+#' @param parameters parameter values associated with effectiveness and outcomes.
+#' The table must have two columns, with each parameter name in the first column
+#' and the associated parameter value in the second column:
+#'
+#' \tabular{ll}{
+#' parameter      \tab value \cr
+#' parm1 name     \tab parm1 val1 \cr
+#' ...            \tab ... \cr
+#' parm2 name     \tab  parm2 val1 \cr
+#' ...            \tab ... \cr
+#' }
+#'
+#' @inheritParams make_psa_obj
+#'
 #' @export
-create_dsa_oneway <- function(params, effectiveness, strategies,
+create_dsa_oneway <- function(parameters, effectiveness, strategies,
                               cost = NULL, currency = "$") {
-  # todo: checks on input
+  # argument checking
+  cost <- check_df_and_coerce(cost)
+  effectiveness <- check_df_and_coerce(effectiveness)
+  parameters <- check_df_and_coerce(parameters)
 
-  if (inherits(params, "list")) {
-    n_comps_p <- length(params)
-    if (is.null(names(params))) {
-      stop("if a list is provided, it must have names")
+  # parameter names
+  colnames(parameters) <- c("parameter", "parmval")
+  parnames <- unique(parameters$parameter)
+
+  # argument checks and defining other variables
+  # costs, effectiveness, and parameters have same number of rows
+  n_sim_costs <- nrow(cost)
+  n_sim_effectiveness <- nrow(effectiveness)
+  n_sim_parameters <- nrow(parameters)
+  if ( (n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs) ) {
+    stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
+  }
+
+  # define n_sim (could be any of the three, since they're all equal)
+  n_sim <- n_sim_costs
+
+  # costs and effectiveness have same number of columns
+  n_strategies_costs <- ncol(cost)
+  n_strategies_effectiveness <- ncol(effectiveness)
+  if (n_strategies_costs != n_strategies_effectiveness) {
+    stop("The number of columns of the cost and benefit matrices is different and must be the same.")
+  }
+  # define n.strat (could be either n_sim_costs or n_sim_effectiveness)
+  n_strategies <- n_strategies_costs
+
+  # If the name of the strategies is not provided, generate a generic vector
+  # with strategy names
+  if (is.null(strategies)) {
+    strategies <- paste(rep("Strategy_", n_strategies), seq(1, n_strategies), sep = "")
+  } else {
+    # make sure strategies is the same length as the number of columns
+    if (n_strategies != length(strategies)) {
+      stop(
+        paste0("The number of columns in the cost and effectiveness",
+               "matrices is different from the number of strategies provided"))
     }
-  } else {
-    n_comps_p <- 1
-    params <- list("param" = params)
-  }
-  pnames <- names(params)
-
-  if (inherits(effectiveness, "list")) {
-    n_comps_e <- length(effectiveness)
-    names(effectiveness) <- pnames
-  } else {
-    n_comps_e <- 1
-    effectiveness <- list("p" = effectiveness)
-    names(effectiveness) <- pnames
   }
 
-  if (inherits(cost, "list")) {
-    n_comps_c <- length(cost)
-  } else {
-    n_comps_c <- 1
-    cost <- list("p" = cost)
-    names(cost) <- pnames
-  }
-
-  # change column names for effect and cost
-  for (i in 1:n_comps_p) {
-    effectiveness[[i]] <- check_df_and_coerce(effectiveness[[i]])
-    names(effectiveness[[i]]) <- strategies
-    cost[[i]] <- check_df_and_coerce(cost[[i]])
-    names(cost[[i]]) <- strategies
-  }
-
-  dsa <- list(
-    params = params,
-    effectiveness = effectiveness,
-    strategies = strategies,
-    cost = cost,
-    currency = currency,
-    n_dsa = n_comps_p
-  )
+  # define cost and effectiveness column names using strategies
+  names(cost) <- names(effectiveness) <- strategies
+  # define psa as a named list
+  dsa <- list("n_strategies" = n_strategies,
+              "strategies" = strategies,
+              "n_sim" = n_sim,
+              "cost" = cost,
+              "effectiveness" = effectiveness,
+              "parameters" = parameters,
+              "parnames" = parnames,
+              "n_dsa" = length(parnames),
+              "currency" = currency)
   class(dsa) <- "dsa_oneway"
   dsa
 }

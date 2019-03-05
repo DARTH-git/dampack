@@ -14,8 +14,8 @@ c1 <- data.frame("s1" = 1e4 + 1000 * p1$parmval,
 p2 <- data.frame("parameter" = "p2",
                  "parmval" = seq(4, 5, length.out = nsamps),
                  stringsAsFactors = FALSE)
-e2 <- data.frame("s1" = 2 * p2$parmval^2 - 10,
-                 "s2" = 3 * p2$parmval^2 + 4 * p2$parmval - 20)
+e2 <- data.frame("s1" = 2 * p2$parmval ^ 2 - 10,
+                 "s2" = 3 * p2$parmval ^ 2 + 4 * p2$parmval - 20)
 c2 <- data.frame("s1" = 1e5 - 2000 * p2$parmval,
                  "s2" = 1e6 - 1300 * p2$parmval)
 
@@ -26,15 +26,26 @@ es <- rbind(e1, e2)
 cs <- rbind(c1, c2)
 
 # class creation
-dsa <- create_dsa_oneway(ps, es, strategies, cs)
+test_that("dsa class creation", {
+  # with cost
+  expect_silent(create_dsa_oneway(ps, es, strategies, cs))
+  # without cost
+  expect_silent(create_dsa_oneway(ps, es, strategies, cs))
+})
 
-# class creation with just one parameter
-dsa <- create_dsa_oneway(p1, e1, strategies, c1)
-
-# print
-print(dsa)
+test_that("correct class members", {
+  dsa <- create_dsa_oneway(ps, es, strategies)
+  expect_equal(dsa$n_strategies, 2)
+  expect_equal(length(dsa$parnames), 2)
+  expect_equal(dsa$parameters, ps)
+  expect_null(dsa$cost)
+})
 
 # plots
-o <- owsa(dsa, outcome = "nmb", wtp = 1e5)
-owsa_tornado(o, strategy = "s2", min_rel_diff = -1)
-owsa_opt_strat(o)
+test_that("dsa plots", {
+  dsa <- create_dsa_oneway(ps, es, strategies, cs)
+  o <- owsa(dsa, outcome = "nmb", wtp = 1e5)
+  expect_silent(owsa_tornado(o, strategy = "s2", min_rel_diff = -1))
+  expect_silent(owsa_opt_strat(o))
+})
+

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dsa_oneway.R
 \name{create_dsa_oneway}
 \alias{create_dsa_oneway}
-\title{Create deterministic sensitivity analysis object}
+\title{Create one-way deterministic sensitivity analysis object}
 \usage{
 create_dsa_oneway(parameters, effectiveness, strategies, cost = NULL,
   currency = "$")
@@ -12,22 +12,26 @@ create_dsa_oneway(parameters, effectiveness, strategies, cost = NULL,
 The table must have two columns, with each parameter name in the first column
 and the associated parameter value in the second column:
 
+\code{
 \tabular{ll}{
 parameter      \tab value \cr
 parm1 name     \tab parm1 val1 \cr
 ...            \tab ... \cr
 parm2 name     \tab  parm2 val1 \cr
 ...            \tab ... \cr
+}
 }}
 
-\item{effectiveness}{Matrix with the effectiveness for each simulation (rows) and strategy (columns)}
+\item{effectiveness}{Data frame with the effectiveness for each simulation (rows) and strategy (columns)}
 
 \item{strategies}{String vector with the name of the strategies}
 
-\item{cost}{Matrix with the cost for each simulation (rows) and strategy (columns).}
+\item{cost}{Data frame with the cost for each simulation (rows) and strategy (columns).}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }
 \description{
-Create deterministic sensitivity analysis object
+The object returned by this function can be passed to
+\code{\link{owsa}} to do a one-way sensitivity analysis on each
+parameter of interest.
 }

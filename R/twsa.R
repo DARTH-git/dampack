@@ -42,6 +42,7 @@ twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
 
     # calculate outcomes
     # effectiveness, for now
+    # todo: calculate outcomes
     outcome <- eff
 
     # loop over dsa's and create ow

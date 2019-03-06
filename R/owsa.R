@@ -208,7 +208,8 @@ offset_trans <- function(offset = 0) {
 #' @param plot_const whether to plot parameters that don't lead to
 #' changes in optimal strategy as they vary.
 #' @inheritParams add_common_aes
-#'
+#' @inheritParams plot.owsa
+#' @param facet_ncol Number of columns in plot facet.
 #' @import ggplot2
 #' @export
 owsa_opt_strat <- function(owsa, maximize = TRUE,
@@ -218,6 +219,8 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
                            greystart = 0.2,
                            greyend = 0.8,
                            txtsize = 12,
+                           facet_ncol = 1,
+                           facet_nrow = NULL,
                            n_x_ticks = 10) {
   # check that is owsa object
   if (!is_owsa(owsa)) {
@@ -249,12 +252,13 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
   }
   opt_strat$strategy <- as.factor(opt_strat$strategy)
   g <- ggplot(opt_strat) +
-    facet_wrap("parameter", scales = "free_x", ncol = 1) +
+    facet_wrap("parameter", scales = "free_x", ncol = facet_ncol, nrow = facet_nrow) +
     # a little bit hacky: rectangles with height 1
     geom_rect(aes_(xmin = as.name("pmin"), xmax = as.name("pmax"),
                    ymin = 0, ymax = 1,
                    fill = as.name("strategy")),
-              position = "identity")
+              position = "identity") +
+    facet_wrap(facets = "parameter", scales = "free_x", nrow = facet_nrow, ncol = facet_ncol)
 
   col <- match.arg(col)
   g <- add_common_aes(g, txtsize, scale_name = "Optimal Strategy: ",

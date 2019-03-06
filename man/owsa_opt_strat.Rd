@@ -6,7 +6,8 @@
 \usage{
 owsa_opt_strat(owsa, maximize = TRUE, return = c("plot", "data"),
   plot_const = TRUE, col = c("full", "bw"), greystart = 0.2,
-  greyend = 0.8, txtsize = 12, n_x_ticks = 10)
+  greyend = 0.8, txtsize = 12, facet_ncol = 1, facet_nrow = NULL,
+  n_x_ticks = 10)
 }
 \arguments{
 \item{owsa}{An owsa object}
@@ -26,6 +27,10 @@ changes in optimal strategy as they vary.}
 \item{greyend}{between 0 and 1, greater than greystart.}
 
 \item{txtsize}{base text size}
+
+\item{facet_ncol}{Number of columns in plot facet.}
+
+\item{facet_nrow}{number of rows in plot facet.}
 
 \item{n_x_ticks}{number of axis ticks}
 }

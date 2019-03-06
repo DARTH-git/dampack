@@ -1,8 +1,8 @@
-context("metamod")
+context("metamodel")
 library(dampack)
 
 # test the class
-test_that("metamod has all methods we'd expect", {
+test_that("metamodel has all methods we'd expect", {
   current_methods <- as.vector(methods(class = "metamodel"))
   expected_methods <- c("predict.metamodel", "print.metamodel", "summary.metamodel")
   expect_setequal(current_methods, expected_methods)
@@ -15,8 +15,8 @@ data("example_psa")
 psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
                         example_psa$parameters, example_psa$strategies)
 
-test_that("metamod object has correct classes", {
-  mm <- metamod(psa = psa_big, parm = "pFailChemo", outcome = "cost")
+test_that("metamodel object has correct classes", {
+  mm <- metamodel(psa = psa_big, parm = "pFailChemo", outcome = "cost")
   expect_is(mm, "metamodel")
 })
 
@@ -24,7 +24,7 @@ test_that("metamod object has correct classes", {
 
 test_that("metamodel with one outcome", {
   # metamodel
-  mm <- metamod(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo")
+  mm <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo")
   expect_is(mm, "metamodel")
 
   # predictions
@@ -35,7 +35,7 @@ test_that("metamodel with one outcome", {
 
 test_that("prediction with several outcomes", {
   # metamodel
-  mm <- metamod(psa = psa_big, outcome = "eff")
+  mm <- metamodel(psa = psa_big, outcome = "eff")
   expect_is(mm, "metamodel")
 
   # number of linear models
@@ -53,7 +53,7 @@ test_that("prediction with several outcomes", {
 
 test_that("type and content checking with predict", {
   # metamodel
-  mm <- metamod(psa = psa_big, outcome = "eff")
+  mm <- metamodel(psa = psa_big, outcome = "eff")
 
   # good example 1:  a list with some parameters
   preds1 <- predict(mm,
@@ -89,7 +89,7 @@ test_that("type and content checking with predict", {
 
 test_that("out of range warning", {
   # metamodel
-  mm <- metamod(psa = psa_big, outcome = "eff")
+  mm <- metamodel(psa = psa_big, outcome = "eff")
 
   # out of range
   expect_warning(predict(mm, ranges = list("pFailChemo" = c(-1, 1))),
@@ -101,7 +101,7 @@ test_that("out of range warning", {
 
 test_that("two-way metamodel", {
   # metamodel
-  mm <- metamod(analysis = "twoway", parms = c("pFailChemo", "pFailRadio"),
+  mm <- metamodel(analysis = "twoway", parms = c("pFailChemo", "pFailRadio"),
                 psa = psa_big, outcome = "eff")
   expect_is(mm, "metamodel")
 })

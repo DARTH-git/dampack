@@ -14,7 +14,7 @@ calc_evpi(wtp, psa, pop = 1)
 \item{pop}{A scalar that corresponds to the total population}
 }
 \value{
-evpi A data frame with the EVPI at each WTP threshold.
+A data frame and \code{evpi} object with the EVPI at each WTP threshold.
 }
 \description{
 \code{calc_evpi} is used to compute the expected value of perfect information
@@ -26,6 +26,24 @@ evpi A data frame with the EVPI at each WTP threshold.
 cost-effectiveness analysis at each WTP threshold.
 }
 
+\examples{
+# load psa object provided with package
+data("example_psa_obj")
+
+# define wtp threshold vector (can also use a single wtp)
+wtp <- seq(1e4, 1e5, by = 1e4)
+evpi <- calc_evpi(wtp, example_psa_obj)
+plot(evpi) # see ?plot.evpi for options
+
+# can use plot options (# see ?plot.evpi for details)
+plot(evpi, effect_units = "QALE")
+
+# or can use ggplot layers
+plot(evpi) + ggtitle("Expected Value of Perfect Information")
+}
+\seealso{
+\code{\link{plot.evpi}}, \code{\link{make_psa_obj}}
+}
 \keyword{benefit}
 \keyword{expected}
 \keyword{information;}

@@ -1,13 +1,61 @@
-#' function to calculate ICERS
+#' Calculate incremental cost-effectiveness ratios (ICERs)
 #'
-#' Adapted from https://miqdad.freeasinspeech.org.uk/icer_calculator/
+#' @description
+#' This function takes in strategies and their associated cost and effect, assigns them
+#' one of three statuses (non-dominated, extended dominated, or dominated), and
+#' calculates the incremental cost-effectiveness ratios for the non-dominated strategies
+#'
+#' The cost-effectiveness frontier can be visualized with \code{plot}, which calls \code{\link{plot.icers}}.
+#'
+#' An efficent way to get from a probabilistic sensitivity analysis to an ICER table
+#' is by using \code{summary} on the PSA object and then using its columns as
+#' inputs to \code{calculate_icers}.
 #'
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
 #' @param strategies character vector of strategy names
+#' @param ref_strat reference strategy for the incremental comparison.
+#' the default (NULL) is the cheapest strategy.
 #'
+#' @return A data frame and \code{icers} object of strategies and their associated
+#' status, incremental cost, incremental effect, and ICER.
+#'
+#' @seealso \code{\link{plot.icers}}
+#'
+#' @examples
+#' ## Base Case
+#' # if you have a base case analysis, can use calculate_icers on that
+#' data(hund_strat)
+#' hund_icers <- calculate_icers(hund_strat$Cost,
+#'                               hund_strat$QALYs,
+#'                               hund_strat$Strategy)
+#'
+#' plot(hund_icers)
+#' # we have so many strategies that we may just want to plot the frontier
+#' plot(hund_icers, plot_frontier_only = TRUE)
+#' # see ?plot.icers for more options
+#'
+#' ## Using a PSA object
+#' data(cdiff_psa)
+#'
+#' # summary() gives mean cost and effect for each strategy
+#' sum_cdiff <- summary(cdiff_psa)
+#'
+#' # calculate icers
+#' icers <- calculate_icers(sum_cdiff$meanCost,
+#'                          sum_cdiff$meanEffect,
+#'                          sum_cdiff$Strategy)
+#' icers
+#'
+#' # visualize
+#' plot(icers)
+#'
+#' # by default, only the frontier is labeled
+#' # if using a small number of strategies, you can label all the points
+#' # note that longer strategy names will get truncated
+#' plot(icers, label = "all")
 #' @export
-calculate_icers <- function(cost, effect, strategies) {
+calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   # todo: check data is in correct format
   char_strat <- as.character(strategies)
 
@@ -24,6 +72,16 @@ calculate_icers <- function(cost, effect, strategies) {
   # dominated strategies have a higher cost and lower effect
   df <- df %>%
     arrange(.data$Cost, desc(.data$Effect))
+  # if we want a different reference strategy aside from lowest cost
+  if (!is.null(ref_strat)) {
+    if (!(ref_strat %in% df$Strategy)) {
+      stop(paste0("arg ref_strat (value: ", ref_strat, ") not present in data"))
+    }
+    df_ref <- filter(df, .data$Strategy == ref_strat)
+    df_other <- filter(df, .data$Strategy != ref_strat)
+    df <- rbind(df_ref, df_other)
+  }
+
   for (i in 1:(nstrat - 1)) {
     ith_effect <- df[i, "Effect"]
     for (j in (i + 1):nstrat) {
@@ -52,6 +110,11 @@ calculate_icers <- function(cost, effect, strategies) {
 
     # number non-d
     n_non_d <- nrow(nd_df)
+
+    # if only two strategies left, we're done
+    if (n_non_d <= 2) {
+      break
+    }
 
     # strategy identifiers for non-d
     nd_strat <- nd_df$Strategy
@@ -88,6 +151,14 @@ calculate_icers <- function(cost, effect, strategies) {
   results <- bind_rows(d_df, ed_df, nd_df_icers) %>%
     arrange(desc(.data$Status), .data$Cost, desc(.data$Effect))
 
+  # put reference at the top
+  # if we want a different reference strategy aside from lowest cost
+  if (!is.null(ref_strat)) {
+    results_ref <- filter(results, .data$Strategy == ref_strat)
+    results_other <- filter(results, .data$Strategy != ref_strat)
+    results <- rbind(results_ref, results_other)
+  }
+
   # declare status for first entry to be 'ref'
   results[1, "Status"] <- "ref"
 
@@ -113,23 +184,23 @@ compute_icers <- function(non_d) {
       non_d[i, "Inc_Effect"] <- inc_effect
       non_d[i, "ICER"] <- inc_cost / inc_effect
     }
+  } else {
+    non_d[1, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
   }
   return(non_d)
 }
 
 #' Plot of ICERs
 #'
-#' Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
-#' @param x Object of class \code{ceac}. A melted data frame produced by
-#' function \code{ceac} with each strategy's probability of being
-#' cost-effective for each willingness-to-pay (WTP) threshold
+#' Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
+#' @param x Object of class \code{icers}.
 #' @inheritParams add_common_aes
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
 #' @param effect_units string. unit of effectiveness
 #' @param label whether to label strategies on the efficient frontier, all strategies, or none.
 #' defaults to frontier.
-#' @param label_max_char max number of characters to label the strategies - longer strategies will be
-#' truncated to save space.
+#' @param label_max_char max number of characters to label the strategies - if not NULL (the default)
+#' longer strategies are truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
 #' @param alpha opacity of points
 #'
@@ -140,7 +211,7 @@ plot.icers <- function(x,
                        currency = "$",
                        effect_units = "QALYs",
                        label = c("frontier", "all", "none"),
-                       label_max_char = 8,
+                       label_max_char = NULL,
                        plot_frontier_only = FALSE,
                        alpha = 1,
                        n_x_ticks = 6,
@@ -149,6 +220,8 @@ plot.icers <- function(x,
                        ybreaks = NULL,
                        xlim = NULL,
                        ylim = NULL,
+                       xexpand = expand_scale(0.1),
+                       yexpand = expand_scale(0.1),
                        ...){
   # type checking
   label <- match.arg(label)
@@ -198,11 +271,15 @@ plot.icers <- function(x,
                               continuous = c("x", "y"),
                               n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                               xbreaks = xbreaks, ybreaks = ybreaks,
-                              xlim = xlim, ylim = ylim)
+                              xlim = xlim, ylim = ylim,
+                              xexpand = xexpand, yexpand = yexpand)
 
   # labeling
   if (label != "none") {
-    plt_data[, strat_name] <- str_sub(plt_data[, strat_name], start = 1L, end = label_max_char)
+    if (!is.null(label_max_char)) {
+      plt_data[, strat_name] <- str_sub(plt_data[, strat_name],
+                                        start = 1L, end = label_max_char)
+    }
     if (label == "all") {
       lab_data <- plt_data
     }
@@ -217,7 +294,7 @@ plot.icers <- function(x,
     width_y <- range_y[2] - range_y[1]
 
     nudge_x <- width_x / 50
-    nudge_y <- - width_y / 50
+    nudge_y <- - width_y / 30
 
     icer_plot <- icer_plot +
       geom_label(data = lab_data,

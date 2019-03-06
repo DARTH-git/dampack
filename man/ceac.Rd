@@ -2,29 +2,55 @@
 % Please edit documentation in R/ceac.R
 \name{ceac}
 \alias{ceac}
-\title{Cost-Effectiveness Acceptability Curves (CEAC)}
+\title{Cost-Effectiveness Acceptability Curve (CEAC)}
 \usage{
 ceac(wtp, psa)
 }
 \arguments{
 \item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
 
-\item{psa}{A psa object from \code{psa}}
+\item{psa}{A psa object from \code{\link{make_psa_obj}}}
 }
 \value{
-ceac A melted data frame with each strategy's probability of being
-cost-effective at each WTP threshold.
+An object of class \code{ceac} that can be visualized with \code{plot}.
 }
 \description{
 \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 }
-\section{Details}{
-
+\details{
 \code{ceac} computes the probability of each of the strategies being
-cost-effective (optimal?) at each \code{wtp} threshold.
+cost-effective at each \code{wtp} threshold. The returned object has classes
+\code{ceac} and \code{data.frame}, and has its own plot method (\code{\link{plot.ceac}}).
 }
+\examples{
+# load psa object provided with package
+data("example_psa_obj")
 
+# define wtp threshold vector (can also use a single wtp)
+wtp <- seq(1e4, 1e5, by = 1e4)
+ceac_obj <- ceac(wtp, example_psa_obj)
+plot(ceac_obj) # see ?plot.ceac for options
+
+# this is most useful when there are many strategies
+# warnings are printed to describe strategies that
+# have been filtered out
+plot(ceac_obj, min_prob = 0.5)
+
+# standard ggplot layers can be used
+plot(ceac_obj) +
+    labs(title = "CEAC", y = "Pr(Cost-effective) at WTP")
+
+# the ceac object is also a data frame
+head(ceac_obj)
+
+# summary() tells us the regions of cost-effectiveness for each strategy
+summary(ceac_obj)
+
+}
+\seealso{
+\code{\link{plot.ceac}}, \code{\link{summary.ceac}}
+}
 \keyword{acceptability}
 \keyword{cost-effectiveness}
 \keyword{curves}

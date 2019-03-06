@@ -4,17 +4,17 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, frontier = TRUE, currency = "$", min_prob = 0,
-  txtsize = 12, n_x_ticks = 10, n_y_ticks = 8, xbreaks = NULL,
-  ybreaks = NULL, ylim = NULL, xlim = NULL, col = c("full", "bw"),
-  ...)
+\method{plot}{ceac}(x, frontier = TRUE, points = TRUE,
+  currency = "$", min_prob = 0, txtsize = 12, n_x_ticks = 10,
+  n_y_ticks = 8, xbreaks = NULL, ybreaks = NULL, ylim = NULL,
+  xlim = c(0, NA), col = c("full", "bw"), ...)
 }
 \arguments{
-\item{x}{Object of class \code{ceac}. A melted data frame produced by
-function \code{ceac} with each strategy's probability of being
-cost-effective for each willingness-to-pay (WTP) threshold}
+\item{x}{Object of class \code{ceac}.}
 
-\item{frontier}{Whether to plot acceptability frontier}
+\item{frontier}{Whether to plot acceptability frontier (TRUE) or not (FALSE)}
+
+\item{points}{Whether to plot points (TRUE) or not (FALSE)}
 
 \item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
 Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)}
@@ -45,12 +45,13 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{...}{further arguments to plot (not used)}
 }
 \value{
-ceac.gg A \code{ggplot2} object with the CEAC
+A \code{ggplot2} plot of the CEAC.
 }
 \description{
-Plots the CEAC as a \code{ggplot2} object calculated with \code{\link{ceac}}.
+Plots the CEAC, using the object created by \code{\link{ceac}}.
 }
 \details{
 \code{ceac} computes the probability of each of the strategies being
 cost-effective at each \code{wtp} value.
 }
+\keyword{internal}

@@ -6,7 +6,8 @@
 \usage{
 \method{plot}{evpi}(x, txtsize = 12, currency = "$",
   effect_units = "QALY", n_y_ticks = 8, n_x_ticks = 20,
-  xbreaks = NULL, ybreaks = NULL, xlim = NULL, ylim = NULL, ...)
+  xbreaks = NULL, ybreaks = NULL, xlim = c(0, NA), ylim = NULL,
+  ...)
 }
 \arguments{
 \item{x}{object of class \code{evpi}, produced by function
@@ -36,10 +37,13 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{...}{further arguments to plot (not used)}
 }
 \value{
-A \code{ggplot2} object with the EVPI
+A \code{ggplot2} plot with the EVPI
 }
 \description{
-Plots the EVPI as a \code{ggplot2} object calculated with \code{\link{calc_evpi}}.
+Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
+}
+\seealso{
+\code{\link{calc_evpi}}
 }
 \keyword{expected}
 \keyword{information}

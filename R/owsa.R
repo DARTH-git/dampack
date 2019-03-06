@@ -7,7 +7,7 @@
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 #' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #' @param nsamps number of samples to take from the ranges
-#' @inheritParams metamod
+#' @inheritParams metamodel
 #' @inheritParams predict.metamodel
 #' @return A dataframe with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
@@ -119,7 +119,8 @@ plot.owsa <- function(x, txtsize = 12,
 #' @param owsa an owsa object
 #' @param min_rel_diff this function only plots
 #' parameters that lead to a relative change in the outcome greater than or equal
-#' to \code{min_rel_diff}, which must be between 0 and 1. To disable filtering, set to 0.
+#' to \code{min_rel_diff}, which must be between 0 and 1. The default (0) is that
+#' no strategies are filtered.
 #' @param strategy the desired strategy
 #' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
@@ -127,12 +128,17 @@ plot.owsa <- function(x, txtsize = 12,
 #' @import ggplot2
 #' @export
 owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
-                         txtsize = 12, min_rel_diff = 0.01,
+                         txtsize = 12, min_rel_diff = 0,
                          col = c("full", "bw"),
                          n_y_ticks = 8, ylim = NULL, ybreaks = NULL){
   # check that is owsa object
   if (!is_owsa(owsa)) {
     stop("must provide an owsa object created with owsa()")
+  }
+
+  # range of min_rel_diff
+  if (min_rel_diff < 0 | min_rel_diff > 1) {
+    stop("min_rel_diff must be between 0 and 1")
   }
   # filter to strategy
   owsa_filt <- owsa[owsa$strategy == strategy, ]
@@ -174,7 +180,8 @@ owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
                         ytrans = offset_trans(offset = avg),
                         n_y_ticks = n_y_ticks,
                         ybreaks = ybreaks,
-                        ylim = ylim)
+                        ylim = ylim) +
+      geom_hline(yintercept = avg, linetype = 3)
 
     return(g)
   } else {
@@ -232,7 +239,8 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
     filter(.data$outcome_val == obj_fun(.data$outcome_val)) %>%
     ungroup() %>%
     group_by(.data$parameter, .data$strategy) %>%
-    summarize(pmin = min(.data$param_val), pmax = max(.data$param_val))
+    summarize(pmin = min(.data$param_val), pmax = max(.data$param_val)) %>%
+    ungroup()
   if (!plot_const) {
     opt_strat <- opt_strat %>%
       group_by(.data$parameter) %>%

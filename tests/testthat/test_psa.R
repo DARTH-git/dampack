@@ -32,10 +32,18 @@ test_that("psa returns correct object", {
   expect_equal(psa_small$parnames, colnames(sm_parameters))
 })
 
+# missing strategies
 test_that("psa: missing strategies", {
   psa_small <- make_psa_obj(sm_costs, sm_effectiveness,
                             sm_parameters)
   expect_equal(psa_small$strategies, c("Strategy_1", "Strategy_2", "Strategy_3"))
+})
+
+## replacing spaces in strategies with underscores
+sm_str_space <- c("test", "no test", "treat")
+test_that("fix strategy", {
+  expect_warning(make_psa_obj(sm_costs, sm_effectiveness,
+                              sm_parameters, sm_str_space), "no_test")
 })
 
 ## methods

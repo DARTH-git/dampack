@@ -12,14 +12,13 @@ Authors@R: c(
   )
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: GPL
+License: file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 3.3)
+    R (>= 3.3),
+    ggplot2
 Imports:
     reshape2,
-    matrixStats,
-    ggplot2,
     ellipse,
     dplyr,
     scales,

@@ -39,3 +39,21 @@ big_icer <- calculate_icers(cost = hund_strat$Cost, effect = hund_strat$QALYs, s
 test_that("plot.icers runs", {
   expect_silent(plot(big_icer, xbreaks = seq(0, 1, by = 0.1), ylim = c(0, 20000)))
 })
+
+# three strategies
+test_that("default reference strategy", {
+  cea <- calculate_icers(cost = c(163771.0, 164848.7, 163765.1),
+                         effect = c(6.48273, 6.52861, 6.52861),
+                         strategies = c("No Treat",   "Treat all", "Test & treat"))
+  expect_equal(cea$Strategy[1], "Test & treat")
+  }
+)
+
+test_that("custom reference strategy", {
+  cea <- calculate_icers(cost = c(163771.0, 164848.7, 163765.1),
+                         effect = c(6.48273, 6.52861, 6.52861),
+                         strategies = c("No Treat",   "Treat all", "Test & treat"),
+                         ref_strat = "No Treat")
+  expect_equal(cea$Strategy[1], "No Treat")
+  }
+)

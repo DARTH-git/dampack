@@ -133,7 +133,7 @@ plot(evpi)
 **explanation here**
 
 ```{r}
-elc <- calc_elc(wtp = example_psa$wtp, psa = psa_obj)
-head(elc)
-plot(elc, n_x_ticks = 8, n_y_ticks = 6)
+el <- calc_exp_loss(wtp = example_psa$wtp, psa = psa_obj)
+head(el)
+plot(el, n_x_ticks = 8, n_y_ticks = 6)
 ```

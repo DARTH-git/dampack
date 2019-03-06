@@ -1,12 +1,35 @@
-#' Calculate the expected loss
+#' Calculate the expected loss at a range of willingness-to-pay thresholds
+#'
+#' @description
+#' The expected loss is the ...
 #'
 #' @param wtp vector of willingness to pay thresholds
 #' @param psa object of class \code{psa}, produced by function
 #' \code{\link{make_psa_obj}}
 #'
-#' @return object with classes \code{elc} and \code{data.frame}
+#' @details
+#' Visualize the expected loss at a variety of WTP thresholds using \code{\link{plot.exp_loss}}.
+#'
+#' @return object with classes \code{exp_loss} and \code{data.frame}
+#'
+#' @seealso \code{\link{plot.exp_loss}}, \code{\link{make_psa_obj}}
+#'
+#' @examples
+#' data("example_psa_obj")
+#' wtp <- seq(1e4, 1e5, by = 1e4)
+#' exp_loss <- calc_exp_loss(wtp, example_psa_obj)
+#'
+#' # can use head(), summary(), print(), etc.
+#' head(exp_loss)
+#'
+#' # plot an expected loss curve (ELC)
+#' plot(exp_loss)
+#'
+#' # the y axis is on a log scale by default
+#' plot(exp_loss, log_y = FALSE)
+#'
 #' @export
-calc_elc <- function(wtp, psa) {
+calc_exp_loss <- function(wtp, psa) {
   check_psa_object(psa)
   cost <- psa$cost
   effectiveness <- psa$effectiveness
@@ -27,15 +50,15 @@ calc_elc <- function(wtp, psa) {
   # Format expected loss for plotting
   exp_loss_df <- data.frame(wtp, exp_loss, optimal.el)
   colnames(exp_loss_df) <- c("WTP", strategies, "Frontier_EVPI")
-  class(exp_loss_df) <- c("elc", "data.frame")
+  class(exp_loss_df) <- c("exp_loss", "data.frame")
   return(exp_loss_df)
 }
 
 
 #' Plot of Expected Loss Curves (ELC)
 #'
-#' @param x object of class \code{elc}, produced by function
-#'  \code{\link{calc_elc}}
+#' @param x object of class \code{exp_loss}, produced by function
+#'  \code{\link{calc_exp_loss}}
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
 #' @param effect_units Units of effectiveness. Default: QALY
@@ -47,27 +70,26 @@ calc_elc <- function(wtp, psa) {
 #' @inheritParams add_common_aes
 #'
 #' @return A \code{ggplot2} object with the expected loss
-
 #' @importFrom reshape2 melt
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export
-plot.elc <- function(x,
-                     log_y = TRUE,
-                     frontier = TRUE,
-                     points = TRUE,
-                     lsize = 1,
-                     txtsize = 12,
-                     currency = "$",
-                     effect_units = "QALY",
-                     n_y_ticks = 8,
-                     n_x_ticks = 20,
-                     xbreaks = NULL,
-                     ybreaks = NULL,
-                     xlim = NULL,
-                     ylim = NULL,
-                     col = c("full", "bw"),
-                     ...) {
+plot.exp_loss <- function(x,
+                          log_y = TRUE,
+                          frontier = TRUE,
+                          points = TRUE,
+                          lsize = 1,
+                          txtsize = 12,
+                          currency = "$",
+                          effect_units = "QALY",
+                          n_y_ticks = 8,
+                          n_x_ticks = 20,
+                          xbreaks = NULL,
+                          ybreaks = NULL,
+                          xlim = c(0, NA),
+                          ylim = NULL,
+                          col = c("full", "bw"),
+                          ...) {
   # melt for plotting in ggplot
   wtp_name <- "WTP_thou"
   loss_name <- "value"

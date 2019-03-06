@@ -1,9 +1,52 @@
-#' An object to hold PSA results.
+#' Create a PSA object
+#' 
+#' @description
+#' Creates an object to hold probabilistic sensivity analysis data,
+#' while checking the data for validity. The object can then be
+#' used for many standard cost-effectiveness analyses (see Details below).
 #'
 #' @param parameters Data frame with values for each simulation (rows) and parameter (columns).
 #' The column names should be the parameter names.
 #' @inheritParams create_sa
 #'
+#' @details
+#' The PSA object forms the backbone of one part of the \code{dampack} package.
+#'
+#' A scatterplot of the cost-effectiveness plane may be shown by running \code{plot}
+#' on the output of \code{make_psa_obj}.
+#'
+#' Using this object, you may calculate:
+#' \itemize{
+#'   \item Cost-effectiveness acceptability curves (\code{\link{ceac}})
+#'   \item Expected value of perfect information (\code{\link{calc_evpi}})
+#'   \item Expected loss (\code{\link{calc_exp_loss}})
+#'   \item One-way sensitivity analysis (\code{\link{owsa}})
+#'   \item Two-way sensitivity analysis (\code{\link{twsa}})
+#'   \item Metamodels (\code{\link{metamodel}})
+#' }
+#'
+#' In addition, the PSA may be converted to a base-case analysis by using \code{summary}
+#' on the PSA object. The output of \code{summary} can be used in \code{\link{calculate_icers}}.
+#'
+#'
+#' @return An object of class \code{psa}
+#'
+#' @seealso \code{\link{summary.psa}}, \code{\link{plot.psa}}
+#'
+#' @examples
+#' # psa input provided with package
+#' data("example_psa")
+#' psa <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+#'                     example_psa$parameters, example_psa$strategies)
+#'
+#' # custom print and summary methods
+#' print(psa)
+#' summary(psa)
+#'
+#' # custom plot method; see ?plot.psa for options
+#' plot(psa)
+#'
+#' @importFrom stringr str_replace
 #' @export
 make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, currency = "$"){
   # parameter names

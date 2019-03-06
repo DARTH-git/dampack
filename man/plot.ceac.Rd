@@ -14,6 +14,8 @@
 
 \item{frontier}{Whether to plot acceptability frontier (TRUE) or not (FALSE)}
 
+\item{points}{Whether to plot points (TRUE) or not (FALSE)}
+
 \item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
 Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)}
 

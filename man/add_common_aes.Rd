@@ -39,8 +39,9 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 
 \item{xtrans, ytrans}{transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.}
 
-\item{xexpand, yexpand}{padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
-Currently only used for TWSA.}
+\item{xexpand, yexpand}{Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
+The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
+to see how to modify this.}
 
 \item{...}{further arguments to plot (not used)}
 }

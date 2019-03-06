@@ -117,6 +117,7 @@ ceac <- function(wtp, psa){
 #'
 #' @param x Object of class \code{ceac}.
 #' @param frontier Whether to plot acceptability frontier (TRUE) or not (FALSE)
+#' @param points Whether to plot points (TRUE) or not (FALSE)
 #' @param currency String with currency used in the cost-effectiveness analysis (CEA).
 #'Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)
 #' @param min_prob minimum probability to show strategy in plot.
@@ -138,6 +139,7 @@ ceac <- function(wtp, psa){
 #' @export
 plot.ceac <- function(x,
                       frontier = TRUE,
+                      points = TRUE,
                       currency = "$",
                       min_prob = 0,
                       txtsize = 12,
@@ -190,17 +192,22 @@ plot.ceac <- function(x,
   }
   p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
                              y = as.name(prop_name),
-                             color = as.name(strat_name),
-                             shape = as.name(strat_name))) +
-    geom_point() +
+                             color = as.name(strat_name))) +
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
     ylab("Pr Cost-Effective")
+  if (points) {
+    p <- p + geom_point()
+  }
   if (frontier) {
     front <- x[x$On_Frontier, ]
     p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),
-                                           y = as.name(prop_name)),
-                        shape = 0, size = 3, stroke = 1.2, color = "black")
+                                           y = as.name(prop_name),
+                                           shape = as.name("On_Frontier")),
+                        size = 3, stroke = 1, color = "black") +
+      scale_shape_manual(name = NULL, values = 0, labels = "Frontier") +
+      guides(color = guide_legend(order = 1),
+             shape = guide_legend(order = 2))
   }
   col <- match.arg(col)
   add_common_aes(p, txtsize, col = col, col_aes = "color",

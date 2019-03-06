@@ -21,7 +21,7 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
   outcome <- match.arg(outcome)
   if (inherits(sens, "psa")) {
     # create metamodel
-    mm <- metamod("oneway", sens, parms,
+    mm <- metamodel("oneway", sens, parms,
                   strategies, outcome, wtp, poly.order)
 
     # predict outcomes using predict.metamodel

@@ -6,7 +6,8 @@
 \usage{
 \method{plot}{evpi}(x, txtsize = 12, currency = "$",
   effect_units = "QALY", n_y_ticks = 8, n_x_ticks = 20,
-  xbreaks = NULL, ybreaks = NULL, xlim = NULL, ylim = NULL, ...)
+  xbreaks = NULL, ybreaks = NULL, xlim = c(0, NA), ylim = NULL,
+  ...)
 }
 \arguments{
 \item{x}{object of class \code{evpi}, produced by function

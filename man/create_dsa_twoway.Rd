@@ -19,11 +19,19 @@ parm1 val2     \tab parm2 val2 \cr
 ...            \tab ... \cr
 }}
 
-\item{effectiveness}{Data frame with the effectiveness for each simulation (rows) and strategy (columns)}
+\item{effectiveness}{Data frames containing costs and effectiveness data, respectively.
+Each simulation should be a row of the data frame, and each strategy should be a column.
+Naming the columns of the data frames is not necessary, as they will be renamed with
+the \code{strategies} vector.}
 
-\item{strategies}{String vector with the name of the strategies}
+\item{strategies}{#' Vector with the names of the strategies. Due to requirements in
+certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
+with a warning.}
 
-\item{cost}{Data frame with the cost for each simulation (rows) and strategy (columns).}
+\item{cost}{Data frames containing costs and effectiveness data, respectively.
+Each simulation should be a row of the data frame, and each strategy should be a column.
+Naming the columns of the data frames is not necessary, as they will be renamed with
+the \code{strategies} vector.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }

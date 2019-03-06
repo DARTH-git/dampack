@@ -6,10 +6,13 @@
 #'
 #' @param parameters Data frame with parameter values for each model run.
 #' @param parnames names for the parameters
-#' @param cost Data frame with the cost for each simulation (rows) and strategy (columns).
-#' @param effectiveness Data frame with the effectiveness for each simulation (rows) and strategy (columns)
-
-#' @param strategies String vector with the name of the strategies
+#' @param cost,effectiveness Data frames containing costs and effectiveness data, respectively.
+#' Each simulation should be a row of the data frame, and each strategy should be a column.
+#' Naming the columns of the data frames is not necessary, as they will be renamed with
+#' the \code{strategies} vector.
+#' @param strategies #' Vector with the names of the strategies. Due to requirements in
+#' certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
+#' with a warning.
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'
 create_sa <- function(parameters, parnames, effectiveness, strategies,
@@ -60,6 +63,17 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   if (is.null(strategies)) {
     strategies <- paste(rep("Strategy_", n_strategies), seq(1, n_strategies), sep = "")
   } else {
+    # replace spaces with underscores
+    new_strategies <- str_replace(strategies, " ", "_")
+    for (i in 1:n_strategies) {
+      old_strat <- strategies[i]
+      new_strat <- new_strategies[i]
+      if (new_strat != old_strat) {
+        warning(paste0("replacing space with underscore: ",
+                       old_strat, " is now ", new_strat))
+      }
+    }
+
     # make sure strategies is the same length as the number of columns
     if (n_strategies != length(strategies)) {
       stop(

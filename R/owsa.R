@@ -3,6 +3,9 @@
 #' This function uses a linear regression metamodel of a PSA for a given
 #' decision-analytic model to predict the desired outcome.
 #'
+#' @param sens sensitivity analysis object;
+#' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
+#' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #' @param nsamps number of samples to take from the ranges
 #' @inheritParams metamodel
 #' @inheritParams predict.metamodel
@@ -10,18 +13,50 @@
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 #'
 #' @export
-owsa <- function(psa, parms = NULL, ranges = NULL, nsamps = 100,
+owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
                  outcome = c("eff", "cost", "nhb", "nmb"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
+  outcome <- match.arg(outcome)
+  if (inherits(sens, "psa")) {
+    # create metamodel
+    mm <- metamodel("oneway", sens, parms,
+                  strategies, outcome, wtp, poly.order)
 
-  # create metamodel
-  mm <- metamodel("oneway", psa, parms,
-                strategies, outcome, wtp, poly.order)
+    # predict outcomes using predict.metamodel
+    ow <- predict(mm, ranges, nsamps)
+  } else if (inherits(sens, "dsa_oneway")) {
+    params <- sens$parameters
+    eff <- sens$effectiveness
+    cost <- sens$cost
+    strategies <- sens$strategies
+    param_names <- sens$parnames
 
-  # predict outcomes using predict.metamodel
-  ow <- predict(mm, ranges, nsamps)
+    # calculate outcome of interest
+    y <- calculate_outcome(outcome, cost, eff, wtp)
+    names(y) <- strategies
+
+    # loop over dsa's and create ow
+    ow <- NULL
+    for (p in param_names) {
+      for (s in strategies) {
+        # maybe extract this out later - shared with predict.metamodel
+        param_rows <- params$parameter == p
+        param_val <- params[param_rows, "parmval"]
+        outcome_val <- y[param_rows, s]
+
+        new_df <- data.frame("parameter" = p,
+                             "strategy" = s,
+                             "param_val" = param_val,
+                             "outcome_val" = outcome_val)
+        ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
+      }
+    }
+
+  } else {
+    stop("sens must have class 'psa' or 'dsa_oneway'")
+  }
 
   # define classes
   class(ow) <- c("owsa", "data.frame")

@@ -4,7 +4,7 @@ library(dampack)
 # test the class
 test_that("psa has all methods we'd expect", {
   current_methods <- as.vector(methods(class = "psa"))
-  expected_methods <- c("plot.psa", "print.psa", "summary.psa")
+  expected_methods <- c("plot.psa", "summary.psa")
   expect_setequal(current_methods, expected_methods)
 })
 
@@ -30,6 +30,13 @@ test_that("psa returns correct object", {
   expect_equal(psa_small$n_sim, 2)
   expect_equal(psa_small$parameters, sm_parameters)
   expect_equal(psa_small$parnames, colnames(sm_parameters))
+})
+
+# missing strategies
+test_that("psa: missing strategies", {
+  psa_small <- make_psa_obj(sm_costs, sm_effectiveness,
+                            sm_parameters)
+  expect_equal(psa_small$strategies, c("Strategy_1", "Strategy_2", "Strategy_3"))
 })
 
 ## replacing spaces in strategies with underscores

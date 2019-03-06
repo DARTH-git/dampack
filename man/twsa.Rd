@@ -4,12 +4,14 @@
 \alias{twsa}
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
-twsa(psa, parm1, parm2, ranges = NULL, nsamp = 100,
+twsa(sens, parm1 = NULL, parm2 = NULL, ranges = NULL, nsamp = 100,
   outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
   strategies = NULL, poly.order = 2)
 }
 \arguments{
-\item{psa}{psa object}
+\item{sens}{sensitivity analysis object;
+either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
+a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
 
 \item{parm1}{String with the name of the first parameter of interest}
 

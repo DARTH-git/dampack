@@ -8,15 +8,20 @@ make_psa_obj(cost, effectiveness, parameters, strategies = NULL,
   currency = "$")
 }
 \arguments{
-\item{cost, effectiveness}{Data frames containing costs and effectiveness data, respectively.
+\item{cost}{Data frames containing costs and effectiveness data, respectively.
+Each simulation should be a row of the data frame, and each strategy should be a column.
+Naming the columns of the data frames is not necessary, as they will be renamed with
+the \code{strategies} vector.}
+
+\item{effectiveness}{Data frames containing costs and effectiveness data, respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
 \item{parameters}{Data frame with values for each simulation (rows) and parameter (columns).
-The column names should be the parameter names}
+The column names should be the parameter names.}
 
-\item{strategies}{Vector with the names of the strategies. Due to requirements in
+\item{strategies}{#' Vector with the names of the strategies. Due to requirements in
 certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
 with a warning.}
 

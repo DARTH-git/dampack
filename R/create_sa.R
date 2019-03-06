@@ -96,11 +96,15 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 #' @export
 print.sa <- function(x, all_strat = FALSE, ...) {
   xclass <- class(x)
-  is_dsa <- "dsa_oneway" %in% xclass
+  is_ow_dsa <- "dsa_oneway" %in% xclass
+  is_tw_dsa <- "dsa_twoway" %in% xclass
   is_psa <- "psa" %in% xclass
   cat("\n")
-  if (is_dsa) {
+  if (is_ow_dsa) {
     cat("One-way Deterministic SA Object", "\n")
+  }
+  if (is_tw_dsa) {
+    cat("Two-way Deterministic SA Object", "\n")
   }
   if (is_psa) {
     cat("PSA object", "\n")

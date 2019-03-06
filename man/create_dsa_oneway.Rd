@@ -12,14 +12,12 @@ create_dsa_oneway(parameters, effectiveness, strategies, cost = NULL,
 The table must have two columns, with each parameter name in the first column
 and the associated parameter value in the second column:
 
-\code{
 \tabular{ll}{
 parameter      \tab value \cr
 parm1 name     \tab parm1 val1 \cr
 ...            \tab ... \cr
 parm2 name     \tab  parm2 val1 \cr
 ...            \tab ... \cr
-}
 }}
 
 \item{effectiveness}{Data frame with the effectiveness for each simulation (rows) and strategy (columns)}

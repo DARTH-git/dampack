@@ -48,4 +48,3 @@ test_that("dsa plots", {
   expect_silent(owsa_tornado(o, strategy = "s2", min_rel_diff = -1))
   expect_silent(owsa_opt_strat(o))
 })
-

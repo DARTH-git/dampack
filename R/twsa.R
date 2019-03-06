@@ -33,12 +33,11 @@ twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
     # Predict Outcomes using MMMR Metamodel fit
     tw <- predict(mm, ranges, nsamp)
   } else if (inherits(sens, "dsa_twoway")) {
-    params <- sens$params
+    params <- sens$parameters
     eff <- sens$effectiveness
     cost <- sens$cost
     strategies <- sens$strategies
-    n_dsa <- sens$n_dsa
-    param_names <- names(params)
+    parnames <- sens$parnames
 
     # calculate outcomes
     # effectiveness, for now
@@ -49,11 +48,11 @@ twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
     tw <- NULL
     for (s in strategies) {
       # maybe extract this out later - shared with predict.metamodel
-      new_df <- data.frame("p1" = params[, param_names[1]], "p2" = params[, param_names[2]],
+      new_df <- data.frame("p1" = params[, parnames[1]], "p2" = params[, parnames[2]],
                            "strategy" = s, "outcome_val" = outcome[, s])
       tw <- rbind(tw, new_df, stringsAsFactors = FALSE)
     }
-    names(tw)[1:2] <- param_names
+    names(tw)[1:2] <- parnames
   } else {
     stop("either a psa or dsa_twoway object must be provided")
   }

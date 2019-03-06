@@ -2,14 +2,33 @@
 % Please edit documentation in R/dsa_twoway.R
 \name{create_dsa_twoway}
 \alias{create_dsa_twoway}
-\title{create two-way deterministic sensitivity analysis object}
+\title{Create one-way deterministic sensitivity analysis object}
 \usage{
-create_dsa_twoway(params, effectiveness, strategies, cost = NULL,
+create_dsa_twoway(parameters, effectiveness, strategies, cost = NULL,
   currency = "$")
 }
 \arguments{
-\item{params}{parameter values associated with}
+\item{parameters}{parameter values associated with effectiveness and outcomes.
+The table must have two columns, one for each parameter.
+The parameter names must be the column names.
+
+\tabular{ll}{
+parm1 name     \tab parm2 name \cr
+parm1 val1     \tab parm2 val1 \cr
+parm1 val2     \tab parm2 val2 \cr
+...            \tab ... \cr
+}}
+
+\item{effectiveness}{Data frame with the effectiveness for each simulation (rows) and strategy (columns)}
+
+\item{strategies}{String vector with the name of the strategies}
+
+\item{cost}{Data frame with the cost for each simulation (rows) and strategy (columns).}
+
+\item{currency}{symbol for the currency being used (ex. "$", "£")}
 }
 \description{
-create two-way deterministic sensitivity analysis object
+The object returned by this function can be passed to
+\code{\link{owsa}} to do a one-way sensitivity analysis on each
+parameter of interest.
 }

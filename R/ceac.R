@@ -146,7 +146,7 @@ plot.ceac <- function(x,
                       xbreaks = NULL,
                       ybreaks = NULL,
                       ylim = NULL,
-                      xlim = NULL,
+                      xlim = c(0, NA),
                       col = c("full", "bw"),
                       ...){
   wtp_name <- "WTP"

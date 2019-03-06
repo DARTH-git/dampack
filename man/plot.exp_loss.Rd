@@ -7,7 +7,7 @@
 \method{plot}{exp_loss}(x, log_y = TRUE, frontier = TRUE,
   points = TRUE, lsize = 1, txtsize = 12, currency = "$",
   effect_units = "QALY", n_y_ticks = 8, n_x_ticks = 20,
-  xbreaks = NULL, ybreaks = NULL, xlim = NULL, ylim = NULL,
+  xbreaks = NULL, ybreaks = NULL, xlim = c(0, NA), ylim = NULL,
   col = c("full", "bw"), ...)
 }
 \arguments{

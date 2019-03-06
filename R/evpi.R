@@ -85,7 +85,7 @@ plot.evpi <- function(x,
                       n_x_ticks = 20,
                       xbreaks = NULL,
                       ybreaks = NULL,
-                      xlim = NULL,
+                      xlim = c(0, NA),
                       ylim = NULL,
                       ...){
   x$WTP_thou <- x$WTP / 1000

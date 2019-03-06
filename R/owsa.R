@@ -3,6 +3,9 @@
 #' This function uses a linear regression metamodel of a PSA for a given
 #' decision-analytic model to predict the desired outcome.
 #'
+#' @param sens sensitivity analysis object;
+#' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
+#' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #' @param nsamps number of samples to take from the ranges
 #' @inheritParams metamod
 #' @inheritParams predict.metamodel
@@ -30,16 +33,9 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
     strategies <- sens$strategies
     param_names <- sens$parnames
 
-    # calculate outcomes
-    # effectiveness, for now
-    if (outcome == "eff") {
-      y <- eff
-    } else if (outcome == "cost") {
-      y <- cost
-    } else {
-      y <- calculate_net_benefit(outcome, cost, eff, wtp)
-      names(y) <- strategies
-    }
+    # calculate outcome of interest
+    y <- calculate_outcome(outcome, cost, eff, wtp)
+    names(y) <- strategies
 
     # loop over dsa's and create ow
     ow <- NULL

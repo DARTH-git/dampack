@@ -9,6 +9,10 @@ owsa(sens, parms = NULL, ranges = NULL, nsamps = 100,
   strategies = NULL, poly.order = 2)
 }
 \arguments{
+\item{sens}{sensitivity analysis object;
+either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
+a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
+
 \item{parms}{String with the name of the parameter of interest}
 
 \item{ranges}{A named list of the form c("parm" = c(0, 1), ...)

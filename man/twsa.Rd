@@ -9,6 +9,10 @@ twsa(sens, parm1 = NULL, parm2 = NULL, ranges = NULL, nsamp = 100,
   strategies = NULL, poly.order = 2)
 }
 \arguments{
+\item{sens}{sensitivity analysis object;
+either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
+a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
+
 \item{parm1}{String with the name of the first parameter of interest}
 
 \item{parm2}{String with the name of the second parameter of interest}

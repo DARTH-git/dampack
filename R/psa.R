@@ -1,5 +1,7 @@
 #' An object to hold PSA results.
 #'
+#' @param parameters Data frame with values for each simulation (rows) and parameter (columns).
+#' The column names should be the parameter names.
 #' @inheritParams create_sa
 #'
 #' @export

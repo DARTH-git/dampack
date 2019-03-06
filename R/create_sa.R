@@ -1,13 +1,14 @@
 #' An generic sensitivity analysis object
 #'
-#' @description This object is called by \code{\link{create_psa_obj}}
+#' @description This object is called by \code{\link{make_psa_obj}}
 #' and \code{\link{create_dsa_oneway}}, and checks the structure of
 #' each of the arguments before creating an SA object.
 #'
+#' @param parameters Data frame with parameter values for each model run.
+#' @param parnames names for the parameters
 #' @param cost Data frame with the cost for each simulation (rows) and strategy (columns).
 #' @param effectiveness Data frame with the effectiveness for each simulation (rows) and strategy (columns)
-#' @param parameters Data frame with values for each simulation (rows) and parameter (columns).
-#' The column names should be the parameter names.
+
 #' @param strategies String vector with the name of the strategies
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'

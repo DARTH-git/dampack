@@ -3,6 +3,11 @@
 #' This function displays a two-way sensitivity analysis (TWSA) graph
 #' by estimating a linear regression metamodel of a PSA for a given
 #' decision-analytic model
+#'
+#' @param sens sensitivity analysis object;
+#' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
+#' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
+#'
 #' @param parm1 String with the name of the first parameter of interest
 #' @param parm2 String with the name of the second parameter of interest
 
@@ -40,16 +45,16 @@ twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
     parnames <- sens$parnames
 
     # calculate outcomes
-    # effectiveness, for now
-    # todo: calculate outcomes
-    outcome <- eff
+    # calculate outcome of interest
+    y <- calculate_outcome(outcome, cost, eff, wtp)
+    names(y) <- strategies
 
     # loop over dsa's and create ow
     tw <- NULL
     for (s in strategies) {
       # maybe extract this out later - shared with predict.metamodel
       new_df <- data.frame("p1" = params[, parnames[1]], "p2" = params[, parnames[2]],
-                           "strategy" = s, "outcome_val" = outcome[, s])
+                           "strategy" = s, "outcome_val" = y[, s])
       tw <- rbind(tw, new_df, stringsAsFactors = FALSE)
     }
     names(tw)[1:2] <- parnames

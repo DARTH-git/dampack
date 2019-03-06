@@ -7,8 +7,9 @@
 create_sa(parameters, parnames, effectiveness, strategies, cost, currency)
 }
 \arguments{
-\item{parameters}{Data frame with values for each simulation (rows) and parameter (columns).
-The column names should be the parameter names.}
+\item{parameters}{Data frame with parameter values for each model run.}
+
+\item{parnames}{names for the parameters}
 
 \item{effectiveness}{Data frame with the effectiveness for each simulation (rows) and strategy (columns)}
 
@@ -19,7 +20,7 @@ The column names should be the parameter names.}
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }
 \description{
-This object is called by \code{\link{create_psa_obj}}
+This object is called by \code{\link{make_psa_obj}}
 and \code{\link{create_dsa_oneway}}, and checks the structure of
 each of the arguments before creating an SA object.
 }

@@ -4,10 +4,10 @@
 \alias{plot.ceac}
 \title{Plot of Cost-Effectiveness Acceptability Curves (CEAC)}
 \usage{
-\method{plot}{ceac}(x, frontier = TRUE, currency = "$", min_prob = 0,
-  txtsize = 12, n_x_ticks = 10, n_y_ticks = 8, xbreaks = NULL,
-  ybreaks = NULL, ylim = NULL, xlim = c(0, NA), col = c("full",
-  "bw"), ...)
+\method{plot}{ceac}(x, frontier = TRUE, points = TRUE,
+  currency = "$", min_prob = 0, txtsize = 12, n_x_ticks = 10,
+  n_y_ticks = 8, xbreaks = NULL, ybreaks = NULL, ylim = NULL,
+  xlim = c(0, NA), col = c("full", "bw"), ...)
 }
 \arguments{
 \item{x}{Object of class \code{ceac}.}

@@ -57,7 +57,7 @@ make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, curre
                        cost, currency)
 
   # give classes "psa" and "sa"
-  class(psa_obj) <- c("psa", class(psa_obj))
+  class(psa_obj) <- c("PSA", class(psa_obj))
   return(psa_obj)
 }
 

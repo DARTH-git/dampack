@@ -58,24 +58,8 @@ metamodel <- function(analysis = c("oneway", "twoway"),
   # define dependent variables
   outcome <- match.arg(outcome)
 
-  ## make sure wtp is not null if nmb or nhb
-  if (is.null(wtp) & (outcome == "nmb" | outcome == "nhb")) {
-    stop("wtp must be provided if nmb or nhb is the outcome to be modeled")
-  }
-
   # define y, the outcome matrix
-  if (outcome == "eff") {
-    y <- psa$effectiveness
-  }
-  if (outcome == "cost") {
-    y <- psa$cost
-  }
-  if (outcome == "nhb") {
-    y <- psa$effectiveness - psa$cost / wtp
-  }
-  if (outcome == "nmb") {
-    y <- psa$effectiveness * wtp - psa$cost
-  }
+  y <- calculate_outcome(outcome, psa$cost, psa$effectiveness, wtp)
 
   # define strategies
   strat <- psa$strategies

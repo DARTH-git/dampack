@@ -18,11 +18,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-The probabilistic sensitivity analysis object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` object from an existing PSA, and what can be done once the PSA object is created in `dampack`.
+The probabilistic sensitivity analysis (PSA) object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` PSA object from an existing PSA dataset, and what can be done once the PSA object is created in `dampack`.
 
 ## Probability Sensitivity Analysis: An Introduction
 
 **theoretical background and stuff here**
+The purpose of a PSA is to translate model parameter uncertainty into decision uncertainty, reflected as uncertainty as to which strategy is optimal (probability of maximizing net monetary benefit).
 
 ## PSA in dampack
 

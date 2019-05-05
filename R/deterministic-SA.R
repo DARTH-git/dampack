@@ -109,13 +109,14 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
     pars_i <- parms[i]
     ix <- which(pars_df$pars == pars_i)
     pars_range <- pars_df[ix, c("min", "max")]
-    v_owsa_input <- seq(pars_range[[1]],
-                        pars_range[[2]],
-                        length.out = nsamps)
+    v_owsa_input <- t(t(seq(pars_range[[1]],
+                            pars_range[[2]],
+                            length.out = nsamps)))
+    colnames(v_owsa_input) <- pars_i
 
     # Run model and capture outcome
     sim_out <- lapply(c(1:nsamps),
-                      owsa_det_wrapper_of_user_model,
+                      wrapper_of_user_model,
                       user_fun = FUN,
                       parm_name = pars_i,
                       tmp_input = fun_input_ls,
@@ -127,9 +128,10 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
                            })
 
     sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
+    colnames(sim_out_df) <- strategies
 
-    parm_table <- data.frame(parameter = rep(parms[i], nsamps),
-                             parmval = v_owsa_input)
+    parm_table <- data.frame(parameter = rep(pars_i, nsamps),
+                             parmval = unname(v_owsa_input))
 
     parm_table_all <- rbind(parm_table_all, parm_table)
     sim_out_df_all <- rbind(sim_out_df_all, sim_out_df)
@@ -140,12 +142,6 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
 
   owsa_out <- owsa(df_owsa, outcome = outcome_type)
   return(owsa_out)
-}
-
-owsa_det_wrapper_of_user_model <- function(x, user_fun, parm_name,
-                                           tmp_input, tmp_replace) {
-  tmp_input[[1]][parm_name] <- tmp_replace[x]
-  do.call(user_fun, tmp_input)
 }
 
 #' Two-way sensitivity analysis (TWSA)
@@ -265,7 +261,7 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   # Run model and capture outcome
   n_run <- nrow(param_table)
   sim_out <- lapply(c(1:n_run),
-                    twsa_det_wrapper_of_user_model,
+                    wrapper_of_user_model,
                     user_fun = FUN,
                     parm_name = poi,
                     tmp_input = fun_input_ls,
@@ -285,8 +281,8 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   return(twsa_out)
 }
 
-twsa_det_wrapper_of_user_model <- function(x, user_fun, parm_name,
-                                           tmp_input, tmp_replace) {
+wrapper_of_user_model <- function(x, user_fun, parm_name,
+                                  tmp_input, tmp_replace) {
   tmp_input[[1]][parm_name] <- tmp_replace[x, parm_name]
   do.call(user_fun, tmp_input)
 }

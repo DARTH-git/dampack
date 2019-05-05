@@ -1,206 +1,294 @@
-#---------------------------------------------------------------#
-#### Function to compute one-way sensitivity analysis (OWSA) ####
-#---------------------------------------------------------------#
-#' One-way sensitivity analysis (OWSA)
+#' Compute one-way sensitivity analysis (OWSA)
 #'
-#' This function runs a deterministic one-way sensitivity analysis (OWSA) on a
+#' @description This function runs a deterministic one-way sensitivity analysis (OWSA) on a
 #' given function that produces outcomes.
-#' @param parms Vector with strings with the name of the parameters of interest
-#' @param ranges A named list of the form c("parm" = c(0, 1), ...) that gives 
-#' the ranges for the parameters of interest. The number of samples from this 
-#' range is determined by \code{nsamp}
-#' @param nsamps number of parameter values. If NULL, 100 parameter values are 
-#' used
-#' @param params.basecase List with parameters for the base case
-#' @param FUN Function that takes \code{params.basecase} and \code{...} and 
-#' produces \code{outcome} of interest
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param strategies vector of strategy names. The default (NULL) will use 
-#' strategy names in FUN
-#' @param ... Further arguments to FUN (not used)
-#' @keywords owsa
-#' @return A dataframe with the results of the sensitivity analysis. Can be 
-#' visualized with \code{plot.owsa}, \code{owsa_opt_strat} and 
-#' \code{owsa_tornado} from \code{dampack}
-#' @section Details:
-#' FUN must return a dataframe where the first column are the strategy names
-#' and the rest of teh columns must be outcomes.
 #'
-owsa_det <- function(parms, ranges, nsamps = 100, params.basecase, FUN, outcome, 
-                     strategies = NULL, ...){
-  ### Check for errors
-  if(sum(parms %in% names(params.basecase)) != length(parms)){
-    stop("parms should be in names of params.basecase")
+#' @param parms Vector with strings with the name of the parameters of interest
+#' @param pars_df A data.frame with 4 columns with following column order: "pars",
+#' "basecase", "min", and "max". The number of samples from this range is
+#' determined by \code{nsamp}
+#' @param nsamps number of parameter values. If \code{NULL}, 100 parameter values are
+#' used
+#' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
+#' produce the \code{outcome} of interest
+#' @param outcome String with the outcome of interest produced by \code{nsamp}
+#' @param outcome_type The type of outcome is either "eff" or "cost". The default
+#' outcome_type is "eff"
+#' @param strategies vector of strategy names. The default \code{NULL} will use
+#' strategy names in \code{FUN}
+#' @param ... Additional arguments to user-defined \code{FUN}
+#'
+#' @keywords owsa
+#'
+#' @return A dataframe with the results of the sensitivity analysis. Can be
+#' visualized with \code{plot.owsa}, \code{owsa_opt_strat} and
+#' \code{owsa_tornado} from \code{dampack}
+#'
+#' @section Details:
+#' \itemize{
+#' \item \code{pars_df}
+#' \itemize{
+#' \item "pars" are the names of the input parameters in the
+#' user defined function. "pars" should include all parameters of interest provided in
+#' \code{parms}.
+#' \item "basecase" are the base value of input parameters in user defined \code{FUN}.
+#' \item "min" and "max" are the mininum and maximum values of the parameters of interest.
+#' Users only need to provide the "min" and "max" of the parameters of interest.
+#' For the rest of the parameter inputs into the user defined function,
+#' "min" and "max" can be any value or \code{NA} but these values are not evaluated in
+#' \code{owsa_det}}
+#' \item \code{FUN} must return a dataframe where the first column are the strategy names
+#' and the rest of the columns must be outcomes.
+#' }
+#'
+#' @export
+owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
+                     outcome_type, strategies = NULL, ...){
+  # Check for errors
+  if (missing(FUN)) stop("FUN is missing")
+
+  if (missing(parms)) {
+    parms <- as.character(pars_df[, 1])
+    warning("assuming the pars in pars_df are the parameters of interest")
   }
-  
-  if(typeof(ranges)!="list"){
-    stop("ranges should be a list")
+
+  if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+
+  params_basecase <- pars_df[, 2]
+  names(params_basecase) <- as.character(pars_df[, 1])
+  opt_arg_val <- list(...)
+  fun_input_ls <- c(list(params_basecase), opt_arg_val)
+
+  if (!all(parms %in% pars_df[, 1])) {
+    stop("parms should be in the parameters provided in pars_df")
   }
-  
-  if(length(parms) != length(ranges)){
-    stop("The number of parameters is not the same as the number of ranges")
+
+  if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
+    stop("basecase, min and maximum in pars_df must be numeric")
   }
-  
-  if(sum(parms==names(ranges)) != length(parms)){
-    stop("The name of parameters in parms does not match the name in ranges")
+
+  ix <- match(parms, pars_df$pars)
+  if (!all( (pars_df[ix, 2] >= pars_df[ix, 3]) &
+            (pars_df[ix, 2] <= pars_df[ix, 4]))) {
+    stop("basecase has to be in between min and max")
   }
-  
+
+  names(pars_df) <- c("pars", "basecase", "min", "max")
+
   jj <- tryCatch({
-    funtest <- FUN(params.basecase, ...)  
-  }, error = function(e) NA)
-  if(is.na(sum(is.na(jj)))){
-    stop("FUN is not well defined by 'params.basecase' and ...")
+    funtest <- do.call(FUN, fun_input_ls)
+  },
+  error = function(e) NA)
+  if (is.na(sum(is.na(jj)))) {
+    stop("FUN is not well defined by 'params_basecase' and ...")
   }
-  funtest <- FUN(params.basecase, ...)
-  if(is.null(strategies)){
-    strategies <- funtest[, 1]
-    n.str <- length(strategies) 
+
+  funtest <- do.call(FUN, fun_input_ls)
+  if (is.null(strategies)){
+    strategies <- as.character(funtest[, 1])
   }
-  if(length(strategies)!=length(funtest[, 1])){
-    stop("Number of strategies not the same as in FUN")
+
+  if (length(strategies) != length(funtest[, 1])){
+    stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
-  v.outcomes <- colnames(funtest)[-1]
-  
-  if(!(outcome %in% v.outcomes)){
-    stop("outcome is not part of FUN outcomes")
+
+  if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
+
+  v_outcomes <- colnames(funtest)[-1]
+
+  if (!(outcome %in% v_outcomes)){
+    stop("outcome is not in FUN outcomes")
   }
-  
-  df.owsa.all <- NULL
-  for (i in 1:length(parms)) { # i <- 2
-    ### Generate matrix of inputs
-    v.owsa.input <- seq(ranges[[i]][1], 
-                        ranges[[i]][2], 
+
+  parm_table_all <- NULL
+  sim_out_df_all <- NULL
+  n_parms <- length(parms)
+
+  for (i in 1:n_parms) {
+    # Generate matrix of inputs
+    pars_i <- parms[i]
+    ix <- which(pars_df$pars == pars_i)
+    pars_range <- pars_df[ix, c("min", "max")]
+    v_owsa_input <- seq(pars_range[[1]],
+                        pars_range[[2]],
                         length.out = nsamps)
-    ### Initialize matrix to store outcomes from a OWSA of the CEA
-    m.out.owsa <- matrix(0, 
-                         nrow = length(v.owsa.input), 
-                         ncol = n.str)
-    ### Run model and capture outcome
-    l.owsa.input <- params.basecase
-    for (j in 1:length(v.owsa.input)){ # j <- 1
-      l.owsa.input[names(l.owsa.input) == parms[i]] <- v.owsa.input[j]
-      m.out.owsa[j, ] <- FUN(l.owsa.input, ...)[[outcome]]
-    }
-    
-    df.owsa <- data.frame(parameter = parms[i],
-                          v.owsa.input,
-                          m.out.owsa)
-    names(df.owsa)[-1] <- c("param_val", strategies)
-    
-    df.owsa.all <- rbind(df.owsa.all, df.owsa)
+
+    # Run model and capture outcome
+    sim_out <- lapply(c(1:nsamps),
+                      dampack:::owsa_det_wrapper_of_user_model,
+                      user_fun = FUN,
+                      parm_name = pars_i,
+                      tmp_input = fun_input_ls,
+                      tmp_replace = v_owsa_input)
+
+    sim_out_df <- lapply(sim_out,
+                         function(x, tmp_out = outcome) {
+                           x[[outcome]]
+                           })
+
+    sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
+
+    parm_table <- data.frame(parameter = rep(parms[i], nsamps),
+                             parmval = v_owsa_input)
+
+    parm_table_all <- rbind(parm_table_all, parm_table)
+    sim_out_df_all <- rbind(sim_out_df_all, sim_out_df)
   }
-  
-  df.owsa.lng <- reshape2::melt(df.owsa.all, 
-                                id.vars = c("parameter", "param_val"), 
-                                variable.name = "strategy", 
-                                value.name = "outcome_val")
-  
-  class(df.owsa.lng) <- c("owsa", "data.frame")
-  
-  return(df.owsa.lng)
+
+  parm_table_all$parameter <- as.character(parm_table_all$parameter)
+  df_owsa <- create_dsa_oneway(parm_table_all, sim_out_df_all, strategies)
+
+  owsa_out <- owsa(df_owsa, outcome = outcome_type)
+  return(owsa_out)
 }
 
-#---------------------------------------------------------------#
-#### Function to compute two-way sensitivity analysis (TWSA) ####
-#---------------------------------------------------------------#
+#' Specifically used for owsa_det
+owsa_det_wrapper_of_user_model <- function(x, user_fun, parm_name,
+                                           tmp_input, tmp_replace) {
+  tmp_input[[1]][parm_name] <- tmp_replace[x]
+  do.call(user_fun, tmp_input)
+}
+
 #' Two-way sensitivity analysis (TWSA)
 #'
-#' This function runs a deterministic two-way sensitivity analysis (TWSA) on a
+#' @description This function runs a deterministic two-way sensitivity analysis (TWSA) on a
 #' given function that produces outcomes.
+#'
 #' @param parm1 String with the name of the first parameter of interest
 #' @param parm2 String with the name of the second parameter of interest
-#' @param ranges A named list of the form list("parm1" = c(0, 1), ...) that gives 
-#' the ranges for the parameters of interest. The number of samples from this 
-#' range is determined by \code{nsamp}
-#' @param nsamps number of parameter values. If NULL, 100 parameter values are 
+#' @param pars_df A data.frame with 4 columns with following column order: "pars",
+#' "basecase", "min", and "max". The number of samples from this range is
+#' determined by \code{nsamp}
+#' @param nsamps number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
-#' @param params.basecase List with parameters for the base case
-#' @param FUN Function that takes \code{params.basecase} and \code{...} and 
-#' produces \code{outcome} of interest
+#' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
+#' produce the \code{outcome} of interest
 #' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param strategies vector of strategy names. The default (NULL) will use 
+#' @param outcome_type The type of outcome is either "eff" or "cost". The default
+#' outcome_type is "eff"
+#' @param strategies vector of strategy names. The default (NULL) will use
 #' strategy names in FUN
-#' @param ... Further arguments to FUN (not used)
-#' @keywords owsa
-#' @return A dataframe with the results of the sensitivity analysis. Can be 
-#' visualized with \code{plot.owsa}, and \code{owsa_tornado}
-#' @section Details:
-#' FUN must return a dataframe where the first column are the strategy names
-#' and the rest of teh columns must be outcomes.
+#' @param ... Additional arguments to user-defined \code{FUN}
 #'
-twsa_det <- function(parm1, parm2, ranges, nsamps = 40, params.basecase, FUN, outcome, 
-                     strategies = NULL, ...){
-  ### Check for errors
-  if(sum(c(parm1, parm2) %in% names(params.basecase)) != 2){
-    stop("parm1 and parm2 should be in names of params.basecase")
+#' @keywords twsa
+#'
+#' @return A dataframe with the results of the sensitivity analysis. Can be
+#' visualized with ??
+#'
+#' @section Details:
+#' \itemize{
+#' \item \code{pars_df}
+#' \itemize{
+#' \item "pars" are the names of the input parameters in the
+#' user defined function. "pars" should include all parameters of interest provided in
+#' \code{parms}.
+#' \item "basecase" are the base value of input parameters in user defined \code{FUN}.
+#' \item "min" and "max" are the mininum and maximum values of the parameters of interest.
+#' Users only need to provide the "min" and "max" of the parameters of interest.
+#' For the rest of the parameter inputs into the user defined function,
+#' "min" and "max" can be any value or \code{NA} but these values are not evaluated in
+#' \code{twsa_det}}
+#' \item \code{FUN} must return a dataframe where the first column are the strategy names
+#' and the rest of the columns must be outcomes.
+#' }
+#'
+#' @export
+twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
+                     outcome_type = "eff", strategies = NULL, ...){
+
+  if (missing(FUN)) stop("FUN is missing")
+
+  if (missing(parm1) | missing(parm2)) stop("parm1 and parm2 should be provided")
+
+  if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+
+  poi <- unique(c(parm1, parm2))
+  params_basecase <- pars_df[, 2]
+  names(params_basecase) <- as.character(pars_df[, 1])
+  opt_arg_val <- list(...)
+  fun_input_ls <- c(list(params_basecase), opt_arg_val)
+
+  if (length(poi) != 2) {
+    stop("two-way sensitivity analysis only allows for and requires 2 different paramters of interest at a time")
   }
-  
-  if(typeof(ranges)!="list"){
-    stop("ranges should be a list")
+
+  if (!all(poi %in% names(params_basecase))){
+    stop("parm1 and parm2 should be in the parameters provided in pars_df")
   }
-  
-  if(length(ranges)!=2){
-    stop("The number of elements in ranges has to be two")
+
+  if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
+    stop("basecase, min and maximum in pars_df must be numeric")
   }
-  
+
+  ix <- match(poi, pars_df$pars)
+  if (!all( (pars_df[ix, 2] >= pars_df[ix, 3]) &
+            (pars_df[ix, 2] <= pars_df[ix, 4]))) {
+    stop("basecase has to be in between min and max")
+  }
+
+  names(pars_df) <- c("pars", "basecase", "min", "max")
+
   jj <- tryCatch({
-    funtest <- FUN(params.basecase, ...)  
-  }, error = function(e) NA)
-  if(is.na(sum(is.na(jj)))){
-    stop("FUN is not well defined by 'params.basecase' and ...")
+    funtest <- do.call(FUN, fun_input_ls)
+  },
+  error = function(e) NA)
+  if (is.na(sum(is.na(jj)))){
+    stop("FUN is not well defined by the basecase parameter values and ...")
   }
-  funtest <- FUN(params.basecase, ...)
-  if(is.null(strategies)){
-    strategies <- funtest[,1]
-    n.str <- length(strategies) 
+
+  funtest <- do.call(FUN, fun_input_ls)
+  if (is.null(strategies)){
+    strategies <- as.character(funtest[, 1])
   }
-  if(length(strategies)!=length(funtest[, 1])){
-    stop("Number of strategies not the same as in FUN")
+
+  if (length(strategies) != length(funtest[, 1])){
+    stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
-  v.outcomes <- colnames(funtest)[-1]
-  
-  if(!(outcome %in% v.outcomes)){
+
+  if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
+
+  v_outcomes <- colnames(funtest)[-1]
+
+  if (!(outcome %in% v_outcomes)){
     stop("outcome is not part of FUN outcomes")
   }
-  
+
   ### Generate matrix of inputs
-  df.twsa.params <- expand.grid(placeholder_name1 = seq(ranges[[1]][1], 
-                                                        ranges[[1]][2], 
-                                                        length.out = nsamps), 
-                                placeholder_name2 = seq(ranges[[2]][1], 
-                                                        ranges[[2]][2], 
-                                                        length.out = nsamps))
-  names(df.twsa.params) <- c(parm1, parm2)
-  n.rows <- nrow(df.twsa.params)
-  
-  ### Initialize matrix to store outcomes from a OWSA of the CEA
-  m.out.twsa <- matrix(0, 
-                       nrow = n.rows, 
-                       ncol = n.str)
-  
-  ### Run model and capture outcome
-  l.twsa.input <- params.basecase
-  for (i in 1:n.rows){ # i <- 1
-    l.twsa.input[names(l.twsa.input) == parm1] <- df.twsa.params[i,1]
-    l.twsa.input[names(l.twsa.input) == parm2] <- df.twsa.params[i,2]
-    m.out.twsa[i, ] <- FUN(l.twsa.input, ...)[[outcome]]
-    
-    ## Display simulation progress
-    if(i/(n.rows/10) == round(i/(n.rows/10),0)) {
-      cat('\r', paste(i/n.rows * 100, "% done", sep = " "))
-    }
-  }
-  
-  df.twsa <- data.frame(df.twsa.params,
-                        m.out.twsa)
-  names(df.twsa)[-c(1:2)] <- strategies
-  
-  
-  df.twsa.lng <- reshape2::melt(df.twsa, id.vars = c(parm1, parm2), 
-                                variable.name = "strategy", 
-                                value.name = "outcome_val")
-  
-  class(df.twsa.lng) <- c("twsa", "data.frame")
-  
-  return(df.twsa.lng)
+  range_df <- pars_df[ix, c("min", "max")]
+  param_table <- expand.grid(parm1 = seq(range_df[1, "min"],
+                                         range_df[1, "max"],
+                                         length.out = nsamps),
+                             parm2 = seq(range_df[2, "min"],
+                                         range_df[2, "max"],
+                                         length.out = nsamps))
+  colnames(param_table) <- poi
+
+  # Run model and capture outcome
+  n_run <- nrow(param_table)
+  sim_out <- lapply(c(1:n_run),
+                    dampack:::twsa_det_wrapper_of_user_model,
+                    user_fun = FUN,
+                    parm_name = poi,
+                    tmp_input = fun_input_ls,
+                    tmp_replace = param_table)
+
+  sim_out_df <- lapply(sim_out,
+                       function(x, tmp_out = outcome) {
+                         x[[outcome]]
+                       })
+  sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
+  colnames(sim_out_df) <- strategies
+
+  df_twsa <- create_dsa_twoway(param_table, sim_out_df, strategies)
+
+  twsa_out <- twsa(df_twsa, outcome = outcome_type)
+
+  return(twsa_out)
+}
+
+#' Specifically used for twsa_det
+twsa_det_wrapper_of_user_model <- function(x, user_fun, parm_name,
+                                           tmp_input, tmp_replace) {
+  tmp_input[[1]][parm_name] <- tmp_replace[x, parm_name]
+  do.call(user_fun, tmp_input)
 }

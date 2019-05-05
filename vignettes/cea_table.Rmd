@@ -32,7 +32,6 @@ We use a PSA from a study of *C difficile*. A `dampack` PSA object has already b
 ```{r}
 library(dampack)
 data("cdiff_psa")
-print(cdiff_psa)
 ```
 
 To use the PSA object in `calculate_icers()` we need to get the average cost and average effect for each strategy. To do this, we use `summary()`, which has a specific version for the `psa` object. To get more information on the `summary.psa()` method, just type `?summary.psa` in the console.

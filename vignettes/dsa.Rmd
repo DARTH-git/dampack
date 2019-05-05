@@ -1,0 +1,20 @@
+---
+title: "Deterministic Sensitivity Analysis: Basic Usage"
+author: "Fernando Alarid-Escudero, Caleb Easterly, Eva Enns, and the DARTH Team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Probabilistic Sensitivity Analysis: Basic Usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.align = "center"
+)
+```
+

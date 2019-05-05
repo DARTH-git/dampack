@@ -18,11 +18,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-The probabilistic sensitivity analysis object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` object from an existing PSA, and what can be done once the PSA object is created in `dampack`.
+The probabilistic sensitivity analysis (PSA) object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` PSA object from an existing PSA dataset, and what can be done once the PSA object is created in `dampack`.
 
 ## Probability Sensitivity Analysis: An Introduction
 
 **theoretical background and stuff here**
+The purpose of a PSA is to translate model parameter uncertainty into decision uncertainty, reflected as uncertainty as to which strategy is optimal (probability of maximizing net monetary benefit).
 
 ## PSA in dampack
 
@@ -31,7 +32,7 @@ First, we need to load the `dampack` package.
 library(dampack)
 ```
 
-## Read in data
+### Read in data
 
 **explanation of data here?**
 
@@ -63,10 +64,10 @@ We can ignore the `wtp` part for now. The other parts of the `example_psa` objec
 example_psa$strategies
 ```
 
-- `costs`: a data frame of the cost of carrying out each strategy. The columns are the strategies and the
+- `cost`: a data frame of the cost of carrying out each strategy. The columns are the strategies and the
 rows are the PSA samples (of which there were 10,000).
 ```{r}
-head(example_psa$costs)
+head(example_psa$cost)
 ```
 
 Note that the columns have names that suggest the strategy and the units. This is, however, not necessary. It is *critical* that the vector of strategies (`example_psa$strategies`) and the columns of the `cost` and `effectiveness` dataframes be in the same order, though.
@@ -87,7 +88,7 @@ psa_obj <- make_psa_obj(cost = example_psa$cost,
 str(psa_obj)
 ```
 
-## Scatterplot
+### Scatterplot
 
 **explanation here**
 
@@ -95,7 +96,7 @@ str(psa_obj)
 plot(psa_obj)
 ```
 
-## Cost-effectiveness acceptability curve
+### Cost-effectiveness acceptability curve
 
 **explanation here**
 
@@ -118,7 +119,7 @@ plot(ceac_obj, frontier = FALSE)
 ```
 
 
-## Expected Value of Perfect Information
+### Expected Value of Perfect Information
 
 **explanation here**
 
@@ -128,7 +129,7 @@ head(evpi)
 plot(evpi)
 ```
 
-## Expected loss curves
+### Expected loss curves
 
 **explanation here**
 
@@ -136,4 +137,85 @@ plot(evpi)
 el <- calc_exp_loss(wtp = example_psa$wtp, psa = psa_obj)
 head(el)
 plot(el, n_x_ticks = 8, n_y_ticks = 6)
+```
+
+## One- and Two-Way Sensitivity Analyses
+
+### One-Way
+
+Make an `owsa` object.
+
+```{r}
+o <- owsa(psa_obj)
+```
+
+Default plot:
+
+```{r fig.height = 6, fig.width = 6}
+plot(o)
+```
+
+Tornado plot:
+
+```{r}
+owsa_tornado(o, strategy = "Radio")
+```
+
+Can filter out strategies that don't change using `min_rel_diff`.
+
+```{r}
+owsa_tornado(o, strategy = "Radio", min_rel_diff = 0.05)
+```
+
+Can also return plot data:
+
+```{r}
+owsa_tornado(o, strategy = "Radio", return = "data")
+```
+
+Optimal strategy rangeplot:
+
+```{r, fig.height = 6, fig.width = 8}
+owsa_opt_strat(o)
+```
+
+Plot data:
+
+```{r}
+owsa_opt_strat(o, return = "data")
+```
+
+### Two-way
+
+specify the two parameters of interest.
+
+```{r}
+tw <- twsa(psa_obj, parm1 = "pFailChemo", parm2 = "muDieCancer")
+```
+
+Plot
+
+```{r}
+plot(tw)
+```
+
+## Base-case CEA
+
+Summarize the PSA results:
+
+```{r}
+psa_sum <- summary(psa_obj)
+```
+
+Calculate incremental cost-effectiveness ratios:
+
+```{r fig.height = 5, fig.width = 7}
+icers <- calculate_icers(cost = psa_sum$meanCost, effect = psa_sum$meanEffect, strategies = psa_sum$Strategy)
+plot(icers)
+```
+
+Label more:
+
+```{r fig.height = 5, fig.width = 7}
+plot(icers, label = "all")
 ```

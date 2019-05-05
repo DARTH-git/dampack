@@ -115,7 +115,7 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
 
     # Run model and capture outcome
     sim_out <- lapply(c(1:nsamps),
-                      dampack:::owsa_det_wrapper_of_user_model,
+                      owsa_det_wrapper_of_user_model,
                       user_fun = FUN,
                       parm_name = pars_i,
                       tmp_input = fun_input_ls,
@@ -142,7 +142,6 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
   return(owsa_out)
 }
 
-#' Specifically used for owsa_det
 owsa_det_wrapper_of_user_model <- function(x, user_fun, parm_name,
                                            tmp_input, tmp_replace) {
   tmp_input[[1]][parm_name] <- tmp_replace[x]
@@ -266,7 +265,7 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   # Run model and capture outcome
   n_run <- nrow(param_table)
   sim_out <- lapply(c(1:n_run),
-                    dampack:::twsa_det_wrapper_of_user_model,
+                    twsa_det_wrapper_of_user_model,
                     user_fun = FUN,
                     parm_name = poi,
                     tmp_input = fun_input_ls,
@@ -286,7 +285,6 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   return(twsa_out)
 }
 
-#' Specifically used for twsa_det
 twsa_det_wrapper_of_user_model <- function(x, user_fun, parm_name,
                                            tmp_input, tmp_replace) {
   tmp_input[[1]][parm_name] <- tmp_replace[x, parm_name]

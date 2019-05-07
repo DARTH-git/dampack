@@ -21,6 +21,7 @@
 #' @param type type of metamodel
 #' @param poly.order Order of polynomial for the linear regression metamodel.
 #' Default: 2
+#' @inheritParams mgcv::s
 #'
 #' @return
 #' A metamodel object, which contains a list of metamodels and other relevant information.
@@ -37,12 +38,15 @@ metamodel <- function(analysis = c("oneway", "twoway"),
                       psa, parms = NULL, strategies = NULL,
                       outcome = c("eff", "cost", "nhb", "nmb"),
                       wtp = NULL,
-                      type = "poly", poly.order = 2) {
+                      type = c("linear", "gam", "poly"), poly.order = 2, k = -1) {
   # get parameter names
   pnames <- psa$parnames
 
   # analysis
   analysis <- match.arg(analysis)
+
+  # type of model
+  type <- match.arg(type)
 
   # make sure all of parms is in parameter names
   if (is.null(parms)) {
@@ -118,28 +122,48 @@ metamodel <- function(analysis = c("oneway", "twoway"),
 #' @param all_parms all parms in PSA
 #' @keywords internal
 #' @inheritParams metamodel
-mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order) {
-  # build formula
-  ## dependent variable
-  fbeg <- paste0(dep, " ~ ")
+mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
+  if (type == "linear") {
+    # build formula
+    ## dependent variable
+    fdep <- paste0(dep, " ~ ")
 
-  ## parameters of interest
-  fparm <- ""
-  for (p in parms) {
-    fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
+    ## parameters
+    fparm <- paste(all_parms, collapse = " + ")
+
+    ## combine
+    f <- as.formula(paste0(fdep, fparm))
+
+    # run metamodel
+    metamod <- lm(f, data = dat)
+    metamod$call <- call("lm", formula = f, data = quote(dat))
   }
+  if (type == "poly") {
+    # build formula
+    ## dependent variable
+    fbeg <- paste0(dep, " ~ ")
 
-  ## other parameters
-  other_parms <- all_parms[-match(parms, all_parms)]
-  fend <- paste(other_parms, collapse = " + ")
+    ## parameters of interest
+    fparm <- ""
+    for (p in parms) {
+      fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
+    }
 
-  ## combine
-  f <- as.formula(paste0(fbeg, fparm, fend))
+    ## other parameters
+    other_parms <- all_parms[-match(parms, all_parms)]
+    fend <- paste(other_parms, collapse = " + ")
 
-  # run metamodel
-  metamodel <- lm(f, data = dat)
-  metamodel$call <- call("lm", formula = f, data = quote(dat))
-  return(metamodel)
+    ## combine
+    f <- as.formula(paste0(fbeg, fparm, fend))
+
+    # run metamodel
+    metamod <- lm(f, data = dat)
+    metamod$call <- call("lm", formula = f, data = quote(dat))
+  }
+  if (type == "gam") {
+    # todo
+  }
+  return(metamod)
 }
 
 

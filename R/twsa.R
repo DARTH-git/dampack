@@ -33,7 +33,7 @@ twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
     parms <- c(parm1, parm2)
 
     # run metamodel
-    mm <- metamodel("twoway", sens, parms, strategies, outcome, wtp, poly.order)
+    mm <- metamodel("twoway", sens, parms, strategies, outcome, wtp, "poly", poly.order)
     # predict outcomes
     tw <- predict(mm, ranges, nsamp)
   } else if (inherits(sens, "dsa_twoway")) {

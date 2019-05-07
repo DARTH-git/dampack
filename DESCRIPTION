@@ -22,7 +22,8 @@ Imports:
     ellipse,
     dplyr,
     scales,
-    stringr
+    stringr,
+    mgcv
 Suggests:
     testthat,
     lintr,

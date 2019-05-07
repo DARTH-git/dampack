@@ -90,7 +90,7 @@ metamodel <- function(analysis = c("oneway", "twoway"),
     for (p in parms) {
       # loop over strategies
       for (s in strategies) {
-        mod <- mm_run_reg(s, p, dat, pnames, type, poly.order)
+        mod <- mm_run_reg(s, p, dat, pnames, type, poly.order, k)
         mod$parm_of_int <- p
         mod$strat <- s
         lms[[p]][[s]] <- mod
@@ -100,7 +100,7 @@ metamodel <- function(analysis = c("oneway", "twoway"),
   if (analysis == "twoway") {
     # loop over strategies
     for (s in strategies) {
-      mod <- mm_run_reg(s, parms, dat, pnames, type, poly.order)
+      mod <- mm_run_reg(s, parms, dat, pnames, type, poly.order, k)
       # for accessing later in predict
       mod$parm_of_int <- parms
       mod$strat <- s
@@ -110,7 +110,8 @@ metamodel <- function(analysis = c("oneway", "twoway"),
 
   metamodel <- list(outcome = outcome, mods = lms, wtp = wtp,
                     parms = parms, strategies = strategies,
-                    psa = psa, analysis = analysis)
+                    psa = psa, analysis = analysis,
+                    type = type, poly.order = poly.order, k = k)
   # define class
   class(metamodel) <- "metamodel"
   return(metamodel)
@@ -120,9 +121,13 @@ metamodel <- function(analysis = c("oneway", "twoway"),
 #' @param dep dependent variable in regression
 #' @param dat data to use in regression
 #' @param all_parms all parms in PSA
+#'
+#' @importFrom mgcv gam
 #' @keywords internal
 #' @inheritParams metamodel
 mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
+  n_parms <- length(parms)
+
   if (type == "linear") {
     # build formula
     ## dependent variable
@@ -161,7 +166,22 @@ mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
     metamod$call <- call("lm", formula = f, data = quote(dat))
   }
   if (type == "gam") {
-    # todo
+    # build formula
+    fbeg <- paste0(dep, " ~ ")
+
+    ## parameters of interest
+    fparm <- ""
+    if (n_parms == 1) {
+      fparm <- paste0(fparm, "s(", parms, ", k=", k, ")")
+    } else {
+      for (p in parms) {
+        fparm <- paste0(fparm, "s(", p, ", k=", k, ")")
+      }
+    }
+
+    f <- as.formula(paste0(fbeg, fparm))
+
+    metamod <- gam(f, data = dat)
   }
   return(metamod)
 }
@@ -317,7 +337,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
         mod <- mods[[p]][[s]]
         outcome_dfs[[counter]] <- data.frame("parameter" = p, "strategy" = s,
                                              "param_val" = newdata,
-                                             "outcome_val" = predict(mod, newdata = this_p_data),
+                                             "outcome_val" = predict(mod, newdata = this_p_data, type = "response"),
                                              stringsAsFactors = FALSE)
         counter <- counter + 1
       }

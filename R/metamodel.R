@@ -36,7 +36,7 @@
 #' @export
 metamodel <- function(analysis = c("oneway", "twoway"),
                       psa, parms = NULL, strategies = NULL,
-                      outcome = c("eff", "cost", "nhb", "nmb"),
+                      outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                       wtp = NULL,
                       type = c("linear", "gam", "poly"), poly.order = 2, k = -1) {
   # get parameter names

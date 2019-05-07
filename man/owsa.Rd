@@ -5,8 +5,8 @@
 \title{One-way sensitivity analysis using linear regression metamodeling}
 \usage{
 owsa(sens, parms = NULL, ranges = NULL, nsamps = 100,
-  outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
-  strategies = NULL, poly.order = 2)
+  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
+  wtp = NULL, strategies = NULL, poly.order = 2)
 }
 \arguments{
 \item{sens}{sensitivity analysis object;

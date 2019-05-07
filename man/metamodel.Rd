@@ -5,9 +5,9 @@
 \title{Linear regression metamodeling}
 \usage{
 metamodel(analysis = c("oneway", "twoway"), psa, parms = NULL,
-  strategies = NULL, outcome = c("eff", "cost", "nhb", "nmb"),
-  wtp = NULL, type = c("linear", "gam", "poly"), poly.order = 2,
-  k = -1)
+  strategies = NULL, outcome = c("eff", "cost", "nhb", "nmb",
+  "nhb_loss", "nmb_loss"), wtp = NULL, type = c("linear", "gam",
+  "poly"), poly.order = 2, k = -1)
 }
 \arguments{
 \item{analysis}{either "oneway" or "twoway"}

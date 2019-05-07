@@ -20,7 +20,7 @@
 #' @export
 twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
                  nsamp = 100,
-                 outcome = c("eff", "cost", "nhb", "nmb"),
+                 outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){

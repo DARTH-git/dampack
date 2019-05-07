@@ -10,9 +10,11 @@
 #' Each simulation should be a row of the data frame, and each strategy should be a column.
 #' Naming the columns of the data frames is not necessary, as they will be renamed with
 #' the \code{strategies} vector.
-#' @param strategies #' Vector with the names of the strategies. Due to requirements in
-#' certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
-#' with a warning.
+#' @param strategies Vector with the names of the strategies. Due to requirements in
+#' certain uses of this vector, this function uses \code{\link{make.names}} to modify
+#' strategy names as necessary. It is strongly suggested that you follow the rules
+#' in the \code{\link{make.names}} help, to avoid unexpected errors.
+#'
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'
 create_sa <- function(parameters, parnames, effectiveness, strategies,

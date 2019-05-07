@@ -63,16 +63,21 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   if (is.null(strategies)) {
     strategies <- paste(rep("Strategy_", n_strategies), seq(1, n_strategies), sep = "")
   } else {
-    # replace spaces with underscores
-    new_strategies <- str_replace(strategies, " ", "_")
+    # correct strategy names. they are used as data.frame column names and in lm()
+    # so they need to be syntactically valid
+    new_strategies <- make.names(strategies, unique = TRUE)
+
+    # write warning to console, so user knows that strategy name was changed
     for (i in 1:n_strategies) {
       old_strat <- strategies[i]
       new_strat <- new_strategies[i]
       if (new_strat != old_strat) {
-        warning(paste0("replacing space with underscore: ",
-                       old_strat, " is now ", new_strat))
+        warning(paste0("strategy name '", old_strat, "' was converted to '", new_strat,
+                       "' for compatibility. See ?make.names"), call. = FALSE)
       }
     }
+    # update strategies
+    strategies <- new_strategies
 
     # make sure strategies is the same length as the number of columns
     if (n_strategies != length(strategies)) {

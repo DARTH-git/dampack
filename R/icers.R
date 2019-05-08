@@ -159,9 +159,6 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
     results <- rbind(results_ref, results_other)
   }
 
-  # declare status for first entry to be 'ref'
-  results[1, "Status"] <- "ref"
-
   # re-arrange columns
   results <- results %>%
     select(.data$Strategy, .data$Cost, .data$Effect,

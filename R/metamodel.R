@@ -34,7 +34,7 @@
 #'
 #' @importFrom stats as.formula formula getCall lm
 #' @export
-metamodel <- function(analysis = c("oneway", "twoway"),
+metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
                       psa, parms = NULL, strategies = NULL,
                       outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                       wtp = NULL,
@@ -97,7 +97,7 @@ metamodel <- function(analysis = c("oneway", "twoway"),
       }
     }
   }
-  if (analysis == "twoway") {
+  if (analysis == "twoway" | analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
       mod <- mm_run_reg(s, parms, dat, pnames, type, poly.order, k)
@@ -177,6 +177,8 @@ mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
       for (p in parms) {
         fparm <- paste0(fparm, "s(", p, ", k=", k, ")")
       }
+      # add interactions
+      fparm <- paste0("ti(", paste(parms, collapse = ", "), ", k = ", k, ")")
     }
 
     f <- as.formula(paste0(fbeg, fparm))

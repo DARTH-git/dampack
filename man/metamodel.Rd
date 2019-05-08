@@ -4,9 +4,9 @@
 \alias{metamodel}
 \title{Linear regression metamodeling}
 \usage{
-metamodel(analysis = c("oneway", "twoway"), psa, parms = NULL,
-  strategies = NULL, outcome = c("eff", "cost", "nhb", "nmb",
-  "nhb_loss", "nmb_loss"), wtp = NULL, type = c("linear", "gam",
+metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
+  parms = NULL, strategies = NULL, outcome = c("eff", "cost", "nhb",
+  "nmb", "nhb_loss", "nmb_loss"), wtp = NULL, type = c("linear", "gam",
   "poly"), poly.order = 2, k = -1)
 }
 \arguments{

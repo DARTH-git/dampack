@@ -4,6 +4,5 @@ language: R
 sudo: false
 cache: packages
 os:
-  - windows
   - linux
   - osx

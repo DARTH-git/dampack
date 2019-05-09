@@ -5,7 +5,7 @@
 \title{Estimation of the Expected Value of Partial Perfect Information (EVPPI)
 using a linear regression metamodel approach}
 \usage{
-calc_evppi(psa, wtp, parms = NULL, outcome = c("nhb_loss", "nmb_loss"),
+calc_evppi(psa, wtp, parms = NULL, outcome = c("nmb_loss", "nhb_loss"),
   type = c("gam", "poly"), poly.order = 2, k = NA)
 }
 \arguments{

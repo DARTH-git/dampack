@@ -63,7 +63,7 @@
 calc_evppi <- function(psa,
                        wtp,
                        parms = NULL,
-                       outcome = c("nhb_loss", "nmb_loss"),
+                       outcome = c("nmb_loss", "nhb_loss"),
                        type = c("gam", "poly"),
                        poly.order = 2,
                        k = NA) {

@@ -1,6 +1,7 @@
 calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss", "nmb_loss"),
                               cost, effect, wtp) {
   outcome <- match.arg(outcome)
+  n_sim <- nrow(cost)
   if (outcome == "eff") {
     y <- effect
   } else if (outcome == "cost") {
@@ -18,15 +19,16 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
     if (outcome == "nmb") {
       y <- effect * wtp - cost
     }
-    if (outcome == "nhb_loss") {
-      nhb <- calculate_outcome("nhb", cost, effect, wtp)
-      optimal_strat <- which.max(colMeans(nhb))
-      y <-  nhb[, optimal_strat] - nhb
-    }
-    if (outcome == "nmb_loss") {
-      nmb <- calculate_outcome("nmb", cost, effect, wtp)
-      optimal_strat <- which.max(colMeans(nmb))
-      y <- nmb[, optimal_strat] - nmb
+    if (outcome == "nhb_loss" | outcome == "nmb_loss") {
+      if (outcome == "nhb_loss") {
+        net_outcome <- "nhb"
+      }
+      if (outcome == "nmb_loss") {
+        net_outcome <- "nmb"
+      }
+      netben <- calculate_outcome(net_outcome, cost, effect, wtp)
+      max_str <- max.col(netben)
+      y <-  netben[cbind(1:n_sim, max_str)] - netben
     }
   }
   return(y)

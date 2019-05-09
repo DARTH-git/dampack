@@ -68,7 +68,8 @@ ceac <- function(wtp, psa){
 
   for (l in 1:n_wtps) {
     # calculate net monetary benefit at wtp[l]
-    nmb <-  wtp[l] * effectiveness - cost
+    lth_wtp <- wtp[l]
+    nmb <-  calculate_outcome("nmb", cost, effectiveness, lth_wtp)
 
     # find the distribution of optimal strategies
     max.nmb <- max.col(nmb)

@@ -34,16 +34,15 @@ calc_exp_loss <- function(wtp, psa) {
   cost <- psa$cost
   effectiveness <- psa$effectiveness
   strategies <- psa$strategies
-  n_sim <- psa$n_sim
   n_str  <- psa$n_strategies
   exp_loss <- matrix(0, nrow = length(wtp), ncol = n_str)
-  for (l in 1:length(wtp)) {
-    nmb <- effectiveness * wtp[l] - cost # Effectiveness minus Costs, with vector indexing
-    max_str <- max.col(nmb)
-    loss <- nmb[cbind(1:n_sim, max_str)] - nmb
-    exp_loss[l, ] <- colMeans(loss)
+  for (i in 1:length(wtp)) {
+    ith_wtp <- wtp[i]
+    loss <- calculate_outcome("nmb_loss", cost, effectiveness, ith_wtp)
+    exp_loss[i, ] <- colMeans(loss)
   }
-  # Optimal strategy based on lowest expected loss (max of negative expected loss)
+  # optimal strategy based on lowest expected loss (max of negative expected loss)
+  # this was done because min.col isn't a function
   optimal.str <- max.col(-exp_loss)
   # Expected loss of optimal strategy
   optimal.el <- exp_loss[cbind(1:length(wtp), optimal.str)]

@@ -63,7 +63,7 @@
 calc_evppi <- function(psa,
                        wtp,
                        parms = NULL,
-                       outcome = c("nhb_loss", "nmb_loss"),
+                       outcome = c("nmb_loss", "nhb_loss"),
                        type = c("gam", "poly"),
                        poly.order = 2,
                        k = NA) {
@@ -85,8 +85,8 @@ calc_evppi <- function(psa,
   # there is one for each strategy
   fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
 
-  # bind the columns to get a dataframe, and multiply by -1 to get losses positive
-  fitted_loss_df <- -1 * bind_cols(fitted_loss_list)
+  # bind the columns to get a dataframe
+  fitted_loss_df <- bind_cols(fitted_loss_list)
 
   # calculate the evppi as the average of the row maxima
   row_maxes <- apply(fitted_loss_df, 1, max)

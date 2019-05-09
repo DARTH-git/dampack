@@ -21,12 +21,12 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
     if (outcome == "nhb_loss") {
       nhb <- calculate_outcome("nhb", cost, effect, wtp)
       optimal_strat <- which.max(colMeans(nhb))
-      y <- nhb - nhb[, optimal_strat]
+      y <-  nhb[, optimal_strat] - nhb
     }
     if (outcome == "nmb_loss") {
       nmb <- calculate_outcome("nmb", cost, effect, wtp)
       optimal_strat <- which.max(colMeans(nmb))
-      y <- nmb - nmb[, optimal_strat]
+      y <- nmb[, optimal_strat] - nmb
     }
   }
   return(y)

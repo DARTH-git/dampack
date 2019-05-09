@@ -29,7 +29,7 @@ calc_evsi <- function(psa,
                    k = k)
 
   # predict from the regression models
-  predicted_loss_list <- lapply(mms$mods, function(m) predict.ga(m, n, n0))
+  predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
   # bind the columns to get a dataframe, and multiply by -1 to get losses positive
   predicted_loss_df <- -1 * bind_cols(predicted_loss_list)
@@ -42,137 +42,158 @@ calc_evsi <- function(psa,
 }
 
 
-predict.ga <- function(object, n, n0){
-  #### Function to compute the preposterior for each of the
-  #### basis functions of the GAM model.
-  #### Inputs:
-  #### - object: gam object
-  #### - n: scalar or vector of new sample size to compute evsi on
-  #### - n0: scalar or vector of effective prior sample size
-  #### - verbose: Prints the variance reduction factor for each parameter
+#' Function to compute the preposterior for each of the
+#' basis functions of the GAM model.
+#'
+#' @keywords internal
+#'
+#' @param object gam object
+#' @param n scalar or vector of new sample size to compute evsi on
+#' @param n0 scalar or vector of effective prior sample size
+#' @importFrom stats coef
+predict_ga <- function(object, n, n0){
 
-  ### Name of parameters
-  names.data <- colnames(object$model)
-  ### Create dataframe with parameter values
-  data <- data.frame(object$model[,-1])
-  ## Name columns of dataframe
-  colnames(data) <- names.data[-1]
+  # Name of parameters
+  param_names <- colnames(object$model)
 
-  ### Number of parameters
-  n.params <- ncol(data)
+  # Create dataframe with parameter values
+  param_vals <- data.frame(object$model[, -1])
 
-  ### Sanity checks
-  if(!(length(n)==1 | length(n)==n.params)){
+  # Name columns of dataframe
+  colnames(param_vals) <- param_names[-1]
+
+  # Number of parameters
+  n_params <- ncol(param_vals)
+
+  # Sanity checks
+  if (!(length(n) == 1 | length(n) == n_params)) {
     stop("Variable 'n' should be either a scalar or a vector
          the same size as the number of parameters")
   }
-  if(!(length(n0)==1 | length(n0)==n.params)){
+  if (!(length(n0) == 1 | length(n0) == n_params)) {
     stop("Variable 'n0' should be either a scalar or a vector
          the same size as the number of parameters")
   }
 
-  ### Make n & n0 consistent with the number of parameters
-  if(length(n) == 1){
-    n <- rep(n, n.params)
+  # Make n & n0 consistent with the number of parameters
+  if (length(n) == 1) {
+    n <- rep(n, n_params)
   }
-  if(length(n0) == 1){
-    n0 <- rep(n0, n.params)
+  if (length(n0) == 1){
+    n0 <- rep(n0, n_params)
   }
 
-  ### Compute variance reduction factor
-  v.ga <- sqrt(n/(n+n0))
+  # Compute variance reduction factor
+  vrf <- sqrt(n / (n + n0))
 
-  ### Number of smoothers
-  n.smooth <- length(object$smooth)
-  ### Number of total basis functions
-  n.colX <- length(object$coefficients)
-  ### Number of observations
-  n.rowX <- nrow(object$model)
+  # Number of smoothers
+  n_smooth <- length(object$smooth)
 
-  ### Initialize matrix for preposterior of total basis functions
-  X <- matrix(NA, n.rowX, n.colX)
-  X[, 1] <- 1
+  # Number of total basis functions
+  n_col_x <- length(object$coefficients)
 
-  for (k in 1:n.smooth) { # k <- 1
+  # Number of observations
+  n_row_x <- nrow(object$model)
+
+  # Initialize matrix for preposterior of total basis functions
+  x <- matrix(NA, n_row_x, n_col_x)
+  x[, 1] <- 1
+
+  for (k in 1:n_smooth) {
     klab <- substr(object$smooth[[k]]$label, 1, 1)
-    if (klab == "s"){
-      Xfrag <- Predict.smooth.ga(object$smooth[[k]], data, v.ga[k])
+    if (klab == "s") {
+      x_frag <- predict_smooth_ga(object$smooth[[k]], param_vals, vrf[k])
     } else {
-      Xfrag <- Predict.matrix.tensor.smooth.ga(object$smooth[[k]], data, v.ga)
+      x_frag <- predict_matrix_tensor_smooth_ga(object$smooth[[k]], param_vals, vrf)
     }
-    X[, object$smooth[[k]]$first.para:object$smooth[[k]]$last.para] <- Xfrag
+    x[, object$smooth[[k]]$first.para:object$smooth[[k]]$last.para] <- x_frag
   }
 
-  ### Coefficients of GAM model
-  Beta <- coef(object)
+  # Coefficients of GAM model
+  beta <- coef(object)
 
-  ### Compute conditional Loss
-  Ltilde <- X %*% Beta
+  # Compute conditional Loss
+  l_tilde <- x %*% beta
 
-  return(Ltilde)
+  return(l_tilde)
   }
 
+#' Function to compute the preposterior for each of the
+#' basis functions of a smooth for one parameter
+#'
+#' @keywords internal
+#'
 #' @importFrom mgcv PredictMat
-Predict.smooth.ga <- function (object, data, v.ga = 1) {
-  #### Function to compute the preposterior for each of the
-  #### basis functions of a smooth for one parameter
+predict_smooth_ga <- function (object, param_vals, vrf = 1) {
+  # Produce basis functions for one parameter
+  x <- PredictMat(object, param_vals)
 
-  ### Produce basis functions for one parameter
-  X <- PredictMat(object, data) # ‘mgcv’ version 1.8-17
-  ## Number of observations
-  n.obs <- nrow(X)
+  # Number of observations
+  n_obs <- nrow(x)
 
-  ### Apply variance reduction to compute the preposterior
-  ### for each of the basis functions
-  ## Vector of ones
-  ones <- matrix(1, n.obs, 1)
-  ## Compute phi on each of the basis function
-  X.ga <- v.ga*X + (1-v.ga)*(ones %*% colMeans(X))
+  # Apply variance reduction to compute the preposterior
+  # for each of the basis functions
+  # Vector of ones
+  ones <- matrix(1, n_obs, 1)
 
-  return(X.ga)
+  # Compute phi on each of the basis function
+  x <- vrf * x + (1 - vrf) * (ones %*% colMeans(x))
+
+  return(x)
 }
 
-#' @importFrom mgcv tensor.prod.model.matrix
-Predict.matrix.tensor.smooth.ga <- function (object,
-                                             data,
-                                             v.ga = rep(1, ncol(data))){
-  #### Function to compute the preposterior for each of the
-  #### basis functions for one or more parameters and calculates
-  #### the tensor product if more than one parameter is selected
-  #### (Heavily based on function Predict.matrix.tensor.smooth from
-  #### mgcv package)
+#' Predict matrix tensor smooth (GA)
+#'
+#' @description
+#' Function to compute the preposterior for each of the
+#' basis functions for one or more parameters and calculates
+#' the tensor product if more than one parameter is selected
+#' (Heavily based on function Predict.matrix.tensor.smooth from
+#' mgcv package)
+#'
+#' @keywords internal
+#' @importFrom mgcv tensor.prod.model.matrix Predict.matrix PredictMat
+predict_matrix_tensor_smooth_ga <- function (object,
+                                             param_vals,
+                                             vrf = rep(1, ncol(param_vals))){
+
 
   m <- length(object$margin)
-  X <- list()
-  for (i in 1:m) { # i <- 1
+  x <- list()
+  for (i in 1:m) {
     term <- object$margin[[i]]$term
     dat <- list()
-    for (j in 1:length(term)) { # j <- 1
-      dat[[term[j]]] <- data[[term[j]]]
+    for (j in 1:length(term)) {
+      dat[[term[j]]] <- param_vals[[term[j]]]
     }
-    X[[i]] <- if (!is.null(object$mc[i])) # before: object$mc[i]
-      PredictMat(object$margin[[i]], dat, n = length(dat[[1]])) # ‘mgcv’ version 1.8-17
-    else Predict.matrix(object$margin[[i]], dat)
-    n.obs <- nrow(X[[i]])
-  } # end for 'i'
+    x[[i]] <- if (!is.null(object$mc[i])) {
+      PredictMat(object$margin[[i]], dat, n = length(dat[[1]]))
+    } else {
+      Predict.matrix(object$margin[[i]], dat)
+    }
+    n_obs <- nrow(x[[i]])
+  }
   mxp <- length(object$XP)
-  if (mxp > 0)
-    for (i in 1:mxp) if (!is.null(object$XP[[i]]))
-      X[[i]] <- X[[i]] %*% object$XP[[i]]
-
-  ### Apply variance reduction to compute the preposterior
-  ### for each of the basis functions
-  ## Vector of ones
-  ones <- matrix(1, n.obs, 1)
-  ## Initialize and fill list with preposterior of basis functions
-  ## for each parameter
-  X.ga <- list()
-  for (i in 1:m) { # i <- 1
-    X.ga[[i]] <- v.ga[i]*X[[i]] + (1-v.ga[i])*(ones %*% colMeans(X[[i]]))
+  if (mxp > 0) {
+    for (i in 1:mxp) if (!is.null(object$XP[[i]])) {
+      x[[i]] <- x[[i]] %*% object$XP[[i]]
+    }
   }
 
-  ### Compute tensor product
-  T.ga <- tensor.prod.model.matrix(X.ga) # ‘mgcv’ version 1.8-17
+  # Apply variance reduction to compute the preposterior
+  # for each of the basis functions
+  # Vector of ones
+  ones <- matrix(1, n_obs, 1)
 
-  return(T.ga)
+  # Initialize and fill list with preposterior of basis functions
+  # for each parameter
+  x_ga <- list()
+  for (i in 1:m) {
+    x_ga[[i]] <- vrf[i] * x[[i]] + (1 - vrf[i]) * (ones %*% colMeans(x[[i]]))
+  }
+
+  # Compute tensor product
+  t_ga <- tensor.prod.model.matrix(x_ga)
+
+  return(t_ga)
 }

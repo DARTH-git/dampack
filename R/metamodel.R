@@ -14,7 +14,7 @@
 #'
 #' @param analysis either "oneway" or "twoway"
 #' @param psa psa object
-#' @param parms String with the name of the parameter of interest
+#' @param parms String vector with the name(s) of the parameter of interest. Defaults to all.
 #' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
 #' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 #' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
@@ -92,7 +92,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
     for (p in parms) {
       # loop over strategies
       for (s in strategies) {
-        mod <- mm_run_reg(s, p, dat, pnames, type, poly.order, k)
+        mod <- mm_run_reg(s, p, dat, type, poly.order, k)
         mod$parm_of_int <- p
         mod$strat <- s
         lms[[p]][[s]] <- mod
@@ -102,7 +102,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   if (analysis == "twoway" | analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
-      mod <- mm_run_reg(s, parms, dat, pnames, type, poly.order, k)
+      mod <- mm_run_reg(s, parms, dat, type, poly.order, k)
       # for accessing later in predict
       mod$parm_of_int <- parms
       mod$strat <- s
@@ -127,7 +127,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 #' @importFrom mgcv gam
 #' @keywords internal
 #' @inheritParams metamodel
-mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
+mm_run_reg <- function(dep, parms, dat, type, poly.order, k) {
   n_parms <- length(parms)
 
   if (type == "linear") {
@@ -135,8 +135,8 @@ mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
     ## dependent variable
     fdep <- paste0(dep, " ~ ")
 
-    ## parameters
-    fparm <- paste(all_parms, collapse = " + ")
+    ## parameter of interest
+    fparm <- parms
 
     ## combine
     f <- as.formula(paste0(fdep, fparm))
@@ -152,16 +152,11 @@ mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
 
     ## parameters of interest
     fparm <- ""
-    for (p in parms) {
-      fparm <- paste0(fparm, "poly(", p, ",", poly.order, ", raw=TRUE) + ")
-    }
-
-    ## other parameters
-    other_parms <- all_parms[-match(parms, all_parms)]
-    fend <- paste(other_parms, collapse = " + ")
+    list_of_ps <- lapply(parms, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
+    fparm <- paste(list_of_ps, collapse = " + ")
 
     ## combine
-    f <- as.formula(paste0(fbeg, fparm, fend))
+    f <- as.formula(paste0(fbeg, fparm))
 
     # run metamodel
     metamod <- lm(f, data = dat)

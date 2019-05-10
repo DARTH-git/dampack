@@ -4,16 +4,14 @@
 \alias{mm_run_reg}
 \title{Build formula and run linear regression for metamodel}
 \usage{
-mm_run_reg(dep, parms, dat, all_parms, type, poly.order, k)
+mm_run_reg(dep, parms, dat, type, poly.order, k)
 }
 \arguments{
 \item{dep}{dependent variable in regression}
 
-\item{parms}{String with the name of the parameter of interest}
+\item{parms}{String vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{dat}{data to use in regression}
-
-\item{all_parms}{all parms in PSA}
 
 \item{type}{type of metamodel}
 
@@ -26,6 +24,8 @@ Default: 2}
     null space of the penalty for the term (see
     \code{\link{null.space.dimension}}), but will be reset if
   it is. See \code{\link{choose.k}} for further information.}
+
+\item{all_parms}{all parms in PSA}
 }
 \description{
 Build formula and run linear regression for metamodel

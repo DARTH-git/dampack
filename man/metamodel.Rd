@@ -14,7 +14,7 @@ metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
 
 \item{psa}{psa object}
 
-\item{parms}{String with the name of the parameter of interest}
+\item{parms}{String vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 

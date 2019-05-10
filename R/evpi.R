@@ -39,14 +39,8 @@ calc_evpi <- function(wtp, psa, pop = 1) {
   evpi <- rep(0, n_wtps)
   # Estimate the Loss matrix and EVPI at each WTP threshold
   for (l in 1:n_wtps){
-    # Compute NMB at wtp[l]
-    nmb <-  wtp[l] * effectiveness - cost
-
-    ## Find the optimal strategy with current info
-    d.star <- which.max(colMeans(nmb))
-
     ## Calculate the opportunity loss from choosing d.star for each strategy
-    loss <- nmb - nmb[, d.star]
+    loss <- calculate_outcome("nmb_loss", cost, effectiveness, wtp[l])
 
     ## Compute EVPI
     evpi[l] <- mean(apply(loss, 1, max)) * pop

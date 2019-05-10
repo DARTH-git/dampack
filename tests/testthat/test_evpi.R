@@ -32,8 +32,9 @@ test_that("return object has column names WTP and EVPI", {
 # calculation
 test_that("evpi is what we'd expect", {
   nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$cost
-  d.star <- which.max(colMeans(nmb))
-  loss <- nmb - nmb[, d.star]
+  n_sim <- nrow(example_psa$cost)
+  max_str <- max.col(nmb)
+  loss <-  nmb[cbind(1:n_sim, max_str)] - nmb
   evpi <- mean(apply(loss, 1, max))
   expect_equal(evpi, evpi_obj[1, 2])
 })

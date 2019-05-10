@@ -4,8 +4,8 @@
 \alias{owsa_det}
 \title{Compute one-way sensitivity analysis (OWSA)}
 \usage{
-owsa_det(parms, pars_df, nsamps = 100, FUN, outcome, outcome_type,
-  strategies = NULL, ...)
+owsa_det(parms = NULL, pars_df, nsamps = 100, FUN, outcome,
+  outcome_type = "eff", strategies = NULL, ...)
 }
 \arguments{
 \item{parms}{Vector with strings with the name of the parameters of interest}
@@ -18,7 +18,8 @@ determined by \code{nsamp}}
 used}
 
 \item{FUN}{Function that takes the basecase in \code{pars_df} and \code{...} to
-produce the \code{outcome} of interest}
+produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
+where the first column are the strategy names and the rest of the columns must be outcomes.}
 
 \item{outcome}{String with the outcome of interest produced by \code{nsamp}}
 
@@ -53,9 +54,6 @@ Users only need to provide the "min" and "max" of the parameters of interest.
 For the rest of the parameter inputs into the user defined function,
 "min" and "max" can be any value or \code{NA} but these values are not evaluated in
 \code{owsa_det}}
-\item \code{FUN} must return a dataframe where the first column are the strategy names
-and the rest of the columns must be outcomes.
 }
 }
 
-\keyword{owsa}

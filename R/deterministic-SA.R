@@ -82,7 +82,7 @@ owsa_det <- function(parms = NULL, pars_df, nsamps = 100, FUN, outcome,
 
   userfun <- do.call(FUN, fun_input_ls)
   if (is.null(strategies)){
-    strategies <- as.character(userfun[, 1])
+    strategies <- paste0("st_", userfun[, 1])
   }
 
   if (!is.data.frame(userfun)) {
@@ -229,7 +229,7 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
 
   userfun <- do.call(FUN, fun_input_ls)
   if (is.null(strategies)){
-    strategies <- as.character(userfun[, 1])
+    strategies <- paste0("st_", userfun[, 1])
   }
 
   if (!is.data.frame(userfun)) {

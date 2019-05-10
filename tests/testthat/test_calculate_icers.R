@@ -57,3 +57,16 @@ test_that("custom reference strategy", {
   expect_equal(cea$Strategy[1], "No Treat")
   }
 )
+
+# one strategy
+test_that("one strategy runs", {
+  cea <- calculate_icers(1, 2, "s")
+  exp_df <- data.frame("Strategy" = "s",
+                       "Cost" = 1,
+                       "Effect" = 2,
+                       "ICER" = NA,
+                       "Inc_Cost" = NA,
+                       "Inc_Effect" = NA,
+                       stringsAsFactors = FALSE)
+  expect_equal(cea, exp_df)
+})

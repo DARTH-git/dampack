@@ -75,6 +75,12 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
                    stringsAsFactors = FALSE)
   nstrat <- nrow(df)
 
+  # if only one strategy was provided, return df with NAs for incremental
+  if (nstrat == 1) {
+    df[, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
+    return(df)
+  }
+
   # three statuses: dominated, extended dominated, and non-dominated
   d <- NULL
 

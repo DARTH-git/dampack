@@ -178,7 +178,9 @@ mm_run_reg <- function(dep, parms, dat, all_parms, type, poly.order, k) {
         fparm <- paste0(fparm, "s(", p, ", k=", k, ")")
       }
       # add interactions
-      fparm <- paste0("ti(", paste(parms, collapse = ", "), ", k = ", k, ")")
+      ## the default for k in interactions is NA
+      k_ti <- ifelse(k == -1, NA, k)
+      fparm <- paste0("ti(", paste(parms, collapse = ", "), ", k = ", k_ti, ")")
     }
 
     f <- as.formula(paste0(fbeg, fparm))

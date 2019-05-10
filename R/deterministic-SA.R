@@ -10,15 +10,14 @@
 #' @param nsamps number of parameter values. If \code{NULL}, 100 parameter values are
 #' used
 #' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
-#' produce the \code{outcome} of interest
+#' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
+#' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcome String with the outcome of interest produced by \code{nsamp}
 #' @param outcome_type The type of outcome is either "eff" or "cost". The default
 #' outcome_type is "eff"
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
 #' @param ... Additional arguments to user-defined \code{FUN}
-#'
-#' @keywords owsa
 #'
 #' @return A dataframe with the results of the sensitivity analysis. Can be
 #' visualized with \code{plot.owsa}, \code{owsa_opt_strat} and
@@ -37,22 +36,20 @@
 #' For the rest of the parameter inputs into the user defined function,
 #' "min" and "max" can be any value or \code{NA} but these values are not evaluated in
 #' \code{owsa_det}}
-#' \item \code{FUN} must return a dataframe where the first column are the strategy names
-#' and the rest of the columns must be outcomes.
 #' }
 #'
 #' @export
-owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
-                     outcome_type, strategies = NULL, ...){
-  # Check for errors
-  if (missing(FUN)) stop("FUN is missing")
+owsa_det <- function(parms = NULL, pars_df, nsamps = 100, FUN, outcome,
+                     outcome_type = "eff", strategies = NULL, ...){
 
-  if (missing(parms)) {
+  if (is.null(parms)) {
     parms <- as.character(pars_df[, 1])
     warning("assuming the pars in pars_df are the parameters of interest")
   }
 
   if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+
+  if (ncol(pars_df) != 4) stop("pars_df must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
 
   params_basecase <- pars_df[, 2]
   names(params_basecase) <- as.character(pars_df[, 1])
@@ -64,7 +61,7 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
   }
 
   if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
-    stop("basecase, min and maximum in pars_df must be numeric")
+    stop("basecase, min and max in pars_df must be numeric")
   }
 
   ix <- match(parms, pars_df$pars)
@@ -76,25 +73,29 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
   names(pars_df) <- c("pars", "basecase", "min", "max")
 
   jj <- tryCatch({
-    funtest <- do.call(FUN, fun_input_ls)
+    userfun <- do.call(FUN, fun_input_ls)
   },
   error = function(e) NA)
   if (is.na(sum(is.na(jj)))) {
     stop("FUN is not well defined by 'params_basecase' and ...")
   }
 
-  funtest <- do.call(FUN, fun_input_ls)
+  userfun <- do.call(FUN, fun_input_ls)
   if (is.null(strategies)){
-    strategies <- as.character(funtest[, 1])
+    strategies <- as.character(userfun[, 1])
   }
 
-  if (length(strategies) != length(funtest[, 1])){
+  if (!is.data.frame(userfun)) {
+    stop("FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
+  }
+
+  if (length(strategies) != length(userfun[, 1])){
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
   if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
 
-  v_outcomes <- colnames(funtest)[-1]
+  v_outcomes <- colnames(userfun)[-1]
 
   if (!(outcome %in% v_outcomes)){
     stop("outcome is not in FUN outcomes")
@@ -157,15 +158,14 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
 #' @param nsamps number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
 #' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
-#' produce the \code{outcome} of interest
+#' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
+#' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcome String with the outcome of interest produced by \code{nsamp}
 #' @param outcome_type The type of outcome is either "eff" or "cost". The default
 #' outcome_type is "eff"
 #' @param strategies vector of strategy names. The default (NULL) will use
 #' strategy names in FUN
 #' @param ... Additional arguments to user-defined \code{FUN}
-#'
-#' @keywords twsa
 #'
 #' @return A dataframe with the results of the sensitivity analysis. Can be
 #' visualized with ??
@@ -183,19 +183,15 @@ owsa_det <- function(parms, pars_df, nsamps = 100, FUN, outcome,
 #' For the rest of the parameter inputs into the user defined function,
 #' "min" and "max" can be any value or \code{NA} but these values are not evaluated in
 #' \code{twsa_det}}
-#' \item \code{FUN} must return a dataframe where the first column are the strategy names
-#' and the rest of the columns must be outcomes.
 #' }
 #'
 #' @export
 twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
                      outcome_type = "eff", strategies = NULL, ...){
 
-  if (missing(FUN)) stop("FUN is missing")
-
-  if (missing(parm1) | missing(parm2)) stop("parm1 and parm2 should be provided")
-
   if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+
+  if (ncol(pars_df) != 4) stop("pars_df must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
 
   poi <- unique(c(parm1, parm2))
   params_basecase <- pars_df[, 2]
@@ -212,7 +208,7 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   }
 
   if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
-    stop("basecase, min and maximum in pars_df must be numeric")
+    stop("basecase, min and max in pars_df must be numeric")
   }
 
   ix <- match(poi, pars_df$pars)
@@ -224,25 +220,29 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   names(pars_df) <- c("pars", "basecase", "min", "max")
 
   jj <- tryCatch({
-    funtest <- do.call(FUN, fun_input_ls)
+    userfun <- do.call(FUN, fun_input_ls)
   },
   error = function(e) NA)
   if (is.na(sum(is.na(jj)))){
     stop("FUN is not well defined by the basecase parameter values and ...")
   }
 
-  funtest <- do.call(FUN, fun_input_ls)
+  userfun <- do.call(FUN, fun_input_ls)
   if (is.null(strategies)){
-    strategies <- as.character(funtest[, 1])
+    strategies <- as.character(userfun[, 1])
   }
 
-  if (length(strategies) != length(funtest[, 1])){
+  if (!is.data.frame(userfun)) {
+    stop("FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
+  }
+
+  if (length(strategies) != length(userfun[, 1])){
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
   if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
 
-  v_outcomes <- colnames(funtest)[-1]
+  v_outcomes <- colnames(userfun)[-1]
 
   if (!(outcome %in% v_outcomes)){
     stop("outcome is not part of FUN outcomes")
@@ -281,6 +281,16 @@ twsa_det <- function(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
   return(twsa_out)
 }
 
+
+#' Wrapper function for owsa_det and twsa_det
+#'
+#' @param x iteration
+#' @param user_fun \code{FUN} input from users
+#' @param parm_name user-defined list of parameters of interest
+#' @param tmp_input basecase values
+#' @param tmp_replace values from predetermined PSA samples that will replace some values in \code{tmp_input}
+#'
+#' @keywords internal
 wrapper_of_user_model <- function(x, user_fun, parm_name,
                                   tmp_input, tmp_replace) {
   tmp_input[[1]][parm_name] <- tmp_replace[x, parm_name]

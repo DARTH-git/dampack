@@ -13,7 +13,7 @@
 \item{maximize}{If \code{TRUE}, plot of strategy with maximum expected outcome
 (default); if \code{FALSE}, plot of strategy with minimum expected outcome}
 
-\item{col}{either full color or black and white}
+\item{col}{either none, full color, or black and white}
 
 \item{n_x_ticks}{number of axis ticks}
 
@@ -21,7 +21,8 @@
 
 \item{txtsize}{base text size}
 
-\item{...}{further arguments to plot (not used)}
+\item{...}{further arguments to plot.
+This is not used by \code{dampack} but required for generic consistency.}
 }
 \description{
 Two-way sensitivity analysis plot

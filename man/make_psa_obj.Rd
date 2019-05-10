@@ -24,7 +24,7 @@ The column names should be the parameter names.}
 \item{strategies}{Vector with the names of the strategies. Due to requirements in
 certain uses of this vector, this function uses \code{\link{make.names}} to modify
 strategy names as necessary. It is strongly suggested that you follow the rules
-in the \code{\link{make.names}} help, to avoid unexpected errors.}
+in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }

@@ -1,4 +1,3 @@
-
 #' Estimation of the Expected Value of Partial Perfect Information (EVPPI)
 #' using a linear regression metamodel approach
 #'
@@ -8,12 +7,16 @@
 #'
 #' @param psa object of class psa, produced by \code{\link{make_psa_obj}}
 #' @param wtp willingness-to-pay threshold
-#' @param parms parameters for which to analyze the EVPPI
-#' @param outcome either net monetary benefit or net health benefit
-#' @param type either generalized additive models ("gam") or
-#' polynomial models ("poly")
-#' @param poly.order order of the polynomial, if type = "poly"
-#' @param k basis dimension, if type = "gam"
+#' @param parms A vector of parameters for which to analyze the EVPPI.
+#' @param outcome either net monetary benefit (\code{"nmb_loss"})
+#' or net health benefit (\code{"nhb_loss"})
+#' @param type either generalized additive models (\code{"gam"}) or
+#' polynomial models (\code{"poly"})
+#' @param poly.order order of the polynomial, if \code{type == "poly"}
+#' @param k basis dimension, if \code{type == "gam"}
+#'
+#' @return evppi A numeric vector of size one with the EVPPI of the selected
+#' parameters
 #'
 #' @details
 #' The expected value of partial pefect information (EVPPI) is the expected
@@ -45,8 +48,7 @@
 #' \deqn{EVPPI_{\theta_I} = \frac{1}{K}\sum_{i=1}^{K}\max_d(\hat{L}_d)}
 #' The spline model in step 3 is fitted using the `mgcv` package.
 #' }
-#' @return evppi A numeric vector of size one with the EVPPI of the selected
-#' parameters
+
 #' @references
 #' \enumerate{
 #' \item Jalal H, Alarid-Escudero F. A General Gaussian Approximation Approach

@@ -1,3 +1,11 @@
+#' A function that is used to calculate all outcomes
+#'
+#' @param outcome choice of outcome
+#' @param cost data frame with costs
+#' @param effect data frame with effects
+#' @param wtp willingness-to-pay threshold
+#'
+#' @keywords internal
 calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss", "nmb_loss"),
                               cost, effect, wtp) {
   outcome <- match.arg(outcome)
@@ -7,6 +15,7 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
     y <- cost
   } else {
     if (is.null(wtp)) {
+      # the call. = FALSE makes the error message more clear
       stop("wtp must be provided for NHB and NMB",  call. = FALSE)
     }
     if (is.null(cost)) {

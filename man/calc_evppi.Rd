@@ -13,16 +13,17 @@ calc_evppi(psa, wtp, parms = NULL, outcome = c("nmb_loss", "nhb_loss"),
 
 \item{wtp}{willingness-to-pay threshold}
 
-\item{parms}{parameters for which to analyze the EVPPI}
+\item{parms}{A vector of parameters for which to analyze the EVPPI.}
 
-\item{outcome}{either net monetary benefit or net health benefit}
+\item{outcome}{either net monetary benefit (\code{"nmb_loss"})
+or net health benefit (\code{"nhb_loss"})}
 
-\item{type}{either generalized additive models ("gam") or
-polynomial models ("poly")}
+\item{type}{either generalized additive models (\code{"gam"}) or
+polynomial models (\code{"poly"})}
 
-\item{poly.order}{order of the polynomial, if type = "poly"}
+\item{poly.order}{order of the polynomial, if \code{type == "poly"}}
 
-\item{k}{basis dimension, if type = "gam"}
+\item{k}{basis dimension, if \code{type == "gam"}}
 }
 \value{
 evppi A numeric vector of size one with the EVPPI of the selected

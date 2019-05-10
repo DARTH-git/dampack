@@ -16,8 +16,10 @@
 #' @param psa psa object
 #' @param parms String with the name of the parameter of interest
 #' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
-#' @param outcome either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")
-#' @param wtp if outcome is NHB or NMB, must provide the willingness-to-pay threshold
+#' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
+#' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
+#' NMB ("nhb_loss" and "nmb_loss", respectively)
+#' @param wtp if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold
 #' @param type type of metamodel
 #' @param poly.order Order of polynomial for the linear regression metamodel.
 #' Default: 2

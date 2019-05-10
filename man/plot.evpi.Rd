@@ -34,7 +34,8 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 
 \item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
-\item{...}{further arguments to plot (not used)}
+\item{...}{further arguments to plot.
+This is not used by \code{dampack} but required for generic consistency.}
 }
 \value{
 A \code{ggplot2} plot with the EVPI

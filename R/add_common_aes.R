@@ -1,10 +1,9 @@
-
 #' Adds aesthetics to all plots to reduce code duplication
 #'
 #' @param gplot a ggplot object
 #' @param txtsize base text size
 #' @param scale_name how to name scale. Default inherits from variable name.
-#' @param col either full color or black and white
+#' @param col either none, full color, or black and white
 #' @param col_aes which aesthetics to modify with \code{col}
 #' @param lval color lightness - 0 to 100
 #' @param greystart between 0 and 1. used in greyscale only. smaller numbers are lighter
@@ -18,7 +17,8 @@
 #' @param xexpand,yexpand Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
 #' The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
 #' to see how to modify this.
-#' @param ... further arguments to plot (not used)
+#' @param ... further arguments to plot.
+#' This is not used by \code{dampack} but required for generic consistency.
 #'
 #' @import ggplot2
 #' @keywords internal

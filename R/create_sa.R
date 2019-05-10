@@ -4,8 +4,10 @@
 #' and \code{\link{create_dsa_oneway}}, and checks the structure of
 #' each of the arguments before creating an SA object.
 #'
-#' @param parameters Data frame with parameter values for each model run.
-#' @param parnames names for the parameters
+#' @param parameters A data frame with parameter values for each model run. Each
+#' column should represent a different parameter, and each row should represent a
+#' simulation (in the same order as \code{cost} and \code{effectiveness})
+#' @param parnames names for the parameters.
 #' @param cost,effectiveness Data frames containing costs and effectiveness data, respectively.
 #' Each simulation should be a row of the data frame, and each strategy should be a column.
 #' Naming the columns of the data frames is not necessary, as they will be renamed with
@@ -13,7 +15,7 @@
 #' @param strategies Vector with the names of the strategies. Due to requirements in
 #' certain uses of this vector, this function uses \code{\link{make.names}} to modify
 #' strategy names as necessary. It is strongly suggested that you follow the rules
-#' in the \code{\link{make.names}} help, to avoid unexpected errors.
+#' in the \code{\link{make.names}} help page, to avoid unexpected errors.
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'

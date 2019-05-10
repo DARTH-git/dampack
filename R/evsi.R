@@ -31,10 +31,10 @@ calc_evsi <- function(psa,
   # predict from the regression models
   predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
-  # bind the columns to get a dataframe, and multiply by -1 to get losses positive
-  predicted_loss_df <- -1 * bind_cols(predicted_loss_list)
+  # bind the columns to get a dataframe
+  predicted_loss_df <- bind_cols(predicted_loss_list)
 
-  # calculate the evppi as the average of the row maxima
+  # calculate the evsi as the average of the row maxima
   row_maxes <- apply(predicted_loss_df, 1, max)
   evsi <- mean(row_maxes)
 

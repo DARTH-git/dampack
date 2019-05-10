@@ -11,10 +11,11 @@ calculate_icers(cost, effect, strategies, ref_strat = NULL)
 
 \item{effect}{vector of effect for each strategy}
 
-\item{strategies}{character vector of strategy names}
+\item{strategies}{string vector of strategy names}
 
 \item{ref_strat}{reference strategy for the incremental comparison.
-the default (NULL) is the cheapest strategy.}
+With the default (NULL), there is no reference strategy, and the strategies
+are ranked in ascending order of cost.}
 }
 \value{
 A data frame and \code{icers} object of strategies and their associated

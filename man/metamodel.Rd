@@ -4,27 +4,37 @@
 \alias{metamodel}
 \title{Linear regression metamodeling}
 \usage{
-metamodel(analysis = c("oneway", "twoway"), psa, parms = NULL,
-  strategies = NULL, outcome = c("eff", "cost", "nhb", "nmb"),
-  wtp = NULL, type = "poly", poly.order = 2)
+metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
+  parms = NULL, strategies = NULL, outcome = c("eff", "cost", "nhb",
+  "nmb", "nhb_loss", "nmb_loss"), wtp = NULL, type = c("linear", "gam",
+  "poly"), poly.order = 2, k = -1)
 }
 \arguments{
 \item{analysis}{either "oneway" or "twoway"}
 
 \item{psa}{psa object}
 
-\item{parms}{String with the name of the parameter of interest}
+\item{parms}{String vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
-\item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
+\item{outcome}{either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
+net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
+NMB ("nhb_loss" and "nmb_loss", respectively)}
 
-\item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
+\item{wtp}{if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold}
 
 \item{type}{type of metamodel}
 
 \item{poly.order}{Order of polynomial for the linear regression metamodel.
 Default: 2}
+
+\item{k}{ the dimension of the basis used to represent the smooth term.
+    The default depends on the number of variables that the smooth is a
+    function of. \code{k} should not be less than the dimension of the
+    null space of the penalty for the term (see
+    \code{\link{null.space.dimension}}), but will be reset if
+  it is. See \code{\link{choose.k}} for further information.}
 }
 \value{
 A metamodel object, which contains a list of metamodels and other relevant information.

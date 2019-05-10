@@ -31,7 +31,8 @@ which determines the number of rows and columns automatically.}
 
 \item{n_y_ticks}{number of axis ticks}
 
-\item{...}{further arguments to plot (not used)}
+\item{...}{further arguments to plot.
+This is not used by \code{dampack} but required for generic consistency.}
 }
 \description{
 Plot a sensitivity analysis

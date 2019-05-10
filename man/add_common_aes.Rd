@@ -18,7 +18,7 @@ add_common_aes(gplot, txtsize, scale_name = waiver(), col = c("none",
 
 \item{scale_name}{how to name scale. Default inherits from variable name.}
 
-\item{col}{either full color or black and white}
+\item{col}{either none, full color, or black and white}
 
 \item{col_aes}{which aesthetics to modify with \code{col}}
 
@@ -43,7 +43,8 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
 to see how to modify this.}
 
-\item{...}{further arguments to plot (not used)}
+\item{...}{further arguments to plot.
+This is not used by \code{dampack} but required for generic consistency.}
 }
 \description{
 Adds aesthetics to all plots to reduce code duplication

@@ -7,13 +7,16 @@
 create_sa(parameters, parnames, effectiveness, strategies, cost, currency)
 }
 \arguments{
-\item{parameters}{Data frame with parameter values for each model run.}
+\item{parameters}{A data frame with parameter values for each model run. Each
+column should represent a different parameter, and each row should represent a
+simulation (in the same order as \code{cost} and \code{effectiveness})}
 
-\item{parnames}{names for the parameters}
+\item{parnames}{names for the parameters.}
 
-\item{strategies}{#' Vector with the names of the strategies. Due to requirements in
-certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
-with a warning.}
+\item{strategies}{Vector with the names of the strategies. Due to requirements in
+certain uses of this vector, this function uses \code{\link{make.names}} to modify
+strategy names as necessary. It is strongly suggested that you follow the rules
+in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
 \item{cost, effectiveness}{Data frames containing costs and effectiveness data, respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.

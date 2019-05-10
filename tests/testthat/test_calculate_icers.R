@@ -26,7 +26,7 @@ test_that("calculate_icers returns correct object", {
                             "Inc_Cost" = c(NA, 5000, 25000, 20000, NA, NA),
                             "Inc_Effect" = c(NA, 1, 2, 1, NA, NA),
                             "ICER" = c(NA, 5000, 12500, 20000, NA, NA),
-                            "Status" = c("ref", "ND", "ND", "ND", "ED", "D"),
+                            "Status" = c("ND", "ND", "ND", "ND", "ED", "D"),
                             stringsAsFactors = FALSE)
   class(expected_df) <- c("icers", "data.frame")
   expect_equal(expected_df, icer)
@@ -57,3 +57,16 @@ test_that("custom reference strategy", {
   expect_equal(cea$Strategy[1], "No Treat")
   }
 )
+
+# one strategy
+test_that("one strategy runs", {
+  cea <- calculate_icers(1, 2, "s")
+  exp_df <- data.frame("Strategy" = "s",
+                       "Cost" = 1,
+                       "Effect" = 2,
+                       "ICER" = NA,
+                       "Inc_Cost" = NA,
+                       "Inc_Effect" = NA,
+                       stringsAsFactors = FALSE)
+  expect_equal(cea, exp_df)
+})

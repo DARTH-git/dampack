@@ -20,7 +20,7 @@ ranges of parameters for which each strategy is optimal.}
 \item{plot_const}{whether to plot parameters that don't lead to
 changes in optimal strategy as they vary.}
 
-\item{col}{either full color or black and white}
+\item{col}{either none, full color, or black and white}
 
 \item{greystart}{between 0 and 1. used in greyscale only. smaller numbers are lighter}
 

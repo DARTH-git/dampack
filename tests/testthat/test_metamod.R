@@ -24,12 +24,33 @@ test_that("metamodel object has correct classes", {
 
 test_that("metamodel with one outcome", {
   # metamodel
-  mm <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo")
-  expect_is(mm, "metamodel")
+  ## linear
+  mm_lin <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo")
+  expect_is(mm_lin, "metamodel")
 
   # predictions
-  pred <- predict(mm)
-  expect_equal(colnames(pred),
+  pred_lin <- predict(mm_lin)
+  expect_equal(colnames(pred_lin),
+               c("parameter", "strategy", "param_val", "outcome_val"))
+
+  ## poly
+  mm_poly <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo",
+                  type = "poly")
+  expect_is(mm_poly, "metamodel")
+
+  # predictions
+  pred_poly <- predict(mm_poly)
+  expect_equal(colnames(pred_poly),
+               c("parameter", "strategy", "param_val", "outcome_val"))
+
+  ## GAM
+  mm_gam <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo",
+                  type = "gam")
+  expect_is(mm_gam, "metamodel")
+
+  # predictions
+  pred_gam <- predict(mm_gam)
+  expect_equal(colnames(pred_gam),
                c("parameter", "strategy", "param_val", "outcome_val"))
 })
 

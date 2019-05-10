@@ -52,7 +52,11 @@ to see how to modify this.}
 The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
 to see how to modify this.}
 
-\item{...}{further arguments to plot (not used)}
+\item{...}{further arguments to plot.
+This is not used by \code{dampack} but required for generic consistency.}
+}
+\value{
+a ggplot2 object which can be modified by adding additional geoms
 }
 \description{
 Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}

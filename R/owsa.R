@@ -14,7 +14,7 @@
 #'
 #' @export
 owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
-                 outcome = c("eff", "cost", "nhb", "nmb"),
+                 outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
@@ -22,7 +22,7 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
   if (inherits(sens, "psa")) {
     # create metamodel
     mm <- metamodel("oneway", sens, parms,
-                  strategies, outcome, wtp, poly.order)
+                    strategies, outcome, wtp, "poly", poly.order)
 
     # predict outcomes using predict.metamodel
     ow <- predict(mm, ranges, nsamps)

@@ -21,9 +21,10 @@ the \code{strategies} vector.}
 \item{parameters}{Data frame with values for each simulation (rows) and parameter (columns).
 The column names should be the parameter names.}
 
-\item{strategies}{#' Vector with the names of the strategies. Due to requirements in
-certain uses of this vector, all spaces in the strategy names will be replaced with an underscore
-with a warning.}
+\item{strategies}{Vector with the names of the strategies. Due to requirements in
+certain uses of this vector, this function uses \code{\link{make.names}} to modify
+strategy names as necessary. It is strongly suggested that you follow the rules
+in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }

@@ -42,8 +42,12 @@ test_that("psa: missing strategies", {
 ## replacing spaces in strategies with underscores
 sm_str_space <- c("test", "no test", "treat")
 test_that("fix strategy", {
-  expect_warning(make_psa_obj(sm_costs, sm_effectiveness,
-                              sm_parameters, sm_str_space), "no_test")
+  # should produce a warning
+  psa_space <- expect_warning(make_psa_obj(sm_costs, sm_effectiveness,
+                              sm_parameters, sm_str_space), "no.test")
+  # correct strategies
+  expect_true("no.test" %in% psa_space$strategies)
+  expect_false("no test" %in% psa_space$strategies)
 })
 
 ## methods

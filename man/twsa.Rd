@@ -5,8 +5,8 @@
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
 twsa(sens, parm1 = NULL, parm2 = NULL, ranges = NULL, nsamp = 100,
-  outcome = c("eff", "cost", "nhb", "nmb"), wtp = NULL,
-  strategies = NULL, poly.order = 2)
+  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
+  wtp = NULL, strategies = NULL, poly.order = 2)
 }
 \arguments{
 \item{sens}{sensitivity analysis object;
@@ -24,9 +24,11 @@ from this range is determined by \code{nsamp}.}
 
 \item{nsamp}{number of samples from ranges}
 
-\item{outcome}{either effectiveness ("eff"), cost, net health benefit ("nhb"), or net monetary benefit ("nmb")}
+\item{outcome}{either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
+net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
+NMB ("nhb_loss" and "nmb_loss", respectively)}
 
-\item{wtp}{if outcome is NHB or NMB, must provide the willingness-to-pay threshold}
+\item{wtp}{if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold}
 
 \item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 

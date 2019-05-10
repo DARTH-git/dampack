@@ -13,9 +13,10 @@
 #'
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
-#' @param strategies character vector of strategy names
+#' @param strategies string vector of strategy names
 #' @param ref_strat reference strategy for the incremental comparison.
-#' the default (NULL) is the cheapest strategy.
+#' With the default (NULL), there is no reference strategy, and the strategies
+#' are ranked in ascending order of cost.
 #'
 #' @return A data frame and \code{icers} object of strategies and their associated
 #' status, incremental cost, incremental effect, and ICER.
@@ -56,14 +57,29 @@
 #' plot(icers, label = "all")
 #' @export
 calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
-  # todo: check data is in correct format
+  # checks on input
+  n_cost <- length(cost)
+  n_eff <- length(cost)
+  n_strat <- length(strategies)
+  if (n_cost != n_eff | n_eff != n_strat) {
+    stop("cost, effect, and strategies must all be vectors of the same length", call. = FALSE)
+  }
+
+  # coerce to character, in case they are provided as numeric
   char_strat <- as.character(strategies)
 
+  # create data frame to hold data
   df <- data.frame("Strategy" = char_strat,
                    "Cost" = cost,
                    "Effect" = effect,
                    stringsAsFactors = FALSE)
   nstrat <- nrow(df)
+
+  # if only one strategy was provided, return df with NAs for incremental
+  if (nstrat == 1) {
+    df[, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
+    return(df)
+  }
 
   # three statuses: dominated, extended dominated, and non-dominated
   d <- NULL
@@ -72,16 +88,19 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   # dominated strategies have a higher cost and lower effect
   df <- df %>%
     arrange(.data$Cost, desc(.data$Effect))
-  # if we want a different reference strategy aside from lowest cost
+  # if we want a reference strategy
   if (!is.null(ref_strat)) {
     if (!(ref_strat %in% df$Strategy)) {
       stop(paste0("arg ref_strat (value: ", ref_strat, ") not present in data"))
     }
+    # re-arrange to get reference strategy first
     df_ref <- filter(df, .data$Strategy == ref_strat)
     df_other <- filter(df, .data$Strategy != ref_strat)
     df <- rbind(df_ref, df_other)
   }
 
+  # iterate over strategies and detect (strongly) dominated strategies
+  # those with higher cost and equal or lower effect
   for (i in 1:(nstrat - 1)) {
     ith_effect <- df[i, "Effect"]
     for (j in (i + 1):nstrat) {
@@ -96,7 +115,7 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   # detect weakly dominated strategies (extended dominance)
   # this needs to be repeated until there are no more ED strategies
   ed <- vector()
-  continue <- TRUE
+  continue <- TRUE  # ensure that the loop is run at least once
   while (continue) {
     # vector of all dominated strategies (strong or weak)
     dom <- union(d, ed)
@@ -151,16 +170,14 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   results <- bind_rows(d_df, ed_df, nd_df_icers) %>%
     arrange(desc(.data$Status), .data$Cost, desc(.data$Effect))
 
-  # put reference at the top
-  # if we want a different reference strategy aside from lowest cost
+  # put reference at the top (if we have one)
   if (!is.null(ref_strat)) {
     results_ref <- filter(results, .data$Strategy == ref_strat)
     results_other <- filter(results, .data$Strategy != ref_strat)
     results <- rbind(results_ref, results_other)
+    # declare status as 'ref'
+    results[1, "Status"] <- "ref"
   }
-
-  # declare status for first entry to be 'ref'
-  results[1, "Status"] <- "ref"
 
   # re-arrange columns
   results <- results %>%
@@ -173,7 +190,15 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
 }
 
 
-# Source: https://miqdad.freeasinspeech.org.uk/icer_calculator/
+#' compute icers for non-dominated strategies
+#'
+#' @param non_d a data frame of non-dominated strategies, with columns
+#' "Strategy", "Cost", and "Effect"
+#'
+#' @return the input dataframe with columns "Inc_Cost",
+#' "Inc_Effect", and "ICER" appended
+#'
+#' @keywords internal
 compute_icers <- function(non_d) {
   if (nrow(non_d) > 1) {
     non_d[1, "ICER"] <- NA
@@ -185,6 +210,7 @@ compute_icers <- function(non_d) {
       non_d[i, "ICER"] <- inc_cost / inc_effect
     }
   } else {
+    # don't calculate ICER if only one strategy
     non_d[1, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
   }
   return(non_d)
@@ -203,6 +229,8 @@ compute_icers <- function(non_d) {
 #' longer strategies are truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
 #' @param alpha opacity of points
+#'
+#' @return a ggplot2 object which can be modified by adding additional geoms
 #'
 #' @importFrom stringr str_sub
 #' @export
@@ -287,6 +315,7 @@ plot.icers <- function(x,
       lab_data <- plt_data[plt_data$Status == nd_name, ]
     }
     # create nudge columns
+    # the nudging is so labels don't get cut off
     range_x <- range(lab_data[, eff_name])
     width_x <- range_x[2] - range_x[1]
 

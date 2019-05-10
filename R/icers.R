@@ -57,7 +57,15 @@
 #' plot(icers, label = "all")
 #' @export
 calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
-  # todo: check data is in correct format
+  # checks on input
+  n_cost <- length(cost)
+  n_eff <- length(cost)
+  n_strat <- length(strategies)
+  if (n_cost != n_eff | n_eff != n_strat) {
+    stop("cost, effect, and strategies must all be vectors of the same length", call. = FALSE)
+  }
+
+  # coerce to character, in case they are provided as numeric
   char_strat <- as.character(strategies)
 
   # create data frame to hold data

@@ -126,16 +126,26 @@ test_that("accurately producing warnings and errors in owsa_det", {
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
-               "basecase, min and maximum in pars_df must be numeric")
-
-  expect_error(owsa_det(parms, parms_df, nsamps = 10),
-               "FUN is missing")
+               "basecase, min and max in pars_df must be numeric")
 
   expect_error(owsa_det(parms, parms_df, nsamps = 10,
                         strategy_func, "treated", outcome_type = "eff",
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
                "outcome is not in FUN outcomes")
+
+  strategy_func2 <- function(param, state_name, cycle,
+                             mystrategy = NULL, popsize = 1000,
+                             init_state = c(1, 0, 0, 0)) {
+    input_ls <- as.list(environment())
+    output <- do.call(strategy_func, input_ls)
+    return(as.matrix(output))
+  }
+  expect_error(owsa_det(parms, parms_df, nsamps = 10,
+                        strategy_func2, outcome, outcome_type = "eff",
+                        strategies = NULL,
+                        state_name = state_name, cycle = cycle),
+               "FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
 
   tmp_strategy <- c("redInf", "incScr", "incCov")
   expect_error(owsa_det(parms, parms_df, nsamps = 10,
@@ -186,12 +196,6 @@ test_that("check output from twsa_det", {
 })
 
 test_that("checking warning error message from twsa_det", {
-  expect_error(twsa_det(parm1, parm2, parms_df, nsamps = 30,
-                        outcome = outcome, outcome_type = "eff",
-                        strategies = NULL,
-                        state_name = state_name, cycle = cycle),
-               "FUN is missing")
-
   expect_error(twsa_det(c("p_inf", "p_rec"), c("p_asymp"), parms_df, nsamps = 30,
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL, state_name = state_name, cycle = cycle),
@@ -201,4 +205,16 @@ test_that("checking warning error message from twsa_det", {
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL, state_name = state_name, cycle = cycle),
                "parm1 and parm2 should be in the parameters provided in pars_df")
+
+  strategy_func2 <- function(param, state_name, cycle,
+                             mystrategy = NULL, popsize = 1000,
+                             init_state = c(1, 0, 0, 0)) {
+    input_ls <- as.list(environment())
+    output <- do.call(strategy_func, input_ls)
+    return(as.matrix(output))
+  }
+  expect_error(twsa_det(parm1, parm2, parms_df, nsamps = 30,
+                        strategy_func2, outcome, outcome_type = "eff",
+                        strategies = NULL, state_name = state_name, cycle = cycle),
+               "FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
 })

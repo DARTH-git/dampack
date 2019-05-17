@@ -1,7 +1,8 @@
 #' Calculate the expected loss at a range of willingness-to-pay thresholds
 #'
 #' @description
-#' The expected loss is the ...
+#' The expected loss is the the quantification of the foregone benefits
+#' when choosing a suboptimal strategy given current evidence.
 #'
 #' @param wtp vector of willingness to pay thresholds
 #' @param psa object of class \code{psa}, produced by function

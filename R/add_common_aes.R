@@ -114,7 +114,6 @@ labfun <- function(x) {
 #' Function for number of ticks in axis of \code{ggplot2} plots.
 #' @param n integer giving the desired number of number of ticks in axis of
 #' \code{ggplot2} plots. Non-integer values are rounded down.
-#' @keywords internal
 #' @section Details:
 #' Based on function \code{pretty}.
 number_ticks <- function(n) {

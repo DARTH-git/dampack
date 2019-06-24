@@ -68,7 +68,7 @@ calc_evppi <- function(psa,
                        outcome = c("nmb_loss", "nhb_loss"),
                        type = c("gam", "poly"),
                        poly.order = 2,
-                       k = NA) {
+                       k = -1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)

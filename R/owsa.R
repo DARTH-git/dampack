@@ -251,6 +251,8 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
       ungroup()
   }
   opt_strat$strategy <- as.factor(opt_strat$strategy)
+  opt_strat$parameter <- factor(opt_strat$parameter, levels = unique(owsa$parameter))
+    # order parameter levels (and consequently facets of plot) to match initial user input
   g <- ggplot(opt_strat) +
     facet_wrap("parameter", scales = "free_x", ncol = facet_ncol, nrow = facet_nrow) +
     # a little bit hacky: rectangles with height 1

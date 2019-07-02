@@ -4,13 +4,16 @@
 \alias{owsa_opt_strat}
 \title{plot the optimal strategy as the parameter values change}
 \usage{
-owsa_opt_strat(owsa, maximize = TRUE, return = c("plot", "data"),
-  plot_const = TRUE, col = c("full", "bw"), greystart = 0.2,
-  greyend = 0.8, txtsize = 12, facet_ncol = 1, facet_nrow = NULL,
+owsa_opt_strat(owsa, params = NULL, maximize = TRUE,
+  return = c("plot", "data"), plot_const = TRUE, col = c("full",
+  "bw"), greystart = 0.2, greyend = 0.8, txtsize = 12,
+  facet_ncol = 1, facet_nrow = NULL, facet_lab_txtsize = NULL,
   n_x_ticks = 10)
 }
 \arguments{
 \item{owsa}{An owsa object}
+
+\item{params}{vector of parameters to plot}
 
 \item{maximize}{whether to maximize (TRUE) or minimize the outcome}
 
@@ -31,6 +34,8 @@ changes in optimal strategy as they vary.}
 \item{facet_ncol}{Number of columns in plot facet.}
 
 \item{facet_nrow}{number of rows in plot facet.}
+
+\item{facet_lab_txtsize}{text size for plot facet labels}
 
 \item{n_x_ticks}{number of axis ticks}
 }

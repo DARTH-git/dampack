@@ -16,7 +16,8 @@ calc_exp_loss(wtp, psa)
 object with classes \code{exp_loss} and \code{data.frame}
 }
 \description{
-The expected loss is the ...
+The expected loss is the the quantification of the foregone benefits
+when choosing a suboptimal strategy given current evidence.
 }
 \details{
 Visualize the expected loss at a variety of WTP thresholds using \code{\link{plot.exp_loss}}.
@@ -35,6 +36,16 @@ plot(exp_loss)
 # the y axis is on a log scale by default
 plot(exp_loss, log_y = FALSE)
 
+}
+\references{
+\enumerate{
+\item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. 
+"Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: 
+The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability 
+Curves and Frontier. Value Health. 2019;22(5):611-618.
+\item Eckermann S, Briggs A, Willan AR. Health technology assessment in the 
+cost- disutility plane. Med Decis Making. 2008;28(2):172–181.
+}
 }
 \seealso{
 \code{\link{plot.exp_loss}}, \code{\link{make_psa_obj}}

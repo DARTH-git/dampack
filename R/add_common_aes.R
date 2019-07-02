@@ -12,6 +12,7 @@
 #' @param n_x_ticks,n_y_ticks number of axis ticks
 #' @param xbreaks,ybreaks vector of axis breaks.
 #' will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.
+#' @param facet_lab_txtsize text size for plot facet labels
 #' @param xlim,ylim vector of axis limits, or NULL, which sets limits automatically
 #' @param xtrans,ytrans transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.
 #' @param xexpand,yexpand Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
@@ -39,6 +40,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                            ytrans = "identity",
                            xexpand = waiver(),
                            yexpand = waiver(),
+                           facet_lab_txtsize = NULL,
                            ...) {
   p <- gplot +
     theme_bw() +
@@ -48,7 +50,9 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
           axis.title.x = element_text(face = "bold", size = txtsize - 1),
           axis.title.y = element_text(face = "bold", size = txtsize - 1),
           axis.text.y = element_text(size = txtsize - 2),
-          axis.text.x = element_text(size = txtsize - 2))
+          axis.text.x = element_text(size = txtsize - 2),
+          strip.text.x = element_text(size = facet_lab_txtsize),
+          strip.text.y = element_text(size = facet_lab_txtsize))
 
   col <- match.arg(col)
   col_aes <- match.arg(col_aes, several.ok = TRUE)

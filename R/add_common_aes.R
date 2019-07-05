@@ -122,6 +122,6 @@ labfun <- function(x) {
 #' Based on function \code{pretty}.
 number_ticks <- function(n) {
   function(limits) {
-    pretty(limits, n+1)
+    pretty(limits, n + 1)
   }
 }

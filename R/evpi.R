@@ -43,7 +43,7 @@ calc_evpi <- function(wtp, psa, pop = 1) {
     loss <- calculate_outcome("nmb_loss", cost, effectiveness, wtp[l])
 
     ## Compute EVPI
-    evpi[l] <- mean(apply(loss, 1, max)) * pop
+    evpi[l] <- min(apply(loss, 2, mean)) * pop
   }
 
   # Data frame to store EVPI for each WTP threshold

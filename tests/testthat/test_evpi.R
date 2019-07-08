@@ -35,7 +35,7 @@ test_that("evpi is what we'd expect", {
   n_sim <- nrow(example_psa$cost)
   max_str <- max.col(nmb)
   loss <-  nmb[cbind(1:n_sim, max_str)] - nmb
-  evpi <- mean(apply(loss, 1, max))
+  evpi <- min(apply(loss, 2, mean))
   expect_equal(evpi, evpi_obj[1, 2])
 })
 

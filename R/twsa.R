@@ -4,7 +4,7 @@
 #' by estimating a linear regression metamodel of a PSA for a given
 #' decision-analytic model
 #'
-#' @param sens sensitivity analysis object;
+#' @param sa_obj sensitivity analysis object;
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 #' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #'
@@ -18,14 +18,14 @@
 #' \code{parm2} on the outcome of interest.
 #'
 #' @export
-twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
+twsa <- function(sa_obj, parm1 = NULL, parm2 = NULL, ranges = NULL,
                  nsamp = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
 
-  if (inherits(sens, "psa")) {
+  if (inherits(sa_obj, "psa")) {
     if (is.null(parm1) | is.null(parm2)) {
       stop("if using psa object, both parm1 and parm2 must be provided")
     }
@@ -33,15 +33,15 @@ twsa <- function(sens, parm1 = NULL, parm2 = NULL, ranges = NULL,
     parms <- c(parm1, parm2)
 
     # run metamodel
-    mm <- metamodel("twoway", sens, parms, strategies, outcome, wtp, "poly", poly.order)
+    mm <- metamodel("twoway", sa_obj, parms, strategies, outcome, wtp, "poly", poly.order)
     # predict outcomes
     tw <- predict(mm, ranges, nsamp)
-  } else if (inherits(sens, "dsa_twoway")) {
-    params <- sens$parameters
-    eff <- sens$effectiveness
-    cost <- sens$cost
-    strategies <- sens$strategies
-    parnames <- sens$parnames
+  } else if (inherits(sa_obj, "dsa_twoway")) {
+    params <- sa_obj$parameters
+    eff <- sa_obj$effectiveness
+    cost <- sa_obj$cost
+    strategies <- sa_obj$strategies
+    parnames <- sa_obj$parnames
 
     # calculate outcomes
     # calculate outcome of interest

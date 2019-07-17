@@ -4,12 +4,12 @@
 \alias{owsa}
 \title{One-way sensitivity analysis using linear regression metamodeling}
 \usage{
-owsa(sens, parms = NULL, ranges = NULL, nsamps = 100,
+owsa(sa_obj, parms = NULL, ranges = NULL, nsamps = 100,
   outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
   wtp = NULL, strategies = NULL, poly.order = 2)
 }
 \arguments{
-\item{sens}{sensitivity analysis object;
+\item{sa_obj}{sensitivity analysis object;
 either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
 

@@ -202,6 +202,7 @@ offset_trans <- function(offset = 0) {
 #' plot the optimal strategy as the parameter values change
 #'
 #' @param owsa An owsa object
+#' @param params vector of parameters to plot
 #' @param maximize whether to maximize (TRUE) or minimize the outcome
 #' @param return either return a ggplot object \code{plot} or a data frame with
 #' ranges of parameters for which each strategy is optimal.
@@ -212,7 +213,7 @@ offset_trans <- function(offset = 0) {
 #' @param facet_ncol Number of columns in plot facet.
 #' @import ggplot2
 #' @export
-owsa_opt_strat <- function(owsa, maximize = TRUE,
+owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
                            return = c("plot", "data"),
                            plot_const = TRUE,
                            col = c("full", "bw"),
@@ -221,6 +222,7 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
                            txtsize = 12,
                            facet_ncol = 1,
                            facet_nrow = NULL,
+                           facet_lab_txtsize = NULL,
                            n_x_ticks = 10) {
   # check that is owsa object
   if (!is_owsa(owsa)) {
@@ -251,6 +253,20 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
       ungroup()
   }
   opt_strat$strategy <- as.factor(opt_strat$strategy)
+
+  # filter to parameters input by user and maintain their ordering
+  # if no parameters are supplied, initial ordering from owsa will be used
+  if (!is.null(params)) {
+    #check that params supplied are a subset of parameters from owsa
+    if (!all(params %in% opt_strat$parameter)) {
+      stop("must provide valid parameters")
+    }
+    opt_strat <- opt_strat[opt_strat$parameter %in% params, ]
+    opt_strat$parameter <- factor(opt_strat$parameter, levels = params)
+  } else {
+    opt_strat$parameter <- factor(opt_strat$parameter, levels = unique(owsa$parameter))
+  }
+
   g <- ggplot(opt_strat) +
     facet_wrap("parameter", scales = "free_x", ncol = facet_ncol, nrow = facet_nrow) +
     # a little bit hacky: rectangles with height 1
@@ -263,6 +279,7 @@ owsa_opt_strat <- function(owsa, maximize = TRUE,
   col <- match.arg(col)
   g <- add_common_aes(g, txtsize, scale_name = "Optimal Strategy: ",
                       col, col_aes = "fill", continuous = "x",
+                      facet_lab_txtsize = facet_lab_txtsize,
                       n_x_ticks = n_x_ticks) +
     # these remove the meaningless y axis labels and text
     theme(axis.line.y = element_blank(),

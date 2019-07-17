@@ -16,7 +16,7 @@ psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
                         example_psa$parameters, example_psa$strategies)
 
 test_that("metamodel object has correct classes", {
-  mm <- metamodel(psa = psa_big, parm = "pFailChemo", outcome = "cost")
+  mm <- metamodel(psa = psa_big, param = "pFailChemo", outcome = "cost")
   expect_is(mm, "metamodel")
 })
 
@@ -25,7 +25,7 @@ test_that("metamodel object has correct classes", {
 test_that("metamodel with one outcome", {
   # metamodel
   ## linear
-  mm_lin <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo")
+  mm_lin <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo")
   expect_is(mm_lin, "metamodel")
 
   # predictions
@@ -34,7 +34,7 @@ test_that("metamodel with one outcome", {
                c("parameter", "strategy", "param_val", "outcome_val"))
 
   ## poly
-  mm_poly <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo",
+  mm_poly <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo",
                   type = "poly")
   expect_is(mm_poly, "metamodel")
 
@@ -44,7 +44,7 @@ test_that("metamodel with one outcome", {
                c("parameter", "strategy", "param_val", "outcome_val"))
 
   ## GAM
-  mm_gam <- metamodel(psa = psa_big, parms = "pFailChemo", outcome = "cost", strategies = "Chemo",
+  mm_gam <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo",
                   type = "gam")
   expect_is(mm_gam, "metamodel")
 
@@ -122,7 +122,7 @@ test_that("out of range warning", {
 
 test_that("two-way metamodel", {
   # metamodel
-  mm <- metamodel(analysis = "twoway", parms = c("pFailChemo", "pFailRadio"),
+  mm <- metamodel(analysis = "twoway", params = c("pFailChemo", "pFailRadio"),
                 psa = psa_big, outcome = "eff")
   expect_is(mm, "metamodel")
 })

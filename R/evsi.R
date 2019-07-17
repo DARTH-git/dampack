@@ -7,7 +7,7 @@
 #' @export
 calc_evsi <- function(psa,
                       wtp,
-                      parms = NULL,
+                      params = NULL,
                       outcome = c("nhb_loss", "nmb_loss"),
                       type = c("gam", "poly"),
                       poly.order = 2,
@@ -21,7 +21,7 @@ calc_evsi <- function(psa,
   # run the metamodels
   mms <- metamodel(analysis = "multiway",
                    psa = psa,
-                   parms = parms,
+                   params = params,
                    outcome = outcome,
                    wtp = wtp,
                    type = type,

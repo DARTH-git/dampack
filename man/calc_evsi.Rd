@@ -4,7 +4,7 @@
 \alias{calc_evsi}
 \title{Calculate Expected Value of Sample Information}
 \usage{
-calc_evsi(psa, wtp, parms = NULL, outcome = c("nhb_loss", "nmb_loss"),
+calc_evsi(psa, wtp, params = NULL, outcome = c("nhb_loss", "nmb_loss"),
   type = c("gam", "poly"), poly.order = 2, k = NA, n = 100,
   n0 = 10)
 }
@@ -13,7 +13,7 @@ calc_evsi(psa, wtp, parms = NULL, outcome = c("nhb_loss", "nmb_loss"),
 
 \item{wtp}{willingness-to-pay threshold}
 
-\item{parms}{A vector of parameters for which to analyze the EVPPI.}
+\item{params}{A vector of parameters for which to analyze the EVPPI.}
 
 \item{outcome}{either net monetary benefit (\code{"nmb_loss"})
 or net health benefit (\code{"nhb_loss"})}

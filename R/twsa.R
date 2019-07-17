@@ -8,17 +8,17 @@
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 #' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #'
-#' @param parm1 String with the name of the first parameter of interest
-#' @param parm2 String with the name of the second parameter of interest
+#' @param param1 String with the name of the first parameter of interest
+#' @param param2 String with the name of the second parameter of interest
 
 #' @inheritParams metamodel
 #' @inheritParams predict.metamodel
 #'
-#' @return twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and
-#' \code{parm2} on the outcome of interest.
+#' @return twsa A \code{ggplot2} object with the TWSA graph of \code{param1} and
+#' \code{param2} on the outcome of interest.
 #'
 #' @export
-twsa <- function(sa_obj, parm1 = NULL, parm2 = NULL, ranges = NULL,
+twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
                  nsamp = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
@@ -26,14 +26,14 @@ twsa <- function(sa_obj, parm1 = NULL, parm2 = NULL, ranges = NULL,
                  poly.order = 2){
 
   if (inherits(sa_obj, "psa")) {
-    if (is.null(parm1) | is.null(parm2)) {
-      stop("if using psa object, both parm1 and parm2 must be provided")
+    if (is.null(param1) | is.null(param2)) {
+      stop("if using psa object, both param1 and param2 must be provided")
     }
 
-    parms <- c(parm1, parm2)
+    params <- c(param1, param2)
 
     # run metamodel
-    mm <- metamodel("twoway", sa_obj, parms, strategies, outcome, wtp, "poly", poly.order)
+    mm <- metamodel("twoway", sa_obj, params, strategies, outcome, wtp, "poly", poly.order)
     # predict outcomes
     tw <- predict(mm, ranges, nsamp)
   } else if (inherits(sa_obj, "dsa_twoway")) {
@@ -83,9 +83,9 @@ plot.twsa <- function(x, maximize = TRUE,
                       txtsize = 12, ...) {
 
   # parameter names
-  parms <- names(x)[c(1, 2)]
-  parm1 <- parms[1]
-  parm2 <- parms[2]
+  params <- names(x)[c(1, 2)]
+  param1 <- params[1]
+  param2 <- params[2]
 
   # get optimal strategy
   # thanks to
@@ -96,13 +96,13 @@ plot.twsa <- function(x, maximize = TRUE,
     obj_fn <- which.min
   }
   opt_df <- x %>%
-    group_by(.data[[parm1]], .data[[parm2]]) %>%
+    group_by(.data[[param1]], .data[[param2]]) %>%
     slice(obj_fn(.data$outcome_val))
-  g <- ggplot(opt_df, aes_(x = as.name(parm1), y = as.name(parm2))) +
+  g <- ggplot(opt_df, aes_(x = as.name(param1), y = as.name(param2))) +
     geom_tile(aes_(fill = as.name("strategy"))) +
     theme_bw() +
-    xlab(parm1) +
-    ylab(parm2)
+    xlab(param1) +
+    ylab(param2)
   col <- match.arg(col)
   add_common_aes(g, txtsize, col = col, col_aes = "fill",
                  scale_name = "Strategy",

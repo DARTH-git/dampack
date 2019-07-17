@@ -4,7 +4,7 @@
 \alias{twsa}
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
-twsa(sa_obj, parm1 = NULL, parm2 = NULL, ranges = NULL,
+twsa(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
   nsamp = 100, outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss",
   "nmb_loss"), wtp = NULL, strategies = NULL, poly.order = 2)
 }
@@ -13,11 +13,11 @@ twsa(sa_obj, parm1 = NULL, parm2 = NULL, ranges = NULL,
 either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
 
-\item{parm1}{String with the name of the first parameter of interest}
+\item{param1}{String with the name of the first parameter of interest}
 
-\item{parm2}{String with the name of the second parameter of interest}
+\item{param2}{String with the name of the second parameter of interest}
 
-\item{ranges}{A named list of the form c("parm" = c(0, 1), ...)
+\item{ranges}{A named list of the form c("param" = c(0, 1), ...)
 that gives the ranges for the parameter of interest. If NULL,
 parameter values from the middle 95\% of the PSA samples are used. The number of samples
 from this range is determined by \code{nsamp}.}
@@ -36,8 +36,8 @@ NMB ("nhb_loss" and "nmb_loss", respectively)}
 Default: 2}
 }
 \value{
-twsa A \code{ggplot2} object with the TWSA graph of \code{parm1} and
-\code{parm2} on the outcome of interest.
+twsa A \code{ggplot2} object with the TWSA graph of \code{param1} and
+\code{param2} on the outcome of interest.
 }
 \description{
 This function displays a two-way sensitivity analysis (TWSA) graph

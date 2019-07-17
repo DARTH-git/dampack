@@ -4,13 +4,13 @@
 \alias{twsa_det}
 \title{Two-way sensitivity analysis (TWSA)}
 \usage{
-twsa_det(parm1, parm2, pars_df, nsamps = 40, FUN, outcome,
+twsa_det(param1, param2, pars_df, nsamps = 40, FUN, outcome,
   outcome_type = "eff", strategies = NULL, ...)
 }
 \arguments{
-\item{parm1}{String with the name of the first parameter of interest}
+\item{param1}{String with the name of the first parameter of interest}
 
-\item{parm2}{String with the name of the second parameter of interest}
+\item{param2}{String with the name of the second parameter of interest}
 
 \item{pars_df}{A data.frame with 4 columns with following column order: "pars",
 "basecase", "min", and "max". The number of samples from this range is
@@ -48,7 +48,7 @@ given function that produces outcomes.
 \itemize{
 \item "pars" are the names of the input parameters in the
 user defined function. "pars" should include all parameters of interest provided in
-\code{parms}.
+\code{params}.
 \item "basecase" are the base value of input parameters in user defined \code{FUN}.
 \item "min" and "max" are the mininum and maximum values of the parameters of interest.
 Users only need to provide the "min" and "max" of the parameters of interest.

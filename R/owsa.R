@@ -13,7 +13,7 @@
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 #'
 #' @export
-owsa <- function(sa_obj, parms = NULL, ranges = NULL, nsamps = 100,
+owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
@@ -21,7 +21,7 @@ owsa <- function(sa_obj, parms = NULL, ranges = NULL, nsamps = 100,
   outcome <- match.arg(outcome)
   if (inherits(sa_obj, "psa")) {
     # create metamodel
-    mm <- metamodel("oneway", sa_obj, parms,
+    mm <- metamodel("oneway", sa_obj, params,
                     strategies, outcome, wtp, "poly", poly.order)
 
     # predict outcomes using predict.metamodel
@@ -43,7 +43,7 @@ owsa <- function(sa_obj, parms = NULL, ranges = NULL, nsamps = 100,
       for (s in strategies) {
         # maybe extract this out later - shared with predict.metamodel
         param_rows <- params$parameter == p
-        param_val <- params[param_rows, "parmval"]
+        param_val <- params[param_rows, "paramval"]
         outcome_val <- y[param_rows, s]
 
         new_df <- data.frame("parameter" = p,

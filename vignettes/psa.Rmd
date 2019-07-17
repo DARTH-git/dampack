@@ -190,7 +190,7 @@ owsa_opt_strat(o, return = "data")
 specify the two parameters of interest.
 
 ```{r}
-tw <- twsa(psa_obj, parm1 = "pFailChemo", parm2 = "muDieCancer")
+tw <- twsa(psa_obj, param1 = "pFailChemo", param2 = "muDieCancer")
 ```
 
 Plot

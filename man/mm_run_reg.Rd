@@ -4,12 +4,12 @@
 \alias{mm_run_reg}
 \title{Build formula and run linear regression for metamodel}
 \usage{
-mm_run_reg(dep, parms, dat, type, poly.order, k)
+mm_run_reg(dep, params, dat, type, poly.order, k)
 }
 \arguments{
 \item{dep}{dependent variable in regression}
 
-\item{parms}{String vector with the name(s) of the parameter of interest. Defaults to all.}
+\item{params}{String vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{dat}{data to use in regression}
 
@@ -25,7 +25,7 @@ Default: 2}
     \code{\link{null.space.dimension}}), but will be reset if
   it is. See \code{\link{choose.k}} for further information.}
 
-\item{all_parms}{all parms in PSA}
+\item{all_params}{all params in PSA}
 }
 \description{
 Build formula and run linear regression for metamodel

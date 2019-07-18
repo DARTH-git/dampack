@@ -4,9 +4,9 @@
 #' The expected loss is the the quantification of the foregone benefits
 #' when choosing a suboptimal strategy given current evidence.
 #'
-#' @param wtp vector of willingness to pay thresholds
 #' @param psa object of class \code{psa}, produced by function
 #' \code{\link{make_psa_obj}}
+#' @param wtp vector of willingness to pay thresholds
 #'
 #' @details
 #' Visualize the expected loss at a variety of WTP thresholds using \code{\link{plot.exp_loss}}.
@@ -17,11 +17,11 @@
 #'
 #' @references
 #' \enumerate{
-#' \item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. 
-#' "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: 
-#' The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability 
+#' \item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H.
+#' "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting:
+#' The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability
 #' Curves and Frontier. Value Health. 2019;22(5):611-618.
-#' \item Eckermann S, Briggs A, Willan AR. Health technology assessment in the 
+#' \item Eckermann S, Briggs A, Willan AR. Health technology assessment in the
 #' cost- disutility plane. Med Decis Making. 2008;28(2):172–181.
 #' }
 #' @examples
@@ -39,7 +39,7 @@
 #' plot(exp_loss, log_y = FALSE)
 #'
 #' @export
-calc_exp_loss <- function(wtp, psa) {
+calc_exp_loss <- function(psa, wtp) {
   check_psa_object(psa)
   cost <- psa$cost
   effectiveness <- psa$effectiveness

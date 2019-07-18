@@ -17,7 +17,7 @@ Description: More about what it does (maybe more than one line)
 License: file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 3.3),
+    R (>= 3.5),
     ggplot2
 Imports:
     reshape2,

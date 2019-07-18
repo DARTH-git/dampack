@@ -14,8 +14,8 @@ test_that("exp_loss has all methods we'd expect", {
 data("example_psa")
 psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
                         example_psa$parameters, example_psa$strategies)
-elc_obj <- calc_exp_loss(wtp = example_psa$wtp,
-                         psa = psa_obj)
+elc_obj <- calc_exp_loss(psa = psa_obj,
+                         wtp = example_psa$wtp)
 
 # classes
 test_that("return object has classes evpi and data.frame", {

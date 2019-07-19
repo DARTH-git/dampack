@@ -90,8 +90,9 @@ calc_evppi <- function(psa,
   # bind the columns to get a dataframe
   fitted_loss_df <- bind_cols(fitted_loss_list)
 
-  # calculate the evppi as the minimum column mean
-  evppi <- min(apply(fitted_loss_df, 2, mean))
+  # calculate the evppi as the average of the row maxima
+  row_maxes <- apply(fitted_loss_df, 1, max)
+  evppi <- mean(row_maxes)
 
   return(evppi)
 }

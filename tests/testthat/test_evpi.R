@@ -15,8 +15,8 @@ data("example_psa")
 psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
                         example_psa$parameters, example_psa$strategies)
 
-evpi_obj <- calc_evpi(psa = psa_obj,
-                      wtp = example_psa$wtp)
+evpi_obj <- calc_evpi(wtp = example_psa$wtp,
+                      psa = psa_obj)
 
 # classes
 test_that("return object has classes evpi and data.frame", {

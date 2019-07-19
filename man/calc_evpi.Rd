@@ -4,12 +4,12 @@
 \alias{calc_evpi}
 \title{Expected Value of Perfect Information (EVPI)}
 \usage{
-calc_evpi(psa, wtp, pop = 1)
+calc_evpi(wtp, psa, pop = 1)
 }
 \arguments{
-\item{psa}{psa object from \code{\link{make_psa_obj}}}
-
 \item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
+
+\item{psa}{psa object from \code{\link{make_psa_obj}}}
 
 \item{pop}{A scalar that corresponds to the total population}
 }
@@ -32,7 +32,7 @@ data("example_psa_obj")
 
 # define wtp threshold vector (can also use a single wtp)
 wtp <- seq(1e4, 1e5, by = 1e4)
-evpi <- calc_evpi(example_psa_obj, wtp)
+evpi <- calc_evpi(wtp, example_psa_obj)
 plot(evpi) # see ?plot.evpi for options
 
 # can use plot options (# see ?plot.evpi for details)

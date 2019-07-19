@@ -17,7 +17,7 @@
 #'
 #' # define wtp threshold vector (can also use a single wtp)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' evpi <- calc_evpi(wtp, example_psa_obj)
+#' evpi <- calc_evpi(example_psa_obj, wtp)
 #' plot(evpi) # see ?plot.evpi for options
 #'
 #' # can use plot options (# see ?plot.evpi for details)
@@ -26,7 +26,7 @@
 #' # or can use ggplot layers
 #' plot(evpi) + ggtitle("Expected Value of Perfect Information")
 #' @export
-calc_evpi <- function(wtp, psa, pop = 1) {
+calc_evpi <- function(psa, wtp, pop = 1) {
   check_psa_object(psa)
   cost <- psa$cost
   effectiveness <- psa$effectiveness

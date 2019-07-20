@@ -11,7 +11,7 @@ calc_evsi <- function(psa,
                       outcome = c("nhb_loss", "nmb_loss"),
                       type = c("gam", "poly"),
                       poly.order = 2,
-                      k = NA,
+                      k = -1,
                       n = 100,
                       n0 = 10) {
   # define parameter values and make sure they correspond to a valid option

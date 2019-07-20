@@ -5,7 +5,7 @@
 \title{Calculate Expected Value of Sample Information}
 \usage{
 calc_evsi(psa, wtp, params = NULL, outcome = c("nhb_loss", "nmb_loss"),
-  type = c("gam", "poly"), poly.order = 2, k = NA, n = 100,
+  type = c("gam", "poly"), poly.order = 2, k = -1, n = 100,
   n0 = 10)
 }
 \arguments{

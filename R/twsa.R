@@ -32,6 +32,8 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
 
     params <- c(param1, param2)
 
+    outcome <- match.arg(outcome)
+
     # run metamodel
     mm <- metamodel("twoway", sa_obj, params, strategies, outcome, wtp, "poly", poly.order)
     # predict outcomes

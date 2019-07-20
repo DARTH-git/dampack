@@ -18,6 +18,9 @@ calc_evsi <- function(psa,
   type <- match.arg(type)
   outcome <- match.arg(outcome)
 
+  # adjust outcome type
+  outcome <- paste0(outcome, "_voi")
+
   # run the metamodels
   mms <- metamodel(analysis = "multiway",
                    psa = psa,
@@ -34,8 +37,9 @@ calc_evsi <- function(psa,
   # bind the columns to get a dataframe
   predicted_loss_df <- bind_cols(predicted_loss_list)
 
-  # calculate the evsi as the minimum column mean
-  evsi <- min(apply(predicted_loss_df, 2, mean))
+  # calculate the evsi as the average of the row maxima
+  row_maxes <- apply(predicted_loss_df, 1, max)
+  evsi <- mean(row_maxes)
 
   return(evsi)
 }

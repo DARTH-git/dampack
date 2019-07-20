@@ -6,8 +6,9 @@
 \usage{
 metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
   params = NULL, strategies = NULL, outcome = c("eff", "cost", "nhb",
-  "nmb", "nhb_loss", "nmb_loss"), wtp = NULL, type = c("linear", "gam",
-  "poly"), poly.order = 2, k = -1)
+  "nmb", "nhb_loss", "nmb_loss", "nhb_loss_voi", "nmb_loss_voi"),
+  wtp = NULL, type = c("linear", "gam", "poly"), poly.order = 2,
+  k = -1)
 }
 \arguments{
 \item{analysis}{either "oneway" or "twoway"}

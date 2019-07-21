@@ -4,7 +4,7 @@
 \alias{twsa_det}
 \title{Two-way sensitivity analysis (TWSA)}
 \usage{
-twsa_det(param1, param2, pars_df, nsamps = 40, FUN, outcome,
+twsa_det(param1, param2, params_all, nsamps = 40, FUN, outcome,
   outcome_type = "eff", strategies = NULL, ...)
 }
 \arguments{
@@ -12,14 +12,14 @@ twsa_det(param1, param2, pars_df, nsamps = 40, FUN, outcome,
 
 \item{param2}{String with the name of the second parameter of interest}
 
-\item{pars_df}{A data.frame with 4 columns with following column order: "pars",
+\item{params_all}{A data.frame with 4 columns with following column order: "pars",
 "basecase", "min", and "max". The number of samples from this range is
 determined by \code{nsamp}}
 
 \item{nsamps}{number of parameter values. If \code{NULL}, 40 parameter values are
 used}
 
-\item{FUN}{Function that takes the basecase in \code{pars_df} and \code{...} to
+\item{FUN}{Function that takes the basecase in \code{params_all} and \code{...} to
 produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 where the first column are the strategy names and the rest of the columns must be outcomes.}
 
@@ -44,7 +44,7 @@ given function that produces outcomes.
 \section{Details}{
 
 \itemize{
-\item \code{pars_df}
+\item \code{params_all}
 \itemize{
 \item "pars" are the names of the input parameters in the
 user defined function. "pars" should include all parameters of interest provided in

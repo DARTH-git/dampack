@@ -102,14 +102,14 @@ test_that("accurately producing warnings and errors in owsa_det", {
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
-               "params should be in the parameters provided in pars_df")
+               "params should be in the parameters provided in params_all")
 
   params_df2 <- as.matrix(params_df)
   expect_error(owsa_det(params, params_df2, nsamps = 10,
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
-               "pars_df must be a data.frame")
+               "params_all must be a data.frame")
 
   params_df2 <- params_df
   params_df2[, 3] <- params_df[, 4]
@@ -126,7 +126,7 @@ test_that("accurately producing warnings and errors in owsa_det", {
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
-               "basecase, min and max in pars_df must be numeric")
+               "basecase, min and max in params_all must be numeric")
 
   expect_error(owsa_det(params, params_df, nsamps = 10,
                         strategy_func, "treated", outcome_type = "eff",
@@ -204,7 +204,7 @@ test_that("checking warning error message from twsa_det", {
   expect_error(twsa_det("xx", param2, params_df, nsamps = 30,
                         strategy_func, outcome, outcome_type = "eff",
                         strategies = NULL, state_name = state_name, cycle = cycle),
-               "param1 and param2 should be in the parameters provided in pars_df")
+               "param1 and param2 should be in the parameters provided in params_all")
 
   strategy_func2 <- function(param, state_name, cycle,
                              mystrategy = NULL, popsize = 1000,

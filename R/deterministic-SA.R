@@ -4,12 +4,12 @@
 #' given function that produces outcomes.
 #'
 #' @param params Vector with strings with the name of the parameters of interest
-#' @param pars_df A data.frame with 4 columns with following column order: "pars",
+#' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
 #' @param nsamps number of parameter values. If \code{NULL}, 100 parameter values are
 #' used
-#' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
+#' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcome String with the outcome of interest produced by \code{nsamp}
@@ -25,7 +25,7 @@
 #'
 #' @section Details:
 #' \itemize{
-#' \item \code{pars_df}
+#' \item \code{params_all}
 #' \itemize{
 #' \item "pars" are the names of the input parameters in the
 #' user defined function. "pars" should include all parameters of interest provided in
@@ -39,38 +39,38 @@
 #' }
 #'
 #' @export
-owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
+owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN, outcome,
                      outcome_type = "eff", strategies = NULL, ...){
 
   if (is.null(params)) {
-    params <- as.character(pars_df[, 1])
-    warning("assuming the pars in pars_df are the parameters of interest")
+    params <- as.character(params_all[, 1])
+    warning("assuming the pars in params_all are the parameters of interest")
   }
 
-  if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+  if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
-  if (ncol(pars_df) != 4) stop("pars_df must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
+  if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
 
-  params_basecase <- pars_df[, 2]
-  names(params_basecase) <- as.character(pars_df[, 1])
+  params_basecase <- params_all[, 2]
+  names(params_basecase) <- as.character(params_all[, 1])
   opt_arg_val <- list(...)
   fun_input_ls <- c(list(params_basecase), opt_arg_val)
 
-  if (!all(params %in% pars_df[, 1])) {
-    stop("params should be in the parameters provided in pars_df")
+  if (!all(params %in% params_all[, 1])) {
+    stop("params should be in the parameters provided in params_all")
   }
 
-  if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
-    stop("basecase, min and max in pars_df must be numeric")
+  if (!all(is.numeric(params_all[, 2]), is.numeric(params_all[, 3]), is.numeric(params_all[, 4]))) {
+    stop("basecase, min and max in params_all must be numeric")
   }
 
-  ix <- match(params, pars_df$pars)
-  if (!all( (pars_df[ix, 2] >= pars_df[ix, 3]) &
-            (pars_df[ix, 2] <= pars_df[ix, 4]))) {
+  ix <- match(params, params_all$pars)
+  if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
+            (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }
 
-  names(pars_df) <- c("pars", "basecase", "min", "max")
+  names(params_all) <- c("pars", "basecase", "min", "max")
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_ls)
@@ -108,8 +108,8 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
   for (i in 1:n_params) {
     # Generate matrix of inputs
     pars_i <- params[i]
-    ix <- which(pars_df$pars == pars_i)
-    pars_range <- pars_df[ix, c("min", "max")]
+    ix <- which(params_all$pars == pars_i)
+    pars_range <- params_all[ix, c("min", "max")]
     v_owsa_input <- t(t(seq(pars_range[[1]],
                             pars_range[[2]],
                             length.out = nsamps)))
@@ -152,12 +152,12 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
 #'
 #' @param param1 String with the name of the first parameter of interest
 #' @param param2 String with the name of the second parameter of interest
-#' @param pars_df A data.frame with 4 columns with following column order: "pars",
+#' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
 #' @param nsamps number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
-#' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
+#' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcome String with the outcome of interest produced by \code{nsamp}
@@ -172,7 +172,7 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
 #'
 #' @section Details:
 #' \itemize{
-#' \item \code{pars_df}
+#' \item \code{params_all}
 #' \itemize{
 #' \item "pars" are the names of the input parameters in the
 #' user defined function. "pars" should include all parameters of interest provided in
@@ -186,16 +186,16 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
 #' }
 #'
 #' @export
-twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
+twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcome,
                      outcome_type = "eff", strategies = NULL, ...){
 
-  if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+  if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
-  if (ncol(pars_df) != 4) stop("pars_df must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
+  if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
 
   poi <- unique(c(param1, param2))
-  params_basecase <- pars_df[, 2]
-  names(params_basecase) <- as.character(pars_df[, 1])
+  params_basecase <- params_all[, 2]
+  names(params_basecase) <- as.character(params_all[, 1])
   opt_arg_val <- list(...)
   fun_input_ls <- c(list(params_basecase), opt_arg_val)
 
@@ -204,20 +204,20 @@ twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
   }
 
   if (!all(poi %in% names(params_basecase))){
-    stop("param1 and param2 should be in the parameters provided in pars_df")
+    stop("param1 and param2 should be in the parameters provided in params_all")
   }
 
-  if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
-    stop("basecase, min and max in pars_df must be numeric")
+  if (!all(is.numeric(params_all[, 2]), is.numeric(params_all[, 3]), is.numeric(params_all[, 4]))) {
+    stop("basecase, min and max in params_all must be numeric")
   }
 
-  ix <- match(poi, pars_df$pars)
-  if (!all( (pars_df[ix, 2] >= pars_df[ix, 3]) &
-            (pars_df[ix, 2] <= pars_df[ix, 4]))) {
+  ix <- match(poi, params_all$pars)
+  if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
+            (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }
 
-  names(pars_df) <- c("pars", "basecase", "min", "max")
+  names(params_all) <- c("pars", "basecase", "min", "max")
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_ls)
@@ -249,7 +249,7 @@ twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
   }
 
   ### Generate matrix of inputs
-  range_df <- pars_df[ix, c("min", "max")]
+  range_df <- params_all[ix, c("min", "max")]
   param_table <- expand.grid(param1 = seq(range_df[1, "min"],
                                          range_df[1, "max"],
                                          length.out = nsamps),

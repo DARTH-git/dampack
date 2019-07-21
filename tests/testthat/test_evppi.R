@@ -11,6 +11,6 @@ psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
 test_that("evppi runs", {
   expect_silent(calc_evppi(wtp = 1e5,
                            psa = psa_obj,
-                           parms = c("pFailSurg", "pFailChemo"),
+                           params = c("pFailSurg", "pFailChemo"),
                            outcome = "nmb_loss"))
 })

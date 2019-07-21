@@ -7,21 +7,24 @@
 #' @export
 calc_evsi <- function(psa,
                       wtp,
-                      parms = NULL,
+                      params = NULL,
                       outcome = c("nhb_loss", "nmb_loss"),
                       type = c("gam", "poly"),
                       poly.order = 2,
-                      k = NA,
+                      k = -1,
                       n = 100,
                       n0 = 10) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
 
+  # adjust outcome type
+  outcome <- paste0(outcome, "_voi")
+
   # run the metamodels
   mms <- metamodel(analysis = "multiway",
                    psa = psa,
-                   parms = parms,
+                   params = params,
                    outcome = outcome,
                    wtp = wtp,
                    type = type,

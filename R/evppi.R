@@ -7,7 +7,7 @@
 #'
 #' @param psa object of class psa, produced by \code{\link{make_psa_obj}}
 #' @param wtp willingness-to-pay threshold
-#' @param parms A vector of parameters for which to analyze the EVPPI.
+#' @param params A vector of parameters for which to analyze the EVPPI.
 #' @param outcome either net monetary benefit (\code{"nmb_loss"})
 #' or net health benefit (\code{"nhb_loss"})
 #' @param type either generalized additive models (\code{"gam"}) or
@@ -64,7 +64,7 @@
 #' @export
 calc_evppi <- function(psa,
                        wtp,
-                       parms = NULL,
+                       params = NULL,
                        outcome = c("nmb_loss", "nhb_loss"),
                        type = c("gam", "poly"),
                        poly.order = 2,
@@ -73,10 +73,13 @@ calc_evppi <- function(psa,
   type <- match.arg(type)
   outcome <- match.arg(outcome)
 
+  # adjust outcome type
+  outcome <- paste0(outcome, "_voi")
+
   # run the metamodels
   mms <- metamodel(analysis = "multiway",
                    psa = psa,
-                   parms = parms,
+                   params = params,
                    outcome = outcome,
                    wtp = wtp,
                    type = type,

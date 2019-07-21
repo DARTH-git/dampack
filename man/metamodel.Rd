@@ -5,16 +5,17 @@
 \title{Linear regression metamodeling}
 \usage{
 metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
-  parms = NULL, strategies = NULL, outcome = c("eff", "cost", "nhb",
-  "nmb", "nhb_loss", "nmb_loss"), wtp = NULL, type = c("linear", "gam",
-  "poly"), poly.order = 2, k = -1)
+  params = NULL, strategies = NULL, outcome = c("eff", "cost", "nhb",
+  "nmb", "nhb_loss", "nmb_loss", "nhb_loss_voi", "nmb_loss_voi"),
+  wtp = NULL, type = c("linear", "gam", "poly"), poly.order = 2,
+  k = -1)
 }
 \arguments{
 \item{analysis}{either "oneway" or "twoway"}
 
 \item{psa}{psa object}
 
-\item{parms}{String vector with the name(s) of the parameter of interest. Defaults to all.}
+\item{params}{String vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
@@ -46,10 +47,10 @@ a given decision-analytic model by using the results of a probabilistic sensitiv
 \details{
 The most important option is \code{analysis}, which can be either \code{"oneway"}
 or \code{twoway}. If \code{analysis == "oneway"}, a separate metamodel is created
-for each combination of the parameters in \code{parms} and strategies in \code{strategies}
+for each combination of the parameters in \code{params} and strategies in \code{strategies}
 (by default, this is all strategies and parameters).
 
-If \code{analysis == "twoway"}, \code{parms} must be a vector of two parameters, and a metamodel
+If \code{analysis == "twoway"}, \code{params} must be a vector of two parameters, and a metamodel
 is created with these two parameters for each strategy in \code{strategies}.
 }
 \seealso{

@@ -6,7 +6,8 @@
 #' @param wtp willingness-to-pay threshold
 #'
 #' @keywords internal
-calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss", "nmb_loss"),
+calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss",
+                                          "nmb_loss", "nhb_loss_voi", "nmb_loss_voi"),
                               cost, effect, wtp) {
   outcome <- match.arg(outcome)
   n_sim <- nrow(cost)
@@ -36,8 +37,19 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
         net_outcome <- "nmb"
       }
       netben <- calculate_outcome(net_outcome, cost, effect, wtp)
-      max_str <- max.col(netben)
-      y <-  netben[cbind(1:n_sim, max_str)] - netben
+      max_str_rowwise <- max.col(netben)
+      y <-  netben[cbind(1:n_sim, max_str_rowwise)] - netben
+    }
+    if (outcome == "nhb_loss_voi" | outcome == "nmb_loss_voi") {
+      if (outcome == "nhb_loss_voi") {
+        net_outcome <- "nhb"
+      }
+      if (outcome == "nmb_loss_voi") {
+        net_outcome <- "nmb"
+      }
+      netben <- calculate_outcome(net_outcome, cost, effect, wtp)
+      max_str <- which.max(colMeans(netben))
+      y <- netben - netben[cbind(1:n_sim), max_str]
     }
   }
   return(y)

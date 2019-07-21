@@ -17,17 +17,17 @@
 #'
 #' @references
 #' \enumerate{
-#' \item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. 
-#' "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: 
-#' The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability 
+#' \item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H.
+#' "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting:
+#' The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability
 #' Curves and Frontier. Value Health. 2019;22(5):611-618.
-#' \item Eckermann S, Briggs A, Willan AR. Health technology assessment in the 
+#' \item Eckermann S, Briggs A, Willan AR. Health technology assessment in the
 #' cost- disutility plane. Med Decis Making. 2008;28(2):172–181.
 #' }
 #' @examples
 #' data("example_psa_obj")
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' exp_loss <- calc_exp_loss(wtp, example_psa_obj)
+#' exp_loss <- calc_exp_loss(example_psa_obj, wtp)
 #'
 #' # can use head(), summary(), print(), etc.
 #' head(exp_loss)
@@ -39,7 +39,7 @@
 #' plot(exp_loss, log_y = FALSE)
 #'
 #' @export
-calc_exp_loss <- function(wtp, psa) {
+calc_exp_loss <- function(psa, wtp) {
   check_psa_object(psa)
   cost <- psa$cost
   effectiveness <- psa$effectiveness

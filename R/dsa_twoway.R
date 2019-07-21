@@ -11,9 +11,9 @@
 #' The parameter names must be the column names.
 #'
 #' \tabular{ll}{
-#' parm1 name     \tab parm2 name \cr
-#' parm1 val1     \tab parm2 val1 \cr
-#' parm1 val2     \tab parm2 val2 \cr
+#' param1 name     \tab param2 name \cr
+#' param1 val1     \tab param2 val1 \cr
+#' param1 val2     \tab param2 val2 \cr
 #' ...            \tab ... \cr
 #' }
 #'

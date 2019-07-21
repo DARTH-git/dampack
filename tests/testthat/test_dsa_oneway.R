@@ -4,20 +4,20 @@ library(dampack)
 # creation of example data
 nsamps <- 20
 p1 <- data.frame("parameter" = "p1",
-                 "parmval" = seq(0, 1, length.out = nsamps),
+                 "paramval" = seq(0, 1, length.out = nsamps),
                  stringsAsFactors = FALSE)
-e1 <- data.frame("s1" = 4 * p1$parmval - 2,
-                 "s2" = 5 * p1$parmval + 3)
-c1 <- data.frame("s1" = 1e4 + 1000 * p1$parmval,
-                 "s2" = 1e2 + 2000 * p1$parmval)
+e1 <- data.frame("s1" = 4 * p1$paramval - 2,
+                 "s2" = 5 * p1$paramval + 3)
+c1 <- data.frame("s1" = 1e4 + 1000 * p1$paramval,
+                 "s2" = 1e2 + 2000 * p1$paramval)
 
 p2 <- data.frame("parameter" = "p2",
-                 "parmval" = seq(4, 5, length.out = nsamps),
+                 "paramval" = seq(4, 5, length.out = nsamps),
                  stringsAsFactors = FALSE)
-e2 <- data.frame("s1" = 2 * p2$parmval ^ 2 - 10,
-                 "s2" = 3 * p2$parmval ^ 2 + 4 * p2$parmval - 20)
-c2 <- data.frame("s1" = 1e5 - 2000 * p2$parmval,
-                 "s2" = 1e6 - 1300 * p2$parmval)
+e2 <- data.frame("s1" = 2 * p2$paramval ^ 2 - 10,
+                 "s2" = 3 * p2$paramval ^ 2 + 4 * p2$paramval - 20)
+c2 <- data.frame("s1" = 1e5 - 2000 * p2$paramval,
+                 "s2" = 1e6 - 1300 * p2$paramval)
 
 strategies <- c("s1", "s2")
 

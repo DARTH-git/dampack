@@ -14,9 +14,9 @@ and the associated parameter value in the second column:
 
 \tabular{ll}{
 parameter      \tab value \cr
-parm1 name     \tab parm1 val1 \cr
+param1 name     \tab param1 val1 \cr
 ...            \tab ... \cr
-parm2 name     \tab  parm2 val1 \cr
+param2 name     \tab  param2 val1 \cr
 ...            \tab ... \cr
 }}
 

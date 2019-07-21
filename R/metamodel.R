@@ -6,15 +6,15 @@
 #' @details
 #' The most important option is \code{analysis}, which can be either \code{"oneway"}
 #' or \code{twoway}. If \code{analysis == "oneway"}, a separate metamodel is created
-#' for each combination of the parameters in \code{parms} and strategies in \code{strategies}
+#' for each combination of the parameters in \code{params} and strategies in \code{strategies}
 #' (by default, this is all strategies and parameters).
 #'
-#' If \code{analysis == "twoway"}, \code{parms} must be a vector of two parameters, and a metamodel
+#' If \code{analysis == "twoway"}, \code{params} must be a vector of two parameters, and a metamodel
 #' is created with these two parameters for each strategy in \code{strategies}.
 #'
 #' @param analysis either "oneway" or "twoway"
 #' @param psa psa object
-#' @param parms String vector with the name(s) of the parameter of interest. Defaults to all.
+#' @param params String vector with the name(s) of the parameter of interest. Defaults to all.
 #' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
 #' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 #' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
@@ -37,8 +37,9 @@
 #' @importFrom stats as.formula formula getCall lm
 #' @export
 metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
-                      psa, parms = NULL, strategies = NULL,
-                      outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
+                      psa, params = NULL, strategies = NULL,
+                      outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss",
+                                  "nhb_loss_voi", "nmb_loss_voi"),
                       wtp = NULL,
                       type = c("linear", "gam", "poly"), poly.order = 2, k = -1) {
   # get parameter names
@@ -50,15 +51,15 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   # type of model
   type <- match.arg(type)
 
-  # make sure all of parms is in parameter names
-  if (is.null(parms)) {
-    parms <- pnames
-  } else if (!all(parms %in% pnames)) {
+  # make sure all of params is in parameter names
+  if (is.null(params)) {
+    params <- pnames
+  } else if (!all(params %in% pnames)) {
     wrong_p <- setdiff(p, pnames)
     stop(paste0("the following parameters are not valid: ",
                 paste(wrong_p, collapse = ",")))
-  } else if (length(parms) != 2 & analysis == "twoway") {
-    stop("If analysis == twoway, exactly 2 parms must be provided.")
+  } else if (length(params) != 2 & analysis == "twoway") {
+    stop("If analysis == twoway, exactly 2 params must be provided.")
   }
 
   # define dependent variables
@@ -89,11 +90,11 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   # analysis: either oneway or twoway
   if (analysis == "oneway") {
     # loop over parameters
-    for (p in parms) {
+    for (p in params) {
       # loop over strategies
       for (s in strategies) {
         mod <- mm_run_reg(s, p, dat, type, poly.order, k)
-        mod$parm_of_int <- p
+        mod$param_of_int <- p
         mod$strat <- s
         lms[[p]][[s]] <- mod
       }
@@ -102,16 +103,16 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   if (analysis == "twoway" | analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
-      mod <- mm_run_reg(s, parms, dat, type, poly.order, k)
+      mod <- mm_run_reg(s, params, dat, type, poly.order, k)
       # for accessing later in predict
-      mod$parm_of_int <- parms
+      mod$param_of_int <- params
       mod$strat <- s
       lms[[s]] <- mod
     }
   }
 
   metamodel <- list(outcome = outcome, mods = lms, wtp = wtp,
-                    parms = parms, strategies = strategies,
+                    params = params, strategies = strategies,
                     psa = psa, analysis = analysis,
                     type = type, poly.order = poly.order, k = k)
   # define class
@@ -122,13 +123,13 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 #' Build formula and run linear regression for metamodel
 #' @param dep dependent variable in regression
 #' @param dat data to use in regression
-#' @param all_parms all parms in PSA
+#' @param all_params all params in PSA
 #'
 #' @importFrom mgcv gam
 #' @keywords internal
 #' @inheritParams metamodel
-mm_run_reg <- function(dep, parms, dat, type, poly.order, k) {
-  n_parms <- length(parms)
+mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
+  n_params <- length(params)
 
   if (type == "linear") {
     # build formula
@@ -136,10 +137,10 @@ mm_run_reg <- function(dep, parms, dat, type, poly.order, k) {
     fdep <- paste0(dep, " ~ ")
 
     ## parameter of interest
-    fparm <- parms
+    fparam <- params
 
     ## combine
-    f <- as.formula(paste0(fdep, fparm))
+    f <- as.formula(paste0(fdep, fparam))
 
     # run metamodel
     metamod <- lm(f, data = dat)
@@ -151,12 +152,12 @@ mm_run_reg <- function(dep, parms, dat, type, poly.order, k) {
     fbeg <- paste0(dep, " ~ ")
 
     ## parameters of interest
-    fparm <- ""
-    list_of_ps <- lapply(parms, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
-    fparm <- paste(list_of_ps, collapse = " + ")
+    fparam <- ""
+    list_of_ps <- lapply(params, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
+    fparam <- paste(list_of_ps, collapse = " + ")
 
     ## combine
-    f <- as.formula(paste0(fbeg, fparm))
+    f <- as.formula(paste0(fbeg, fparam))
 
     # run metamodel
     metamod <- lm(f, data = dat)
@@ -167,20 +168,20 @@ mm_run_reg <- function(dep, parms, dat, type, poly.order, k) {
     fbeg <- paste0(dep, " ~ ")
 
     ## parameters of interest
-    fparm <- ""
-    if (n_parms == 1) {
-      fparm <- paste0(fparm, "s(", parms, ", k=", k, ")")
+    fparam <- ""
+    if (n_params == 1) {
+      fparam <- paste0(fparam, "s(", params, ", k=", k, ")")
     } else {
-      for (p in parms) {
-        fparm <- paste0(fparm, "s(", p, ", k=", k, ")")
+      for (p in params) {
+        fparam <- paste0(fparam, "s(", p, ", k=", k, ")")
       }
       # add interactions
       ## the default for k in interactions is NA
       k_ti <- ifelse(k == -1, NA, k)
-      fparm <- paste0("ti(", paste(parms, collapse = ", "), ", k = ", k_ti, ")")
+      fparam <- paste0("ti(", paste(params, collapse = ", "), ", k = ", k_ti, ")")
     }
 
-    f <- as.formula(paste0(fbeg, fparm))
+    f <- as.formula(paste0(fbeg, fparam))
 
     metamod <- gam(f, data = dat)
   }
@@ -207,7 +208,7 @@ print.metamodel <- function(x, ...) {
       "outcome: ", x$outcome, "\n",
       "WTP: ", ifelse(!is.null(wtp), wtp, "NA"), "\n",
       "strategies: ", paste(x$strategies, collapse = ", "), "\n",
-      "parameters modeled: ", paste(x$parms, collapse = ", "), "\n",
+      "parameters modeled: ", paste(x$params, collapse = ", "), "\n",
       sep = "")
 }
 
@@ -220,21 +221,21 @@ summary.metamodel <- function(object, ...) {
   analysis <- object$analysis
   summary_df <- NULL
   if (analysis == "oneway") {
-    for (p in object$parms) {
+    for (p in object$params) {
       for (s in object$strategies) {
         lm_summary <- summary(object$mods[[p]][[s]])
         r2 <- lm_summary$r.squared
-        df_new_row <- data.frame("parm" = p, "strat" = s, "rsquared" = r2)
+        df_new_row <- data.frame("param" = p, "strat" = s, "rsquared" = r2)
         summary_df <- rbind(summary_df, df_new_row)
       }
     }
   }
   if (analysis == "twoway") {
-    parms <- object$parms
+    params <- object$params
     for (s in object$strategies) {
       lm_summary <- summary(object$mods[[s]])
       r2 <- lm_summary$r.squared
-      df_new_row <- data.frame("parm1" = parms[1], "parm2" = parms[2],
+      df_new_row <- data.frame("param1" = params[1], "param2" = params[2],
                                "strat" = s, "rsquared" = r2)
       summary_df <- rbind(summary_df, df_new_row)
     }
@@ -245,7 +246,7 @@ summary.metamodel <- function(object, ...) {
 #' Predict from a metamodel
 #'
 #' @param object object with class "metamodel"
-#' @param ranges A named list of the form c("parm" = c(0, 1), ...)
+#' @param ranges A named list of the form c("param" = c(0, 1), ...)
 #' that gives the ranges for the parameter of interest. If NULL,
 #' parameter values from the middle 95\% of the PSA samples are used. The number of samples
 #' from this range is determined by \code{nsamp}.
@@ -271,10 +272,10 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   }
 
   # all parameters in psa
-  psa_parms <- object$parms
+  psa_params <- object$params
 
   # get original psa parameter df
-  psa_parmvals <- object$psa$parameters
+  psa_paramvals <- object$psa$parameters
 
   # set of linear models
   mods <- object$mods
@@ -294,24 +295,24 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   if (analysis == "twoway") {
     pred_data_nrow <- nsamp ^ 2
   }
-  pdata <- data.frame(matrix(colMeans(psa_parmvals),
+  pdata <- data.frame(matrix(colMeans(psa_paramvals),
                              nrow = pred_data_nrow,
-                             ncol = ncol(psa_parmvals),
+                             ncol = ncol(psa_paramvals),
                              byrow = TRUE))
 
   # Name data frame's columns with parameters' names
-  colnames(pdata) <- colnames(psa_parmvals)
+  colnames(pdata) <- colnames(psa_paramvals)
 
   # these are parameters that are included in ranges
   if (is.null(ranges)) {
-    q_parms <- psa_parms
+    q_params <- psa_params
   } else {
     # get parameters associated with ranges
-    q_parms <- names(ranges)
-    if (!all(q_parms %in% psa_parms)) {
-      wrong_parms <- setdiff(q_parms, psa_parms)
+    q_params <- names(ranges)
+    if (!all(q_params %in% psa_params)) {
+      wrong_params <- setdiff(q_params, psa_params)
       stop(paste0("The following range names were not found in psa$parameters:\n",
-                  paste(wrong_parms, collapse = ", ")))
+                  paste(wrong_params, collapse = ", ")))
     }
   }
 
@@ -319,11 +320,11 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   if (analysis == "oneway") {
     ## make list to hold outcome dfs
     outcome_dfs <- vector(mode = "list",
-                          length = length(strats) * length(q_parms))
+                          length = length(strats) * length(q_params))
     counter <- 1
-    for (p in q_parms) {
+    for (p in q_params) {
       # define evenly spaced samples from parameter range
-      param_val <- make_parm_seq(p, ranges, nsamp, psa_parmvals)
+      param_val <- make_param_seq(p, ranges, nsamp, psa_paramvals)
 
       # create new data from param_val
       newdata <- data.frame(param_val)
@@ -348,10 +349,10 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
     outcome_dfs <- vector(mode = "list",
                           length = length(strats))
     counter <- 1
-    p1 <- psa_parms[1]
-    p2 <- psa_parms[2]
-    p1_samp <- make_parm_seq(p1, ranges, nsamp, psa_parmvals)
-    p2_samp <- make_parm_seq(p2, ranges, nsamp, psa_parmvals)
+    p1 <- psa_params[1]
+    p2 <- psa_params[2]
+    p1_samp <- make_param_seq(p1, ranges, nsamp, psa_paramvals)
+    p2_samp <- make_param_seq(p2, ranges, nsamp, psa_paramvals)
     p1p2_data <- data.frame(expand.grid(p1_samp, p2_samp))
     pdata[, c(p1, p2)] <- p1p2_data
 
@@ -375,14 +376,14 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 #' @param p parameter of interest
 #' @param ranges named vector of parameter ranges
 #' @param nsamp number of points from the range
-#' @param psa_parmvals sampled values from the PSA. used to calculate the
+#' @param psa_paramvals sampled values from the PSA. used to calculate the
 #' range if none is supplied
 #' @keywords internal
-make_parm_seq <- function(p, ranges, nsamp, psa_parmvals) {
+make_param_seq <- function(p, ranges, nsamp, psa_paramvals) {
   p_range <- ranges[[p]]
 
   # define default range if necesary
-  p_psa_vals <- psa_parmvals[, p]
+  p_psa_vals <- psa_paramvals[, p]
   if (is.null(p_range)) {
     p_range <- quantile(p_psa_vals, c(0.025, 0.975))
   } else {

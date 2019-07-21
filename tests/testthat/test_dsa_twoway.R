@@ -3,12 +3,12 @@ library(dampack)
 
 # create of example data
 nsamps <- 20
-params <- data.frame(expand.grid("parm1" = seq(0, 1, length.out = nsamps),
-                                 "parm2" = seq(4, 5, length.out = nsamps)))
-effect <- data.frame("s1" = 5 * params$parm1 + 4 * params$parm2,
-                     "s2" = 2 * params$parm1 ^ 2 - 3 * params$parm2 + 10)
-cost <- data.frame("s1" = 1e4 + 1000 * params$parm1 - 900 * params$parm2,
-                   "s2" = 1e5 + 1000 * params$parm1 - 900 * params$parm2)
+params <- data.frame(expand.grid("param1" = seq(0, 1, length.out = nsamps),
+                                 "param2" = seq(4, 5, length.out = nsamps)))
+effect <- data.frame("s1" = 5 * params$param1 + 4 * params$param2,
+                     "s2" = 2 * params$param1 ^ 2 - 3 * params$param2 + 10)
+cost <- data.frame("s1" = 1e4 + 1000 * params$param1 - 900 * params$param2,
+                   "s2" = 1e5 + 1000 * params$param1 - 900 * params$param2)
 
 strategies <- c("s1", "s2")
 
@@ -28,7 +28,7 @@ test_that("dsa class creation", {
   expect_equal(dsa$cost, cost)
   expect_equal(dsa$effectiveness, effect)
   expect_equal(dsa$n_sim, 400)
-  expect_equal(dsa$parnames, c("parm1", "parm2"))
+  expect_equal(dsa$parnames, c("param1", "param2"))
 })
 
 # print

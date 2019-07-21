@@ -3,7 +3,7 @@
 #' This function uses a linear regression metamodel of a PSA for a given
 #' decision-analytic model to predict the desired outcome.
 #'
-#' @param sens sensitivity analysis object;
+#' @param sa_obj sensitivity analysis object;
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 #' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #' @param nsamps number of samples to take from the ranges
@@ -13,25 +13,25 @@
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 #'
 #' @export
-owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
+owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2){
   outcome <- match.arg(outcome)
-  if (inherits(sens, "psa")) {
+  if (inherits(sa_obj, "psa")) {
     # create metamodel
-    mm <- metamodel("oneway", sens, parms,
+    mm <- metamodel("oneway", sa_obj, params,
                     strategies, outcome, wtp, "poly", poly.order)
 
     # predict outcomes using predict.metamodel
     ow <- predict(mm, ranges, nsamps)
-  } else if (inherits(sens, "dsa_oneway")) {
-    params <- sens$parameters
-    eff <- sens$effectiveness
-    cost <- sens$cost
-    strategies <- sens$strategies
-    param_names <- sens$parnames
+  } else if (inherits(sa_obj, "dsa_oneway")) {
+    params <- sa_obj$parameters
+    eff <- sa_obj$effectiveness
+    cost <- sa_obj$cost
+    strategies <- sa_obj$strategies
+    param_names <- sa_obj$parnames
 
     # calculate outcome of interest
     y <- calculate_outcome(outcome, cost, eff, wtp)
@@ -43,7 +43,7 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
       for (s in strategies) {
         # maybe extract this out later - shared with predict.metamodel
         param_rows <- params$parameter == p
-        param_val <- params[param_rows, "parmval"]
+        param_val <- params[param_rows, "paramval"]
         outcome_val <- y[param_rows, s]
 
         new_df <- data.frame("parameter" = p,
@@ -55,7 +55,7 @@ owsa <- function(sens, parms = NULL, ranges = NULL, nsamps = 100,
     }
 
   } else {
-    stop("sens must have class 'psa' or 'dsa_oneway'")
+    stop("sa_obj must have class 'psa' or 'dsa_oneway'")
   }
 
   # define classes

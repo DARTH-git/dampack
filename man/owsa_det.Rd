@@ -4,11 +4,11 @@
 \alias{owsa_det}
 \title{Compute one-way sensitivity analysis (OWSA)}
 \usage{
-owsa_det(parms = NULL, pars_df, nsamps = 100, FUN, outcome,
+owsa_det(params = NULL, pars_df, nsamps = 100, FUN, outcome,
   outcome_type = "eff", strategies = NULL, ...)
 }
 \arguments{
-\item{parms}{Vector with strings with the name of the parameters of interest}
+\item{params}{Vector with strings with the name of the parameters of interest}
 
 \item{pars_df}{A data.frame with 4 columns with following column order: "pars",
 "basecase", "min", and "max". The number of samples from this range is
@@ -47,7 +47,7 @@ given function that produces outcomes.
 \itemize{
 \item "pars" are the names of the input parameters in the
 user defined function. "pars" should include all parameters of interest provided in
-\code{parms}.
+\code{params}.
 \item "basecase" are the base value of input parameters in user defined \code{FUN}.
 \item "min" and "max" are the mininum and maximum values of the parameters of interest.
 Users only need to provide the "min" and "max" of the parameters of interest.

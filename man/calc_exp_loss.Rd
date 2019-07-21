@@ -4,13 +4,13 @@
 \alias{calc_exp_loss}
 \title{Calculate the expected loss at a range of willingness-to-pay thresholds}
 \usage{
-calc_exp_loss(wtp, psa)
+calc_exp_loss(psa, wtp)
 }
 \arguments{
-\item{wtp}{vector of willingness to pay thresholds}
-
 \item{psa}{object of class \code{psa}, produced by function
 \code{\link{make_psa_obj}}}
+
+\item{wtp}{vector of willingness to pay thresholds}
 }
 \value{
 object with classes \code{exp_loss} and \code{data.frame}
@@ -25,7 +25,7 @@ Visualize the expected loss at a variety of WTP thresholds using \code{\link{plo
 \examples{
 data("example_psa_obj")
 wtp <- seq(1e4, 1e5, by = 1e4)
-exp_loss <- calc_exp_loss(wtp, example_psa_obj)
+exp_loss <- calc_exp_loss(example_psa_obj, wtp)
 
 # can use head(), summary(), print(), etc.
 head(exp_loss)
@@ -39,11 +39,11 @@ plot(exp_loss, log_y = FALSE)
 }
 \references{
 \enumerate{
-\item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. 
-"Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: 
-The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability 
+\item Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H.
+"Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting:
+The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability
 Curves and Frontier. Value Health. 2019;22(5):611-618.
-\item Eckermann S, Briggs A, Willan AR. Health technology assessment in the 
+\item Eckermann S, Briggs A, Willan AR. Health technology assessment in the
 cost- disutility plane. Med Decis Making. 2008;28(2):172–181.
 }
 }

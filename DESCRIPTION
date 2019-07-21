@@ -1,13 +1,15 @@
 Package: dampack
 Type: Package
 Title: Decision-Analytic Modeling Package
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
   person("Fernando", "Alarid-Escudero", email="fernando.alarid@cide.edu",
     role = c("aut", "cre")),
   person("Caleb", "Easterly", email="easte080@umn.edu",
     role = "aut"),
   person("Eva", "Enns", email="eenns@umn.edu",
+    role = "aut"),
+  person("Greg", "Knowlton", email="gsknowlton@gmail.com",
     role = "aut")
   )
 Description: More about what it does (maybe more than one line)
@@ -15,7 +17,7 @@ Description: More about what it does (maybe more than one line)
 License: file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 3.3),
+    R (>= 3.5),
     ggplot2
 Imports:
     reshape2,

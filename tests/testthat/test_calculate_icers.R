@@ -49,15 +49,6 @@ test_that("default reference strategy", {
   }
 )
 
-test_that("custom reference strategy", {
-  cea <- calculate_icers(cost = c(163771.0, 164848.7, 163765.1),
-                         effect = c(6.48273, 6.52861, 6.52861),
-                         strategies = c("No Treat",   "Treat all", "Test & treat"),
-                         ref_strat = "No Treat")
-  expect_equal(cea$Strategy[1], "No Treat")
-  }
-)
-
 # one strategy
 test_that("one strategy runs", {
   cea <- calculate_icers(1, 2, "s")

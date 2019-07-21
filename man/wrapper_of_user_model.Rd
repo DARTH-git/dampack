@@ -4,14 +4,14 @@
 \alias{wrapper_of_user_model}
 \title{Wrapper function for owsa_det and twsa_det}
 \usage{
-wrapper_of_user_model(x, user_fun, parm_name, tmp_input, tmp_replace)
+wrapper_of_user_model(x, user_fun, param_name, tmp_input, tmp_replace)
 }
 \arguments{
 \item{x}{iteration}
 
 \item{user_fun}{\code{FUN} input from users}
 
-\item{parm_name}{user-defined list of parameters of interest}
+\item{param_name}{user-defined list of parameters of interest}
 
 \item{tmp_input}{basecase values}
 

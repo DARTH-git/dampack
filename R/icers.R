@@ -14,7 +14,6 @@
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
 #' @param strategies string vector of strategy names
-#' @param ref_strat reference strategy for the incremental comparison.
 #' With the default (NULL), there is no reference strategy, and the strategies
 #' are ranked in ascending order of cost.
 #'
@@ -56,7 +55,7 @@
 #' # note that longer strategy names will get truncated
 #' plot(icers, label = "all")
 #' @export
-calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
+calculate_icers <- function(cost, effect, strategies) {
   # checks on input
   n_cost <- length(cost)
   n_eff <- length(cost)
@@ -88,16 +87,6 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   # dominated strategies have a higher cost and lower effect
   df <- df %>%
     arrange(.data$Cost, desc(.data$Effect))
-  # if we want a reference strategy
-  if (!is.null(ref_strat)) {
-    if (!(ref_strat %in% df$Strategy)) {
-      stop(paste0("arg ref_strat (value: ", ref_strat, ") not present in data"))
-    }
-    # re-arrange to get reference strategy first
-    df_ref <- filter(df, .data$Strategy == ref_strat)
-    df_other <- filter(df, .data$Strategy != ref_strat)
-    df <- rbind(df_ref, df_other)
-  }
 
   # iterate over strategies and detect (strongly) dominated strategies
   # those with higher cost and equal or lower effect
@@ -169,15 +158,6 @@ calculate_icers <- function(cost, effect, strategies, ref_strat = NULL) {
   # when combining, sort so we have ref,ND,ED,D
   results <- bind_rows(d_df, ed_df, nd_df_icers) %>%
     arrange(desc(.data$Status), .data$Cost, desc(.data$Effect))
-
-  # put reference at the top (if we have one)
-  if (!is.null(ref_strat)) {
-    results_ref <- filter(results, .data$Strategy == ref_strat)
-    results_other <- filter(results, .data$Strategy != ref_strat)
-    results <- rbind(results_ref, results_other)
-    # declare status as 'ref'
-    results[1, "Status"] <- "ref"
-  }
 
   # re-arrange columns
   results <- results %>%

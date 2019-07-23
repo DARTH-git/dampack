@@ -12,9 +12,8 @@
 #' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param outcome_type The type of outcome is either "eff" or "cost". The default
-#' outcome_type is "eff"
+#' @param outcome_eff String with the effect outcome of interest produced by \code{nsamp}
+#' @param outcome_cost String with the cost outcome of interest produced by \code{nsamp}
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
 #' @param ... Additional arguments to user-defined \code{FUN}
@@ -39,8 +38,8 @@
 #' }
 #'
 #' @export
-owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN, outcome,
-                     outcome_type = "eff", strategies = NULL, ...){
+owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
+                     outcome_eff = NULL, outcome_cost = NULL, strategies = NULL, ...){
 
   if (is.null(params)) {
     params <- as.character(params_all[, 1])
@@ -93,16 +92,29 @@ owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN, outcome,
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
-  if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
+  if (!is.null(outcome_eff)){
+    if (length(outcome_eff) > 1) stop("only one effect outcome of interest is allowed at a time")
 
-  v_outcomes <- colnames(userfun)[-1]
+    v_outcomes <- colnames(userfun)[-1]
 
-  if (!(outcome %in% v_outcomes)){
-    stop("outcome is not in FUN outcomes")
+    if (!(outcome_eff %in% v_outcomes)){
+      stop("outcome_eff is not in FUN outcomes")
+    }
+  }
+
+  if (!is.null(outcome_cost)){
+    if (length(outcome_cost) > 1) stop("only one cost outcome of interest is allowed at a time")
+
+    v_outcomes <- colnames(userfun)[-1]
+
+    if (!(outcome_cost %in% v_outcomes)){
+      stop("outcome_cost is not in FUN outcomes")
+    }
   }
 
   param_table_all <- NULL
-  sim_out_df_all <- NULL
+  sim_out_eff_df_all <- NULL
+  sim_out_cost_df_all <- NULL
   n_params <- length(params)
 
   for (i in 1:n_params) {
@@ -123,25 +135,58 @@ owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN, outcome,
                       tmp_input = fun_input_ls,
                       tmp_replace = v_owsa_input)
 
-    sim_out_df <- lapply(sim_out,
-                         function(x, tmp_out = outcome) {
-                           x[[outcome]]
-                           })
+    if (!is.null(outcome_eff)){
+      sim_out_eff_df <- lapply(sim_out,
+                               function(x, tmp_out = outcome_eff) {
+                                 x[[outcome_eff]]
+                               })
+      sim_out_eff_df <- as.data.frame(do.call(rbind, sim_out_eff_df))
+      colnames(sim_out_eff_df) <- strategies
+      sim_out_eff_df_all <- rbind(sim_out_eff_df_all, sim_out_eff_df)
+    }
 
-    sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
-    colnames(sim_out_df) <- strategies
+    if (!is.null(outcome_cost)){
+      sim_out_cost_df <- lapply(sim_out,
+                                function(x, tmp_out = outcome_cost) {
+                                  x[[outcome_cost]]
+                                })
+      sim_out_cost_df <- as.data.frame(do.call(rbind, sim_out_cost_df))
+      colnames(sim_out_cost_df) <- strategies
+      sim_out_cost_df_all <- rbind(sim_out_cost_df_all, sim_out_cost_df)
+    }
 
     param_table <- data.frame(parameter = rep(pars_i, nsamps),
                              paramval = unname(v_owsa_input))
 
     param_table_all <- rbind(param_table_all, param_table)
-    sim_out_df_all <- rbind(sim_out_df_all, sim_out_df)
   }
 
   param_table_all$parameter <- as.character(param_table_all$parameter)
-  df_owsa <- create_dsa_oneway(param_table_all, sim_out_df_all, strategies)
 
-  owsa_out <- owsa(df_owsa, outcome = outcome_type)
+  if (!is.null(outcome_eff)) {
+    df_owsa_eff <- create_dsa_oneway(param_table_all, sim_out_eff_df_all, strategies)
+  }
+
+  if (!is.null(outcome_cost)){
+    df_owsa_cost <- create_dsa_oneway(param_table_all, NULL, strategies, sim_out_cost_df_all)
+  }
+
+  if (!is.null(outcome_eff)){
+    owsa_out_eff <- owsa(df_owsa_eff, outcome = "eff")
+  }
+
+  if (!is.null(outcome_cost)){
+    owsa_out_cost <- owsa(df_owsa_cost, outcome = "cost")
+  }
+
+  if (!is.null(outcome_eff) & !is.null(outcome_cost)) {
+    owsa_out <- cbind(owsa_out_eff, owsa_out_cost)
+  } else if (!is.null(outcome_eff)) {
+    owsa_out <- owsa_out_eff
+  } else if (!is.null(outcome_cost)) {
+    owsa_out <- owsa_out_cost
+  }
+
   return(owsa_out)
 }
 

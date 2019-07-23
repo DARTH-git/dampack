@@ -19,7 +19,7 @@
 #' }
 #'
 #' @export
-create_dsa_oneway <- function(parameters, effectiveness, strategies,
+create_dsa_oneway <- function(parameters, effectiveness = NULL, strategies,
                               cost = NULL, currency = "$") {
   # parameter names
   colnames(parameters) <- c("parameter", "paramval")

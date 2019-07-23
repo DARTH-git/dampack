@@ -4,14 +4,12 @@
 \alias{owsa_tornado}
 \title{Tornado plot of a one-way sensitivity analysis}
 \usage{
-owsa_tornado(owsa, strategy, return = c("plot", "data"), txtsize = 12,
+owsa_tornado(owsa, return = c("plot", "data"), txtsize = 12,
   min_rel_diff = 0, col = c("full", "bw"), n_y_ticks = 8,
   ylim = NULL, ybreaks = NULL)
 }
 \arguments{
 \item{owsa}{an owsa object}
-
-\item{strategy}{the desired strategy}
 
 \item{return}{either return a ggplot object \code{plot} or a data frame with
 ranges of parameters for which each strategy is optimal.}

@@ -45,6 +45,6 @@ test_that("correct class members", {
 test_that("dsa plots", {
   dsa <- create_dsa_oneway(ps, es, strategies, cs)
   o <- owsa(dsa, outcome = "nmb", wtp = 1e5)
-  expect_silent(owsa_tornado(o, strategy = "s2", min_rel_diff = 0))
+  expect_silent(owsa_tornado(o, min_rel_diff = 0))
   expect_silent(owsa_opt_strat(o))
 })

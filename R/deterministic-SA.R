@@ -4,28 +4,29 @@
 #' given function that produces outcomes.
 #'
 #' @param params Vector with strings with the name of the parameters of interest
-#' @param pars_df A data.frame with 4 columns with following column order: "pars",
+#' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
 #' @param nsamps number of parameter values. If \code{NULL}, 100 parameter values are
 #' used
-#' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
+#' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param outcome_type The type of outcome is either "eff" or "cost". The default
-#' outcome_type is "eff"
+#' @param outcome_eff String with the effect outcome of interest produced by \code{nsamp}
+#' @param outcome_cost String with the cost outcome of interest produced by \code{nsamp}
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
-#' @return A dataframe with the results of the sensitivity analysis. Can be
+#' @return A dataframe with the results of the sensitivity analysis.
+#' If both cost and effect outcomes are supplied,
+#' a list containing two owsa objects will be returned. Can be
 #' visualized with \code{plot.owsa}, \code{owsa_opt_strat} and
 #' \code{owsa_tornado} from \code{dampack}
 #'
 #' @section Details:
 #' \itemize{
-#' \item \code{pars_df}
+#' \item \code{params_all}
 #' \itemize{
 #' \item "pars" are the names of the input parameters in the
 #' user defined function. "pars" should include all parameters of interest provided in
@@ -39,38 +40,38 @@
 #' }
 #'
 #' @export
-owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
-                     outcome_type = "eff", strategies = NULL, ...){
+owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
+                     outcome_eff = NULL, outcome_cost = NULL, strategies = NULL, ...){
 
   if (is.null(params)) {
-    params <- as.character(pars_df[, 1])
-    warning("assuming the pars in pars_df are the parameters of interest")
+    params <- as.character(params_all[, 1])
+    warning("assuming the pars in params_all are the parameters of interest")
   }
 
-  if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+  if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
-  if (ncol(pars_df) != 4) stop("pars_df must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
+  if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
 
-  params_basecase <- pars_df[, 2]
-  names(params_basecase) <- as.character(pars_df[, 1])
+  params_basecase <- params_all[, 2]
+  names(params_basecase) <- as.character(params_all[, 1])
   opt_arg_val <- list(...)
   fun_input_ls <- c(list(params_basecase), opt_arg_val)
 
-  if (!all(params %in% pars_df[, 1])) {
-    stop("params should be in the parameters provided in pars_df")
+  if (!all(params %in% params_all[, 1])) {
+    stop("params should be in the parameters provided in params_all")
   }
 
-  if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
-    stop("basecase, min and max in pars_df must be numeric")
+  if (!all(is.numeric(params_all[, 2]), is.numeric(params_all[, 3]), is.numeric(params_all[, 4]))) {
+    stop("basecase, min and max in params_all must be numeric")
   }
 
-  ix <- match(params, pars_df$pars)
-  if (!all( (pars_df[ix, 2] >= pars_df[ix, 3]) &
-            (pars_df[ix, 2] <= pars_df[ix, 4]))) {
+  ix <- match(params, params_all$pars)
+  if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
+            (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }
 
-  names(pars_df) <- c("pars", "basecase", "min", "max")
+  names(params_all) <- c("pars", "basecase", "min", "max")
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_ls)
@@ -93,29 +94,42 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
-  if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
+  if (!is.null(outcome_eff)){
+    if (length(outcome_eff) > 1) stop("only one effect outcome of interest is allowed at a time")
 
-  v_outcomes <- colnames(userfun)[-1]
+    v_outcomes <- colnames(userfun)[-1]
 
-  if (!(outcome %in% v_outcomes)){
-    stop("outcome is not in FUN outcomes")
+    if (!(outcome_eff %in% v_outcomes)){
+      stop("outcome_eff is not in FUN outcomes")
+    }
+  }
+
+  if (!is.null(outcome_cost)){
+    if (length(outcome_cost) > 1) stop("only one cost outcome of interest is allowed at a time")
+
+    v_outcomes <- colnames(userfun)[-1]
+
+    if (!(outcome_cost %in% v_outcomes)){
+      stop("outcome_cost is not in FUN outcomes")
+    }
   }
 
   param_table_all <- NULL
-  sim_out_df_all <- NULL
+  sim_out_eff_df_all <- NULL
+  sim_out_cost_df_all <- NULL
   n_params <- length(params)
 
   for (i in 1:n_params) {
     # Generate matrix of inputs
     pars_i <- params[i]
-    ix <- which(pars_df$pars == pars_i)
-    pars_range <- pars_df[ix, c("min", "max")]
+    ix <- which(params_all$pars == pars_i)
+    pars_range <- params_all[ix, c("min", "max")]
     v_owsa_input <- t(t(seq(pars_range[[1]],
                             pars_range[[2]],
                             length.out = nsamps)))
     colnames(v_owsa_input) <- pars_i
 
-    # Run model and capture outcome
+    # Run model and capture outcome(s)
     sim_out <- lapply(c(1:nsamps),
                       wrapper_of_user_model,
                       user_fun = FUN,
@@ -123,26 +137,51 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
                       tmp_input = fun_input_ls,
                       tmp_replace = v_owsa_input)
 
-    sim_out_df <- lapply(sim_out,
-                         function(x, tmp_out = outcome) {
-                           x[[outcome]]
-                           })
+    if (!is.null(outcome_eff)){
+      sim_out_eff_df <- lapply(sim_out,
+                               function(x, tmp_out = outcome_eff) {
+                                 x[[outcome_eff]]
+                               })
+      sim_out_eff_df <- as.data.frame(do.call(rbind, sim_out_eff_df))
+      colnames(sim_out_eff_df) <- strategies
+      sim_out_eff_df_all <- rbind(sim_out_eff_df_all, sim_out_eff_df)
+    }
 
-    sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
-    colnames(sim_out_df) <- strategies
+    if (!is.null(outcome_cost)){
+      sim_out_cost_df <- lapply(sim_out,
+                                function(x, tmp_out = outcome_cost) {
+                                  x[[outcome_cost]]
+                                })
+      sim_out_cost_df <- as.data.frame(do.call(rbind, sim_out_cost_df))
+      colnames(sim_out_cost_df) <- strategies
+      sim_out_cost_df_all <- rbind(sim_out_cost_df_all, sim_out_cost_df)
+    }
 
     param_table <- data.frame(parameter = rep(pars_i, nsamps),
                              paramval = unname(v_owsa_input))
 
     param_table_all <- rbind(param_table_all, param_table)
-    sim_out_df_all <- rbind(sim_out_df_all, sim_out_df)
   }
 
   param_table_all$parameter <- as.character(param_table_all$parameter)
-  df_owsa <- create_dsa_oneway(param_table_all, sim_out_df_all, strategies)
 
-  owsa_out <- owsa(df_owsa, outcome = outcome_type)
-  return(owsa_out)
+  if (!is.null(outcome_eff)) {
+    df_owsa_eff <- create_dsa_oneway(param_table_all, sim_out_eff_df_all, strategies)
+    owsa_out_eff <- owsa(df_owsa_eff, outcome = "eff")
+  }
+
+  if (!is.null(outcome_cost)){
+    df_owsa_cost <- create_dsa_oneway(param_table_all, NULL, strategies, sim_out_cost_df_all)
+    owsa_out_cost <- owsa(df_owsa_cost, outcome = "cost")
+  }
+
+  if (!is.null(outcome_cost) & !is.null(outcome_eff)){
+    return(list(owsa_eff = owsa_out_eff, owsa_cost = owsa_out_cost))
+  } else if (is.null(outcome_cost)){
+    return(owsa_out_eff)
+  } else if (is.null(outcome_eff)){
+    return(owsa_out_cost)
+  }
 }
 
 #' Two-way sensitivity analysis (TWSA)
@@ -152,17 +191,16 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
 #'
 #' @param param1 String with the name of the first parameter of interest
 #' @param param2 String with the name of the second parameter of interest
-#' @param pars_df A data.frame with 4 columns with following column order: "pars",
+#' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
 #' @param nsamps number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
-#' @param FUN Function that takes the basecase in \code{pars_df} and \code{...} to
+#' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param outcome_type The type of outcome is either "eff" or "cost". The default
-#' outcome_type is "eff"
+#' @param outcome_eff String with the effect outcome of interest produced by \code{nsamp}
+#' @param outcome_cost String with the cost outcome of interest produced by \code{nsamp}
 #' @param strategies vector of strategy names. The default (NULL) will use
 #' strategy names in FUN
 #' @param ... Additional arguments to user-defined \code{FUN}
@@ -172,7 +210,7 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
 #'
 #' @section Details:
 #' \itemize{
-#' \item \code{pars_df}
+#' \item \code{params_all}
 #' \itemize{
 #' \item "pars" are the names of the input parameters in the
 #' user defined function. "pars" should include all parameters of interest provided in
@@ -186,16 +224,16 @@ owsa_det <- function(params = NULL, pars_df, nsamps = 100, FUN, outcome,
 #' }
 #'
 #' @export
-twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
-                     outcome_type = "eff", strategies = NULL, ...){
+twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcome_eff = NULL,
+                     outcome_cost = NULL, strategies = NULL, ...){
 
-  if (!is.data.frame(pars_df)) stop("pars_df must be a data.frame")
+  if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
-  if (ncol(pars_df) != 4) stop("pars_df must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
+  if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
 
   poi <- unique(c(param1, param2))
-  params_basecase <- pars_df[, 2]
-  names(params_basecase) <- as.character(pars_df[, 1])
+  params_basecase <- params_all[, 2]
+  names(params_basecase) <- as.character(params_all[, 1])
   opt_arg_val <- list(...)
   fun_input_ls <- c(list(params_basecase), opt_arg_val)
 
@@ -204,20 +242,20 @@ twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
   }
 
   if (!all(poi %in% names(params_basecase))){
-    stop("param1 and param2 should be in the parameters provided in pars_df")
+    stop("param1 and param2 should be in the parameters provided in params_all")
   }
 
-  if (!all(is.numeric(pars_df[, 2]), is.numeric(pars_df[, 3]), is.numeric(pars_df[, 4]))) {
-    stop("basecase, min and max in pars_df must be numeric")
+  if (!all(is.numeric(params_all[, 2]), is.numeric(params_all[, 3]), is.numeric(params_all[, 4]))) {
+    stop("basecase, min and max in params_all must be numeric")
   }
 
-  ix <- match(poi, pars_df$pars)
-  if (!all( (pars_df[ix, 2] >= pars_df[ix, 3]) &
-            (pars_df[ix, 2] <= pars_df[ix, 4]))) {
+  ix <- match(poi, params_all$pars)
+  if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
+            (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }
 
-  names(pars_df) <- c("pars", "basecase", "min", "max")
+  names(params_all) <- c("pars", "basecase", "min", "max")
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_ls)
@@ -240,16 +278,28 @@ twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
-  if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
+  if (!is.null(outcome_eff)){
+    if (length(outcome_eff) > 1) stop("only one effect outcome of interest is allowed at a time")
 
-  v_outcomes <- colnames(userfun)[-1]
+    v_outcomes <- colnames(userfun)[-1]
 
-  if (!(outcome %in% v_outcomes)){
-    stop("outcome is not part of FUN outcomes")
+    if (!(outcome_eff %in% v_outcomes)){
+      stop("outcome_eff is not in FUN outcomes")
+    }
+  }
+
+  if (!is.null(outcome_cost)){
+    if (length(outcome_cost) > 1) stop("only one cost outcome of interest is allowed at a time")
+
+    v_outcomes <- colnames(userfun)[-1]
+
+    if (!(outcome_cost %in% v_outcomes)){
+      stop("outcome_cost is not in FUN outcomes")
+    }
   }
 
   ### Generate matrix of inputs
-  range_df <- pars_df[ix, c("min", "max")]
+  range_df <- params_all[ix, c("min", "max")]
   param_table <- expand.grid(param1 = seq(range_df[1, "min"],
                                          range_df[1, "max"],
                                          length.out = nsamps),
@@ -267,18 +317,43 @@ twsa_det <- function(param1, param2, pars_df, nsamps = 40, FUN, outcome,
                     tmp_input = fun_input_ls,
                     tmp_replace = param_table)
 
-  sim_out_df <- lapply(sim_out,
-                       function(x, tmp_out = outcome) {
-                         x[[outcome]]
-                       })
-  sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
-  colnames(sim_out_df) <- strategies
 
-  df_twsa <- create_dsa_twoway(param_table, sim_out_df, strategies)
+  if (!is.null(outcome_eff)){
+    sim_out_eff_df <- lapply(sim_out,
+                             function(x, tmp_out = outcome_eff) {
+                               x[[outcome_eff]]
+                             })
+    sim_out_eff_df <- as.data.frame(do.call(rbind, sim_out_eff_df))
+    colnames(sim_out_eff_df) <- strategies
+  }
 
-  twsa_out <- twsa(df_twsa, outcome = outcome_type)
+  if (!is.null(outcome_cost)){
+    sim_out_cost_df <- lapply(sim_out,
+                              function(x, tmp_out = outcome_cost) {
+                                x[[outcome_cost]]
+                              })
+    sim_out_cost_df <- as.data.frame(do.call(rbind, sim_out_cost_df))
+    colnames(sim_out_cost_df) <- strategies
+  }
 
-  return(twsa_out)
+  if (!is.null(outcome_eff)) {
+    df_twsa_eff <- create_dsa_twoway(param_table, sim_out_eff_df, strategies)
+    twsa_out_eff <- twsa(df_twsa_eff, outcome = "eff")
+  }
+
+  if (!is.null(outcome_cost)) {
+    df_twsa_cost <- create_dsa_twoway(param_table, effectiveness = NULL,
+                                      strategies, sim_out_cost_df)
+    twsa_out_cost <- twsa(df_twsa_cost, outcome = "cost")
+  }
+
+  if (!is.null(outcome_cost) & !is.null(outcome_eff)){
+    return(list(twsa_eff = twsa_out_eff, twsa_cost = twsa_out_cost))
+  } else if (is.null(outcome_cost)){
+    return(twsa_out_eff)
+  } else if (is.null(outcome_eff)){
+    return(twsa_out_cost)
+  }
 }
 
 

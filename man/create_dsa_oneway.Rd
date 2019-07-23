@@ -4,8 +4,8 @@
 \alias{create_dsa_oneway}
 \title{Create one-way deterministic sensitivity analysis object}
 \usage{
-create_dsa_oneway(parameters, effectiveness, strategies, cost = NULL,
-  currency = "$")
+create_dsa_oneway(parameters, effectiveness = NULL, strategies,
+  cost = NULL, currency = "$")
 }
 \arguments{
 \item{parameters}{parameter values associated with effectiveness and outcomes.

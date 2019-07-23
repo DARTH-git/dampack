@@ -158,19 +158,19 @@ plot(o)
 Tornado plot:
 
 ```{r}
-owsa_tornado(o, strategy = "Radio")
+owsa_tornado(o)
 ```
 
 Can filter out strategies that don't change using `min_rel_diff`.
 
 ```{r}
-owsa_tornado(o, strategy = "Radio", min_rel_diff = 0.05)
+owsa_tornado(o, min_rel_diff = 0.05)
 ```
 
 Can also return plot data:
 
 ```{r}
-owsa_tornado(o, strategy = "Radio", return = "data")
+owsa_tornado(o, return = "data")
 ```
 
 Optimal strategy rangeplot:

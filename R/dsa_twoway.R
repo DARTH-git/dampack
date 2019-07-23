@@ -18,7 +18,7 @@
 #' }
 #'
 #' @export
-create_dsa_twoway <- function(parameters, effectiveness, strategies,
+create_dsa_twoway <- function(parameters, effectiveness = NULL, strategies,
                               cost = NULL, currency = "$") {
   # parameter names and dataframe structure
   parameters <- check_df_and_coerce(parameters)

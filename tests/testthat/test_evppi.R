@@ -12,5 +12,5 @@ test_that("evppi runs", {
   expect_silent(calc_evppi(wtp = 1e5,
                            psa = psa_obj,
                            params = c("pFailSurg", "pFailChemo"),
-                           outcome = "nmb_loss"))
+                           outcome = "nmb"))
 })

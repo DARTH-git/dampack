@@ -8,7 +8,7 @@
 calc_evsi <- function(psa,
                       wtp,
                       params = NULL,
-                      outcome = c("nhb_loss", "nmb_loss"),
+                      outcome = c("nhb", "nmb"),
                       type = c("gam", "poly"),
                       poly.order = 2,
                       k = -1,
@@ -19,7 +19,7 @@ calc_evsi <- function(psa,
   outcome <- match.arg(outcome)
 
   # adjust outcome type
-  outcome <- paste0(outcome, "_voi")
+  outcome <- paste0(outcome, "_loss_voi")
 
   # run the metamodels
   mms <- metamodel(analysis = "multiway",

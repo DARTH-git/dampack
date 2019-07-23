@@ -5,8 +5,8 @@
 \title{Estimation of the Expected Value of Partial Perfect Information (EVPPI)
 using a linear regression metamodel approach}
 \usage{
-calc_evppi(psa, wtp, params = NULL, outcome = c("nmb_loss",
-  "nhb_loss"), type = c("gam", "poly"), poly.order = 2, k = -1)
+calc_evppi(psa, wtp, params = NULL, outcome = c("nmb", "nhb"),
+  type = c("gam", "poly"), poly.order = 2, k = -1)
 }
 \arguments{
 \item{psa}{object of class psa, produced by \code{\link{make_psa_obj}}}
@@ -15,8 +15,8 @@ calc_evppi(psa, wtp, params = NULL, outcome = c("nmb_loss",
 
 \item{params}{A vector of parameters for which to analyze the EVPPI.}
 
-\item{outcome}{either net monetary benefit (\code{"nmb_loss"})
-or net health benefit (\code{"nhb_loss"})}
+\item{outcome}{either net monetary benefit (\code{"nmb"})
+or net health benefit (\code{"nhb"})}
 
 \item{type}{either generalized additive models (\code{"gam"}) or
 polynomial models (\code{"poly"})}

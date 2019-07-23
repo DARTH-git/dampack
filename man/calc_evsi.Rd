@@ -4,7 +4,7 @@
 \alias{calc_evsi}
 \title{Calculate Expected Value of Sample Information}
 \usage{
-calc_evsi(psa, wtp, params = NULL, outcome = c("nhb_loss", "nmb_loss"),
+calc_evsi(psa, wtp, params = NULL, outcome = c("nhb", "nmb"),
   type = c("gam", "poly"), poly.order = 2, k = -1, n = 100,
   n0 = 10)
 }
@@ -15,8 +15,8 @@ calc_evsi(psa, wtp, params = NULL, outcome = c("nhb_loss", "nmb_loss"),
 
 \item{params}{A vector of parameters for which to analyze the EVPPI.}
 
-\item{outcome}{either net monetary benefit (\code{"nmb_loss"})
-or net health benefit (\code{"nhb_loss"})}
+\item{outcome}{either net monetary benefit (\code{"nmb"})
+or net health benefit (\code{"nhb"})}
 
 \item{type}{either generalized additive models (\code{"gam"}) or
 polynomial models (\code{"poly"})}

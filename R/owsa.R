@@ -143,7 +143,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
   owsa_filt <- owsa %>%
     group_by(.data$parameter, .data$param_val) %>%
     arrange(.data$outcome_val) %>%
-    slice(n()) %>% select(-strategy) %>%
+    slice(n()) %>% select(-(.data$strategy)) %>%
     ungroup()
 
   # group by parameter and strategy

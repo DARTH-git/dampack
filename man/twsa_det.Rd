@@ -4,8 +4,8 @@
 \alias{twsa_det}
 \title{Two-way sensitivity analysis (TWSA)}
 \usage{
-twsa_det(param1, param2, params_all, nsamps = 40, FUN, outcome,
-  outcome_type = "eff", strategies = NULL, ...)
+twsa_det(param1, param2, params_all, nsamps = 40, FUN,
+  outcome_eff = NULL, outcome_cost = NULL, strategies = NULL, ...)
 }
 \arguments{
 \item{param1}{String with the name of the first parameter of interest}
@@ -23,10 +23,9 @@ used}
 produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 where the first column are the strategy names and the rest of the columns must be outcomes.}
 
-\item{outcome}{String with the outcome of interest produced by \code{nsamp}}
+\item{outcome_eff}{String with the effect outcome of interest produced by \code{nsamp}}
 
-\item{outcome_type}{The type of outcome is either "eff" or "cost". The default
-outcome_type is "eff"}
+\item{outcome_cost}{String with the cost outcome of interest produced by \code{nsamp}}
 
 \item{strategies}{vector of strategy names. The default (NULL) will use
 strategy names in FUN}

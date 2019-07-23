@@ -40,22 +40,37 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
     n_sim_effectiveness <- nrow(effectiveness)
   }
 
-  n_sim_parameters <- nrow(parameters)
-
   if (!is.null(cost)) {
     n_sim_costs <- nrow(cost)
   }
 
-  #  if ( (n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs) ) {
-  #    stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
-  #  }
-  #} else {
-  #  if (n_sim_effectiveness != n_sim_parameters) {
-  #    stop("The effectiveness, and parameter dataframes must have the same number of rows.")
-  #  }
-  #}
+  n_sim_parameters <- nrow(parameters)
 
-  # define n_sim (could be any of the three, since they're all equal)
+
+  if (!is.null(cost) & !is.null(effectiveness)) {
+    if ( (n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs)
+         | (n_sim_parameters != n_sim_effectiveness) ) {
+      stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
+    }
+  }
+
+  if (is.null(cost)) {
+    if (n_sim_effectiveness != n_sim_parameters) {
+      stop("The effectiveness and parameter dataframes must have the same number of rows.")
+    }
+  }
+
+
+  if (is.null(effectiveness)) {
+    if (n_sim_costs != n_sim_parameters) {
+      stop("The cost and parameter dataframes must have the same number of rows.")
+   }
+  }
+
+
+
+
+  # define n_sim
   n_sim <- n_sim_parameters
 
   # costs and effectiveness have same number of columns (strategies)
@@ -69,18 +84,18 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
     n_strategies <- n_strategies_effectiveness
   }
 
-  #if (!is.null(effectiveness) & !is.null(cost)){
-  #  if (n_strategies_costs != n_strategies_effectiveness) {
-  #    stop("The number of columns of the cost and benefit matrices is different and must be the same.")
-  #  }
-  #}
+  if (!is.null(effectiveness) & !is.null(cost)){
+    if (n_strategies_costs != n_strategies_effectiveness) {
+      stop("The number of columns of the cost and benefit matrices is different and must be the same.")
+    }
+  }
 
-  #if  (!is.null(cost)){
-  #  # define n.strat (could be either n_sim_costs or n_sim_effectiveness)
-  #  n_strategies <- n_strategies_costs
-  #} else if (!is.null(effectiveness)) {
-  #  n_strategies <- ncol(effectiveness)
-  #}
+  if  (!is.null(cost)){
+    # define n.strat (could be either n_sim_costs or n_sim_effectiveness)
+    n_strategies <- n_strategies_costs
+  } else if (!is.null(effectiveness)) {
+    n_strategies <- n_strategies_effectiveness
+  }
 
   # If the name of the strategies is not provided, generate a generic vector
   # with strategy names

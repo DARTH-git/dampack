@@ -18,7 +18,9 @@
 #' strategy names in \code{FUN}
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
-#' @return A dataframe with the results of the sensitivity analysis. Can be
+#' @return A dataframe with the results of the sensitivity analysis.
+#' If both cost and effect outcomes are supplied,
+#' a list containing two owsa objects will be returned. Can be
 #' visualized with \code{plot.owsa}, \code{owsa_opt_strat} and
 #' \code{owsa_tornado} from \code{dampack}
 #'
@@ -127,7 +129,7 @@ owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
                             length.out = nsamps)))
     colnames(v_owsa_input) <- pars_i
 
-    # Run model and capture outcome
+    # Run model and capture outcome(s)
     sim_out <- lapply(c(1:nsamps),
                       wrapper_of_user_model,
                       user_fun = FUN,
@@ -165,29 +167,21 @@ owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
 
   if (!is.null(outcome_eff)) {
     df_owsa_eff <- create_dsa_oneway(param_table_all, sim_out_eff_df_all, strategies)
-  }
-
-  if (!is.null(outcome_cost)){
-    df_owsa_cost <- create_dsa_oneway(param_table_all, NULL, strategies, sim_out_cost_df_all)
-  }
-
-  if (!is.null(outcome_eff)){
     owsa_out_eff <- owsa(df_owsa_eff, outcome = "eff")
   }
 
   if (!is.null(outcome_cost)){
+    df_owsa_cost <- create_dsa_oneway(param_table_all, NULL, strategies, sim_out_cost_df_all)
     owsa_out_cost <- owsa(df_owsa_cost, outcome = "cost")
   }
 
-  if (!is.null(outcome_eff) & !is.null(outcome_cost)) {
-    owsa_out <- cbind(owsa_out_eff, owsa_out_cost)
-  } else if (!is.null(outcome_eff)) {
-    owsa_out <- owsa_out_eff
-  } else if (!is.null(outcome_cost)) {
-    owsa_out <- owsa_out_cost
+  if (!is.null(outcome_cost) & !is.null(outcome_eff)){
+    return(list(owsa_eff = owsa_out_eff, owsa_cost = owsa_out_cost))
+  } else if (is.null(outcome_cost)){
+    return(owsa_out_eff)
+  } else if (is.null(outcome_eff)){
+    return(owsa_out_cost)
   }
-
-  return(owsa_out)
 }
 
 #' Two-way sensitivity analysis (TWSA)
@@ -205,9 +199,8 @@ owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
 #' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
-#' @param outcome String with the outcome of interest produced by \code{nsamp}
-#' @param outcome_type The type of outcome is either "eff" or "cost". The default
-#' outcome_type is "eff"
+#' @param outcome_eff String with the effect outcome of interest produced by \code{nsamp}
+#' @param outcome_cost String with the cost outcome of interest produced by \code{nsamp}
 #' @param strategies vector of strategy names. The default (NULL) will use
 #' strategy names in FUN
 #' @param ... Additional arguments to user-defined \code{FUN}
@@ -231,8 +224,8 @@ owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
 #' }
 #'
 #' @export
-twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcome,
-                     outcome_type = "eff", strategies = NULL, ...){
+twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcome_eff = NULL,
+                     outcome_cost = NULL, strategies = NULL, ...){
 
   if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
@@ -285,12 +278,24 @@ twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcome,
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
-  if (length(outcome) > 1) stop("only one outcome of interest is allowed once at a time")
+  if (!is.null(outcome_eff)){
+    if (length(outcome_eff) > 1) stop("only one effect outcome of interest is allowed at a time")
 
-  v_outcomes <- colnames(userfun)[-1]
+    v_outcomes <- colnames(userfun)[-1]
 
-  if (!(outcome %in% v_outcomes)){
-    stop("outcome is not part of FUN outcomes")
+    if (!(outcome_eff %in% v_outcomes)){
+      stop("outcome_eff is not in FUN outcomes")
+    }
+  }
+
+  if (!is.null(outcome_cost)){
+    if (length(outcome_cost) > 1) stop("only one cost outcome of interest is allowed at a time")
+
+    v_outcomes <- colnames(userfun)[-1]
+
+    if (!(outcome_cost %in% v_outcomes)){
+      stop("outcome_cost is not in FUN outcomes")
+    }
   }
 
   ### Generate matrix of inputs
@@ -312,18 +317,43 @@ twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcome,
                     tmp_input = fun_input_ls,
                     tmp_replace = param_table)
 
-  sim_out_df <- lapply(sim_out,
-                       function(x, tmp_out = outcome) {
-                         x[[outcome]]
-                       })
-  sim_out_df <- as.data.frame(do.call(rbind, sim_out_df))
-  colnames(sim_out_df) <- strategies
 
-  df_twsa <- create_dsa_twoway(param_table, sim_out_df, strategies)
+  if (!is.null(outcome_eff)){
+    sim_out_eff_df <- lapply(sim_out,
+                             function(x, tmp_out = outcome_eff) {
+                               x[[outcome_eff]]
+                             })
+    sim_out_eff_df <- as.data.frame(do.call(rbind, sim_out_eff_df))
+    colnames(sim_out_eff_df) <- strategies
+  }
 
-  twsa_out <- twsa(df_twsa, outcome = outcome_type)
+  if (!is.null(outcome_cost)){
+    sim_out_cost_df <- lapply(sim_out,
+                              function(x, tmp_out = outcome_cost) {
+                                x[[outcome_cost]]
+                              })
+    sim_out_cost_df <- as.data.frame(do.call(rbind, sim_out_cost_df))
+    colnames(sim_out_cost_df) <- strategies
+  }
 
-  return(twsa_out)
+  if (!is.null(outcome_eff)) {
+    df_twsa_eff <- create_dsa_twoway(param_table, sim_out_eff_df, strategies)
+    twsa_out_eff <- twsa(df_twsa_eff, outcome = "eff")
+  }
+
+  if (!is.null(outcome_cost)) {
+    df_twsa_cost <- create_dsa_twoway(param_table, effectiveness = NULL,
+                                      strategies, sim_out_cost_df)
+    twsa_out_cost <- twsa(df_twsa_cost, outcome = "cost")
+  }
+
+  if (!is.null(outcome_cost) & !is.null(outcome_eff)){
+    return(list(twsa_eff = twsa_out_eff, twsa_cost = twsa_out_cost))
+  } else if (is.null(outcome_cost)){
+    return(twsa_out_eff)
+  } else if (is.null(outcome_eff)){
+    return(twsa_out_cost)
+  }
 }
 
 

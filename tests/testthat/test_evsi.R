@@ -11,5 +11,5 @@ test_that("evsi runs", {
   expect_silent(calc_evsi(wtp = 1e5,
                           psa = psa_obj,
                           params = c("pFailSurg", "pFailChemo"),
-                          outcome = "nmb_loss"))
+                          outcome = "nmb"))
 })

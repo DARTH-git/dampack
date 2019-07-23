@@ -121,13 +121,12 @@ plot.owsa <- function(x, txtsize = 12,
 #' parameters that lead to a relative change in the outcome greater than or equal
 #' to \code{min_rel_diff}, which must be between 0 and 1. The default (0) is that
 #' no strategies are filtered.
-#' @param strategy the desired strategy
 #' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
 #' @importFrom stats median reorder
 #' @import ggplot2
 #' @export
-owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
+owsa_tornado <- function(owsa, return = c("plot", "data"),
                          txtsize = 12, min_rel_diff = 0,
                          col = c("full", "bw"),
                          n_y_ticks = 8, ylim = NULL, ybreaks = NULL){
@@ -140,8 +139,12 @@ owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
   if (min_rel_diff < 0 | min_rel_diff > 1) {
     stop("min_rel_diff must be between 0 and 1")
   }
-  # filter to strategy
-  owsa_filt <- owsa[owsa$strategy == strategy, ]
+
+  owsa_filt <- owsa %>%
+    group_by(.data$parameter, .data$param_val) %>%
+    arrange(.data$outcome_val) %>%
+    slice(n()) %>% select(-strategy) %>%
+    ungroup()
 
   # group by parameter and strategy
   mins <- owsa_filt %>%
@@ -154,7 +157,7 @@ owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
 
   avg <- median(owsa_filt$outcome_val)
 
-  min_max <- inner_join(mins, maxes, by = c("parameter", "strategy"),
+  min_max <- inner_join(mins, maxes, by = c("parameter"),
                         suffix = c(".low", ".high")) %>%
     mutate(abs_diff = abs(.data$outcome_val.high - .data$outcome_val.low),
            rel_diff = .data$abs_diff / .data$outcome_val.low) %>%
@@ -169,8 +172,7 @@ owsa_tornado <- function(owsa, strategy, return = c("plot", "data"),
                stat = "identity") +
       geom_bar(aes_(y = as.name("outcome_val.high"), fill = "High"),
                stat = "identity") +
-      labs(x = "Parameter", y = "Outcome",
-           title = paste0("Strategy: ", strategy)) +
+      labs(x = "Parameter", y = "Outcome") +
       coord_flip()
 
     col <- match.arg(col)

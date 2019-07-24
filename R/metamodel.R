@@ -172,13 +172,10 @@ mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
     if (n_params == 1) {
       fparam <- paste0(fparam, "s(", params, ", k=", k, ")")
     } else {
-      for (p in params) {
-        fparam <- paste0(fparam, "s(", p, ", k=", k, ")")
-      }
-      # add interactions
-      ## the default for k in interactions is NA
+      params_k <- paste0("s(", params,  ", k=", k, ")")
+      f_s <- paste(params_k, collapse = " + ")
       k_ti <- ifelse(k == -1, NA, k)
-      fparam <- paste0("ti(", paste(params, collapse = ", "), ", k = ", k_ti, ")")
+      fparam <- paste0(f_s, " + ti(", paste(params, collapse = ", "), ", k = ", k_ti, ")")
     }
 
     f <- as.formula(paste0(fbeg, fparam))

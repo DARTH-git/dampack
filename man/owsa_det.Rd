@@ -5,7 +5,7 @@
 \title{Compute one-way sensitivity analysis (OWSA)}
 \usage{
 owsa_det(params = NULL, params_all, nsamps = 100, FUN,
-  outcome_eff = NULL, outcome_cost = NULL, strategies = NULL, ...)
+  outcomes = NULL, strategies = NULL, ...)
 }
 \arguments{
 \item{params}{Vector with strings with the name of the parameters of interest}
@@ -21,9 +21,8 @@ used}
 produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 where the first column are the strategy names and the rest of the columns must be outcomes.}
 
-\item{outcome_eff}{String with the effect outcome of interest produced by \code{nsamp}}
-
-\item{outcome_cost}{String with the cost outcome of interest produced by \code{nsamp}}
+\item{outcomes}{String vector with the outcomes of interest from \code{FUN}
+produced by \code{nsamp}}
 
 \item{strategies}{vector of strategy names. The default \code{NULL} will use
 strategy names in \code{FUN}}
@@ -31,10 +30,10 @@ strategy names in \code{FUN}}
 \item{...}{Additional arguments to user-defined \code{FUN}}
 }
 \value{
-A dataframe with the results of the sensitivity analysis.
-If both cost and effect outcomes are supplied,
-a list containing two owsa objects will be returned. Can be
-visualized with \code{plot.owsa}, \code{owsa_opt_strat} and
+A list containing dataframes with the results of the sensitivity analyses.
+The list will contain a dataframe for each outcome specified.
+List elements can be visualized with \code{plot.owsa},
+\code{owsa_opt_strat} and
 \code{owsa_tornado} from \code{dampack}
 }
 \description{

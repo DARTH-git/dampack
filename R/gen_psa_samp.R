@@ -1,96 +1,94 @@
-gen_psa_samp(params = NULL, dist = NULL, parameterization_type = NULL, dist_params = NULL, n_samp = NULL)
+gen_psa_samp <- function(params = NULL,
+                         dist = NULL,
+                         parameterization_type = NULL,
+                         dist_params = NULL,
+                         n_samp = NULL) {
 
-n_params <- length(params)
-params_df <- "initialize list or df here"
+  n_params <- length(params)
+  params_df <- vector(mode = "list", length = n_params)
 
-for (i in 1:n_params) {
-
-  #normal
-  if (dist[i] == "normal") {
-    params_df[[i]] <- rnorm(n_samp, mean = dist_params[[i]][1], sd = dist_params[[i]][2])
-  }
-
-  #log-normal
-  if (dist[i] == "log-normal") {
-    mu <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
-    sd <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
-    params_df[[i]] <- rlnorm(n_samp, meanlog = mu, sdlog = sd)
-  }
-
-  #beta
-  if (dist[i] == "beta") {
-    if (parameterization_type == "mean, sd") {
-      a <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
-      b <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
-      params_df[[i]] <- rbeta(n_samp, a, b)
-    } else if (parameterization_type == "a, b") {
-      a <- dist_params[[i]][1]
-      b <- dist_params[[i]][2]
-      params_df[[i]] <- rbeta(n_samp, a, b)
+  for (i in 1:n_params) {
+    #normal
+    if (dist[i] == "normal") {
+      params_df[[i]] <- data.frame(param_val = rnorm(n_samp, mean = dist_params[[i]][1], sd = dist_params[[i]][2]))
+      names(params_df[[i]]) <- paste0(params[i])
     }
-  }
 
-  #gamma
-  if (dist[i] == "gamma") {
-    if (parameterization_type == "mean, sd") {
-      shape <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[1]]
-      scale <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[2]]
-      params_df[[i]] <- rgamma(n_samp, shape = shape, scale = scale)
-    } else if (parameterization_type == "shape, scale") {
-      shape <- dist_params[[i]][1]
-      scale <- dist_params[[i]][2]
-      params_df[[i]] <- rgamma(n_samp, shape = shape, scale = scale)
+    #log-normal
+    if (dist[i] == "log-normal") {
+      mu <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
+      sd <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
+      params_df[[i]] <- data.frame(param_val = rlnorm(n_samp, meanlog = mu, sdlog = sd))
+      names(params_df[[i]]) <- paste0(params[i])
     }
-  }
 
-  #dirichlet
-  if (dist[i] == "dirichlet") {
-    if (parameterization_type == "value, mean_prop, sd") {
-
-    } else if (parameterization_type == "alpha") {
-
+    #beta
+    if (dist[i] == "beta") {
+      if (parameterization_type[i] == "mean, sd") {
+        a <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
+        b <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
+        params_df[[i]] <- as.data.frame(rbeta(n_samp, a, b))
+      } else if (parameterization_type[i] == "a, b") {
+        a <- dist_params[[i]][1]
+        b <- dist_params[[i]][2]
+        params_df[[i]] <- as.data.frame(rbeta(n_samp, a, b))
+      }
+      names(params_df[[i]]) <- paste0(params[i])
     }
-  }
 
+    #gamma
+    if (dist[i] == "gamma") {
+      if (parameterization_type[i] == "mean, sd") {
+        shape <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[1]]
+        scale <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[2]]
+        params_df[[i]] <- as.data.frame(rgamma(n_samp, shape = shape, scale = scale))
+      } else if (parameterization_type[i] == "shape, scale") {
+        shape <- dist_params[[i]][1]
+        scale <- dist_params[[i]][2]
+        params_df[[i]] <- as.data.frame(rgamma(n_samp, shape = shape, scale = scale))
+      }
+      names(params_df[[i]]) <- paste0(params[i])
+    }
+
+    #dirichlet
+    if (dist[i] == "dirichlet") {
+      if (parameterization_type[i] == "value, mean_prop, sd") {
+        alpha <- dirichlet_params(dist_params[[i]][,2], dist_params[[i]][,3])
+        params_df[[i]] <- as.data.frame(rdirichlet(n_samp, alpha))
+      } else if (parameterization_type[i] == "value, alpha") {
+        alpha <- dist_params[[i]][,2]
+        params_df[[i]] <- as.data.frame(rdirichlet(n_samp, alpha))
+      }
+      names(params_df[[i]]) <- paste0(params[i], "_", dist_params[[i]][,1])
+    }
+
+    #bootstrap
+    if (dist[i] == "bootstrap") {
+      params_df[[i]] <- as.data.frame(sample(x = dist_params[[i]][,1]), size = 1, replace = TRUE, prob = dist_params[[i]][,2])
+      names(params_df[[i]]) <- paste0(params[i])
+    }
+
+  }
+  params_df <- do.call(cbind, params_df)
+  return(params_df)
 }
-params <- c("param1","param2")
-dist <- c("normal", "log-normal", "beta", "gamma", "dirichlet", "bootstrap")
-parameterization_type <- c("")
-dist_params <- c("")
-n_samp <- 100
 
-test<-c(c(1,2),c(3,4),c(5,6))
 
-rnorm()
-rlnorm()
-rbeta()
-rgamma()
-rmultinom()
-rbootstrap()
+
+test <- gen_psa_samp(params = c("normalboi", "loggyboi","betaboi","gammaboi","dirchboi"),
+             dist = c("normal", "log-normal","beta","gamma","dirichlet"),
+             parameterization_type = c("mean, sd", "mean, sd","mean, sd","mean, sd", "value, mean_prop, sd"),
+             dist_params = list(c(1,2),c(1,3), c(.5,.2), c(100,1), data.frame(value = c("egg","tofu","bacon"), mean_prop = c(.1,.4,.5), sd = c(.05, .01, .1))),
+             n_samp =100)
+
+
 
 rdirichlet <-function (n, alpha) {
-    if (is.matrix(alpha)) {
-      k <- dim(alpha)[2]
-      alpha <- as.vector(t(alpha))
-    }
-    else k <- length(alpha)
+    k <- length(alpha)
     out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
     out <- out/rowSums(out)
     return(out)
 }
-
-rdirichlet(1, c(.1,.1,.1))
-
-n=100
-k=3
-alpha = c(1,2,3)
-rgamma(n * k, shape = 1)
-
-
-get_alpha <- function(mean, var){
-
-}
-alpha0 <- sum(alpha)
 
 
 #' Calculate alpha and beta parameters of Beta distribution.

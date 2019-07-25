@@ -5,11 +5,53 @@ params_df <- "initialize list or df here"
 
 for (i in 1:n_params) {
 
+  #normal
   if (dist[i] == "normal") {
     params_df[[i]] <- rnorm(n_samp, mean = dist_params[[i]][1], sd = dist_params[[i]][2])
   }
 
-  if (dist[i] == "")
+  #log-normal
+  if (dist[i] == "log-normal") {
+    mu <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
+    sd <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
+    params_df[[i]] <- rlnorm(n_samp, meanlog = mu, sdlog = sd)
+  }
+
+  #beta
+  if (dist[i] == "beta") {
+    if (parameterization_type == "mean, sd") {
+      a <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
+      b <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
+      params_df[[i]] <- rbeta(n_samp, a, b)
+    } else if (parameterization_type == "a, b") {
+      a <- dist_params[[i]][1]
+      b <- dist_params[[i]][2]
+      params_df[[i]] <- rbeta(n_samp, a, b)
+    }
+  }
+
+  #gamma
+  if (dist[i] == "gamma") {
+    if (parameterization_type == "mean, sd") {
+      shape <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[1]]
+      scale <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[2]]
+      params_df[[i]] <- rgamma(n_samp, shape = shape, scale = scale)
+    } else if (parameterization_type == "shape, scale") {
+      shape <- dist_params[[i]][1]
+      scale <- dist_params[[i]][2]
+      params_df[[i]] <- rgamma(n_samp, shape = shape, scale = scale)
+    }
+  }
+
+  #dirichlet
+  if (dist[i] == "dirichlet") {
+    if (parameterization_type == "value, mean_prop, sd") {
+
+    } else if (parameterization_type == "alpha") {
+
+    }
+  }
+
 }
 params <- c("param1","param2")
 dist <- c("normal", "log-normal", "beta", "gamma", "dirichlet", "bootstrap")

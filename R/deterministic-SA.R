@@ -316,7 +316,7 @@ twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes = NU
 #' @param user_fun \code{FUN} input from users
 #' @param param_name user-defined list of parameters of interest
 #' @param tmp_input basecase values
-#' @param tmp_replace values from predetermined PSA samples that will replace some values in \code{tmp_input}
+#' @param tmp_replace values from predetermined DSA samples that will replace some values in \code{tmp_input}
 #'
 #' @keywords internal
 wrapper_of_user_model <- function(x, user_fun, param_name,

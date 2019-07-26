@@ -49,7 +49,8 @@ gen_psa_samp <- function(params = NULL,
   for (i in 1:n_params) {
     #normal
     if (dist[i] == "normal") {
-      params_df[[i]] <- data.frame(param_val = rnorm(n_samp, mean = dist_params[[i]][1], sd = dist_params[[i]][2]))
+      params_df[[i]] <- data.frame(param_val = rnorm(n_samp, mean = dist_params[[i]][1],
+                                                     sd = dist_params[[i]][2]))
       names(params_df[[i]]) <- paste0(params[i])
     }
 
@@ -103,7 +104,10 @@ gen_psa_samp <- function(params = NULL,
 
     #bootstrap
     if (dist[i] == "bootstrap") {
-      params_df[[i]] <- as.data.frame(sample(x = dist_params[[i]][,1]), size = 1, replace = TRUE, prob = dist_params[[i]][,2])
+      params_df[[i]] <- as.data.frame(mean(sample(x = dist_params[[i]][,1]),
+                                           size = length(dist_params[[i]][,1]),
+                                           replace = TRUE,
+                                           prob = dist_params[[i]][,2]))
       names(params_df[[i]]) <- paste0(params[i])
     }
 

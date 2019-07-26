@@ -10,7 +10,8 @@
 
 
 run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
-                    strategies = NULL, ...){
+                    effectiveness_outcome = NULL,
+                    strategies = NULL, currency = "$", ...){
 
   FUN <- test_func
   psa_samp <- test
@@ -66,36 +67,34 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
     colnames(sim_out_df[[j]]) <- strategies
   }
 
-  if (!is.null(cost_outcome)) {
-    psa_out <- vector(mode = "list", length = n_outcomes - 1)
-    for (j in 1:n_outcomes){
-      psa_out[[]]
-    }
-  } else {
+
+
     psa_out <- vector(mode = "list", length = n_outcomes)
     for (j in 1:n_outcomes){
-      psa_out[[j]] <- make_psa_obj
+      psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = sim_out_df[[j]],
+                                   parameters = psa_samp[,-1], strategies= strategies,
+                                   currency = "$")
     }
+
+    names(psa_out) <- outcomes
+
+    if (!is.null(cost_outcome) & !is.null(effectiveness_outcome)) {
+      cea_psa <- make_psa_obj(cost = sim_out_df[[cost_outcome]],
+                              effectiveness = sim_out_df[[effectiveness_outcome]],
+                              parameters = psa_samp[,-1], strategies= strategies,
+                              currency = currency)
+      psa_out <- c(cea_psa, psa_out)
+    }
+
+
+    return(psa_out)
   }
   ##HAVE USER DESIGNATE WHICH OUTCOME IS COST
   ##IF NO OUTCOME OTHER THAN COST IS PRESENT, THEN JUST RETURN SINGLE PSA WITH COST ALONE
 
-  psa_object<- make_psa_obj(cost = sim_out_df[[1]], effectiveness = NULL, parameters = psa_samp[,-1], strategies= strategies, currency = "$")
-}
 
 
 
 
 
-test_func <- function(params, cheetos){
-  normalboi <- params[["normalboi"]]
-  loggyboi <- params[["loggyboi"]]
 
-  effect <- normalboi + loggyboi *cheetos
-  cost <- -normalboi - loggyboi
-
-  output <- data.frame(strategy = "mystrat",
-                       effect = effect,
-                       cost = cost)
-  return(output)
-}

@@ -1,8 +1,47 @@
+#' Generate PSA Sample
+#'
+#' @description This function generates a data.frame of sampled parameter values from user-specified distributions
+#' to be used in a probabilistic sensitivity analysis (PSA)
+
+#' @details
+#' The most important option is \code{analysis}, which can be either \code{"oneway"}
+#' or \code{twoway}. If \code{analysis == "oneway"}, a separate metamodel is created
+#' for each combination of the parameters in \code{params} and strategies in \code{strategies}
+#' (by default, this is all strategies and parameters).
+#'
+#' If \code{analysis == "twoway"}, \code{params} must be a vector of two parameters, and a metamodel
+#' is created with these two parameters for each strategy in \code{strategies}.
+#'
+#' @param analysis either "oneway" or "twoway"
+#' @param psa psa object
+#' @param params String vector with the name(s) of the parameter of interest. Defaults to all.
+#' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
+#' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
+#' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
+#' NMB ("nhb_loss" and "nmb_loss", respectively)
+#' @param wtp if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold
+#' @param type type of metamodel
+#' @param poly.order Order of polynomial for the linear regression metamodel.
+#' Default: 2
+#' @inheritParams mgcv::s
+#'
+#' @return
+#' A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
+#'
+#' @seealso
+#' \code{\link{run_psa}},
+#' \code{\link{make_psa_obj}},
+#' \code{\link{owsa}},
+#' \code{\link{twsa}}
+#'
+#' @importFrom stats as.formula formula getCall lm
+#' @export
+
 gen_psa_samp <- function(params = NULL,
                          dist = NULL,
                          parameterization_type = NULL,
                          dist_params = NULL,
-                         n_samp = NULL) {
+                         n_samp = 100) {
 
   n_params <- length(params)
   params_df <- vector(mode = "list", length = n_params)
@@ -59,7 +98,7 @@ gen_psa_samp <- function(params = NULL,
         alpha <- dist_params[[i]][,2]
         params_df[[i]] <- as.data.frame(rdirichlet(n_samp, alpha))
       }
-      names(params_df[[i]]) <- paste0(params[i], "_", dist_params[[i]][,1])
+      names(params_df[[i]]) <- paste0(dist_params[[i]][,1])
     }
 
     #bootstrap
@@ -69,7 +108,10 @@ gen_psa_samp <- function(params = NULL,
     }
 
   }
+
   params_df <- do.call(cbind, params_df)
+  n_samp <- 1:n_samp
+  params_df <- cbind(n_samp,params_df)
   return(params_df)
 }
 
@@ -89,6 +131,9 @@ rdirichlet <-function (n, alpha) {
     out <- out/rowSums(out)
     return(out)
 }
+
+
+
 
 
 #' Calculate alpha and beta parameters of Beta distribution.
@@ -114,6 +159,9 @@ beta_params <- function(mean, sigma){
   params <- list(alpha = alpha, beta = beta)
   return(params)
 }
+
+
+
 
 #' Calculate alpha parameters of Dirichlet distribution.
 #'
@@ -163,6 +211,8 @@ dirichlet_params <- function(p.mean, sigma){
   alpha[n.params] <- (p.mean[1] - p.2[1])*(1-sum(p.mean[-n.params]))/(p.2[1] - p.mean[1]^2)
   return(alpha)
 }
+
+
 
 #' Calculate shape and scale (or rate) parameters of a gamma distribution.
 #'
@@ -220,6 +270,8 @@ gamma_params <- function(mu, sigma, scale = TRUE){
 }
 
 
+
+
 #' Calculate location and scale parameters of a log-normal distribution.
 #'
 #' Function to calculate the location, \eqn{\mu}, and scale, \eqn{\sigma},
@@ -266,3 +318,4 @@ lnorm_params <- function(m = 1, v = 1){
   return(list(mu = mu,
               sigma = sigma))
 }
+

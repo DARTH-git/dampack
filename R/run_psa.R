@@ -2,12 +2,15 @@
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}.
+#' @param cost_outcome String within \code{outcomes} that is designated as the cost outcome
+#' in the creation of \code{psa} objects for use in cost-effectiveness analyses.
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
 #' @param ... Additional arguments to user-defined \code{FUN}
 
 
-run_psa <- function(psa_samp, FUN, outcomes = NULL, strategies = NULL, ...){
+run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
+                    strategies = NULL, ...){
 
   FUN <- test_func
   psa_samp <- test
@@ -63,23 +66,23 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, strategies = NULL, ...){
     colnames(sim_out_df[[j]]) <- strategies
   }
 
+  if (!is.null(cost_outcome)) {
+    psa_out <- vector(mode = "list", length = n_outcomes - 1)
+    for (j in 1:n_outcomes){
+      psa_out[[]]
+    }
+  } else {
+    psa_out <- vector(mode = "list", length = n_outcomes)
+    for (j in 1:n_outcomes){
+      psa_out[[j]] <- make_psa_obj
+    }
+  }
+  ##HAVE USER DESIGNATE WHICH OUTCOME IS COST
+  ##IF NO OUTCOME OTHER THAN COST IS PRESENT, THEN JUST RETURN SINGLE PSA WITH COST ALONE
+
+  psa_object<- make_psa_obj(cost = sim_out_df[[1]], effectiveness = NULL, parameters = psa_samp[,-1], strategies= strategies, currency = "$")
 }
 
-
-
-#' Wrapper function for owsa_det and twsa_det
-#'
-#' @param x iteration
-#' @param user_fun \code{FUN} input from users
-#' @param param_name user-defined list of parameters of interest
-#' @param tmp_input basecase values
-#' @param tmp_replace values from predetermined DSA samples that will replace some values in \code{tmp_input}
-#'
-#' @keywords internal
-wrapper_of_user_model <- function(x, user_fun, tmp_input) {
-  tmp_input[[1]][param_name] <- tmp_replace[x, param_name]
-  do.call(user_fun, tmp_input)
-}
 
 
 

@@ -4,26 +4,16 @@
 #' to be used in a probabilistic sensitivity analysis (PSA)
 
 #' @details
-#' The most important option is \code{analysis}, which can be either \code{"oneway"}
-#' or \code{twoway}. If \code{analysis == "oneway"}, a separate metamodel is created
-#' for each combination of the parameters in \code{params} and strategies in \code{strategies}
-#' (by default, this is all strategies and parameters).
 #'
-#' If \code{analysis == "twoway"}, \code{params} must be a vector of two parameters, and a metamodel
-#' is created with these two parameters for each strategy in \code{strategies}.
-#'
-#' @param analysis either "oneway" or "twoway"
+#
+#' @param
 #' @param psa psa object
 #' @param params String vector with the name(s) of the parameter of interest. Defaults to all.
 #' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
-#' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
-#' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
-#' NMB ("nhb_loss" and "nmb_loss", respectively)
-#' @param wtp if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold
-#' @param type type of metamodel
-#' @param poly.order Order of polynomial for the linear regression metamodel.
-#' Default: 2
-#' @inheritParams mgcv::s
+#' @param
+#' @param
+#' @param
+#' @param
 #'
 #' @return
 #' A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
@@ -34,7 +24,6 @@
 #' \code{\link{owsa}},
 #' \code{\link{twsa}}
 #'
-#' @importFrom stats as.formula formula getCall lm
 #' @export
 
 gen_psa_samp <- function(params = NULL,
@@ -102,12 +91,13 @@ gen_psa_samp <- function(params = NULL,
       names(params_df[[i]]) <- paste0(dist_params[[i]][,1])
     }
 
+    #for size = length(dist_params[[i]][,1]) or size = sum(dist_params[[i]][,2])?
     #bootstrap
     if (dist[i] == "bootstrap") {
       params_df[[i]] <- as.data.frame(mean(sample(x = dist_params[[i]][,1]),
-                                           size = length(dist_params[[i]][,1]),
-                                           replace = TRUE,
-                                           prob = dist_params[[i]][,2]))
+                                                  size = sum(dist_params[[i]][,2]),
+                                                  replace = TRUE,
+                                                  prob = dist_params[[i]][,2]))
       names(params_df[[i]]) <- paste0(params[i])
     }
 
@@ -128,6 +118,12 @@ test <- gen_psa_samp(params = c("normalboi", "loggyboi","betaboi","gammaboi","di
              n_samp =100)
 
 
+#'
+#'
+#'
+#'
+#'
+#'
 
 rdirichlet <-function (n, alpha) {
     k <- length(alpha)

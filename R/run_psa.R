@@ -1,13 +1,36 @@
-#' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
+#' Calculate outcomes for a PSA using a user-defined function.
+#'
+#' @description \code{run_psa} calculates outcomes using a user-defined function and creates PSA objects
+#' corresponding to the specified outcomes.
+#' @details
+#'
+#'
+#' @param psa_samp A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
+#' @param FUN Function that takes the parameter values in \code{psa_samp} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}.
 #' @param cost_outcome String within \code{outcomes} that is designated as the cost outcome
 #' in the creation of \code{psa} objects for use in cost-effectiveness analyses.
+#' @param effect_outcome String within \code{outcomes} that is designated as the effectiveness outcome
+#' in the creation of \code{psa} objects for use in cost-effectiveness analyses.
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
+#' @param currency symbol for the currency being used (ex. "$", "£")
 #' @param ... Additional arguments to user-defined \code{FUN}
-
+#'
+#'
+#' @return
+#' A list containing PSA objects for each outcome in \code{outcomes},
+#' as well as an additional PSA object containing both effectiveness and cost for CEA
+#' if cost_outcome and effectiveness_outcome were both supplied.
+#'
+#' @seealso
+#' \code{\link{run_psa}},
+#' \code{\link{make_psa_obj}},
+#' \code{\link{gen_psa_samp}},
+#'
+#' @export
 
 run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
                     effectiveness_outcome = NULL,

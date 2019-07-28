@@ -84,7 +84,15 @@ gen_psa_samp <- function(params = NULL,
       if (parameterization_type[i] == "value, mean_prop, sd") {
         alpha <- dirichlet_params(dist_params[[i]][,2], dist_params[[i]][,3])
         params_df[[i]] <- as.data.frame(rdirichlet(n_samp, alpha))
-      } else if (parameterization_type[i] == "value, alpha") {
+      } else if (parameterization_type[i] == "value, n") {
+        val_n <- as.data.frame(dist_params[[i]])
+        total <- sum(val_n[,2])
+        p_mean <- val_n[,2]/total
+        #check formula no internet now
+        sd <- sqrt((p_mean * ( 1 - p_mean )) / total)
+        alpha <- dirichlet_params(p_mean, sd)
+        params_df[[i]] <- as.data.frame(rdirichlet(n_samp, alpha))
+        } else if (parameterization_type[i] == "value, alpha") {
         alpha <- dist_params[[i]][,2]
         params_df[[i]] <- as.data.frame(rdirichlet(n_samp, alpha))
       }
@@ -108,14 +116,6 @@ gen_psa_samp <- function(params = NULL,
   params_df <- cbind(n_samp,params_df)
   return(params_df)
 }
-
-
-
-test <- gen_psa_samp(params = c("normalboi", "loggyboi","betaboi","gammaboi","dirchboi"),
-             dist = c("normal", "log-normal","beta","gamma","dirichlet"),
-             parameterization_type = c("mean, sd", "mean, sd","mean, sd","mean, sd", "value, mean_prop, sd"),
-             dist_params = list(c(1,2),c(1,3), c(.5,.2), c(100,1), data.frame(value = c("egg","tofu","bacon"), mean_prop = c(.1,.4,.5), sd = c(.05, .01, .1))),
-             n_samp =100)
 
 
 #'

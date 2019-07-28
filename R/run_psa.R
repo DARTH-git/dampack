@@ -13,12 +13,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
                     effectiveness_outcome = NULL,
                     strategies = NULL, currency = "$", ...){
 
-  FUN <- test_func
-  psa_samp <- test
-  strategies = NULL
-  opt_arg_val <- list(cheetos = 1.5)
-  outcomes <- c("cost", "effect")
-
+  opt_arg_val <- list(...)
   fun_input_test <- c(list(psa_samp[1,]), opt_arg_val)
 
   jj <- tryCatch({
@@ -28,6 +23,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
   if (is.na(sum(is.na(jj)))){
     stop("FUN is not well defined by the parameter values and ...")
   }
+  userfun <- do.call(FUN, fun_input_test)
 
   if (is.null(strategies)){
     strategies <- paste0("st_", userfun[, 1])
@@ -47,7 +43,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
     stop("at least one outcome is not in FUN outcomes")
   }
 
-  opt_arg_val <- list(...)
+
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 
   for (i in 1:nrow(psa_samp)){
@@ -83,14 +79,13 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
                               effectiveness = sim_out_df[[effectiveness_outcome]],
                               parameters = psa_samp[,-1], strategies= strategies,
                               currency = currency)
-      psa_out <- c(cea_psa, psa_out)
+      psa_out <- append(list(cea_psa), psa_out)
+      names(psa_out) <- c("cea_psa", outcomes)
     }
 
 
     return(psa_out)
   }
-  ##HAVE USER DESIGNATE WHICH OUTCOME IS COST
-  ##IF NO OUTCOME OTHER THAN COST IS PRESENT, THEN JUST RETURN SINGLE PSA WITH COST ALONE
 
 
 

@@ -3,7 +3,7 @@
 #' @description \code{run_psa} calculates outcomes using a user-defined function and creates PSA objects
 #' corresponding to the specified outcomes.
 #' @details
-#'
+#' Fill in details
 #'
 #' @param psa_samp A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
 #' @param FUN Function that takes the parameter values in \code{psa_samp} and \code{...} to
@@ -12,7 +12,7 @@
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}.
 #' @param cost_outcome String within \code{outcomes} that is designated as the cost outcome
 #' in the creation of \code{psa} objects for use in cost-effectiveness analyses.
-#' @param effect_outcome String within \code{outcomes} that is designated as the effectiveness outcome
+#' @param effectiveness_outcome String within \code{outcomes} that is designated as the effectiveness outcome
 #' in the creation of \code{psa} objects for use in cost-effectiveness analyses.
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
@@ -37,7 +37,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
                     strategies = NULL, currency = "$", ...){
 
   opt_arg_val <- list(...)
-  fun_input_test <- c(list(psa_samp[1,]), opt_arg_val)
+  fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_test)
@@ -70,7 +70,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 
   for (i in 1:nrow(psa_samp)){
-    fun_input_ls <- c(list(psa_samp[i,]), opt_arg_val)
+    fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
     sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
   }
 
@@ -91,7 +91,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
     psa_out <- vector(mode = "list", length = n_outcomes)
     for (j in 1:n_outcomes){
       psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = sim_out_df[[j]],
-                                   parameters = psa_samp[,-1], strategies= strategies,
+                                   parameters = psa_samp[, -1], strategies = strategies,
                                    currency = "$")
     }
 
@@ -100,7 +100,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
     if (!is.null(cost_outcome) & !is.null(effectiveness_outcome)) {
       cea_psa <- make_psa_obj(cost = sim_out_df[[cost_outcome]],
                               effectiveness = sim_out_df[[effectiveness_outcome]],
-                              parameters = psa_samp[,-1], strategies= strategies,
+                              parameters = psa_samp[, -1], strategies = strategies,
                               currency = currency)
       psa_out <- append(list(cea_psa), psa_out)
       names(psa_out) <- c("cea_psa", outcomes)
@@ -109,10 +109,3 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL, cost_outcome = NULL,
 
     return(psa_out)
   }
-
-
-
-
-
-
-

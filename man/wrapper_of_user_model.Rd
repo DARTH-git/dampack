@@ -15,7 +15,7 @@ wrapper_of_user_model(x, user_fun, param_name, tmp_input, tmp_replace)
 
 \item{tmp_input}{basecase values}
 
-\item{tmp_replace}{values from predetermined PSA samples that will replace some values in \code{tmp_input}}
+\item{tmp_replace}{values from predetermined DSA samples that will replace some values in \code{tmp_input}}
 }
 \description{
 Wrapper function for owsa_det and twsa_det

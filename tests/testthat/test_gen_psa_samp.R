@@ -14,5 +14,5 @@ test_that("gen_psa_samp runs", {
                                                         mean_prop = c(.1, .4, .5), sd = c(.05, .01, .1)),
                                                         data.frame(value = c(1, 2, 4, 6, 7, 8),
                                                                    weight = c(1, 1, 1, 1, 1, 4))),
-                                     n_samp = 100))
+                                     nsamp = 100))
 })

@@ -39,8 +39,59 @@ if cost_outcome and effectiveness_outcome were both supplied.
 \code{run_psa} calculates outcomes using a user-defined function and creates PSA objects
 corresponding to the specified outcomes.
 }
-\details{
-Fill in details
+\examples{
+
+#load package
+library(dampack)
+
+#example of function that produces output required by run_psa
+test_func <- function(params, extra_param) {
+  normal_param <- params[["normal_param"]]
+  lognorm_param <- params[["lognorm_param"]]
+  beta_param <- params[["beta_param"]]
+  gamma_param <- params[["gamma_param"]]
+  level1 <- params[["level1"]]
+  level2 <- params[["level2"]]
+  level3 <- params[["level3"]]
+  bootstrap_param <- params[["bootstrap_param"]]
+ effect1 <- normal_param + lognorm_param * extra_param + beta_param + gamma_param +
+   level1 + level2 + level3 + bootstrap_param
+ cost1 <- - normal_param - lognorm_param - beta_param - gamma_param
+  - level1 - level2 - level3 - bootstrap_param
+
+ effect2 <- normal_param - lognorm_param * extra_param + beta_param - gamma_param +
+            level1 - level2 + level3 - bootstrap_param
+ cost2 <- - normal_param + lognorm_param - beta_param + gamma_param
+          - level1 + level2 - level3 + bootstrap_param
+
+ output <- data.frame(strategies = c("mystrat1", "mystrat2"),
+                      effect = c(effect1, effect2),
+                      cost = c(cost1, cost2))
+
+ return(output)
+}
+
+#generate parameter data.frame from parent distributions
+psa_df <- gen_psa_samp(params = c("normal_param", "lognorm_param", "beta_param",
+                               "gamma_param", "dirichlet_param", "bootstrap_param"),
+                    dist = c("normal", "log-normal", "beta",
+                     "gamma", "dirichlet", "bootstrap"),
+                    parameterization_type = c("mean, sd", "mean, sd", "mean, sd", "mean, sd",
+                                              "value, mean_prop, sd", "value, weight"),
+                    dist_params = list(c(1, 2), c(1, 3), c(.5, .2), c(100, 1),
+                                       data.frame(value = c("level1", "level2", "level3"),
+                                                  mean_prop = c(.1, .4, .5),
+                                                  sd = c(.05, .01, .1)),
+                                       data.frame(value = c(1, 2, 4, 6, 7, 8),
+                                                  weight = c(1, 1, 1, 1, 1, 4))),
+                    nsamp = 100)
+
+#run psa using psa parameter data.frame
+run_psa(psa_df, test_func, outcomes = c("cost", "effect"), cost_outcome = "cost",
+       effectiveness_outcome = "effect", strategies = c("customstrat1", "customstrat2"),
+       currency = "$", extra_param = 1.5)
+
+
 }
 \seealso{
 \code{\link{run_psa}},

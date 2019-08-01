@@ -35,7 +35,7 @@ test <- gen_psa_samp(params = c("normal_param", "lognorm_param", "beta_param",
                                         data.frame(value = c("level1", "level2", "level3"),
                                                    mean_prop = c(.1, .4, .5), sd = c(.05, .01, .1)),
                                         data.frame(value = c(1, 2, 4, 6, 7, 8), weight = c(1, 1, 1, 1, 1, 4))),
-                     n_samp = 100)
+                     nsamp = 100)
 
 test_that("run_psa runs", {
   expect_silent( runtest <- run_psa(test, test_func, outcomes = c("cost", "effect"), cost_outcome = "cost",

@@ -13,3 +13,14 @@ This package was developed with funding from the National Institutes of Allergy 
 # Install development version from GitHub
 devtools::install_github("DARTH-git/dampack")
 ```
+
+Trying to install dampack from Github in a non-US locale on macOS may produce the following error:
+
+``` 
+Error: (converted from warning) Setting LC_CTYPE failed, using "C"
+```
+
+To solve this problem, run the following code in the terminal:
+```
+defaults write org.R-project.R force.LANG en_US.UTF-8 
+```

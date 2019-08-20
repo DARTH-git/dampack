@@ -1,3 +1,3 @@
 #' Sample PSA dataset
 #'
-"cdiff_psa"
+"psa_cdiff"

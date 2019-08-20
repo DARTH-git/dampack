@@ -36,10 +36,10 @@
 #' # see ?plot.icers for more options
 #'
 #' ## Using a PSA object
-#' data(cdiff_psa)
+#' data(psa_cdiff)
 #'
 #' # summary() gives mean cost and effect for each strategy
-#' sum_cdiff <- summary(cdiff_psa)
+#' sum_cdiff <- summary(psa_cdiff)
 #'
 #' # calculate icers
 #' icers <- calculate_icers(sum_cdiff$meanCost,

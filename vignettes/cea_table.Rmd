@@ -31,13 +31,13 @@ We use a PSA from a study of *C difficile*. A `dampack` PSA object has already b
 
 ```{r}
 library(dampack)
-data("cdiff_psa")
+data("psa_cdiff")
 ```
 
 To use the PSA object in `calculate_icers()` we need to get the average cost and average effect for each strategy. To do this, we use `summary()`, which has a specific version for the `psa` object. To get more information on the `summary.psa()` method, just type `?summary.psa` in the console.
 
 ```{r}
-avg_cdiff <- summary(cdiff_psa)
+avg_cdiff <- summary(psa_cdiff)
 head(avg_cdiff)
 ```
 
@@ -48,7 +48,7 @@ Now, we can calculate the incremental cost-effectiveness ratios on the `avg_cdif
 ```{r}
 icer_table <- calculate_icers(cost = avg_cdiff$meanCost,
                               effect = avg_cdiff$meanEffect,
-                              strategies = cdiff_psa$strategies)
+                              strategies = psa_cdiff$strategies)
 head(icer_table)
 ```
 

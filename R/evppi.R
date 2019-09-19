@@ -78,26 +78,37 @@ calc_evppi <- function(psa,
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
 
-  # run the metamodels
-  mms <- metamodel(analysis = "multiway",
-                   psa = psa,
-                   params = params,
-                   outcome = outcome,
-                   wtp = wtp,
-                   type = type,
-                   poly.order = poly.order,
-                   k = k)
+  # number of wtp thresholds
+  n_wtps <- length(wtp)
+  # vector to store evppi
+  evppi <- rep(0, n_wtps)
 
-  # get the fitted loss values from the regression models
-  # there is one for each strategy
-  fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
+  # calculate evppi at each wtp
+  for (l in 1:n_wtps){
+    # run the metamodels
+    mms <- metamodel(analysis = "multiway",
+                     psa = psa,
+                     params = params,
+                     outcome = outcome,
+                     wtp = wtp[l],
+                     type = type,
+                     poly.order = poly.order,
+                     k = k)
 
-  # bind the columns to get a dataframe
-  fitted_loss_df <- bind_cols(fitted_loss_list)
+    # get the fitted loss values from the regression models
+    # there is one for each strategy
+    fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
 
-  # calculate the evppi as the average of the row maxima
-  row_maxes <- apply(fitted_loss_df, 1, max)
-  evppi <- mean(row_maxes) * pop
+    # bind the columns to get a dataframe
+    fitted_loss_df <- bind_cols(fitted_loss_list)
 
-  return(evppi)
+    # calculate the evppi as the average of the row maxima
+    row_maxes <- apply(fitted_loss_df, 1, max)
+    evppi[l] <- mean(row_maxes) * pop
+  }
+
+  # data.frame to store EVPPI for each WTP threshold
+  df.evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
+  class(df.evppi) <- "data.frame"
+  return(df.evppi)
 }

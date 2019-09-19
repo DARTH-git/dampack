@@ -14,6 +14,7 @@
 #' polynomial models (\code{"poly"})
 #' @param poly.order order of the polynomial, if \code{type == "poly"}
 #' @param k basis dimension, if \code{type == "gam"}
+#' @param pop A scalar that corresponds to the total population
 #'
 #' @return evppi A numeric vector of size one with the EVPPI of the selected
 #' parameters
@@ -68,7 +69,8 @@ calc_evppi <- function(psa,
                        outcome = c("nmb", "nhb"),
                        type = c("gam", "poly"),
                        poly.order = 2,
-                       k = -1) {
+                       k = -1,
+                       pop = 1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
@@ -95,7 +97,7 @@ calc_evppi <- function(psa,
 
   # calculate the evppi as the average of the row maxima
   row_maxes <- apply(fitted_loss_df, 1, max)
-  evppi <- mean(row_maxes)
+  evppi <- mean(row_maxes) * pop
 
   return(evppi)
 }

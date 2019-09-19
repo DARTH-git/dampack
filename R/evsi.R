@@ -13,7 +13,8 @@ calc_evsi <- function(psa,
                       poly.order = 2,
                       k = -1,
                       n = 100,
-                      n0 = 10) {
+                      n0 = 10,
+                      pop = 1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
@@ -39,7 +40,7 @@ calc_evsi <- function(psa,
 
   # calculate the evsi as the average of the row maxima
   row_maxes <- apply(predicted_loss_df, 1, max)
-  evsi <- mean(row_maxes)
+  evsi <- mean(row_maxes) * pop
 
   return(evsi)
 }

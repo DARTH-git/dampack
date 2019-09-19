@@ -6,7 +6,7 @@
 \usage{
 calc_evsi(psa, wtp, params = NULL, outcome = c("nhb", "nmb"),
   type = c("gam", "poly"), poly.order = 2, k = -1, n = 100,
-  n0 = 10)
+  n0 = 10, pop = 1)
 }
 \arguments{
 \item{psa}{object of class psa, produced by \code{\link{make_psa_obj}}}
@@ -28,6 +28,8 @@ polynomial models (\code{"poly"})}
 \item{n}{additional sample size}
 
 \item{n0}{initial sample size}
+
+\item{pop}{A scalar that corresponds to the total population}
 }
 \description{
 Calculate Expected Value of Sample Information

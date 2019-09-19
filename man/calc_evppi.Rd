@@ -6,14 +6,14 @@
 using a linear regression metamodel approach}
 \usage{
 calc_evppi(psa, wtp, params = NULL, outcome = c("nmb", "nhb"),
-  type = c("gam", "poly"), poly.order = 2, k = -1)
+  type = c("gam", "poly"), poly.order = 2, k = -1, pop = 1)
 }
 \arguments{
 \item{psa}{object of class psa, produced by \code{\link{make_psa_obj}}}
 
 \item{wtp}{willingness-to-pay threshold}
 
-\item{params}{A vector of parameters for which to analyze the EVPPI.}
+\item{params}{A vector of parameter names to be analyzed in terms of EVPPI.}
 
 \item{outcome}{either net monetary benefit (\code{"nmb"})
 or net health benefit (\code{"nhb"})}
@@ -24,6 +24,8 @@ polynomial models (\code{"poly"})}
 \item{poly.order}{order of the polynomial, if \code{type == "poly"}}
 
 \item{k}{basis dimension, if \code{type == "gam"}}
+
+\item{pop}{A scalar that corresponds to the total population}
 }
 \value{
 evppi A numeric vector of size one with the EVPPI of the selected

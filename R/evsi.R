@@ -13,7 +13,8 @@ calc_evsi <- function(psa,
                       poly.order = 2,
                       k = -1,
                       n = 100,
-                      n0 = 10) {
+                      n0 = 10,
+                      pop = 1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
@@ -21,27 +22,38 @@ calc_evsi <- function(psa,
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
 
-  # run the metamodels
-  mms <- metamodel(analysis = "multiway",
-                   psa = psa,
-                   params = params,
-                   outcome = outcome,
-                   wtp = wtp,
-                   type = type,
-                   poly.order = poly.order,
-                   k = k)
+  # number of wtp thresholds
+  n_wtps <- length(wtp)
+  # vector to store evsi
+  evsi <- rep(0, n_wtps)
 
-  # predict from the regression models
-  predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
+  # calculate evppi at each wtp
+  for (l in 1:n_wtps){
+    # run the metamodels
+    mms <- metamodel(analysis = "multiway",
+                     psa = psa,
+                     params = params,
+                     outcome = outcome,
+                     wtp = wtp[l],
+                     type = type,
+                     poly.order = poly.order,
+                     k = k)
 
-  # bind the columns to get a dataframe
-  predicted_loss_df <- bind_cols(predicted_loss_list)
+    # predict from the regression models
+    predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
-  # calculate the evsi as the average of the row maxima
-  row_maxes <- apply(predicted_loss_df, 1, max)
-  evsi <- mean(row_maxes)
+    # bind the columns to get a dataframe
+    predicted_loss_df <- bind_cols(predicted_loss_list)
 
-  return(evsi)
+    # calculate the evsi as the average of the row maxima
+    row_maxes <- apply(predicted_loss_df, 1, max)
+    evsi[l] <- mean(row_maxes) * pop
+  }
+
+  # data.frame to store EVPPI for each WTP threshold
+  df.evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
+  class(df.evsi) <- "data.frame"
+  return(df.evsi)
 }
 
 

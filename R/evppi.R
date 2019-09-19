@@ -7,13 +7,14 @@
 #'
 #' @param psa object of class psa, produced by \code{\link{make_psa_obj}}
 #' @param wtp willingness-to-pay threshold
-#' @param params A vector of parameters for which to analyze the EVPPI.
+#' @param params A vector of parameter names to be analyzed in terms of EVPPI.
 #' @param outcome either net monetary benefit (\code{"nmb"})
 #' or net health benefit (\code{"nhb"})
 #' @param type either generalized additive models (\code{"gam"}) or
 #' polynomial models (\code{"poly"})
 #' @param poly.order order of the polynomial, if \code{type == "poly"}
 #' @param k basis dimension, if \code{type == "gam"}
+#' @param pop A scalar that corresponds to the total population
 #'
 #' @return evppi A numeric vector of size one with the EVPPI of the selected
 #' parameters
@@ -68,7 +69,8 @@ calc_evppi <- function(psa,
                        outcome = c("nmb", "nhb"),
                        type = c("gam", "poly"),
                        poly.order = 2,
-                       k = -1) {
+                       k = -1,
+                       pop = 1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
@@ -76,26 +78,37 @@ calc_evppi <- function(psa,
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
 
-  # run the metamodels
-  mms <- metamodel(analysis = "multiway",
-                   psa = psa,
-                   params = params,
-                   outcome = outcome,
-                   wtp = wtp,
-                   type = type,
-                   poly.order = poly.order,
-                   k = k)
+  # number of wtp thresholds
+  n_wtps <- length(wtp)
+  # vector to store evppi
+  evppi <- rep(0, n_wtps)
 
-  # get the fitted loss values from the regression models
-  # there is one for each strategy
-  fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
+  # calculate evppi at each wtp
+  for (l in 1:n_wtps){
+    # run the metamodels
+    mms <- metamodel(analysis = "multiway",
+                     psa = psa,
+                     params = params,
+                     outcome = outcome,
+                     wtp = wtp[l],
+                     type = type,
+                     poly.order = poly.order,
+                     k = k)
 
-  # bind the columns to get a dataframe
-  fitted_loss_df <- bind_cols(fitted_loss_list)
+    # get the fitted loss values from the regression models
+    # there is one for each strategy
+    fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
 
-  # calculate the evppi as the average of the row maxima
-  row_maxes <- apply(fitted_loss_df, 1, max)
-  evppi <- mean(row_maxes)
+    # bind the columns to get a dataframe
+    fitted_loss_df <- bind_cols(fitted_loss_list)
 
-  return(evppi)
+    # calculate the evppi as the average of the row maxima
+    row_maxes <- apply(fitted_loss_df, 1, max)
+    evppi[l] <- mean(row_maxes) * pop
+  }
+
+  # data.frame to store EVPPI for each WTP threshold
+  df.evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
+  class(df.evppi) <- "data.frame"
+  return(df.evppi)
 }

@@ -7,7 +7,7 @@
 #'
 #' @param psa object of class psa, produced by \code{\link{make_psa_obj}}
 #' @param wtp willingness-to-pay threshold
-#' @param params A vector of parameters for which to analyze the EVPPI.
+#' @param params A vector of parameter names to be analyzed in terms of EVPPI.
 #' @param outcome either net monetary benefit (\code{"nmb"})
 #' or net health benefit (\code{"nhb"})
 #' @param type either generalized additive models (\code{"gam"}) or

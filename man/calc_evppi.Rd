@@ -13,7 +13,7 @@ calc_evppi(psa, wtp, params = NULL, outcome = c("nmb", "nhb"),
 
 \item{wtp}{willingness-to-pay threshold}
 
-\item{params}{A vector of parameters for which to analyze the EVPPI.}
+\item{params}{A vector of parameter names to be analyzed in terms of EVPPI.}
 
 \item{outcome}{either net monetary benefit (\code{"nmb"})
 or net health benefit (\code{"nhb"})}

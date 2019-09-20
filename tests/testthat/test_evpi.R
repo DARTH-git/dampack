@@ -48,4 +48,3 @@ test_that("plot.evpi has ggplot class", {
             xbreaks = seq(0, 200, by = 10), ylim = c(0, 100000))
   expect_is(p, "ggplot")
 })
-

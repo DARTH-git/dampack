@@ -16,8 +16,10 @@
 #' @return An object of class \code{ceac} that can be visualized with \code{plot}.
 #'
 #' @examples
-#' # load psa object provided with package
-#' data("example_psa_obj")
+#' # psa input provided with package
+#' data("example_psa")
+#' example_psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+#'                     example_psa$parameters, example_psa$strategies)
 #'
 #' # define wtp threshold vector (can also use a single wtp)
 #' wtp <- seq(1e4, 1e5, by = 1e4)

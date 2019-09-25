@@ -1,6 +1,6 @@
 ---
 title: "Calculation of Incremental Cost-Effectiveness Ratios"
-author: "Fernando Alarid-Escudero, Caleb Easterly, Eva Enns, and the DARTH Team"
+author: "Fernando Alarid-Escudero, Greg Knowlton, Caleb Easterly, Eva Enns, and the DARTH Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

@@ -12,54 +12,77 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r}
+library(dampack)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r}
+data("example_psa")
+psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+                        example_psa$parameters, example_psa$strategies)
 ```
 
-Also a quote using `>`:
+```{r}
+mm <- metamodel(analysis = "twoway", psa = psa_big, params = c("pFailChemo", "cChemo"), 
+                strategies = "Chemo", outcome = "eff", type = "gam")
+```
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+```{r}
+print(mm)
+```
+
+```{r}
+summary(mm)
+```
+
+```{r}
+pred_mm <- predict(mm,
+                   ranges = list("pFailChemo" = c(0.3, 0.6),
+                                  "cChemo" = NULL),
+                   nsamp = 10)
+```
+
+```{r}
+evpi_obj <- calc_evpi(psa = psa_big,
+                      wtp = example_psa$wtp,
+                      pop = 1)
+```
+
+```{r}
+p <- plot(evpi_obj,
+          txtsize = 16, effect_units = "QALY", currency = "Dollars ($)",
+          xbreaks = seq(0, 200, by = 10), ylim = c(0, 100000))
+p
+```
+
+```{r}
+evppi <- calc_evppi(psa = psa_big,
+                    wtp = c(1e5, 2e5, 5e5, 1e6),
+                    params = c("pFailSurg", "pFailChemo"),
+                    outcome = "nmb",
+                    type = "gam",
+                    k = -1,
+                    pop = 1)
+evppi
+```
+
+
+```{r}
+evsi <- calc_evsi(psa = psa_big,
+                    wtp = c(1e5, 2e5, 5e5, 1e6),
+                    params = c("pFailSurg", "pFailChemo"),
+                    outcome = "nmb",
+                    type = "gam",
+                    k = -1,
+                    n = 100,
+                    n0 = 10,
+                    pop = 1)
+evsi
+```

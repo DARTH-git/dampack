@@ -225,8 +225,7 @@ summary.metamodel <- function(object, ...) {
         lm_summary <- summary(object$mods[[p]][[s]])
         if (type == "gam") {
           r2 <- lm_summary$r.sq
-        }
-        if (type %in% c("linear", "poly")) {
+        } else {
           r2 <- lm_summary$r.squared
         }
         df_new_row <- data.frame("param" = p, "strat" = s, "rsquared" = r2)
@@ -240,8 +239,7 @@ summary.metamodel <- function(object, ...) {
       lm_summary <- summary(object$mods[[s]])
       if (type == "gam") {
         r2 <- lm_summary$r.sq
-      }
-      if (type %in% c("linear", "poly")) {
+      } else {
         r2 <- lm_summary$r.squared
       }
       df_new_row <- data.frame("param1" = params[1], "param2" = params[2],

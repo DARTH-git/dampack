@@ -21,7 +21,8 @@ metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
 
 \item{outcome}{either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
-NMB ("nhb_loss" and "nmb_loss", respectively)}
+NMB ("nhb_loss" and "nmb_loss", respectively). "nmb_loss_voi" and "nhb_loss_voi" are only
+used in internal function calls of metamodel within other VOI functions.}
 
 \item{wtp}{if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold}
 

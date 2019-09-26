@@ -1,10 +1,10 @@
 ---
-title: "Probabilistic Sensitivity Analysis: Generation"
+title: "Probabilistic Sensitivity Analysis: Analysis"
 author: "Fernando Alarid-Escudero, Greg Knowlton, Eva Enns, and the DARTH Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Probabilistic Sensitivity Analysis: Generation}
+  %\VignetteIndexEntry{Probabilistic Sensitivity Analysis: Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

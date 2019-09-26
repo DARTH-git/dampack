@@ -17,14 +17,15 @@ a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
 
 \item{ranges}{A named list of the form c("param" = c(0, 1), ...)
 that gives the ranges for the parameter of interest. If NULL,
-parameter values from the middle 95\% of the PSA samples are used. The number of samples
+parameter values from the middle 95% of the PSA samples are used. The number of samples
 from this range is determined by \code{nsamp}.}
 
 \item{nsamps}{number of samples to take from the ranges}
 
 \item{outcome}{either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
-NMB ("nhb_loss" and "nmb_loss", respectively)}
+NMB ("nhb_loss" and "nmb_loss", respectively). "nmb_loss_voi" and "nhb_loss_voi" are only
+used in internal function calls of metamodel within other VOI functions.}
 
 \item{wtp}{if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold}
 

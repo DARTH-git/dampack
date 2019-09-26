@@ -216,6 +216,7 @@ plot(icers)
 
 Label more:
 
+
 ```{r fig.height = 5, fig.width = 7}
 plot(icers, label = "all")
 ```

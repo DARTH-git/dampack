@@ -1,0 +1,90 @@
+---
+title: "Value of Information Analysis"
+author: "Fernando Alarid-Escudero, Greg Knowlton, Eva Enns, and the DARTH Team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Value of Information Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
+)
+```
+
+```{r}
+library(dampack)
+```
+
+```{r}
+data("example_psa")
+psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+                        example_psa$parameters, example_psa$strategies)
+```
+
+```{r}
+mm <- metamodel(analysis = "twoway", psa = psa_big, params = c("pFailChemo", "cChemo"), 
+                strategies = "Chemo", outcome = "eff", type = "gam")
+```
+
+```{r}
+print(mm)
+```
+
+```{r}
+summary(mm)
+```
+
+```{r}
+pred_mm <- predict(mm,
+                   ranges = list("pFailChemo" = c(0.3, 0.6),
+                                  "cChemo" = NULL),
+                   nsamp = 10)
+head(pred_mm)
+```
+
+```{r}
+evpi_obj <- calc_evpi(psa = psa_big,
+                      wtp = example_psa$wtp,
+                      pop = 1)
+evpi_obj
+```
+
+```{r}
+p <- plot(evpi_obj,
+          txtsize = 16, effect_units = "QALY", currency = "Dollars ($)",
+          xbreaks = seq(0, 200, by = 10), ylim = c(0, 100000))
+p
+```
+
+```{r}
+evppi <- calc_evppi(psa = psa_big,
+                    wtp = c(1e5, 2e5, 5e5, 1e6),
+                    params = c("pFailSurg", "pFailChemo"),
+                    outcome = "nmb",
+                    type = "gam",
+                    k = -1,
+                    pop = 1)
+evppi
+```
+
+
+```{r}
+evsi <- calc_evsi(psa = psa_big,
+                    wtp = c(1e5, 2e5, 5e5, 1e6),
+                    params = c("pFailSurg", "pFailChemo"),
+                    outcome = "nmb",
+                    type = "gam",
+                    k = -1,
+                    n = 100,
+                    n0 = 10,
+                    pop = 1)
+evsi
+```

@@ -1,0 +1,18 @@
+---
+title: "Deterministic Sensitivity Analysis: Generation"
+author: "Fernando Alarid-Escudero, Greg Knowlton, Eva Enns, and the DARTH Team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Deterministic Sensitivity Analysis: Generation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+

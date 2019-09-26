@@ -18,7 +18,8 @@
 #' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
 #' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 #' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
-#' NMB ("nhb_loss" and "nmb_loss", respectively)
+#' NMB ("nhb_loss" and "nmb_loss", respectively). "nmb_loss_voi" and "nhb_loss_voi" are only
+#' used in internal function calls of metamodel within other VOI functions.
 #' @param wtp if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold
 #' @param type type of metamodel
 #' @param poly.order Order of polynomial for the linear regression metamodel.
@@ -216,12 +217,17 @@ print.metamodel <- function(x, ...) {
 #' @export
 summary.metamodel <- function(object, ...) {
   analysis <- object$analysis
+  type <- object$type
   summary_df <- NULL
   if (analysis == "oneway") {
     for (p in object$params) {
       for (s in object$strategies) {
         lm_summary <- summary(object$mods[[p]][[s]])
-        r2 <- lm_summary$r.squared
+        if (type == "gam") {
+          r2 <- lm_summary$r.sq
+        } else {
+          r2 <- lm_summary$r.squared
+        }
         df_new_row <- data.frame("param" = p, "strat" = s, "rsquared" = r2)
         summary_df <- rbind(summary_df, df_new_row)
       }
@@ -231,7 +237,11 @@ summary.metamodel <- function(object, ...) {
     params <- object$params
     for (s in object$strategies) {
       lm_summary <- summary(object$mods[[s]])
-      r2 <- lm_summary$r.squared
+      if (type == "gam") {
+        r2 <- lm_summary$r.sq
+      } else {
+        r2 <- lm_summary$r.squared
+      }
       df_new_row <- data.frame("param1" = params[1], "param2" = params[2],
                                "strat" = s, "rsquared" = r2)
       summary_df <- rbind(summary_df, df_new_row)
@@ -245,7 +255,7 @@ summary.metamodel <- function(object, ...) {
 #' @param object object with class "metamodel"
 #' @param ranges A named list of the form c("param" = c(0, 1), ...)
 #' that gives the ranges for the parameter of interest. If NULL,
-#' parameter values from the middle 95\% of the PSA samples are used. The number of samples
+#' parameter values from the middle 95% of the PSA samples are used. The number of samples
 #' from this range is determined by \code{nsamp}.
 #' @param nsamp number of samples from ranges
 #' @param ... further arguments to \code{predict} (not used)

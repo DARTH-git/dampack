@@ -1,0 +1,122 @@
+---
+title: "Probabilistic Sensitivity Analysis: Analysis"
+author: "Fernando Alarid-Escudero, Greg Knowlton, Eva Enns, and the DARTH Team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Probabilistic Sensitivity Analysis: Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
+)
+```
+
+```{r}
+library(dampack)
+```
+
+```{r}
+data("example_psa")
+```
+
+```{r}
+psa_obj <- make_psa_obj(cost = example_psa$cost,
+                        effectiveness = example_psa$effectiveness,
+                        parameters = example_psa$parameters,
+                        strategies = example_psa$strategies,
+                        currency = "$")
+```
+
+
+```{r fig.width = 7, fig.height = 5, fig.align = "center"}
+plot(psa_obj)
+```
+
+```{r}
+psa_sum <- summary(psa_obj)
+```
+
+```{r fig.height = 5, fig.width = 7}
+icers <- calculate_icers(cost = psa_sum$meanCost, effect = psa_sum$meanEffect, strategies = psa_sum$Strategy)
+plot(icers)
+```
+
+```{r fig.height = 5, fig.width = 7}
+plot(icers, label = "all")
+```
+
+```{r}
+ceac_obj <- ceac(wtp = example_psa$wtp, psa = psa_obj)
+head(ceac_obj)
+```
+
+```{r}
+summary(ceac_obj)
+```
+
+```{r}
+plot(ceac_obj, frontier = TRUE, points = TRUE)
+plot(ceac_obj, frontier = FALSE, points = FALSE)
+```
+
+```{r}
+evpi <- calc_evpi(wtp = example_psa$wtp, psa = psa_obj)
+head(evpi)
+plot(evpi)
+```
+
+```{r}
+el <- calc_exp_loss(wtp = example_psa$wtp, psa = psa_obj)
+head(el)
+plot(el, n_x_ticks = 8, n_y_ticks = 6)
+```
+
+```{r}
+o <- owsa(psa_obj)
+```
+
+
+```{r}
+plot(o)
+```
+
+
+```{r}
+owsa_tornado(o)
+```
+
+Can filter out strategies that don't change using `min_rel_diff`.
+
+```{r}
+owsa_tornado(o, min_rel_diff = 0.05)
+```
+
+```{r}
+owsa_tornado(o, return = "data")
+```
+
+```{r, fig.height = 6, fig.width = 8}
+owsa_opt_strat(o)
+```
+
+```{r}
+owsa_opt_strat(o, return = "data")
+```
+
+```{r}
+tw <- twsa(psa_obj, param1 = "pFailChemo", param2 = "muDieCancer")
+```
+
+```{r}
+plot(tw)
+```
+
+

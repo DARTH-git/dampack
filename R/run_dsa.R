@@ -1,4 +1,4 @@
-#' Compute one-way sensitivity analysis (OWSA)
+#' Run deterministic one-way sensitivity analysis (OWSA)
 #'
 #' @description This function runs a deterministic one-way sensitivity analysis (OWSA) on a
 #' given function that produces outcomes.
@@ -36,11 +36,11 @@
 #' Users only need to provide the "min" and "max" of the parameters of interest.
 #' For the rest of the parameter inputs into the user defined function,
 #' "min" and "max" can be any value or \code{NA} but these values are not evaluated in
-#' \code{owsa_det}}
+#' \code{run_owsa_det}}
 #' }
 #'
 #' @export
-owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
+run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
                      outcomes = NULL, strategies = NULL, ...){
 
   if (is.null(params)) {
@@ -160,7 +160,7 @@ if (n_outcomes == 1) {
   return(owsa_out)
 }
 
-#' Two-way sensitivity analysis (TWSA)
+#' Run deterministic two-way sensitivity analysis (TWSA)
 #'
 #' @description This function runs a deterministic two-way sensitivity analysis (TWSA) on a
 #' given function that produces outcomes.
@@ -196,11 +196,11 @@ if (n_outcomes == 1) {
 #' Users only need to provide the "min" and "max" of the parameters of interest.
 #' For the rest of the parameter inputs into the user defined function,
 #' "min" and "max" can be any value or \code{NA} but these values are not evaluated in
-#' \code{twsa_det}}
+#' \code{run_twsa_det}}
 #' }
 #'
 #' @export
-twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes = NULL,
+run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes = NULL,
                      strategies = NULL, ...){
 
   if (!is.data.frame(params_all)) stop("params_all must be a data.frame")

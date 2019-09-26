@@ -1,10 +1,10 @@
 ---
-title: "Deterministic Sensitivity Analysis: Basic Usage"
-author: "Fernando Alarid-Escudero, Caleb Easterly, Eva Enns, and the DARTH Team"
+title: "Probabilistic Sensitivity Analysis: Generation"
+author: "Fernando Alarid-Escudero, Greg Knowlton, Eva Enns, and the DARTH Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Deterministic Sensitivity Analysis: Basic Usage}
+  %\VignetteIndexEntry{Probabilistic Sensitivity Analysis: Generation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,7 +13,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 6,
+  fig.width = 7,
+  fig.height = 5,
   fig.align = "center"
 )
 ```

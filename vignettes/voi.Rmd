@@ -47,12 +47,14 @@ pred_mm <- predict(mm,
                    ranges = list("pFailChemo" = c(0.3, 0.6),
                                   "cChemo" = NULL),
                    nsamp = 10)
+head(pred_mm)
 ```
 
 ```{r}
 evpi_obj <- calc_evpi(psa = psa_big,
                       wtp = example_psa$wtp,
                       pop = 1)
+evpi_obj
 ```
 
 ```{r}

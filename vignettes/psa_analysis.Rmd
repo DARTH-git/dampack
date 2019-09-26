@@ -84,7 +84,7 @@ o <- owsa(psa_obj)
 ```
 
 
-```{r fig.height = 6, fig.width = 6}
+```{r}
 plot(o)
 ```
 

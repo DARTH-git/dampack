@@ -20,59 +20,182 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-#'
-#' @examples
-#'
-#' #load package
-#' library(dampack)
-#'
-#' #example of function that produces output required by run_psa
-#' test_func <- function(params, extra_param) {
-#'   normal_param <- params[["normal_param"]]
-#'   lognorm_param <- params[["lognorm_param"]]
-#'   beta_param <- params[["beta_param"]]
-#'   gamma_param <- params[["gamma_param"]]
-#'   level1 <- params[["level1"]]
-#'   level2 <- params[["level2"]]
-#'   level3 <- params[["level3"]]
-#'   bootstrap_param <- params[["bootstrap_param"]]
+library(dampack)
+rm(list = ls())
 
-#'  effect1 <- normal_param + lognorm_param * extra_param + beta_param + gamma_param +
-#'    level1 + level2 + level3 + bootstrap_param
-#'  cost1 <- - normal_param - lognorm_param - beta_param - gamma_param
-#'   - level1 - level2 - level3 - bootstrap_param
-#'
-#'  effect2 <- normal_param - lognorm_param * extra_param + beta_param - gamma_param +
-#'             level1 - level2 + level3 - bootstrap_param
-#'  cost2 <- - normal_param + lognorm_param - beta_param + gamma_param
-#'           - level1 + level2 - level3 + bootstrap_param
-#'
-#'  output <- data.frame(strategies = c("mystrat1", "mystrat2"),
-#'                       effect = c(effect1, effect2),
-#'                       cost = c(cost1, cost2))
-#'
-#'  return(output)
-#'}
-#'
-#' #generate parameter data.frame from parent distributions
-#' psa_df <- gen_psa_samp(params = c("normal_param", "lognorm_param", "beta_param",
-#'                                "gamma_param", "dirichlet_param", "bootstrap_param"),
-#'                     dist = c("normal", "log-normal", "beta",
-#'                      "gamma", "dirichlet", "bootstrap"),
-#'                     parameterization_type = c("mean, sd", "mean, sd", "mean, sd", "mean, sd",
-#'                                               "value, mean_prop, sd", "value, weight"),
-#'                     dist_params = list(c(1, 2), c(1, 3), c(.5, .2), c(100, 1),
-#'                                        data.frame(value = c("level1", "level2", "level3"),
-#'                                                   mean_prop = c(.1, .4, .5),
-#'                                                   sd = c(.05, .01, .1)),
-#'                                        data.frame(value = c(1, 2, 4, 6, 7, 8),
-#'                                                   weight = c(1, 1, 1, 1, 1, 4))),
-#'                     nsamp = 100)
-#'
-#'#run psa using psa parameter data.frame
-#'run_psa(psa_df, test_func, outcomes = c("cost", "effect"), cost_outcome = "cost",
-#'        effectiveness_outcome = "effect", strategies = c("customstrat1", "customstrat2"),
-#'        currency = "$", extra_param = 1.5)
-#'
-#'
+decision_model <- function(l_params_all, verbose = FALSE) {
+  with(as.list(l_params_all), {
+    # compute internal paramters as a function of external parameters
+    r_HD    = - log(1 - p_HD) # rate of death in healthy
+    r_S1D   = hr_S1 * r_HD 	  # rate of death in sick
+    r_S2D   = hr_S2 * r_HD  	# rate of death in sicker
+    p_S1D   = 1 - exp(-r_S1D) # probability to die in sick
+    p_S2D   = 1 - exp(-r_S2D) # probability to die in sicker
+    
+    ####### INITIALIZATION ##########################################
+    # create the cohort trace
+    m_M <- matrix(NA, nrow = n_t + 1 , 
+                  ncol = n_s,
+                  dimnames = list(0:n_t, v_n))     # create Markov trace (n_t + 1 because R doesn't understand  Cycle 0)
+    
+    m_M[1, ] <- c(1, 0, 0, 0)                      # initialize Markov trace
+    
+    # create transition probability matrix for NO treatment
+    m_P <- matrix(0,
+                  nrow = n_s, 
+                  ncol = n_s,
+                  dimnames = list(v_n, v_n))
+    # fill in the transition probability array
+    ### From Healthy
+    m_P["H", "H"]  <- 1 - (p_HS1 + p_HD)
+    m_P["H", "S1"] <- p_HS1
+    m_P["H", "D"]  <- p_HD
+    ### From Sick
+    m_P["S1", "H"]  <- p_S1H
+    m_P["S1", "S1"] <- 1 - (p_S1H + p_S1S2 + p_S1D)
+    m_P["S1", "S2"] <- p_S1S2
+    m_P["S1", "D"]  <- p_S1D
+    ### From Sicker
+    m_P["S2", "S2"] <- 1 - p_S2D
+    m_P["S2", "D"]  <- p_S2D
+    ### From Dead
+    m_P["D", "D"] <- 1
+    
+    # check rows add up to 1
+    if (!isTRUE(all.equal(as.numeric(rowSums(m_P)), as.numeric(rep(1, n_s))))) {
+      stop("This is not a valid transition Matrix")
+    }
+    
+    ############# PROCESS ###########################################
+    
+    for (t in 1:n_t){                              # throughout the number of cycles
+      m_M[t + 1, ] <- m_M[t, ] %*% m_P           # estimate the Markov trace for cycle the next cycle (t + 1)
+    }
+    
+    ####### EPIDEMIOLOGICAL OUTPUT  ###########################################
+    #### Overall Survival (OS) ####
+    v_os <- 1 - m_M[, "D"]                # calculate the overall survival (OS) probability for no treatment
+    
+    #### Disease prevalence #####
+    v_prev <- rowSums(m_M[, c("S1", "S2")])/v_os
+    
+    #### Proportion of sick in S1 state #####
+    v_prop_S1 <- m_M[, "S1"] / v_prev
+    
+    ####### RETURN OUTPUT  ###########################################
+    out <- list(m_M = m_M,
+                m_P = m_P,
+                Surv = v_os[-1],
+                Prev = v_prev[-1],
+                PropSick = v_prop_S1[c(11, 21, 31)])
+    
+    return(out)
+  }
+  )
+}
+
+calculate_ce_out <- function(l_params_all, n_wtp = 100000){
+  # User defined
+  with(as.list(l_params_all), {
+    ## Create discounting vectors
+    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_t))) # vector with discount weights for costs
+    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_t))) # vector with discount weights for QALYs
+    
+    ## Run STM model at a parameter set for each intervention
+    l_model_out_no_trt <- decision_model(l_params_all = l_params_all)
+    l_model_out_trt    <- decision_model(l_params_all = l_params_all)
+    
+    ## Cohort trace by treatment
+    m_M_no_trt <- l_model_out_no_trt$m_M # No treatment
+    m_M_trt    <- l_model_out_trt$m_M    # Treatment
+    
+    ## Vectors with costs and utilities by treatment
+    v_u_no_trt <- c(u_H, u_S1, u_S2, u_D)
+    v_u_trt    <- c(u_H, u_Trt, u_S2, u_D)
+    
+    v_c_no_trt <- c(c_H, c_S1, c_S2, c_D)
+    v_c_trt    <- c(c_H, c_S1 + c_Trt, c_S2 + c_Trt, c_D)
+    
+    ## Mean Costs and QALYs for Treatment and NO Treatment
+    v_tu_no_trt <- m_M_no_trt %*% v_u_no_trt
+    v_tu_trt    <- m_M_trt %*% v_u_trt
+    
+    v_tc_no_trt <- m_M_no_trt %*% v_c_no_trt
+    v_tc_trt    <- m_M_trt %*% v_c_trt
+    
+    ## Total discounted mean Costs and QALYs
+    tu_d_no_trt <- t(v_tu_no_trt) %*% v_dwe 
+    tu_d_trt    <- t(v_tu_trt) %*% v_dwe
+    
+    tc_d_no_trt <- t(v_tc_no_trt) %*% v_dwc
+    tc_d_trt    <- t(v_tc_trt)    %*% v_dwc
+    
+    ## Vector with total discounted mean Costs and QALYs
+    v_tc_d <- c(tc_d_no_trt, tc_d_trt)
+    v_tu_d <- c(tu_d_no_trt, tu_d_trt)
+    
+    ## Vector with discounted net monetary benefits (NMB)
+    v_nmb_d <- v_tu_d * n_wtp - v_tc_d
+    
+    ## Dataframe with discounted costs, effectiveness and NMB
+    df_ce <- data.frame(Strategy = v_names_str,
+                        Cost     = v_tc_d,
+                        Effect   = v_tu_d,
+                        NMB      = v_nmb_d)
+    
+    return(df_ce)
+  }
+  )
+}
+
+my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
+               "p_HD", "hr_S1", "hr_S2", 
+               "c_H", "c_S1", "c_S2", 
+               "c_Trt", "c_D","u_H",
+               "u_S1","u_S2", "u_D",
+               "u_Trt", "d_e", "d_c")
+
+my_dist <- c("beta", "beta", "beta",
+              "beta", "log-normal", "log-normal",
+              "gamma", "gamma", "gamma",
+              "gamma", "constant", "truncated-normal", 
+              "truncated-normal", "truncated-normal", "constant", 
+              "truncated-normal", "constant", "constant")
+
+my_parameterization_type <- c("a, b", "a, b", "a, b",
+                             "a, b", "meanlog, sdlog", "meanlog, sdlog",
+                             "shape, scale", "shape, scale", "shape, scale",
+                             "shape, scale", "val", "mean, sd, ll, ul", 
+                             "mean, sd, ll, ul", "mean, sd, ll, ul", "val",
+                             "mean, sd, ll, ul", "val", "val")
+
+my_dist_params <- list(c(30, 170), c(60, 60), c(84, 716),
+                       c(10, 1990), c(log(3), 0.01), c(log(10), 0.02),
+                       c(100, 20), c(177.8, 22.5), c(225, 66.7),
+                       c(73.5, 163.3), 0, c(1, 0.01, NA, 1),
+                       c(0.75, 0.02, NA, 1), c(0.5, 0.03, NA, 1), 0,
+                       c(0.95, 0.02, NA, 1), 0.03, 0.03)
+                       
+l_params_all <- gen_psa_samp(params = my_params,
+                               dist = my_dist,
+                               parameterization_type = my_parameterization_type,
+                               dist_params = my_dist_params)
+
+v_names_str <- c("No Treatment", "Treatment")  
+## Number of strategies
+n_str <- length(v_names_str)
+## Markov model parameters
+n_age_init <- 25                # age at baseline
+n_age_max  <- 55                # maximum age of follow up
+n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
+v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
+n_s <- length(v_n)                            # number of health states 
+
+psa_output <- run_psa(psa_samp = l_params_all, 
+                      FUN = calculate_ce_out,
+                      outcomes = c("Cost", "Effect", "NMB"),
+                      strategies = c("No_Treatment", "Treatment"))
+
 ```
+
+

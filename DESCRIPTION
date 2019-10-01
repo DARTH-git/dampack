@@ -25,7 +25,8 @@ Imports:
     dplyr,
     scales,
     stringr,
-    mgcv
+    mgcv,
+    truncnorm
 Suggests:
     testthat,
     lintr,

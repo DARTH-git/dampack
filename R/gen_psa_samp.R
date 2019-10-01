@@ -17,6 +17,9 @@
 #' \item If \code{dist == "log-normal"}, \code{parameterization_type} can only be \code{"mean, sd"},
 #' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
 #'
+#' \item If \code{dist == "truncated-normal"}, \code{parameterization_type} can only be \code{"mean, sd, lowerbound, upperbound"},
+#' and \code{dist_params} must be the vector \code{c(mean, sd, lowerbound, upperbound)}.
+#'
 #' \item If \code{dist == "beta"}, \code{parameterization_type} can be \code{"mean, sd"} or \code{"a, b"}
 #' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
 #' or \code{c(a, b)}, respectively.
@@ -69,20 +72,20 @@
 #'
 #' @examples
 #' #define parameter names
-#' params <- c("normal_param", "lognorm_param", "beta_param",
+#' params <- c("normal_param", "lognorm_param", "truncnorm_param", "beta_param",
 #'             "gamma_param", "dirichlet_param", "bootstrap_param")
 #'
 #' #indicate parent distribution types for each parameter
-#' dist <- c("normal", "log-normal", "beta", "gamma", "dirichlet", "bootstrap")
+#' dist <- c("normal", "log-normal", "truncated-normal", "beta", "gamma", "dirichlet", "bootstrap")
 #'
 #' #indicate which type of parameterization is used for each parent distribution
-#' parameterization_type <- c("mean, sd", "mean, sd", "mean, sd", "mean, sd",
+#' parameterization_type <- c("mean, sd", "mean, sd", "mean, sd, lowerbound, upperbound", "mean, sd", "mean, sd",
 #'                           "value, mean_prop, sd", "value, weight")
 #'
 #' #provide distribution parameters that fully define each parent distribution, and
 #' #ensure that these distribution parameters match the form expected by each combination of dist
 #' #and parameterization_type
-#' dist_params <- list(c(1, 2), c(1, 3), c(.5, .2), c(100, 1),
+#' dist_params <- list(c(1, 2), c(1, 3), c(1, 0.1, NA, 1), c(.5, .2), c(100, 1),
 #'                    data.frame(value = c("level1", "level2", "level3"),
 #'                               mean_prop = c(.1, .4, .5), sd = c(.05, .01, .1)),
 #'                    data.frame(value = c(1, 2, 4, 6, 7, 8),
@@ -96,14 +99,15 @@
 #'              nsamp = 100)
 #'
 #' @importFrom stats rbeta rgamma rlnorm rnorm
+#' @importFrom truncnorm rtruncnorm
 #' @export
 
 gen_psa_samp <- function(params = NULL,
-                         dist = c("normal", "log-normal", "beta", "gamma",
+                         dist = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
                                   "dirichlet", "bootstrap"),
                          parameterization_type = c("mean, sd", "a, b", "shape, scale",
                                                    "value, mean_prop, sd", "value, n",
-                                                   "value, alpha"),
+                                                   "value, alpha", "mean, sd, lowerbound, upperbound"),
                          dist_params = NULL,
                          nsamp = 100) {
 
@@ -129,6 +133,17 @@ gen_psa_samp <- function(params = NULL,
       names(params_df[[i]]) <- paste0(params[i])
     }
 
+    #truncated normal
+    if (dist[i] == "truncated-normal") {
+      sample_mean <- dist_params[[i]][1]
+      sample_sd <- dist_params[[i]][2]
+      lowerbound <- ifelse(!is.na(dist_params[[i]][3]), dist_params[[i]][3], -Inf)
+      upperbound <- ifelse(!is.na(dist_params[[i]][4]), dist_params[[i]][4], Inf)
+      params_df[[i]] <- data.frame(param_val = rtruncnorm(nsamp, a = lowerbound,
+                                                          b = upperbound, mean = sample_mean,
+                                                          sd = sample_sd))
+      names(params_df[[i]]) <- paste0(params[i])
+    }
     #beta
     if (dist[i] == "beta") {
       if (parameterization_type[i] == "mean, sd") {

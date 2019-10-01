@@ -23,7 +23,7 @@
 #' @export
 
 run_psa <- function(psa_samp, FUN, outcomes = NULL,
-                    strategies = NULL, currency = "$", ...){
+                    strategies = NULL, ...){
 
   opt_arg_val <- list(...)
   fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)

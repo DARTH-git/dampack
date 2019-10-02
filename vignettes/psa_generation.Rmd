@@ -148,6 +148,16 @@ calculate_ce_out <- function(l_params_all, n_wtp = 100000){
   )
 }
 
+v_names_str <- c("No Treatment", "Treatment")  
+## Number of strategies
+n_str <- length(v_names_str)
+## Markov model parameters
+n_age_init <- 25                # age at baseline
+n_age_max  <- 55                # maximum age of follow up
+n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
+v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
+n_s <- length(v_n)                            # number of health states 
+
 my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
                "p_HD", "hr_S1", "hr_S2", 
                "c_H", "c_S1", "c_S2", 
@@ -181,20 +191,18 @@ l_params_all <- gen_psa_samp(params = my_params,
                                parameterization_type = my_parameterization_type,
                                dist_params = my_dist_params)
 
-v_names_str <- c("No Treatment", "Treatment")  
-## Number of strategies
-n_str <- length(v_names_str)
-## Markov model parameters
-n_age_init <- 25                # age at baseline
-n_age_max  <- 55                # maximum age of follow up
-n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
-v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
-n_s <- length(v_n)                            # number of health states 
-
 psa_output <- run_psa(psa_samp = l_params_all, 
                       FUN = calculate_ce_out,
                       outcomes = c("Cost", "Effect", "NMB"),
                       strategies = c("No_Treatment", "Treatment"))
+
+
+###emonstrating the passing of extra parameters to calculated_ce_out (n_wtp)
+psa_output2 <- run_psa(psa_samp = l_params_all, 
+                      FUN = calculate_ce_out,
+                      outcomes = c("Cost", "Effect", "NMB"),
+                      strategies = c("No_Treatment", "Treatment"), 
+                      n_wtp = 50000)
 
 ```
 

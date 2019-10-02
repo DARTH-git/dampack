@@ -1,6 +1,6 @@
 ---
 title: "Basic Cost Effectiveness Analysis"
-author: "Fernando Alarid-Escudero, Caleb Easterly, Eva Enns, and the DARTH Team"
+author: "Fernando Alarid-Escudero, Eva Enns, Gregory Knowlton, and the DARTH Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

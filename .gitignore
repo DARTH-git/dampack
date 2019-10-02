@@ -3,6 +3,8 @@ inst/doc
 .Rhistory
 .Rapp.history
 
+# Mac OS finder window files
+.DS_Store
 # Session Data files
 .RData
 # Example code in package build process

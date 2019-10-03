@@ -23,7 +23,7 @@
 #' @export
 
 run_psa <- function(psa_samp, FUN, outcomes = NULL,
-                    strategies = NULL, ...){
+                    strategies = NULL, ...) {
 
   opt_arg_val <- list(...)
   fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
@@ -32,12 +32,12 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
     userfun <- do.call(FUN, fun_input_test)
   },
   error = function(e) NA)
-  if (is.na(sum(is.na(jj)))){
+  if (is.na(sum(is.na(jj)))) {
     stop("FUN is not well defined by the parameter values and ...")
   }
   userfun <- do.call(FUN, fun_input_test)
 
-  if (is.null(strategies)){
+  if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
   }
 
@@ -45,20 +45,20 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
     stop("FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
   }
 
-  if (length(strategies) != length(userfun[, 1])){
+  if (length(strategies) != length(userfun[, 1])) {
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
   v_outcomes <- colnames(userfun)[-1]
 
-  if (!all(outcomes %in% v_outcomes)){
+  if (!all(outcomes %in% v_outcomes)) {
     stop("at least one outcome is not in FUN outcomes")
   }
 
 
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 
-  for (i in 1:nrow(psa_samp)){
+  for (i in 1:nrow(psa_samp)) {
     fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
     sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
   }
@@ -66,7 +66,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
   n_outcomes <- length(outcomes)
   sim_out_df <- vector(mode = "list", length = n_outcomes)
   names(sim_out_df) <- outcomes
-  for (j in 1:n_outcomes){
+  for (j in 1:n_outcomes) {
     sim_out_df[[j]] <- lapply(sim_out_ls,
                               function(x, tmp_out = outcomes[j]) {
                                 x[[outcomes[j]]]
@@ -78,7 +78,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
 
 
     psa_out <- vector(mode = "list", length = n_outcomes)
-    for (j in 1:n_outcomes){
+    for (j in 1:n_outcomes) {
       psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
                                    other_outcome = sim_out_df[[j]],
                                    parameters = psa_samp[, -1], strategies = strategies,

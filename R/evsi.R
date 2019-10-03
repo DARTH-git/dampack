@@ -28,7 +28,7 @@ calc_evsi <- function(psa,
   evsi <- rep(0, n_wtps)
 
   # calculate evppi at each wtp
-  for (l in 1:n_wtps){
+  for (l in 1:n_wtps) {
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,
@@ -51,9 +51,9 @@ calc_evsi <- function(psa,
   }
 
   # data.frame to store EVPPI for each WTP threshold
-  df.evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
-  class(df.evsi) <- "data.frame"
-  return(df.evsi)
+  df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
+  class(df_evsi) <- "data.frame"
+  return(df_evsi)
 }
 
 
@@ -66,7 +66,7 @@ calc_evsi <- function(psa,
 #' @param n scalar or vector of new sample size to compute evsi on
 #' @param n0 scalar or vector of effective prior sample size
 #' @importFrom stats coef
-predict_ga <- function(object, n, n0){
+predict_ga <- function(object, n, n0) {
 
   # Name of parameters
   param_names <- colnames(object$model)
@@ -94,7 +94,7 @@ predict_ga <- function(object, n, n0){
   if (length(n) == 1) {
     n <- rep(n, n_params)
   }
-  if (length(n0) == 1){
+  if (length(n0) == 1) {
     n0 <- rep(n0, n_params)
   }
 
@@ -139,7 +139,7 @@ predict_ga <- function(object, n, n0){
 #' @keywords internal
 #'
 #' @importFrom mgcv PredictMat
-predict_smooth_ga <- function (object, param_vals, vrf = 1) {
+predict_smooth_ga <- function(object, param_vals, vrf = 1) {
   # Produce basis functions for one parameter
   x <- PredictMat(object, param_vals)
 
@@ -168,9 +168,9 @@ predict_smooth_ga <- function (object, param_vals, vrf = 1) {
 #'
 #' @keywords internal
 #' @importFrom mgcv tensor.prod.model.matrix Predict.matrix PredictMat
-predict_matrix_tensor_smooth_ga <- function (object,
-                                             param_vals,
-                                             vrf = rep(1, ncol(param_vals))){
+predict_matrix_tensor_smooth_ga <- function(object,
+                                            param_vals,
+                                            vrf = rep(1, ncol(param_vals))) {
 
 
   m <- length(object$margin)

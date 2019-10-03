@@ -7,7 +7,7 @@
 #' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
-#' @param nsamps number of parameter values. If \code{NULL}, 100 parameter values are
+#' @param nsamp number of parameter values. If \code{NULL}, 100 parameter values are
 #' used
 #' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
@@ -40,8 +40,8 @@
 #' }
 #'
 #' @export
-run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
-                     outcomes = NULL, strategies = NULL, ...){
+run_owsa_det <- function(params = NULL, params_all, nsamp = 100, FUN,
+                     outcomes = NULL, strategies = NULL, ...) {
 
   if (is.null(params)) {
     params <- as.character(params_all[, 1])
@@ -90,14 +90,14 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
     stop("FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
   }
 
-  if (length(strategies) != length(userfun[, 1])){
+  if (length(strategies) != length(userfun[, 1])) {
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
 
   v_outcomes <- colnames(userfun)[-1]
 
-  if (!all(outcomes %in% v_outcomes)){
+  if (!all(outcomes %in% v_outcomes)) {
     stop("at least one outcome is not in FUN outcomes")
     }
 
@@ -115,18 +115,18 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
     pars_range <- params_all[ix, c("min", "max")]
     v_owsa_input <- t(t(seq(pars_range[[1]],
                             pars_range[[2]],
-                            length.out = nsamps)))
+                            length.out = nsamp)))
     colnames(v_owsa_input) <- pars_i
 
     # Run model and capture outcome(s)
-    sim_out <- lapply(c(1:nsamps),
+    sim_out <- lapply(c(1:nsamp),
                       wrapper_of_user_model,
                       user_fun = FUN,
                       param_name = pars_i,
                       tmp_input = fun_input_ls,
                       tmp_replace = v_owsa_input)
 
-    for (j in 1:n_outcomes){
+    for (j in 1:n_outcomes) {
       sim_out_df[[j]] <- lapply(sim_out,
                                 function(x, tmp_out = outcomes[j]) {
                                   x[[outcomes[j]]]
@@ -136,7 +136,7 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
       sim_out_df_all[[j]] <- rbind(sim_out_df_all[[j]], sim_out_df[[j]])
     }
 
-    param_table <- data.frame(parameter = rep(pars_i, nsamps),
+    param_table <- data.frame(parameter = rep(pars_i, nsamp),
                               paramval = unname(v_owsa_input))
 
     param_table_all <- rbind(param_table_all, param_table)
@@ -146,8 +146,10 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
 
   df_owsa <- vector(mode = "list", length = n_outcomes)
   owsa_out <- vector(mode = "list", length = n_outcomes)
-  for (k in 1:n_outcomes){
-    df_owsa[[k]] <- create_dsa_oneway(param_table_all, sim_out_df_all[[k]], strategies)
+  for (k in 1:n_outcomes) {
+    df_owsa[[k]] <- create_dsa_oneway(parameters = param_table_all,
+                                      other_outcome = sim_out_df_all[[k]],
+                                      strategies = strategies)
     owsa_out[[k]] <- owsa(df_owsa[[k]], outcome = "eff")
   }
 
@@ -170,7 +172,7 @@ if (n_outcomes == 1) {
 #' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
-#' @param nsamps number of parameter values. If \code{NULL}, 40 parameter values are
+#' @param nsamp number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
 #' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
@@ -200,9 +202,8 @@ if (n_outcomes == 1) {
 #' }
 #'
 #' @export
-run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes = NULL,
-                     strategies = NULL, ...){
-
+run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes = NULL,
+                     strategies = NULL, ...) {
   if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
   if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
@@ -217,7 +218,7 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
     stop("two-way sensitivity analysis only allows for and requires 2 different paramters of interest at a time")
   }
 
-  if (!all(poi %in% names(params_basecase))){
+  if (!all(poi %in% names(params_basecase))) {
     stop("param1 and param2 should be in the parameters provided in params_all")
   }
 
@@ -227,7 +228,7 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
 
   ix <- match(poi, params_all$pars)
   if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
-            (params_all[ix, 2] <= params_all[ix, 4]))) {
+           (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }
 
@@ -237,12 +238,12 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
     userfun <- do.call(FUN, fun_input_ls)
   },
   error = function(e) NA)
-  if (is.na(sum(is.na(jj)))){
+  if (is.na(sum(is.na(jj)))) {
     stop("FUN is not well defined by the basecase parameter values and ...")
   }
 
   userfun <- do.call(FUN, fun_input_ls)
-  if (is.null(strategies)){
+  if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
   }
 
@@ -250,13 +251,13 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
     stop("FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
   }
 
-  if (length(strategies) != length(userfun[, 1])){
+  if (length(strategies) != length(userfun[, 1])) {
     stop("number of strategies is not the same as the number of strategies in user defined FUN")
   }
 
   v_outcomes <- colnames(userfun)[-1]
 
-  if (!all(outcomes %in% v_outcomes)){
+  if (!all(outcomes %in% v_outcomes)) {
       stop("at least one outcome is not in FUN outcomes")
   }
 
@@ -267,10 +268,10 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
   range_df <- params_all[ix, c("min", "max")]
   param_table <- expand.grid(param1 = seq(range_df[1, "min"],
                                          range_df[1, "max"],
-                                         length.out = nsamps),
+                                         length.out = nsamp),
                              param2 = seq(range_df[2, "min"],
                                          range_df[2, "max"],
-                                         length.out = nsamps))
+                                         length.out = nsamp))
   colnames(param_table) <- poi
 
   # Run model and capture outcome
@@ -282,7 +283,7 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
                     tmp_input = fun_input_ls,
                     tmp_replace = param_table)
 
-  for (j in 1:n_outcomes){
+  for (j in 1:n_outcomes) {
     sim_out_df[[j]] <- lapply(sim_out,
                               function(x, tmp_out = outcomes[j]) {
                                 x[[outcomes[j]]]
@@ -295,8 +296,10 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
   df_twsa <- vector(mode = "list", length = n_outcomes)
   twsa_out <- vector(mode = "list", length = n_outcomes)
 
-  for (k in 1:n_outcomes){
-    df_twsa[[k]] <- create_dsa_twoway(param_table, sim_out_df[[k]], strategies)
+  for (k in 1:n_outcomes) {
+    df_twsa[[k]] <- create_dsa_twoway(parameters = param_table,
+                                      other_outcome = sim_out_df[[k]],
+                                      strategies = strategies)
     twsa_out[[k]] <- twsa(df_twsa[[k]], outcome = "eff")
   }
 

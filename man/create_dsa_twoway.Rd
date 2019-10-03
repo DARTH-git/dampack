@@ -5,7 +5,7 @@
 \title{Create one-way deterministic sensitivity analysis object}
 \usage{
 create_dsa_twoway(parameters, effectiveness = NULL, strategies,
-  cost = NULL, currency = "$")
+  cost = NULL, currency = "$", other_outcome = NULL)
 }
 \arguments{
 \item{parameters}{parameter values associated with effectiveness and outcomes.
@@ -19,7 +19,8 @@ param1 val2     \tab param2 val2 \cr
 ...            \tab ... \cr
 }}
 
-\item{effectiveness}{Data frames containing costs and effectiveness data, respectively.
+\item{effectiveness}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
@@ -29,12 +30,19 @@ certain uses of this vector, this function uses \code{\link{make.names}} to modi
 strategy names as necessary. It is strongly suggested that you follow the rules
 in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
-\item{cost}{Data frames containing costs and effectiveness data, respectively.
+\item{cost}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
+
+\item{other_outcome}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
+Each simulation should be a row of the data frame, and each strategy should be a column.
+Naming the columns of the data frames is not necessary, as they will be renamed with
+the \code{strategies} vector.}
 }
 \description{
 The object returned by this function can be passed to

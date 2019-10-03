@@ -1,12 +1,14 @@
 #' Generate PSA Sample
 #'
-#' @description \code{gen_psa_samp} generates a data.frame of sampled parameter values from user-specified distributions
+#' @description \code{gen_psa_samp} generates a data.frame of sampled parameter values from
+#' user-specified distributions
 #' to be used in a probabilistic sensitivity analysis (PSA)
 
 #' @details
 #' Length of vectors \code{params}, \code{dist}, \code{parameterization_type}, and list \code{dist_params} must all
 #' be the same.
-#' The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params} all define the distribution that will be
+#' The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params}
+#' all define the distribution that will be
 #' used to draw samples of the corresponding nth element of the \code{params} vector.
 #'
 #' For a given element of \code{params}:
@@ -14,8 +16,19 @@
 #' \item If \code{dist == "normal"}, \code{parameterization_type} can only be \code{"mean, sd"},
 #' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
 #'
-#' \item If \code{dist == "log-normal"}, \code{parameterization_type} can only be \code{"mean, sd"},
-#' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
+#' \item If \code{dist == "log-normal"}, \code{parameterization_type} can be either \code{"mean, sd"} or
+#' \code{"meanlog, sdlog"}, and the corresponding element of list \code{dist_params} must be either
+#' the the vector \code{c(mean, sd)} or \code{c(meanlog, sdlog)}. Use \code{"mean, sd"} if you have
+#' sample mean and sample standard deviation of an empirical sample of the random variable, and use
+#' \code{"meanlog, sdlog"} if you want to directly specify the parameters of the log-normal distribution
+#' as specified by \code{\link{rlnorm}}
+#'
+#' \item If \code{dist == "truncated-normal"}, \code{parameterization_type} can only be \code{"mean, sd, ll, ul"},
+#' and \code{dist_params} must be the vector \code{c(mean, sd, ll, ul)}, where ll is
+#' the lower limit of the distribution and ul
+#' is the upper limit of the distribution. If either the lower limit or the upper
+#' limit does not exist, simply specify NA in
+#' the corresponding position of the dist_params vector.
 #'
 #' \item If \code{dist == "beta"}, \code{parameterization_type} can be \code{"mean, sd"} or \code{"a, b"}
 #' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
@@ -32,32 +45,48 @@
 #' then the corresponding element of list \code{dist_params} must be a data.frame where the first column
 #' is a string vector of the the different multinomial outcomes. These multinomial outcomes will become column names
 #' in the data.frame returned by \code{gen_psa_samp}, and therefore the strings in this column should correspond to
-#' variable names used in \code{FUN} for \code{\link{run_psa}}. The second and third columns of this \code{dist_params}
-#' should be numerical vectors containing the sample means and sample standard errors for each of the multinomial outcomes.
+#' variable names used in \code{FUN} for \code{\link{run_psa}}. The second and
+#' third columns of this \code{dist_params}
+#' should be numerical vectors containing the sample means and sample standard errors for
+#' each of the multinomial outcomes.
 #'
-#' \item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a data.frame with the first column
-#' being a string vector of the multinomial outcomes, and the second column being a vector of the observed number of each
+#' \item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a
+#' data.frame with the first column
+#' being a string vector of the multinomial outcomes, and the second column being a
+#' vector of the observed number of each
 #' multinomial outcome in a sample.
 #'
 #' \item If \code{parameterization_type == "value, alpha"}, then \code{dist_params} must be a data.frame with
-#' the first column being a string vector of the multinomial outcomes, and the second column must be a numerical vector
+#' the first column being a string vector of the multinomial outcomes, and
+#'  the second column must be a numerical vector
 #' of the alpha parameter values for each multinomial outcome in the dirichlet distribution.
 #' }
 #'
-#' \item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be \code{"value, weight"}, and \code{dist_params}
-#' must be a data.frame with the first column being a numerical vector containing all of the bootstrap sample values, and
-#' the second column being an integer vector designating the sampling weights of each bootstrap sample value.  For example,
-#' the number of rows in the \code{dist_params} data.frame is the number of individuals in the population to be sampled
-#' from (with replacement) or the number of values an empirical distribution (e.g. a histogram). If each individual value in the
-#' sample is unique and should be weighted equally, set each weight to 1. If the sample distribution resembles a histogram,
-#' the weights should be equal to the number of observations for each unique value in the empirical distribution.
+#' \item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be
+#'  \code{"value, weight"}, and \code{dist_params}
+#' must be a data.frame with the first column being a numerical vector
+#' containing all of the bootstrap sample values, and
+#' the second column being an integer vector designating the
+#' sampling weights of each bootstrap sample value.  For example,
+#' the number of rows in the \code{dist_params} data.frame
+#' is the number of individuals in the population to be sampled
+#' from (with replacement) or the number of values an
+#' empirical distribution (e.g. a histogram). If each individual value in the
+#' sample is unique and should be weighted equally,
+#' set each weight to 1. If the sample distribution resembles a histogram,
+#' the weights should be equal to the number of
+#' observations for each unique value in the empirical distribution.
+#'
+#' \item If \code{dist == "constant"}, \code{parameterization_type} can only be \code{"val"},
+#' and \code{dist_params} must be a single numerical value.
 #' }
 #'
 #' @param params String vector with the names of parameters to be generated by \code{gen_psa_samp}
 #' and used by a user-defined function in \code{run_psa} to calculate outcomes.
 #' @param dist String vector with the distributions from which \code{params} will be drawn.
 #' @param parameterization_type String vector with parameterization types for each \code{dist}
-#' @param dist_params list of input parameters required to by specific \code{dist} and \code{parameterization_type}
+#' @param dist_params list of input parameters required to
+#'  by specific \code{dist} and \code{parameterization_type}
 #' to fully describe distribution and generate parameter samples.
 #' @param nsamp number of sets of parameter values to be generated
 #'
@@ -69,20 +98,20 @@
 #'
 #' @examples
 #' #define parameter names
-#' params <- c("normal_param", "lognorm_param", "beta_param",
+#' params <- c("normal_param", "lognorm_param", "truncnorm_param", "beta_param",
 #'             "gamma_param", "dirichlet_param", "bootstrap_param")
 #'
 #' #indicate parent distribution types for each parameter
-#' dist <- c("normal", "log-normal", "beta", "gamma", "dirichlet", "bootstrap")
+#' dist <- c("normal", "log-normal", "truncated-normal", "beta", "gamma", "dirichlet", "bootstrap")
 #'
 #' #indicate which type of parameterization is used for each parent distribution
-#' parameterization_type <- c("mean, sd", "mean, sd", "mean, sd", "mean, sd",
+#' parameterization_type <- c("mean, sd", "mean, sd", "mean, sd, ll, ul", "mean, sd", "mean, sd",
 #'                           "value, mean_prop, sd", "value, weight")
 #'
 #' #provide distribution parameters that fully define each parent distribution, and
 #' #ensure that these distribution parameters match the form expected by each combination of dist
 #' #and parameterization_type
-#' dist_params <- list(c(1, 2), c(1, 3), c(.5, .2), c(100, 1),
+#' dist_params <- list(c(1, 2), c(1, 3), c(1, 0.1, NA, 1), c(.5, .2), c(100, 1),
 #'                    data.frame(value = c("level1", "level2", "level3"),
 #'                               mean_prop = c(.1, .4, .5), sd = c(.05, .01, .1)),
 #'                    data.frame(value = c(1, 2, 4, 6, 7, 8),
@@ -96,14 +125,15 @@
 #'              nsamp = 100)
 #'
 #' @importFrom stats rbeta rgamma rlnorm rnorm
+#' @importFrom truncnorm rtruncnorm
 #' @export
 
 gen_psa_samp <- function(params = NULL,
-                         dist = c("normal", "log-normal", "beta", "gamma",
-                                  "dirichlet", "bootstrap"),
+                         dist = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
+                                  "dirichlet", "bootstrap", "constant"),
                          parameterization_type = c("mean, sd", "a, b", "shape, scale",
                                                    "value, mean_prop, sd", "value, n",
-                                                   "value, alpha"),
+                                                   "value, alpha", "mean, sd, ll, ul", "val", "meanlog, sdlog"),
                          dist_params = NULL,
                          nsamp = 100) {
 
@@ -123,12 +153,29 @@ gen_psa_samp <- function(params = NULL,
 
     #log normal
     if (dist[i] == "log-normal") {
-      mu <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
-      sd <- lnorm_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
+      if (parameterization_type[i] == "mean, sd") {
+        mu <- lnorm_params(dist_params[[i]][1], (dist_params[[i]][2]) ^ 2)[[1]]
+        sd <- lnorm_params(dist_params[[i]][1], (dist_params[[i]][2]) ^ 2)[[2]]
+      } else if (parameterization_type[i] == "meanlog, sdlog") {
+        mu <- dist_params[[i]][1]
+        sd <- dist_params[[i]][2]
+      }
+
       params_df[[i]] <- data.frame(param_val = rlnorm(nsamp, meanlog = mu, sdlog = sd))
       names(params_df[[i]]) <- paste0(params[i])
     }
 
+    #truncated normal
+    if (dist[i] == "truncated-normal") {
+      sample_mean <- dist_params[[i]][1]
+      sample_sd <- dist_params[[i]][2]
+      lowerbound <- ifelse(!is.na(dist_params[[i]][3]), dist_params[[i]][3], -Inf)
+      upperbound <- ifelse(!is.na(dist_params[[i]][4]), dist_params[[i]][4], Inf)
+      params_df[[i]] <- data.frame(param_val = rtruncnorm(nsamp, a = lowerbound,
+                                                          b = upperbound, mean = sample_mean,
+                                                          sd = sample_sd))
+      names(params_df[[i]]) <- paste0(params[i])
+    }
     #beta
     if (dist[i] == "beta") {
       if (parameterization_type[i] == "mean, sd") {
@@ -166,7 +213,7 @@ gen_psa_samp <- function(params = NULL,
         val_n <- as.data.frame(dist_params[[i]])
         total <- sum(val_n[, 2])
         p_mean <- val_n[, 2] / total
-        sd <- sqrt( ( p_mean * ( 1 - p_mean ) ) / total)
+        sd <- sqrt( (p_mean * (1 - p_mean)) / total)
         alpha <- dirichlet_params(p_mean, sd)
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
         } else if (parameterization_type[i] == "value, alpha") {
@@ -180,13 +227,20 @@ gen_psa_samp <- function(params = NULL,
     #bootstrap
     if (dist[i] == "bootstrap") {
       samp_vec <- vector(mode = "numeric", length = nsamp)
-      for (k in 1:nsamp){
+      for (k in 1:nsamp) {
         samp_vec[k] <- mean(sample(x = dist_params[[i]][, 1],
                                    size = sum(dist_params[[i]][, 2]),
                                    replace = TRUE,
                                    prob = dist_params[[i]][, 2]))
       }
       params_df[[i]] <- as.data.frame(samp_vec)
+      names(params_df[[i]]) <- paste0(params[i])
+    }
+
+    #constant
+    if (dist[i] == "constant") {
+      val <- dist_params[[i]]
+      params_df[[i]] <- data.frame(param_val = rep(val, nsamp))
       names(params_df[[i]]) <- paste0(params[i])
     }
 
@@ -207,7 +261,7 @@ gen_psa_samp <- function(params = NULL,
 #'
 #'  @importFrom stats rgamma
 
-rdirichlet <- function (n, alpha) {
+rdirichlet <- function(n, alpha) {
     k <- length(alpha)
     out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
     out <- out / rowSums(out)
@@ -237,8 +291,8 @@ rdirichlet <- function (n, alpha) {
 #' @return beta Beta parameter of beta distribution
 #'
 beta_params <- function(mean, sigma) {
-  alpha <- ( ( 1 - mean ) / sigma ^ 2 - 1 / mean ) * mean ^ 2
-  beta  <- alpha * ( 1 / mean - 1)
+  alpha <- ( (1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
+  beta  <- alpha * (1 / mean - 1)
   params <- list(alpha = alpha, beta = beta)
   return(params)
 }
@@ -289,10 +343,10 @@ dirichlet_params <- function(p.mean, sigma) {
   p.2 <- sigma ^ 2 + p.mean ^ 2
   # Initialize alpa vector
   alpha <- numeric(n.params)
-  for (i in 1:( n.params - 1 )) {
-    alpha[i] <- ( p.mean[1] - p.2[1]) * p.mean[i] / ( p.2[1] - p.mean[1] ^ 2 )
+  for (i in 1:(n.params - 1)) {
+    alpha[i] <- (p.mean[1] - p.2[1]) * p.mean[i] / (p.2[1] - p.mean[1] ^ 2)
   }
-  alpha[n.params] <- ( p.mean[1] - p.2[1] ) * ( 1 - sum(p.mean[ - n.params])) / ( p.2[1] - p.mean[1] ^ 2 )
+  alpha[n.params] <- (p.mean[1] - p.2[1]) * (1 - sum(p.mean[- n.params])) / (p.2[1] - p.mean[1] ^ 2)
   return(alpha)
 }
 
@@ -339,15 +393,15 @@ dirichlet_params <- function(p.mean, sigma) {
 #' gamma_params(mu, sigma, scale = FALSE)
 #' }
 #'
-gamma_params <- function(mu, sigma, scale = TRUE){
-  if ( scale ) {
-    shape <- ( mu ^ 2 ) / ( sigma ^ 2)
-    scale <- ( sigma ^ 2) / mu
+gamma_params <- function(mu, sigma, scale = TRUE) {
+  if (scale) {
+    shape <- (mu ^ 2) / (sigma ^ 2)
+    scale <- (sigma ^ 2) / mu
     params <- list(shape = shape,
                    scale = scale)
   } else {
-    shape <- ( mu ^ 2) / ( sigma ^ 2 )
-    rate  <- mu / ( sigma ^ 2 )
+    shape <- (mu ^ 2) / (sigma ^ 2)
+    rate  <- mu / (sigma ^ 2)
     params <- list(shape = shape,
                    rate  = rate)
   }
@@ -395,7 +449,7 @@ gamma_params <- function(mu, sigma, scale = TRUE){
 #' # True values: 100, 30, 70
 #' }
 #'
-lnorm_params <- function(m = 1, v = 1){
+lnorm_params <- function(m = 1, v = 1) {
   ### Sanity checkd
   if (m <= 0) {
     stop("'m' needs to be greater than 0")
@@ -403,7 +457,7 @@ lnorm_params <- function(m = 1, v = 1){
   if (v <= 0) {
     stop("'v' needs to be greater than 0")
     }
-  mu    <- log(m / sqrt(1 + v / m ^ 2))
+  mu <- log(m / sqrt(1 + v / m ^ 2))
   sigma <- sqrt(log(1 + v / m ^ 2))
   return(list(mu = mu,
               sigma = sigma))

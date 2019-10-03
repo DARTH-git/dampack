@@ -16,7 +16,8 @@
 
 \item{col}{either full-color ("full") or black and white ("bw")}
 
-\item{facet_scales}{whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
+\item{facet_scales}{whether the x or y axes should be fixed.
+See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
 more details.}
 
 \item{facet_nrow}{number of rows in plot facet.}

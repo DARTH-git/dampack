@@ -20,14 +20,14 @@
 #'
 #' @export
 create_dsa_oneway <- function(parameters, effectiveness = NULL, strategies,
-                              cost = NULL, currency = "$") {
+                              cost = NULL, currency = "$", other_outcome = NULL) {
   # parameter names
   colnames(parameters) <- c("parameter", "paramval")
   parnames <- unique(parameters$parameter)
 
   # check object structure and define dsa
   dsa <- create_sa(parameters, parnames, effectiveness,
-                   strategies, cost, currency)
+                   strategies, cost, currency, other_outcome)
   class(dsa) <- c("dsa_oneway", class(dsa))
   dsa
 }

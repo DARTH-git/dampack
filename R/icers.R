@@ -230,7 +230,7 @@ plot.icers <- function(x,
                        ylim = NULL,
                        xexpand = expand_scale(0.1),
                        yexpand = expand_scale(0.1),
-                       ...){
+                       ...) {
   # type checking
   label <- match.arg(label)
 

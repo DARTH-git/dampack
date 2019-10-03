@@ -17,31 +17,31 @@ outcomes <- c("tot_incidence")
 
 # testing run_owsa_det
 test_that("correct input in run_owsa_det", {
-  expect_silent(run_owsa_det(params, params_df, nsamps = 10,
+  expect_silent(run_owsa_det(params, params_df, nsamp = 10,
                          strategy_func, outcomes,
                          strategies = NULL,
                          state_name = state_name, cycle = cycle))
 
   outcomes_2 <- "prev"
-  expect_silent(run_owsa_det(params, params_df, nsamps = 10,
+  expect_silent(run_owsa_det(params, params_df, nsamp = 10,
                          strategy_func, outcomes_2,
                          strategies = NULL,
                          state_name = state_name, cycle = cycle))
 
   temp_params <- sort(params)
-  expect_silent(run_owsa_det(temp_params, params_df, nsamps = 10,
+  expect_silent(run_owsa_det(temp_params, params_df, nsamp = 10,
                          strategy_func, outcomes,
                          strategies = NULL,
                          state_name = state_name, cycle = cycle))
 
   temp_params <- params[-1]
-  expect_silent(run_owsa_det(temp_params, params_df, nsamps = 10,
+  expect_silent(run_owsa_det(temp_params, params_df, nsamp = 10,
                          strategy_func, outcomes,
                          strategies = NULL,
                          state_name = state_name, cycle = cycle))
 
   strategies <- c("redInf", "incScr")
-  expect_silent(run_owsa_det(params, params_df, nsamps = 10,
+  expect_silent(run_owsa_det(params, params_df, nsamp = 10,
                          strategy_func, outcomes,
                          strategies = strategies,
                          state_name = state_name, cycle = cycle))
@@ -49,7 +49,7 @@ test_that("correct input in run_owsa_det", {
 
 
 test_that("check output of run_owsa_det", {
-  o <- run_owsa_det(params, params_df, nsamps = 10,
+  o <- run_owsa_det(params, params_df, nsamp = 10,
                 strategy_func, outcomes,
                 strategies = NULL,
                 state_name = state_name, cycle = cycle)
@@ -57,14 +57,14 @@ test_that("check output of run_owsa_det", {
   expect_is(o, "data.frame")
 
   params2 <- params[-2]
-  o <- run_owsa_det(params2, params_df, nsamps = 10,
+  o <- run_owsa_det(params2, params_df, nsamp = 10,
                 strategy_func, outcomes,
                 strategies = NULL,
                 state_name = state_name, cycle = cycle)
   expect_equal(unique(as.character(o$parameter)), params2)
 
 
-  o <- run_owsa_det(params2, params_df, nsamps = 10,
+  o <- run_owsa_det(params2, params_df, nsamp = 10,
                 strategy_func, outcomes,
                 strategies = NULL,
                 state_name = state_name, cycle = cycle)
@@ -86,7 +86,7 @@ test_that("check output of run_owsa_det", {
 
 
 test_that("check output from run_owsa_det with other dampack functions", {
-  o <- run_owsa_det(params, params_df, nsamps = 10,
+  o <- run_owsa_det(params, params_df, nsamp = 10,
                 strategy_func, outcomes,
                 strategies = NULL,
                 state_name = state_name, cycle = cycle)
@@ -98,14 +98,14 @@ test_that("check output from run_owsa_det with other dampack functions", {
 test_that("accurately producing warnings and errors in run_owsa_det", {
   temp_params <- params
   temp_params[1] <- c("xx")
-  expect_error(run_owsa_det(temp_params, params_df, nsamps = 10,
+  expect_error(run_owsa_det(temp_params, params_df, nsamp = 10,
                         strategy_func, outcomes,
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
                "params should be in the parameters provided in params_all")
 
   params_df2 <- as.matrix(params_df)
-  expect_error(run_owsa_det(params, params_df2, nsamps = 10,
+  expect_error(run_owsa_det(params, params_df2, nsamp = 10,
                         strategy_func, outcomes,
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
@@ -114,7 +114,7 @@ test_that("accurately producing warnings and errors in run_owsa_det", {
   params_df2 <- params_df
   params_df2[, 3] <- params_df[, 4]
   params_df2[, 4] <- params_df[, 3]
-  expect_error(run_owsa_det(params, params_df2, nsamps = 10,
+  expect_error(run_owsa_det(params, params_df2, nsamp = 10,
                         strategy_func, outcomes,
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
@@ -122,13 +122,13 @@ test_that("accurately producing warnings and errors in run_owsa_det", {
 
   params_df2 <- params_df
   params_df2[2, 3] <- as.character(params_df2[2, 3])
-  expect_error(run_owsa_det(params, params_df2, nsamps = 10,
+  expect_error(run_owsa_det(params, params_df2, nsamp = 10,
                         strategy_func, outcomes,
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
                "basecase, min and max in params_all must be numeric")
 
-  expect_error(run_owsa_det(params, params_df, nsamps = 10,
+  expect_error(run_owsa_det(params, params_df, nsamp = 10,
                         strategy_func, outcomes = "treated",
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
@@ -141,14 +141,14 @@ test_that("accurately producing warnings and errors in run_owsa_det", {
     output <- do.call(strategy_func, input_ls)
     return(as.matrix(output))
   }
-  expect_error(run_owsa_det(params, params_df, nsamps = 10,
+  expect_error(run_owsa_det(params, params_df, nsamp = 10,
                         strategy_func2, outcomes,
                         strategies = NULL,
                         state_name = state_name, cycle = cycle),
                "FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
 
   tmp_strategy <- c("redInf", "incScr", "incCov")
-  expect_error(run_owsa_det(params, params_df, nsamps = 10,
+  expect_error(run_owsa_det(params, params_df, nsamp = 10,
                         strategy_func, outcomes = "treated",
                         strategies = tmp_strategy,
                         state_name = state_name, cycle = cycle),
@@ -161,19 +161,19 @@ param1 <- "p_inf"
 param2 <- "p_test_asymp"
 
 test_that("check input in run_twsa_det", {
-  expect_silent(run_twsa_det(param1, param2, params_df, nsamps = 30,
+  expect_silent(run_twsa_det(param1, param2, params_df, nsamp = 30,
                          strategy_func, outcomes,
                          strategies = NULL,
                          state_name = state_name, cycle = cycle))
 
   outcomes_2 <- "prev"
-  expect_silent(run_twsa_det(param1, param2, params_df, nsamps = 30,
+  expect_silent(run_twsa_det(param1, param2, params_df, nsamp = 30,
                          strategy_func, outcomes_2,
                          strategies = NULL,
                          state_name = state_name, cycle = cycle))
 
   strategies <- c("redInf", "incScr")
-  expect_silent(run_twsa_det(param1, param2, params_df, nsamps = 30,
+  expect_silent(run_twsa_det(param1, param2, params_df, nsamp = 30,
                          strategy_func, outcomes,
                          strategies = strategies,
                          state_name = state_name, cycle = cycle))
@@ -181,7 +181,7 @@ test_that("check input in run_twsa_det", {
 
 test_that("check output from run_twsa_det", {
   strategy <- c("s1", "s2")
-  tw <- run_twsa_det(param1, param2, params_df, nsamps = 30,
+  tw <- run_twsa_det(param1, param2, params_df, nsamp = 30,
                  strategy_func, outcomes,
                  strategies = strategy,
                  state_name = state_name, cycle = cycle)
@@ -196,12 +196,12 @@ test_that("check output from run_twsa_det", {
 })
 
 test_that("checking warning error message from run_twsa_det", {
-  expect_error(run_twsa_det(c("p_inf", "p_rec"), c("p_asymp"), params_df, nsamps = 30,
+  expect_error(run_twsa_det(c("p_inf", "p_rec"), c("p_asymp"), params_df, nsamp = 30,
                         strategy_func, outcomes,
                         strategies = NULL, state_name = state_name, cycle = cycle),
                "two-way sensitivity analysis only allows for and requires 2 different paramters of interest at a time")
 
-  expect_error(run_twsa_det("xx", param2, params_df, nsamps = 30,
+  expect_error(run_twsa_det("xx", param2, params_df, nsamp = 30,
                         strategy_func, outcomes,
                         strategies = NULL, state_name = state_name, cycle = cycle),
                "param1 and param2 should be in the parameters provided in params_all")
@@ -213,7 +213,7 @@ test_that("checking warning error message from run_twsa_det", {
     output <- do.call(strategy_func, input_ls)
     return(as.matrix(output))
   }
-  expect_error(run_twsa_det(param1, param2, params_df, nsamps = 30,
+  expect_error(run_twsa_det(param1, param2, params_df, nsamp = 30,
                         strategy_func2, outcomes,
                         strategies = NULL, state_name = state_name, cycle = cycle),
                "FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")

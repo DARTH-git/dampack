@@ -53,11 +53,11 @@ calc_exp_loss <- function(psa, wtp) {
   }
   # optimal strategy based on lowest expected loss (max of negative expected loss)
   # this was done because min.col isn't a function
-  optimal.str <- max.col(-exp_loss)
+  optimal_str <- max.col(-exp_loss)
   # Expected loss of optimal strategy
-  optimal.el <- exp_loss[cbind(1:length(wtp), optimal.str)]
+  optimal_el <- exp_loss[cbind(1:length(wtp), optimal_str)]
   # Format expected loss for plotting
-  exp_loss_df <- data.frame(wtp, exp_loss, optimal.el)
+  exp_loss_df <- data.frame(wtp, exp_loss, optimal_el)
   colnames(exp_loss_df) <- c("WTP", strategies, "Frontier_EVPI")
   class(exp_loss_df) <- c("exp_loss", "data.frame")
   return(exp_loss_df)

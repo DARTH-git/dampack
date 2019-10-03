@@ -1,5 +1,5 @@
 #' Create a PSA object
-#' 
+#'
 #' @description
 #' Creates an object to hold probabilistic sensivity analysis data,
 #' while checking the data for validity. The object can then be
@@ -48,13 +48,14 @@
 #'
 #' @importFrom stringr str_replace
 #' @export
-make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, currency = "$"){
+make_psa_obj <- function(cost, effectiveness, parameters,
+                         strategies = NULL, currency = "$", other_outcome = NULL) {
   # parameter names
   parnames <- names(parameters)
 
   # define psa as a named list
   psa_obj <- create_sa(parameters, parnames, effectiveness, strategies,
-                       cost, currency)
+                       cost, currency, other_outcome)
 
   # give classes "psa" and "sa"
   class(psa_obj) <- c("psa", class(psa_obj))
@@ -88,6 +89,7 @@ check_df_and_coerce <- function(obj) {
 #' @importFrom stats sd
 #' @export
 summary.psa <- function(object, calc_sds = FALSE, ...) {
+
   mean_cost <- colMeans(object$cost)
   mean_effect <- colMeans(object$effectiveness)
   strat <- object$strategies
@@ -135,19 +137,19 @@ plot.psa <- function(x,
   currency <- x$currency
 
   # expect that effectiveness and costs have strategy column names
-  df.cost <- suppressMessages( # removes confusing 'No id variables; using all as measure variables'
+  df_cost <- suppressMessages( # removes confusing 'No id variables; using all as measure variables'
     melt(cost, variable.name = "Strategy",
          factorsAsStrings = TRUE,
          value.name = "Cost")
   )
-  df.effect <- suppressMessages(
+  df_effect <- suppressMessages(
     melt(effectiveness, variable.name = "Strategy",
          factorsAsStrings = TRUE,
          value.name = "Effectiveness")
   )
-  ce_df <- data.frame("Strategy" = df.cost$Strategy,
-                      "Cost" = df.cost$Cost,
-                      "Effectiveness" = df.effect$Effectiveness)
+  ce_df <- data.frame("Strategy" = df_cost$Strategy,
+                      "Cost" = df_cost$Cost,
+                      "Effectiveness" = df_effect$Effectiveness)
 
   psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
     geom_point(size = 0.7, alpha = alpha, shape = 21) +
@@ -167,7 +169,7 @@ plot.psa <- function(x,
 
   if (ellipse) {
     # make points for ellipse plotting
-    df_list_ell <- lapply(strategies, function (s) {
+    df_list_ell <- lapply(strategies, function(s) {
       strat_specific_df <- ce_df[ce_df$Strategy == s, ]
       els <-  with(strat_specific_df,
                    ellipse(cor(Effectiveness, Cost),

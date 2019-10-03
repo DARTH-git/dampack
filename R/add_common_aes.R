@@ -73,7 +73,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   continuous <- match.arg(continuous, several.ok = TRUE)
 
   if ("x" %in% continuous) {
-    if (!is.null(xbreaks)){
+    if (!is.null(xbreaks)) {
       xb <- xbreaks
     } else {
       xb <- number_ticks(n_x_ticks)
@@ -86,7 +86,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                          expand = xexpand)
   }
   if ("y" %in% continuous) {
-    if (!is.null(ybreaks)){
+    if (!is.null(ybreaks)) {
       yb <- ybreaks
     } else {
       yb <- number_ticks(n_y_ticks)

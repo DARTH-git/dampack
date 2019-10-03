@@ -23,7 +23,7 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
-                 poly.order = 2){
+                 poly.order = 2) {
 
   if (inherits(sa_obj, "psa")) {
     if (is.null(param1) | is.null(param2)) {
@@ -40,7 +40,11 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
     tw <- predict(mm, ranges, nsamp)
   } else if (inherits(sa_obj, "dsa_twoway")) {
     params <- sa_obj$parameters
-    eff <- sa_obj$effectiveness
+    if (!is.null(sa_obj$other_outcome)) {
+      eff <- sa_obj$other_outcome
+    } else {
+      eff <- sa_obj$effectiveness
+    }
     cost <- sa_obj$cost
     strategies <- sa_obj$strategies
     parnames <- sa_obj$parnames

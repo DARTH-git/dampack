@@ -16,113 +16,191 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 ```{r}
 library(dampack)
+rm(list = ls())
 
-# markov model for testing
-markov_model <- function(param, state_name, cycle,
-                         popsize = 1000,
-                         init_state = c(1, 0, 0, 0)){
-  # 4 states: susceptible, asymptomatic infection,
-  # symptomatic infection, and treated
-  p_inf <- param[["p_inf"]]
-  p_asymp <- param[["p_asymp"]]
-  p_test_symp <- param[["p_test_symp"]]
-  p_test_asymp <- param[["p_test_asymp"]]
-  p_rec <- param[["p_rec"]]
-
-  # Transition matrix
-  trans_mat <- matrix(0, nrow = length(state_name), ncol = length(state_name),
-                      dimnames = list(state_name, state_name))
-
-  trans_mat["S", "IS"] <- p_inf * (1 - p_asymp)
-  trans_mat["S", "IA"] <- p_inf * p_asymp
-  trans_mat["S", "S"] <- 1 - p_inf
-
-  trans_mat["IS", "T"] <- p_test_symp
-  trans_mat["IS", "S"] <- p_rec
-  trans_mat["IS", "IS"] <- 1 - p_test_symp - p_rec
-
-  trans_mat["IA", "T"] <- p_test_asymp
-  trans_mat["IA", "S"] <- p_rec
-  trans_mat["IA", "IA"] <- 1 - p_test_asymp - p_rec
-
-  trans_mat["T", "S"] <- 1
-
-  trace <- matrix(0, ncol = length(state_name), nrow = cycle + 1)
-  colnames(trace) <- state_name
-  trace[1, ] <- init_state
-
-  incidence <- matrix(0, ncol = length(state_name), nrow = cycle)
-  colnames(incidence) <- state_name
-
-  for (t in c(1:cycle)) {
-    trace[t + 1, ] <- trace[t, ] %*% trans_mat
-    expand_state <- matrix(rep(trace[t, ], length(state_name)),
-                           nrow = length(state_name), byrow = F)
-    tmp_trans <- expand_state * trans_mat
-    diag(tmp_trans) <- 0
-    incidence[t, ] <- colSums(tmp_trans) * popsize
+decision_model <- function(l_params_all, verbose = FALSE) {
+  with(as.list(l_params_all), {
+    # compute internal paramters as a function of external parameters
+    r_HD    = - log(1 - p_HD) # rate of death in healthy
+    r_S1D   = hr_S1 * r_HD 	  # rate of death in sick
+    r_S2D   = hr_S2 * r_HD  	# rate of death in sicker
+    p_S1D   = 1 - exp(-r_S1D) # probability to die in sick
+    p_S2D   = 1 - exp(-r_S2D) # probability to die in sicker
+    
+    ####### INITIALIZATION ##########################################
+    # create the cohort trace
+    m_M <- matrix(NA, nrow = n_t + 1 , 
+                  ncol = n_s,
+                  dimnames = list(0:n_t, v_n))     # create Markov trace (n_t + 1 because R doesn't understand  Cycle 0)
+    
+    m_M[1, ] <- c(1, 0, 0, 0)                      # initialize Markov trace
+    
+    # create transition probability matrix for NO treatment
+    m_P <- matrix(0,
+                  nrow = n_s, 
+                  ncol = n_s,
+                  dimnames = list(v_n, v_n))
+    # fill in the transition probability array
+    ### From Healthy
+    m_P["H", "H"]  <- 1 - (p_HS1 + p_HD)
+    m_P["H", "S1"] <- p_HS1
+    m_P["H", "D"]  <- p_HD
+    ### From Sick
+    m_P["S1", "H"]  <- p_S1H
+    m_P["S1", "S1"] <- 1 - (p_S1H + p_S1S2 + p_S1D)
+    m_P["S1", "S2"] <- p_S1S2
+    m_P["S1", "D"]  <- p_S1D
+    ### From Sicker
+    m_P["S2", "S2"] <- 1 - p_S2D
+    m_P["S2", "D"]  <- p_S2D
+    ### From Dead
+    m_P["D", "D"] <- 1
+    
+    # check rows add up to 1
+    if (!isTRUE(all.equal(as.numeric(rowSums(m_P)), as.numeric(rep(1, n_s))))) {
+      stop("This is not a valid transition Matrix")
+    }
+    
+    ############# PROCESS ###########################################
+    
+    for (t in 1:n_t){                              # throughout the number of cycles
+      m_M[t + 1, ] <- m_M[t, ] %*% m_P           # estimate the Markov trace for cycle the next cycle (t + 1)
+    }
+    
+    ####### EPIDEMIOLOGICAL OUTPUT  ###########################################
+    #### Overall Survival (OS) ####
+    v_os <- 1 - m_M[, "D"]                # calculate the overall survival (OS) probability for no treatment
+    
+    #### Disease prevalence #####
+    v_prev <- rowSums(m_M[, c("S1", "S2")])/v_os
+    
+    #### Proportion of sick in S1 state #####
+    v_prop_S1 <- m_M[, "S1"] / v_prev
+    
+    ####### RETURN OUTPUT  ###########################################
+    out <- list(m_M = m_M,
+                m_P = m_P,
+                Surv = v_os[-1],
+                Prev = v_prev[-1],
+                PropSick = v_prop_S1[c(11, 21, 31)])
+    
+    return(out)
   }
-
-  prev <- sum(trace[cycle + 1, c("IS", "IA")])
-  tot_incidence <- sum(incidence[, c("IA", "IS")])
-
-  output <- data.frame("prev" = prev,
-                       "tot_incidence" = tot_incidence)
-  return(output)
+  )
 }
 
-strategy_func <- function(param, state_name, cycle,
-                          mystrategy = NULL, popsize = 1000,
-                          init_state = c(1, 0, 0, 0)) {
-
-  st1 <- markov_model(param, state_name, cycle, popsize, init_state)
-
-  param2 <- param
-  param2[["p_inf"]] <- param2[["p_inf"]] * (1 - 0.5)
-  st2 <- markov_model(param2, state_name, cycle, popsize, init_state)
-
-  param3 <- param
-  param3[["p_test_asymp"]] <- param3[["p_test_asymp"]] * (1 + 0.1)
-  st3 <- markov_model(param3, state_name, cycle, popsize, init_state)
-
-  st2 <- st2 - st1
-  st3 <- st3 - st1
-
-  tmp_output <- data.frame(rbind(st2, st3))
-
-  if (is.null(mystrategy)) {
-    output <- data.frame(strategy = c(1:nrow(tmp_output)))
-  } else {
-    output <- data.frame(strategy = mystrategy)
+calculate_ce_out <- function(l_params_all, n_wtp = 100000){
+  # User defined
+  with(as.list(l_params_all), {
+    ## Create discounting vectors
+    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_t))) # vector with discount weights for costs
+    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_t))) # vector with discount weights for QALYs
+    
+    ## Run STM model at a parameter set for each intervention
+    l_model_out_no_trt <- decision_model(l_params_all = l_params_all)
+    l_model_out_trt    <- decision_model(l_params_all = l_params_all)
+    
+    ## Cohort trace by treatment
+    m_M_no_trt <- l_model_out_no_trt$m_M # No treatment
+    m_M_trt    <- l_model_out_trt$m_M    # Treatment
+    
+    ## Vectors with costs and utilities by treatment
+    v_u_no_trt <- c(u_H, u_S1, u_S2, u_D)
+    v_u_trt    <- c(u_H, u_Trt, u_S2, u_D)
+    
+    v_c_no_trt <- c(c_H, c_S1, c_S2, c_D)
+    v_c_trt    <- c(c_H, c_S1 + c_Trt, c_S2 + c_Trt, c_D)
+    
+    ## Mean Costs and QALYs for Treatment and NO Treatment
+    v_tu_no_trt <- m_M_no_trt %*% v_u_no_trt
+    v_tu_trt    <- m_M_trt %*% v_u_trt
+    
+    v_tc_no_trt <- m_M_no_trt %*% v_c_no_trt
+    v_tc_trt    <- m_M_trt %*% v_c_trt
+    
+    ## Total discounted mean Costs and QALYs
+    tu_d_no_trt <- t(v_tu_no_trt) %*% v_dwe 
+    tu_d_trt    <- t(v_tu_trt) %*% v_dwe
+    
+    tc_d_no_trt <- t(v_tc_no_trt) %*% v_dwc
+    tc_d_trt    <- t(v_tc_trt)    %*% v_dwc
+    
+    ## Vector with total discounted mean Costs and QALYs
+    v_tc_d <- c(tc_d_no_trt, tc_d_trt)
+    v_tu_d <- c(tu_d_no_trt, tu_d_trt)
+    
+    ## Vector with discounted net monetary benefits (NMB)
+    v_nmb_d <- v_tu_d * n_wtp - v_tc_d
+    
+    ## Dataframe with discounted costs, effectiveness and NMB
+    df_ce <- data.frame(Strategy = v_names_str,
+                        Cost     = v_tc_d,
+                        Effect   = v_tu_d,
+                        NMB      = v_nmb_d)
+    
+    return(df_ce)
   }
-
-  output <- cbind(output, tmp_output)
-  return(output)
+  )
 }
+
+v_names_str <- c("No Treatment", "Treatment")  
+## Number of strategies
+n_str <- length(v_names_str)
+## Markov model parameters
+n_age_init <- 25                # age at baseline
+n_age_max  <- 55                # maximum age of follow up
+n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
+v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
+n_s <- length(v_n)                            # number of health states 
+
+my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
+               "p_HD", "hr_S1", "hr_S2", 
+               "c_H", "c_S1", "c_S2", 
+               "c_Trt", "c_D","u_H",
+               "u_S1","u_S2", "u_D",
+               "u_Trt", "d_e", "d_c")
+
+params_basecase <- c(0.15, 0.5, 0.105,
+                     0.005, 3, 10,
+                     2000, 4000, 15000,
+                     12000, 0, 1,
+                     0.75, 0.5, 0,
+                     0.95, 0.03, 0.03)
+params_min <- c(0, 0, 0,
+                0, 1, 1,
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0,
+                0.9, 0.03, 0.03)
+
+params_max <- c(1, 1, 1,
+                1, 10, 10,
+                4000, 8000, 30000,
+                24000, 0, 1,
+                1, 1, 0,
+                1, 0.03, 0.03)
+
+
+my_params_all <- data.frame(pars = my_params,
+                            basecase = params_basecase,
+                            min = params_min,
+                            max = params_max)
+
+
 ```
 
-```{r}
-
-state_name <- c("S", "IS", "IA", "T")
-cycle <- 100
-popsize <- 1000
-
-params_df <- data.frame(pars = c("p_inf", "p_asymp", "p_test_symp", "p_test_asymp", "p_rec"),
-                       basecase = c(0.05, 0.8, 0.8, 0.01, 0.01),
-                       min = c(0, 0.5, 0.5, 0, 0),
-                       max = c(0.5, 0.9, 1, 0.2, 0.5))
-
-params <- c("p_inf", "p_asymp", "p_test_symp", "p_test_asymp", "p_rec")
-outcomes <- c("tot_incidence")
-```
 
 ```{r}
-o <- run_owsa_det(params, params_df, nsamps = 10,
-                         strategy_func, outcomes,
-                         strategies = NULL,
-                         state_name = state_name, cycle = cycle)
+o <- run_owsa_det(params = c("p_HS1", "p_S1S2", "p_S1H",
+                             "u_S2", "u_Trt", "c_Trt"),
+                         params_all = my_params_all,
+                         nsamp = 100,
+                         FUN = calculate_ce_out,
+                         outcomes = c("NMB"),
+                         strategies = c("No_Treatment", "Treatment"))
 ```
 
 ```{r}
@@ -131,12 +209,6 @@ plot(o)
 
 ```{r}
 owsa_tornado(o)
-```
-
-Can filter out strategies that don't change using `min_rel_diff`.
-
-```{r}
-owsa_tornado(o, min_rel_diff = 0.05)
 ```
 
 ```{r}
@@ -152,13 +224,14 @@ owsa_opt_strat(o, return = "data")
 ```
 
 ```{r}
-param1 <- "p_inf"
-param2 <- "p_test_asymp"
+tw <- run_twsa_det(param1 = "c_Trt",
+                   param2 = "u_Trt",
+                   params_all = my_params_all,
+                   nsamp = 100,
+                   FUN = calculate_ce_out,
+                   outcomes = c("NMB"),
+                   strategies = c("No_Treatment", "Treatment"))
 
-tw <- run_twsa_det(param1, param2, params_df, nsamps = 30,
-                         strategy_func, outcomes,
-                         strategies = NULL,
-                         state_name = state_name, cycle = cycle)
 ```
 
 ```{r}

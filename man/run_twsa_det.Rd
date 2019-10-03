@@ -4,7 +4,7 @@
 \alias{run_twsa_det}
 \title{Run deterministic two-way sensitivity analysis (TWSA)}
 \usage{
-run_twsa_det(param1, param2, params_all, nsamps = 40, FUN,
+run_twsa_det(param1, param2, params_all, nsamp = 40, FUN,
   outcomes = NULL, strategies = NULL, ...)
 }
 \arguments{
@@ -16,7 +16,7 @@ run_twsa_det(param1, param2, params_all, nsamps = 40, FUN,
 "basecase", "min", and "max". The number of samples from this range is
 determined by \code{nsamp}}
 
-\item{nsamps}{number of parameter values. If \code{NULL}, 40 parameter values are
+\item{nsamp}{number of parameter values. If \code{NULL}, 40 parameter values are
 used}
 
 \item{FUN}{Function that takes the basecase in \code{params_all} and \code{...} to

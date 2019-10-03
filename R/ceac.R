@@ -47,7 +47,7 @@
 #' @importFrom reshape2 melt
 #'
 #' @export
-ceac <- function(wtp, psa){
+ceac <- function(wtp, psa) {
   # check that psa has class 'psa'
   check_psa_object(psa)
 
@@ -84,12 +84,12 @@ ceac <- function(wtp, psa){
   }
 
   # make cea df
-  cea.df <- data.frame(wtp, cea, strategies[frontv],
+  cea_df <- data.frame(wtp, cea, strategies[frontv],
                        stringsAsFactors = FALSE)
-  colnames(cea.df) <- c("WTP", strategies, "fstrat")
+  colnames(cea_df) <- c("WTP", strategies, "fstrat")
 
   # make ceac df
-  ceac <- melt(cea.df, id.vars = c("WTP", "fstrat"),
+  ceac <- melt(cea_df, id.vars = c("WTP", "fstrat"),
                variable.name = "Strategy", value.name = "Proportion")
 
   # replace factors with strings (melt creates factors)
@@ -234,15 +234,15 @@ plot.ceac <- function(x,
 #' @keywords internal
 #'
 #' @export
-summary.ceac <- function(object, ...){
+summary.ceac <- function(object, ...) {
   front <- object[object$On_Frontier == TRUE, ]
   wtp <- front$WTP
   wtp_range <- range(wtp)
-  n.wtps <- length(wtp)
+  n_wtps <- length(wtp)
 
   # get the indices where the CE strategy isn't the same as the following CE strategy
   strat_on_front <- front$Strategy
-  lagged_strat <- c(strat_on_front[-1], strat_on_front[n.wtps])
+  lagged_strat <- c(strat_on_front[-1], strat_on_front[n_wtps])
   switches <- which(strat_on_front != lagged_strat) + 1
   n_switches <- length(switches)
   # strat_on_front[switches] are the optimal strategies at wtp[switches]

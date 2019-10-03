@@ -4,7 +4,7 @@
 \alias{run_owsa_det}
 \title{Run deterministic one-way sensitivity analysis (OWSA)}
 \usage{
-run_owsa_det(params = NULL, params_all, nsamps = 100, FUN,
+run_owsa_det(params = NULL, params_all, nsamp = 100, FUN,
   outcomes = NULL, strategies = NULL, ...)
 }
 \arguments{
@@ -14,7 +14,7 @@ run_owsa_det(params = NULL, params_all, nsamps = 100, FUN,
 "basecase", "min", and "max". The number of samples from this range is
 determined by \code{nsamp}}
 
-\item{nsamps}{number of parameter values. If \code{NULL}, 100 parameter values are
+\item{nsamp}{number of parameter values. If \code{NULL}, 100 parameter values are
 used}
 
 \item{FUN}{Function that takes the basecase in \code{params_all} and \code{...} to

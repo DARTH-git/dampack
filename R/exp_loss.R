@@ -46,7 +46,7 @@ calc_exp_loss <- function(psa, wtp) {
   strategies <- psa$strategies
   n_str  <- psa$n_strategies
   exp_loss <- matrix(0, nrow = length(wtp), ncol = n_str)
-  for (i in seq_len(wtp)) {
+  for (i in 1:length(wtp)) {
     ith_wtp <- wtp[i]
     loss <- calculate_outcome("nmb_loss", cost, effectiveness, ith_wtp)
     exp_loss[i, ] <- colMeans(loss)
@@ -55,7 +55,7 @@ calc_exp_loss <- function(psa, wtp) {
   # this was done because min.col isn't a function
   optimal_str <- max.col(-exp_loss)
   # Expected loss of optimal strategy
-  optimal_el <- exp_loss[cbind(seq_len(wtp), optimal_str)]
+  optimal_el <- exp_loss[cbind(1:length(wtp), optimal_str)]
   # Format expected loss for plotting
   exp_loss_df <- data.frame(wtp, exp_loss, optimal_el)
   colnames(exp_loss_df) <- c("WTP", strategies, "Frontier_EVPI")

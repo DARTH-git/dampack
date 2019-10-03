@@ -178,7 +178,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
   for (i in 1:m) {
     term <- object$margin[[i]]$term
     dat <- list()
-    for (j in seq_len(term)) {
+    for (j in 1:length(term)) {
       dat[[term[j]]] <- param_vals[[term[j]]]
     }
     x[[i]] <- if (!is.null(object$mc[i])) {

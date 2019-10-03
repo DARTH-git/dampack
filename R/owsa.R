@@ -73,7 +73,8 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
 #' @param txtsize base text size in the plot
 #' @param col either full-color ("full") or black and white ("bw")
 #' @param size either point size (ptype = "point") and/or line size (ptype = "line")
-#' @param facet_scales whether the x or y axes should be fixed. See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
+#' @param facet_scales whether the x or y axes should be fixed.
+#' See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
 #' more details.
 #' @param facet_ncol number of columns in plot facet.
 #' The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
@@ -133,7 +134,7 @@ plot.owsa <- function(x, txtsize = 12,
 owsa_tornado <- function(owsa, return = c("plot", "data"),
                          txtsize = 12, min_rel_diff = 0,
                          col = c("full", "bw"),
-                         n_y_ticks = 8, ylim = NULL, ybreaks = NULL){
+                         n_y_ticks = 8, ylim = NULL, ybreaks = NULL) {
   # check that is owsa object
   if (!is_owsa(owsa)) {
     stop("must provide an owsa object created with owsa()")
@@ -147,7 +148,8 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
   owsa_filt <- owsa %>%
     group_by(.data$parameter, .data$param_val) %>%
     arrange(.data$outcome_val) %>%
-    slice(n()) %>% select(-.data$strategy) %>%
+    slice(n()) %>%
+    select(-.data$strategy) %>%
     ungroup()
 
   # group by parameter and strategy

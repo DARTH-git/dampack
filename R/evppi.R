@@ -84,7 +84,7 @@ calc_evppi <- function(psa,
   evppi <- rep(0, n_wtps)
 
   # calculate evppi at each wtp
-  for (l in 1:n_wtps){
+  for (l in 1:n_wtps) {
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,
@@ -108,7 +108,7 @@ calc_evppi <- function(psa,
   }
 
   # data.frame to store EVPPI for each WTP threshold
-  df.evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
-  class(df.evppi) <- "data.frame"
-  return(df.evppi)
+  df_evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
+  class(df_evppi) <- "data.frame"
+  return(df_evppi)
 }

@@ -40,7 +40,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   ### argument checks and defining other variables ###
 
   # costs, effectiveness, and parameters have same number of rows
-  if (!is.null(effectiveness)){
+  if (!is.null(effectiveness)) {
     n_sim_effectiveness <- nrow(effectiveness)
   }
 
@@ -52,8 +52,8 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 
 
   if (!is.null(cost) & !is.null(effectiveness)) {
-    if ( (n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs)
-         | (n_sim_parameters != n_sim_effectiveness) ) {
+    if ((n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs)
+         | (n_sim_parameters != n_sim_effectiveness)) {
       stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
     }
   }
@@ -88,18 +88,18 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
     n_strategies <- n_strategies_costs
   }
 
-  if (!is.null(effectiveness)){
+  if (!is.null(effectiveness)) {
     n_strategies_effectiveness <- ncol(effectiveness)
     n_strategies <- n_strategies_effectiveness
   }
 
-  if (!is.null(effectiveness) & !is.null(cost)){
+  if (!is.null(effectiveness) & !is.null(cost)) {
     if (n_strategies_costs != n_strategies_effectiveness) {
       stop("The number of columns of the cost and benefit matrices is different and must be the same.")
     }
   }
 
-  if  (!is.null(cost)){
+  if  (!is.null(cost)) {
     # define n.strat (could be either n_sim_costs or n_sim_effectiveness)
     n_strategies <- n_strategies_costs
   } else if (!is.null(effectiveness)) {
@@ -139,7 +139,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   if (!is.null(cost)) {
     names(cost) <- strategies
   }
-  if (!is.null(effectiveness)){
+  if (!is.null(effectiveness)) {
     names(effectiveness) <- strategies
   }
 

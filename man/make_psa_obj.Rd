@@ -5,15 +5,17 @@
 \title{Create a PSA object}
 \usage{
 make_psa_obj(cost, effectiveness, parameters, strategies = NULL,
-  currency = "$")
+  currency = "$", other_outcome = NULL)
 }
 \arguments{
-\item{cost}{Data frames containing costs and effectiveness data, respectively.
+\item{cost}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
-\item{effectiveness}{Data frames containing costs and effectiveness data, respectively.
+\item{effectiveness}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
@@ -27,6 +29,12 @@ strategy names as necessary. It is strongly suggested that you follow the rules
 in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
+
+\item{other_outcome}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
+Each simulation should be a row of the data frame, and each strategy should be a column.
+Naming the columns of the data frames is not necessary, as they will be renamed with
+the \code{strategies} vector.}
 }
 \value{
 An object of class \code{psa}

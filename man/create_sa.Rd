@@ -4,7 +4,8 @@
 \alias{create_sa}
 \title{An generic sensitivity analysis object}
 \usage{
-create_sa(parameters, parnames, effectiveness, strategies, cost, currency)
+create_sa(parameters, parnames, effectiveness, strategies, cost, currency,
+  other_outcome)
 }
 \arguments{
 \item{parameters}{A data frame with parameter values for each model run. Each
@@ -18,7 +19,8 @@ certain uses of this vector, this function uses \code{\link{make.names}} to modi
 strategy names as necessary. It is strongly suggested that you follow the rules
 in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
-\item{cost, effectiveness}{Data frames containing costs and effectiveness data, respectively.
+\item{cost, effectiveness, other_outcome}{Data frames containing data for costs,
+effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}

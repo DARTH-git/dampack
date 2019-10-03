@@ -7,7 +7,7 @@
 #' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
-#' @param nsamps number of parameter values. If \code{NULL}, 100 parameter values are
+#' @param nsamp number of parameter values. If \code{NULL}, 100 parameter values are
 #' used
 #' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
@@ -40,7 +40,7 @@
 #' }
 #'
 #' @export
-run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
+run_owsa_det <- function(params = NULL, params_all, nsamp = 100, FUN,
                      outcomes = NULL, strategies = NULL, ...){
 
   if (is.null(params)) {
@@ -115,11 +115,11 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
     pars_range <- params_all[ix, c("min", "max")]
     v_owsa_input <- t(t(seq(pars_range[[1]],
                             pars_range[[2]],
-                            length.out = nsamps)))
+                            length.out = nsamp)))
     colnames(v_owsa_input) <- pars_i
 
     # Run model and capture outcome(s)
-    sim_out <- lapply(c(1:nsamps),
+    sim_out <- lapply(c(1:nsamp),
                       wrapper_of_user_model,
                       user_fun = FUN,
                       param_name = pars_i,
@@ -136,7 +136,7 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
       sim_out_df_all[[j]] <- rbind(sim_out_df_all[[j]], sim_out_df[[j]])
     }
 
-    param_table <- data.frame(parameter = rep(pars_i, nsamps),
+    param_table <- data.frame(parameter = rep(pars_i, nsamp),
                               paramval = unname(v_owsa_input))
 
     param_table_all <- rbind(param_table_all, param_table)
@@ -147,7 +147,9 @@ run_owsa_det <- function(params = NULL, params_all, nsamps = 100, FUN,
   df_owsa <- vector(mode = "list", length = n_outcomes)
   owsa_out <- vector(mode = "list", length = n_outcomes)
   for (k in 1:n_outcomes){
-    df_owsa[[k]] <- create_dsa_oneway(param_table_all, sim_out_df_all[[k]], strategies)
+    df_owsa[[k]] <- create_dsa_oneway(parameters = param_table_all,
+                                      other_outcome = sim_out_df_all[[k]],
+                                      strategies = strategies)
     owsa_out[[k]] <- owsa(df_owsa[[k]], outcome = "eff")
   }
 
@@ -170,7 +172,7 @@ if (n_outcomes == 1) {
 #' @param params_all A data.frame with 4 columns with following column order: "pars",
 #' "basecase", "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}
-#' @param nsamps number of parameter values. If \code{NULL}, 40 parameter values are
+#' @param nsamp number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
 #' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
@@ -200,9 +202,8 @@ if (n_outcomes == 1) {
 #' }
 #'
 #' @export
-run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes = NULL,
+run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes = NULL,
                      strategies = NULL, ...){
-
   if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
   if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
@@ -267,10 +268,10 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
   range_df <- params_all[ix, c("min", "max")]
   param_table <- expand.grid(param1 = seq(range_df[1, "min"],
                                          range_df[1, "max"],
-                                         length.out = nsamps),
+                                         length.out = nsamp),
                              param2 = seq(range_df[2, "min"],
                                          range_df[2, "max"],
-                                         length.out = nsamps))
+                                         length.out = nsamp))
   colnames(param_table) <- poi
 
   # Run model and capture outcome
@@ -296,7 +297,9 @@ run_twsa_det <- function(param1, param2, params_all, nsamps = 40, FUN, outcomes 
   twsa_out <- vector(mode = "list", length = n_outcomes)
 
   for (k in 1:n_outcomes){
-    df_twsa[[k]] <- create_dsa_twoway(param_table, sim_out_df[[k]], strategies)
+    df_twsa[[k]] <- create_dsa_twoway(parameters = param_table,
+                                      other_outcome = sim_out_df[[k]],
+                                      strategies = strategies)
     twsa_out[[k]] <- twsa(df_twsa[[k]], outcome = "eff")
   }
 

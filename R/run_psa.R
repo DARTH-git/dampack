@@ -79,7 +79,8 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
 
     psa_out <- vector(mode = "list", length = n_outcomes)
     for (j in 1:n_outcomes){
-      psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = sim_out_df[[j]],
+      psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
+                                   other_outcome = sim_out_df[[j]],
                                    parameters = psa_samp[, -1], strategies = strategies,
                                    currency = "$")
     }

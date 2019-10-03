@@ -19,7 +19,7 @@
 #'
 #' @export
 create_dsa_twoway <- function(parameters, effectiveness = NULL, strategies,
-                              cost = NULL, currency = "$") {
+                              cost = NULL, currency = "$", other_outcome  = NULL) {
   # parameter names and dataframe structure
   parameters <- check_df_and_coerce(parameters)
   parnames <- colnames(parameters)
@@ -33,7 +33,8 @@ create_dsa_twoway <- function(parameters, effectiveness = NULL, strategies,
   }
 
   # create dsa object
-  dsa <- create_sa(parameters, parnames, effectiveness, strategies, cost, currency)
+  dsa <- create_sa(parameters, parnames, effectiveness, strategies,
+                   cost, currency, other_outcome)
   class(dsa) <- c("dsa_twoway", class(dsa))
   dsa
 }

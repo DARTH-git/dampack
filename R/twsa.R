@@ -40,7 +40,11 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
     tw <- predict(mm, ranges, nsamp)
   } else if (inherits(sa_obj, "dsa_twoway")) {
     params <- sa_obj$parameters
-    eff <- sa_obj$effectiveness
+    if (!is.null(sa_obj$other_outcome)) {
+      eff <- sa_obj$other_outcome
+    } else {
+      eff <- sa_obj$effectiveness
+    }
     cost <- sa_obj$cost
     strategies <- sa_obj$strategies
     parnames <- sa_obj$parnames

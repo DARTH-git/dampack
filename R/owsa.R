@@ -28,7 +28,11 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
     ow <- predict(mm, ranges, nsamps)
   } else if (inherits(sa_obj, "dsa_oneway")) {
     params <- sa_obj$parameters
-    eff <- sa_obj$effectiveness
+    if (!is.null(sa_obj$other_outcome)) {
+      eff <- sa_obj$other_outcome
+    } else {
+      eff <- sa_obj$effectiveness
+    }
     cost <- sa_obj$cost
     strategies <- sa_obj$strategies
     param_names <- sa_obj$parnames

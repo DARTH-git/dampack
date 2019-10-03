@@ -1,5 +1,5 @@
 #' Create a PSA object
-#' 
+#'
 #' @description
 #' Creates an object to hold probabilistic sensivity analysis data,
 #' while checking the data for validity. The object can then be
@@ -48,13 +48,14 @@
 #'
 #' @importFrom stringr str_replace
 #' @export
-make_psa_obj <- function(cost, effectiveness, parameters, strategies=NULL, currency = "$"){
+make_psa_obj <- function(cost, effectiveness, parameters,
+                         strategies = NULL, currency = "$", other_outcome = NULL) {
   # parameter names
   parnames <- names(parameters)
 
   # define psa as a named list
   psa_obj <- create_sa(parameters, parnames, effectiveness, strategies,
-                       cost, currency)
+                       cost, currency, other_outcome)
 
   # give classes "psa" and "sa"
   class(psa_obj) <- c("psa", class(psa_obj))
@@ -88,6 +89,7 @@ check_df_and_coerce <- function(obj) {
 #' @importFrom stats sd
 #' @export
 summary.psa <- function(object, calc_sds = FALSE, ...) {
+
   mean_cost <- colMeans(object$cost)
   mean_effect <- colMeans(object$effectiveness)
   strat <- object$strategies

@@ -66,7 +66,7 @@ run_owsa_det <- function(params = NULL, params_all, nsamp = 100, FUN,
   }
 
   ix <- match(params, params_all$pars)
-  if (!all((params_all[ix, 2] >= params_all[ix, 3]) &
+  if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
             (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }
@@ -227,7 +227,7 @@ run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes =
   }
 
   ix <- match(poi, params_all$pars)
-  if (!all((params_all[ix, 2] >= params_all[ix, 3]) &
+  if (!all( (params_all[ix, 2] >= params_all[ix, 3]) &
            (params_all[ix, 2] <= params_all[ix, 4]))) {
     stop("basecase has to be in between min and max")
   }

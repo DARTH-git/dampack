@@ -4,7 +4,7 @@ author: "Fernando Alarid-Escudero, Caleb Easterly, Eva Enns, and the DARTH Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Basic Cost Effectiveness Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -124,12 +124,12 @@ Costs in this example include all treatment costs and lifetime downstream medica
 The *C. diff* PSA dataset is provided within `dampack` and can be accessed using the `data()` function.
 ```{r}
 library(dampack)
-data("cdiff_psa")
+data("psa_cdiff")
 ```
 
 This creates the object `cdiff_psa` which is a `psa` object class (specific to `dampack`), sharing some properties with data frames. For more information on the properties of `psa` objects, please see **our PSA vignette**. To use `calculate_icers()`, we first need to calculate the average cost and average effectiveness for each strategy across the PSA samples. To do this, we use `summary()`, which has its own specific method for `psa` objects that calculates the mean of each outcome over the PSA samples. For more information, type `?summary.psa` in the console.
 ```{r}
-df_cdiff_ce <- summary(cdiff_psa)
+df_cdiff_ce <- summary(psa_cdiff)
 head(df_cdiff_ce)
 ```
 

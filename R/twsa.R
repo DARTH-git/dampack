@@ -23,7 +23,7 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
-                 poly.order = 2){
+                 poly.order = 2) {
 
   if (inherits(sa_obj, "psa")) {
     if (is.null(param1) | is.null(param2)) {

@@ -38,7 +38,7 @@ calc_evpi <- function(psa, wtp, pop = 1) {
   # vector to store evpi
   evpi <- rep(0, n_wtps)
   # Estimate the Loss matrix and EVPI at each WTP threshold
-  for (l in 1:n_wtps){
+  for (l in 1:n_wtps) {
     ## Calculate the opportunity loss from choosing d.star for each strategy
     loss <- calculate_outcome("nmb_loss", cost, effectiveness, wtp[l])
 
@@ -47,11 +47,11 @@ calc_evpi <- function(psa, wtp, pop = 1) {
   }
 
   # Data frame to store EVPI for each WTP threshold
-  df.evpi <- data.frame("WTP" = wtp, "EVPI" = evpi)
+  df_evpi <- data.frame("WTP" = wtp, "EVPI" = evpi)
 
   # declare class as both evpi (plotting) and data.frame (printing)
-  class(df.evpi) <- c("evpi", "data.frame")
-  return(df.evpi)
+  class(df_evpi) <- c("evpi", "data.frame")
+  return(df_evpi)
 }
 
 #' Plot of Expected Value of Perfect Information (EVPI)
@@ -81,7 +81,7 @@ plot.evpi <- function(x,
                       ybreaks = NULL,
                       xlim = c(0, NA),
                       ylim = NULL,
-                      ...){
+                      ...) {
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
          aes_(x = as.name("WTP_thou"), y = as.name("EVPI"))) +

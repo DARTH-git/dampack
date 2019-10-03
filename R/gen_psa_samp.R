@@ -1,12 +1,14 @@
 #' Generate PSA Sample
 #'
-#' @description \code{gen_psa_samp} generates a data.frame of sampled parameter values from user-specified distributions
+#' @description \code{gen_psa_samp} generates a data.frame of sampled parameter values from
+#' user-specified distributions
 #' to be used in a probabilistic sensitivity analysis (PSA)
 
 #' @details
 #' Length of vectors \code{params}, \code{dist}, \code{parameterization_type}, and list \code{dist_params} must all
 #' be the same.
-#' The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params} all define the distribution that will be
+#' The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params}
+#' all define the distribution that will be
 #' used to draw samples of the corresponding nth element of the \code{params} vector.
 #'
 #' For a given element of \code{params}:
@@ -22,8 +24,10 @@
 #' as specified by \code{\link{rlnorm}}
 #'
 #' \item If \code{dist == "truncated-normal"}, \code{parameterization_type} can only be \code{"mean, sd, ll, ul"},
-#' and \code{dist_params} must be the vector \code{c(mean, sd, ll, ul)}, where ll is the lower limit of the distribution and ul
-#' is the upper limit of the distribution. If either the lower limit or the upper limit does not exist, simply specify NA in
+#' and \code{dist_params} must be the vector \code{c(mean, sd, ll, ul)}, where ll is
+#' the lower limit of the distribution and ul
+#' is the upper limit of the distribution. If either the lower limit or the upper
+#' limit does not exist, simply specify NA in
 #' the corresponding position of the dist_params vector.
 #'
 #' \item If \code{dist == "beta"}, \code{parameterization_type} can be \code{"mean, sd"} or \code{"a, b"}
@@ -41,25 +45,37 @@
 #' then the corresponding element of list \code{dist_params} must be a data.frame where the first column
 #' is a string vector of the the different multinomial outcomes. These multinomial outcomes will become column names
 #' in the data.frame returned by \code{gen_psa_samp}, and therefore the strings in this column should correspond to
-#' variable names used in \code{FUN} for \code{\link{run_psa}}. The second and third columns of this \code{dist_params}
-#' should be numerical vectors containing the sample means and sample standard errors for each of the multinomial outcomes.
+#' variable names used in \code{FUN} for \code{\link{run_psa}}. The second and
+#' third columns of this \code{dist_params}
+#' should be numerical vectors containing the sample means and sample standard errors for
+#' each of the multinomial outcomes.
 #'
-#' \item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a data.frame with the first column
-#' being a string vector of the multinomial outcomes, and the second column being a vector of the observed number of each
+#' \item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a
+#' data.frame with the first column
+#' being a string vector of the multinomial outcomes, and the second column being a
+#' vector of the observed number of each
 #' multinomial outcome in a sample.
 #'
 #' \item If \code{parameterization_type == "value, alpha"}, then \code{dist_params} must be a data.frame with
-#' the first column being a string vector of the multinomial outcomes, and the second column must be a numerical vector
+#' the first column being a string vector of the multinomial outcomes, and
+#'  the second column must be a numerical vector
 #' of the alpha parameter values for each multinomial outcome in the dirichlet distribution.
 #' }
 #'
-#' \item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be \code{"value, weight"}, and \code{dist_params}
-#' must be a data.frame with the first column being a numerical vector containing all of the bootstrap sample values, and
-#' the second column being an integer vector designating the sampling weights of each bootstrap sample value.  For example,
-#' the number of rows in the \code{dist_params} data.frame is the number of individuals in the population to be sampled
-#' from (with replacement) or the number of values an empirical distribution (e.g. a histogram). If each individual value in the
-#' sample is unique and should be weighted equally, set each weight to 1. If the sample distribution resembles a histogram,
-#' the weights should be equal to the number of observations for each unique value in the empirical distribution.
+#' \item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be
+#'  \code{"value, weight"}, and \code{dist_params}
+#' must be a data.frame with the first column being a numerical vector
+#' containing all of the bootstrap sample values, and
+#' the second column being an integer vector designating the
+#' sampling weights of each bootstrap sample value.  For example,
+#' the number of rows in the \code{dist_params} data.frame
+#' is the number of individuals in the population to be sampled
+#' from (with replacement) or the number of values an
+#' empirical distribution (e.g. a histogram). If each individual value in the
+#' sample is unique and should be weighted equally,
+#' set each weight to 1. If the sample distribution resembles a histogram,
+#' the weights should be equal to the number of
+#' observations for each unique value in the empirical distribution.
 #'
 #' \item If \code{dist == "constant"}, \code{parameterization_type} can only be \code{"val"},
 #' and \code{dist_params} must be a single numerical value.
@@ -69,7 +85,8 @@
 #' and used by a user-defined function in \code{run_psa} to calculate outcomes.
 #' @param dist String vector with the distributions from which \code{params} will be drawn.
 #' @param parameterization_type String vector with parameterization types for each \code{dist}
-#' @param dist_params list of input parameters required to by specific \code{dist} and \code{parameterization_type}
+#' @param dist_params list of input parameters required to
+#'  by specific \code{dist} and \code{parameterization_type}
 #' to fully describe distribution and generate parameter samples.
 #' @param nsamp number of sets of parameter values to be generated
 #'
@@ -137,8 +154,8 @@ gen_psa_samp <- function(params = NULL,
     #log normal
     if (dist[i] == "log-normal") {
       if (parameterization_type[i] == "mean, sd") {
-        mu <- lnorm_params(dist_params[[i]][1], ( dist_params[[i]][2] ) ^ 2 )[[1]]
-        sd <- lnorm_params(dist_params[[i]][1], ( dist_params[[i]][2] ) ^ 2 )[[2]]
+        mu <- lnorm_params(dist_params[[i]][1], (dist_params[[i]][2]) ^ 2)[[1]]
+        sd <- lnorm_params(dist_params[[i]][1], (dist_params[[i]][2]) ^ 2)[[2]]
       } else if (parameterization_type[i] == "meanlog, sdlog") {
         mu <- dist_params[[i]][1]
         sd <- dist_params[[i]][2]
@@ -196,7 +213,7 @@ gen_psa_samp <- function(params = NULL,
         val_n <- as.data.frame(dist_params[[i]])
         total <- sum(val_n[, 2])
         p_mean <- val_n[, 2] / total
-        sd <- sqrt( ( p_mean * ( 1 - p_mean ) ) / total)
+        sd <- sqrt((p_mean * (1 - p_mean)) / total)
         alpha <- dirichlet_params(p_mean, sd)
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
         } else if (parameterization_type[i] == "value, alpha") {
@@ -210,7 +227,7 @@ gen_psa_samp <- function(params = NULL,
     #bootstrap
     if (dist[i] == "bootstrap") {
       samp_vec <- vector(mode = "numeric", length = nsamp)
-      for (k in 1:nsamp){
+      for (k in 1:nsamp) {
         samp_vec[k] <- mean(sample(x = dist_params[[i]][, 1],
                                    size = sum(dist_params[[i]][, 2]),
                                    replace = TRUE,
@@ -244,7 +261,7 @@ gen_psa_samp <- function(params = NULL,
 #'
 #'  @importFrom stats rgamma
 
-rdirichlet <- function (n, alpha) {
+rdirichlet <- function(n, alpha) {
     k <- length(alpha)
     out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
     out <- out / rowSums(out)
@@ -274,8 +291,8 @@ rdirichlet <- function (n, alpha) {
 #' @return beta Beta parameter of beta distribution
 #'
 beta_params <- function(mean, sigma) {
-  alpha <- ( ( 1 - mean ) / sigma ^ 2 - 1 / mean ) * mean ^ 2
-  beta  <- alpha * ( 1 / mean - 1)
+  alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
+  beta  <- alpha * (1 / mean - 1)
   params <- list(alpha = alpha, beta = beta)
   return(params)
 }
@@ -326,10 +343,10 @@ dirichlet_params <- function(p.mean, sigma) {
   p.2 <- sigma ^ 2 + p.mean ^ 2
   # Initialize alpa vector
   alpha <- numeric(n.params)
-  for (i in 1:( n.params - 1 )) {
-    alpha[i] <- ( p.mean[1] - p.2[1]) * p.mean[i] / ( p.2[1] - p.mean[1] ^ 2 )
+  for (i in 1:(n.params - 1)) {
+    alpha[i] <- (p.mean[1] - p.2[1]) * p.mean[i] / (p.2[1] - p.mean[1] ^ 2)
   }
-  alpha[n.params] <- ( p.mean[1] - p.2[1] ) * ( 1 - sum(p.mean[ - n.params])) / ( p.2[1] - p.mean[1] ^ 2 )
+  alpha[n.params] <- (p.mean[1] - p.2[1]) * (1 - sum(p.mean[- n.params])) / (p.2[1] - p.mean[1] ^ 2)
   return(alpha)
 }
 
@@ -376,15 +393,15 @@ dirichlet_params <- function(p.mean, sigma) {
 #' gamma_params(mu, sigma, scale = FALSE)
 #' }
 #'
-gamma_params <- function(mu, sigma, scale = TRUE){
-  if ( scale ) {
-    shape <- ( mu ^ 2 ) / ( sigma ^ 2)
-    scale <- ( sigma ^ 2) / mu
+gamma_params <- function(mu, sigma, scale = TRUE) {
+  if (scale) {
+    shape <- (mu ^ 2) / (sigma ^ 2)
+    scale <- (sigma ^ 2) / mu
     params <- list(shape = shape,
                    scale = scale)
   } else {
-    shape <- ( mu ^ 2) / ( sigma ^ 2 )
-    rate  <- mu / ( sigma ^ 2 )
+    shape <- (mu ^ 2) / (sigma ^ 2)
+    rate  <- mu / (sigma ^ 2)
     params <- list(shape = shape,
                    rate  = rate)
   }
@@ -432,7 +449,7 @@ gamma_params <- function(mu, sigma, scale = TRUE){
 #' # True values: 100, 30, 70
 #' }
 #'
-lnorm_params <- function(m = 1, v = 1){
+lnorm_params <- function(m = 1, v = 1) {
   ### Sanity checkd
   if (m <= 0) {
     stop("'m' needs to be greater than 0")
@@ -440,7 +457,7 @@ lnorm_params <- function(m = 1, v = 1){
   if (v <= 0) {
     stop("'v' needs to be greater than 0")
     }
-  mu    <- log(m / sqrt(1 + v / m ^ 2))
+  mu <- log(m / sqrt(1 + v / m ^ 2))
   sigma <- sqrt(log(1 + v / m ^ 2))
   return(list(mu = mu,
               sigma = sigma))

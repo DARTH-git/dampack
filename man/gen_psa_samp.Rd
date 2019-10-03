@@ -19,7 +19,8 @@ and used by a user-defined function in \code{run_psa} to calculate outcomes.}
 
 \item{parameterization_type}{String vector with parameterization types for each \code{dist}}
 
-\item{dist_params}{list of input parameters required to by specific \code{dist} and \code{parameterization_type}
+\item{dist_params}{list of input parameters required to
+ by specific \code{dist} and \code{parameterization_type}
 to fully describe distribution and generate parameter samples.}
 
 \item{nsamp}{number of sets of parameter values to be generated}
@@ -28,13 +29,15 @@ to fully describe distribution and generate parameter samples.}
 A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
 }
 \description{
-\code{gen_psa_samp} generates a data.frame of sampled parameter values from user-specified distributions
+\code{gen_psa_samp} generates a data.frame of sampled parameter values from
+user-specified distributions
 to be used in a probabilistic sensitivity analysis (PSA)
 }
 \details{
 Length of vectors \code{params}, \code{dist}, \code{parameterization_type}, and list \code{dist_params} must all
 be the same.
-The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params} all define the distribution that will be
+The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params}
+all define the distribution that will be
 used to draw samples of the corresponding nth element of the \code{params} vector.
 
 For a given element of \code{params}:
@@ -50,8 +53,10 @@ sample mean and sample standard deviation of an empirical sample of the random v
 as specified by \code{\link{rlnorm}}
 
 \item If \code{dist == "truncated-normal"}, \code{parameterization_type} can only be \code{"mean, sd, ll, ul"},
-and \code{dist_params} must be the vector \code{c(mean, sd, ll, ul)}, where ll is the lower limit of the distribution and ul
-is the upper limit of the distribution. If either the lower limit or the upper limit does not exist, simply specify NA in
+and \code{dist_params} must be the vector \code{c(mean, sd, ll, ul)}, where ll is
+the lower limit of the distribution and ul
+is the upper limit of the distribution. If either the lower limit or the upper
+limit does not exist, simply specify NA in
 the corresponding position of the dist_params vector.
 
 \item If \code{dist == "beta"}, \code{parameterization_type} can be \code{"mean, sd"} or \code{"a, b"}
@@ -69,25 +74,37 @@ or \code{c(shape, scale)}, respectively.
 then the corresponding element of list \code{dist_params} must be a data.frame where the first column
 is a string vector of the the different multinomial outcomes. These multinomial outcomes will become column names
 in the data.frame returned by \code{gen_psa_samp}, and therefore the strings in this column should correspond to
-variable names used in \code{FUN} for \code{\link{run_psa}}. The second and third columns of this \code{dist_params}
-should be numerical vectors containing the sample means and sample standard errors for each of the multinomial outcomes.
+variable names used in \code{FUN} for \code{\link{run_psa}}. The second and
+third columns of this \code{dist_params}
+should be numerical vectors containing the sample means and sample standard errors for
+each of the multinomial outcomes.
 
-\item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a data.frame with the first column
-being a string vector of the multinomial outcomes, and the second column being a vector of the observed number of each
+\item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a
+data.frame with the first column
+being a string vector of the multinomial outcomes, and the second column being a
+vector of the observed number of each
 multinomial outcome in a sample.
 
 \item If \code{parameterization_type == "value, alpha"}, then \code{dist_params} must be a data.frame with
-the first column being a string vector of the multinomial outcomes, and the second column must be a numerical vector
+the first column being a string vector of the multinomial outcomes, and
+ the second column must be a numerical vector
 of the alpha parameter values for each multinomial outcome in the dirichlet distribution.
 }
 
-\item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be \code{"value, weight"}, and \code{dist_params}
-must be a data.frame with the first column being a numerical vector containing all of the bootstrap sample values, and
-the second column being an integer vector designating the sampling weights of each bootstrap sample value.  For example,
-the number of rows in the \code{dist_params} data.frame is the number of individuals in the population to be sampled
-from (with replacement) or the number of values an empirical distribution (e.g. a histogram). If each individual value in the
-sample is unique and should be weighted equally, set each weight to 1. If the sample distribution resembles a histogram,
-the weights should be equal to the number of observations for each unique value in the empirical distribution.
+\item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be
+ \code{"value, weight"}, and \code{dist_params}
+must be a data.frame with the first column being a numerical vector
+containing all of the bootstrap sample values, and
+the second column being an integer vector designating the
+sampling weights of each bootstrap sample value.  For example,
+the number of rows in the \code{dist_params} data.frame
+is the number of individuals in the population to be sampled
+from (with replacement) or the number of values an
+empirical distribution (e.g. a histogram). If each individual value in the
+sample is unique and should be weighted equally,
+set each weight to 1. If the sample distribution resembles a histogram,
+the weights should be equal to the number of
+observations for each unique value in the empirical distribution.
 
 \item If \code{dist == "constant"}, \code{parameterization_type} can only be \code{"val"},
 and \code{dist_params} must be a single numerical value.

@@ -85,6 +85,13 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   # define data for linear model
   dat <- data.frame(y, psa$parameters)
 
+  # make sure there are not more parameters to estimate than there are psa samples
+  if (nrow(dat) < length(params)) {
+    errmsg <- paste0("The number of parameters to be estimated by the metamodel
+                     cannot be greater than the number of PSA samples")
+    stop(errmsg)
+  }
+
   # list to hold linear models
   lms <- NULL
 

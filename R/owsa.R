@@ -17,7 +17,7 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
-                 poly.order = 2){
+                 poly.order = 2) {
   outcome <- match.arg(outcome)
   if (inherits(sa_obj, "psa")) {
     # create metamodel

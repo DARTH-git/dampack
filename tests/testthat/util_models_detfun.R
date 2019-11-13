@@ -1,7 +1,7 @@
 # markov model for testing
 markov_model <- function(param, state_name, cycle,
                          popsize = 1000,
-                         init_state = c(1, 0, 0, 0)){
+                         init_state = c(1, 0, 0, 0)) {
   # 4 states: susceptible, asymptomatic infection,
   # symptomatic infection, and treated
   p_inf <- param[["p_inf"]]
@@ -72,7 +72,7 @@ strategy_func <- function(param, state_name, cycle,
   tmp_output <- data.frame(rbind(st2, st3))
 
   if (is.null(mystrategy)) {
-    output <- data.frame(strategy = c(1:nrow(tmp_output)))
+    output <- data.frame(strategy = c(seq_len(nrow(tmp_output))))
   } else {
     output <- data.frame(strategy = mystrategy)
   }

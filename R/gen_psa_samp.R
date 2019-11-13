@@ -213,7 +213,7 @@ gen_psa_samp <- function(params = NULL,
         val_n <- as.data.frame(dist_params[[i]])
         total <- sum(val_n[, 2])
         p_mean <- val_n[, 2] / total
-        sd <- sqrt( (p_mean * (1 - p_mean)) / total)
+        sd <- sqrt((p_mean * (1 - p_mean)) / total)
         alpha <- dirichlet_params(p_mean, sd)
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
         } else if (parameterization_type[i] == "value, alpha") {
@@ -291,7 +291,7 @@ rdirichlet <- function(n, alpha) {
 #' @return beta Beta parameter of beta distribution
 #'
 beta_params <- function(mean, sigma) {
-  alpha <- ( (1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
+  alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
   beta  <- alpha * (1 / mean - 1)
   params <- list(alpha = alpha, beta = beta)
   return(params)

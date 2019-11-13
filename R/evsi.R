@@ -175,10 +175,10 @@ predict_matrix_tensor_smooth_ga <- function(object,
 
   m <- length(object$margin)
   x <- list()
-  for (i in 1:m) {
+  for (i in seq_len(m)) {
     term <- object$margin[[i]]$term
     dat <- list()
-    for (j in 1:length(term)) {
+    for (j in seq_len(length(term))) {
       dat[[term[j]]] <- param_vals[[term[j]]]
     }
     x[[i]] <- if (!is.null(object$mc[i])) {
@@ -190,7 +190,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
   }
   mxp <- length(object$XP)
   if (mxp > 0) {
-    for (i in 1:mxp) if (!is.null(object$XP[[i]])) {
+    for (i in seq_len(mxp)) if (!is.null(object$XP[[i]])) {
       x[[i]] <- x[[i]] %*% object$XP[[i]]
     }
   }
@@ -203,7 +203,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
   # Initialize and fill list with preposterior of basis functions
   # for each parameter
   x_ga <- list()
-  for (i in 1:m) {
+  for (i in seq_len(m)) {
     x_ga[[i]] <- vrf[i] * x[[i]] + (1 - vrf[i]) * (ones %*% colMeans(x[[i]]))
   }
 

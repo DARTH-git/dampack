@@ -153,7 +153,7 @@ plot.ceac <- function(x,
                       ylim = NULL,
                       xlim = c(0, NA),
                       col = c("full", "bw"),
-                      ...){
+                      ...) {
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"

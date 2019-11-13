@@ -4,10 +4,18 @@
 \alias{plot.owsa}
 \title{Plot a sensitivity analysis}
 \usage{
-\method{plot}{owsa}(x, txtsize = 12, col = c("full", "bw"),
+\method{plot}{owsa}(
+  x,
+  txtsize = 12,
+  col = c("full", "bw"),
   facet_scales = c("free_x", "free_y", "free", "fixed"),
-  facet_nrow = NULL, facet_ncol = NULL, size = 1, n_x_ticks = 6,
-  n_y_ticks = 6, ...)
+  facet_nrow = NULL,
+  facet_ncol = NULL,
+  size = 1,
+  n_x_ticks = 6,
+  n_y_ticks = 6,
+  ...
+)
 }
 \arguments{
 \item{x}{an owsa object}

@@ -5,8 +5,16 @@
 \title{Estimation of the Expected Value of Partial Perfect Information (EVPPI)
 using a linear regression metamodel approach}
 \usage{
-calc_evppi(psa, wtp, params = NULL, outcome = c("nmb", "nhb"),
-  type = c("gam", "poly"), poly.order = 2, k = -1, pop = 1)
+calc_evppi(
+  psa,
+  wtp,
+  params = NULL,
+  outcome = c("nmb", "nhb"),
+  type = c("gam", "poly"),
+  poly.order = 2,
+  k = -1,
+  pop = 1
+)
 }
 \arguments{
 \item{psa}{object of class psa, produced by \code{\link{make_psa_obj}}}

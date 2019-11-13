@@ -4,11 +4,18 @@
 \alias{metamodel}
 \title{Linear regression metamodeling}
 \usage{
-metamodel(analysis = c("oneway", "twoway", "multiway"), psa,
-  params = NULL, strategies = NULL, outcome = c("eff", "cost", "nhb",
-  "nmb", "nhb_loss", "nmb_loss", "nhb_loss_voi", "nmb_loss_voi"),
-  wtp = NULL, type = c("linear", "gam", "poly"), poly.order = 2,
-  k = -1)
+metamodel(
+  analysis = c("oneway", "twoway", "multiway"),
+  psa,
+  params = NULL,
+  strategies = NULL,
+  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss", "nhb_loss_voi",
+    "nmb_loss_voi"),
+  wtp = NULL,
+  type = c("linear", "gam", "poly"),
+  poly.order = 2,
+  k = -1
+)
 }
 \arguments{
 \item{analysis}{either "oneway" or "twoway"}
@@ -35,8 +42,8 @@ Default: 2}
     The default depends on the number of variables that the smooth is a
     function of. \code{k} should not be less than the dimension of the
     null space of the penalty for the term (see
-    \code{\link{null.space.dimension}}), but will be reset if
-  it is. See \code{\link{choose.k}} for further information.}
+    \code{\link[mgcv]{null.space.dimension}}), but will be reset if
+  it is. See \code{\link[mgcv]{choose.k}} for further information.}
 }
 \value{
 A metamodel object, which contains a list of metamodels and other relevant information.

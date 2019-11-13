@@ -4,11 +4,21 @@
 \alias{owsa_opt_strat}
 \title{plot the optimal strategy as the parameter values change}
 \usage{
-owsa_opt_strat(owsa, params = NULL, maximize = TRUE,
-  return = c("plot", "data"), plot_const = TRUE, col = c("full",
-  "bw"), greystart = 0.2, greyend = 0.8, txtsize = 12,
-  facet_ncol = 1, facet_nrow = NULL, facet_lab_txtsize = NULL,
-  n_x_ticks = 10)
+owsa_opt_strat(
+  owsa,
+  params = NULL,
+  maximize = TRUE,
+  return = c("plot", "data"),
+  plot_const = TRUE,
+  col = c("full", "bw"),
+  greystart = 0.2,
+  greyend = 0.8,
+  txtsize = 12,
+  facet_ncol = 1,
+  facet_nrow = NULL,
+  facet_lab_txtsize = NULL,
+  n_x_ticks = 10
+)
 }
 \arguments{
 \item{owsa}{An owsa object}

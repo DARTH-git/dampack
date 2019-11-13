@@ -4,8 +4,16 @@
 \alias{run_twsa_det}
 \title{Run deterministic two-way sensitivity analysis (TWSA)}
 \usage{
-run_twsa_det(param1, param2, params_all, nsamp = 40, FUN,
-  outcomes = NULL, strategies = NULL, ...)
+run_twsa_det(
+  param1,
+  param2,
+  params_all,
+  nsamp = 40,
+  FUN,
+  outcomes = NULL,
+  strategies = NULL,
+  ...
+)
 }
 \arguments{
 \item{param1}{String with the name of the first parameter of interest}

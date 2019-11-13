@@ -4,13 +4,29 @@
 \alias{add_common_aes}
 \title{Adds aesthetics to all plots to reduce code duplication}
 \usage{
-add_common_aes(gplot, txtsize, scale_name = waiver(), col = c("none",
-  "full", "bw"), col_aes = c("fill", "color"), lval = 50,
-  greystart = 0.2, greyend = 0.8, continuous = c("none", "x", "y"),
-  n_x_ticks = 6, n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL,
-  xlim = NULL, ylim = NULL, xtrans = "identity",
-  ytrans = "identity", xexpand = waiver(), yexpand = waiver(),
-  facet_lab_txtsize = NULL, ...)
+add_common_aes(
+  gplot,
+  txtsize,
+  scale_name = waiver(),
+  col = c("none", "full", "bw"),
+  col_aes = c("fill", "color"),
+  lval = 50,
+  greystart = 0.2,
+  greyend = 0.8,
+  continuous = c("none", "x", "y"),
+  n_x_ticks = 6,
+  n_y_ticks = 6,
+  xbreaks = NULL,
+  ybreaks = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  xtrans = "identity",
+  ytrans = "identity",
+  xexpand = waiver(),
+  yexpand = waiver(),
+  facet_lab_txtsize = NULL,
+  ...
+)
 }
 \arguments{
 \item{gplot}{a ggplot object}

@@ -4,8 +4,14 @@
 \alias{make_psa_obj}
 \title{Create a PSA object}
 \usage{
-make_psa_obj(cost, effectiveness, parameters, strategies = NULL,
-  currency = "$", other_outcome = NULL)
+make_psa_obj(
+  cost,
+  effectiveness,
+  parameters,
+  strategies = NULL,
+  currency = "$",
+  other_outcome = NULL
+)
 }
 \arguments{
 \item{cost}{Data frames containing data for costs,

@@ -4,9 +4,16 @@
 \alias{owsa_tornado}
 \title{Tornado plot of a one-way sensitivity analysis}
 \usage{
-owsa_tornado(owsa, return = c("plot", "data"), txtsize = 12,
-  min_rel_diff = 0, col = c("full", "bw"), n_y_ticks = 8,
-  ylim = NULL, ybreaks = NULL)
+owsa_tornado(
+  owsa,
+  return = c("plot", "data"),
+  txtsize = 12,
+  min_rel_diff = 0,
+  col = c("full", "bw"),
+  n_y_ticks = 8,
+  ylim = NULL,
+  ybreaks = NULL
+)
 }
 \arguments{
 \item{owsa}{an owsa object}

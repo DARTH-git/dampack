@@ -4,8 +4,11 @@
 \alias{predict_matrix_tensor_smooth_ga}
 \title{Predict matrix tensor smooth (GA)}
 \usage{
-predict_matrix_tensor_smooth_ga(object, param_vals, vrf = rep(1,
-  ncol(param_vals)))
+predict_matrix_tensor_smooth_ga(
+  object,
+  param_vals,
+  vrf = rep(1, ncol(param_vals))
+)
 }
 \description{
 Function to compute the preposterior for each of the

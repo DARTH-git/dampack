@@ -16,8 +16,8 @@
 #' @param k basis dimension, if \code{type == "gam"}
 #' @param pop A scalar that corresponds to the total population
 #'
-#' @return evppi A numeric vector of size one with the EVPPI of the selected
-#' parameters
+#' @return A data.frame with WTP thresholds and corresponding EVPPIs
+#' for the selected parameters
 #'
 #' @details
 #' The expected value of partial pefect information (EVPPI) is the expected
@@ -84,7 +84,7 @@ calc_evppi <- function(psa,
   evppi <- rep(0, n_wtps)
 
   # calculate evppi at each wtp
-  for (l in 1:n_wtps) {
+  for (l in 1:n_wtps){
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,

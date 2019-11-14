@@ -36,8 +36,8 @@ polynomial models (\code{"poly"})}
 \item{pop}{A scalar that corresponds to the total population}
 }
 \value{
-evppi A numeric vector of size one with the EVPPI of the selected
-parameters
+A data.frame with WTP thresholds and corresponding EVPPIs
+for the selected parameters
 }
 \description{
 \code{evppi} is used to estimate the Expected Value of Partial Perfect

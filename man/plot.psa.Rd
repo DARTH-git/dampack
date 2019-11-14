@@ -4,10 +4,21 @@
 \alias{plot.psa}
 \title{Plot the psa object}
 \usage{
-\method{plot}{psa}(x, center = TRUE, ellipse = TRUE, alpha = 0.2,
-  txtsize = 12, col = c("full", "bw"), n_x_ticks = 6,
-  n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL, xlim = NULL,
-  ylim = NULL, ...)
+\method{plot}{psa}(
+  x,
+  center = TRUE,
+  ellipse = TRUE,
+  alpha = 0.2,
+  txtsize = 12,
+  col = c("full", "bw"),
+  n_x_ticks = 6,
+  n_y_ticks = 6,
+  xbreaks = NULL,
+  ybreaks = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{the psa object}

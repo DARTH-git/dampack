@@ -4,8 +4,15 @@
 \alias{plot.twsa}
 \title{Two-way sensitivity analysis plot}
 \usage{
-\method{plot}{twsa}(x, maximize = TRUE, col = c("full", "bw"),
-  n_x_ticks = 6, n_y_ticks = 6, txtsize = 12, ...)
+\method{plot}{twsa}(
+  x,
+  maximize = TRUE,
+  col = c("full", "bw"),
+  n_x_ticks = 6,
+  n_y_ticks = 6,
+  txtsize = 12,
+  ...
+)
 }
 \arguments{
 \item{x}{a twsa object}

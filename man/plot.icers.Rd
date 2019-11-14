@@ -4,12 +4,25 @@
 \alias{plot.icers}
 \title{Plot of ICERs}
 \usage{
-\method{plot}{icers}(x, txtsize = 12, currency = "$",
-  effect_units = "QALYs", label = c("frontier", "all", "none"),
-  label_max_char = NULL, plot_frontier_only = FALSE, alpha = 1,
-  n_x_ticks = 6, n_y_ticks = 6, xbreaks = NULL, ybreaks = NULL,
-  xlim = NULL, ylim = NULL, xexpand = expand_scale(0.1),
-  yexpand = expand_scale(0.1), ...)
+\method{plot}{icers}(
+  x,
+  txtsize = 12,
+  currency = "$",
+  effect_units = "QALYs",
+  label = c("frontier", "all", "none"),
+  label_max_char = NULL,
+  plot_frontier_only = FALSE,
+  alpha = 1,
+  n_x_ticks = 6,
+  n_y_ticks = 6,
+  xbreaks = NULL,
+  ybreaks = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  xexpand = expand_scale(0.1),
+  yexpand = expand_scale(0.1),
+  ...
+)
 }
 \arguments{
 \item{x}{Object of class \code{icers}.}

@@ -1,8 +1,13 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: R
+env:
+  global:
+    - LINTR_COMMENT_BOT=false
 sudo: false
 cache: packages
 os:
   - linux
   - osx
+after_success:
+  - Rscript -e 'lintr::lint_package()'

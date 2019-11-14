@@ -103,7 +103,7 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
     sum_psa[, "sdCost"] <- sd_cost
     sum_psa[, "sdEffect"] <- sd_effect
   }
-  rownames(sum_psa) <- 1:nrow(sum_psa)
+  rownames(sum_psa) <- seq_len(nrow(sum_psa))
   sum_psa
 }
 
@@ -137,7 +137,8 @@ plot.psa <- function(x,
   currency <- x$currency
 
   # expect that effectiveness and costs have strategy column names
-  df_cost <- suppressMessages( # removes confusing 'No id variables; using all as measure variables'
+  # removes confusing 'No id variables; using all as measure variables'
+  df_cost <- suppressMessages(
     melt(cost, variable.name = "Strategy",
          factorsAsStrings = TRUE,
          value.name = "Cost")

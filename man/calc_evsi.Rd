@@ -4,9 +4,18 @@
 \alias{calc_evsi}
 \title{Calculate Expected Value of Sample Information}
 \usage{
-calc_evsi(psa, wtp, params = NULL, outcome = c("nhb", "nmb"),
-  type = c("gam", "poly"), poly.order = 2, k = -1, n = 100,
-  n0 = 10, pop = 1)
+calc_evsi(
+  psa,
+  wtp,
+  params = NULL,
+  outcome = c("nhb", "nmb"),
+  type = c("gam", "poly"),
+  poly.order = 2,
+  k = -1,
+  n = 100,
+  n0 = 10,
+  pop = 1
+)
 }
 \arguments{
 \item{psa}{object of class psa, produced by \code{\link{make_psa_obj}}}

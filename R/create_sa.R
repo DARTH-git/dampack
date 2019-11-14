@@ -52,8 +52,8 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 
 
   if (!is.null(cost) & !is.null(effectiveness)) {
-    if ( (n_sim_costs != n_sim_effectiveness) | (n_sim_parameters != n_sim_costs)
-         | (n_sim_parameters != n_sim_effectiveness)) {
+    if (n_sim_costs != n_sim_effectiveness | n_sim_parameters != n_sim_costs
+         | n_sim_parameters != n_sim_effectiveness) {
       stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
     }
   }
@@ -65,7 +65,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   }
 
 
-  if (is.null(effectiveness & is.null(other_outcome))) {
+  if (is.null(effectiveness) & is.null(other_outcome)) {
     if (n_sim_costs != n_sim_parameters) {
       stop("The cost and parameter dataframes must have the same number of rows.")
    }

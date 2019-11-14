@@ -4,9 +4,17 @@
 \alias{twsa}
 \title{Two-way sensitivity analysis using linear regression metamodeling}
 \usage{
-twsa(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
-  nsamp = 100, outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss",
-  "nmb_loss"), wtp = NULL, strategies = NULL, poly.order = 2)
+twsa(
+  sa_obj,
+  param1 = NULL,
+  param2 = NULL,
+  ranges = NULL,
+  nsamp = 100,
+  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
+  wtp = NULL,
+  strategies = NULL,
+  poly.order = 2
+)
 }
 \arguments{
 \item{sa_obj}{sensitivity analysis object;

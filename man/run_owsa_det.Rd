@@ -4,8 +4,15 @@
 \alias{run_owsa_det}
 \title{Run deterministic one-way sensitivity analysis (OWSA)}
 \usage{
-run_owsa_det(params = NULL, params_all, nsamp = 100, FUN,
-  outcomes = NULL, strategies = NULL, ...)
+run_owsa_det(
+  params = NULL,
+  params_all,
+  nsamp = 100,
+  FUN,
+  outcomes = NULL,
+  strategies = NULL,
+  ...
+)
 }
 \arguments{
 \item{params}{Vector with strings with the name of the parameters of interest}

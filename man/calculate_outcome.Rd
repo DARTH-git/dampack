@@ -4,8 +4,13 @@
 \alias{calculate_outcome}
 \title{A function that is used to calculate all outcomes}
 \usage{
-calculate_outcome(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss",
-  "nmb_loss", "nhb_loss_voi", "nmb_loss_voi"), cost, effect, wtp)
+calculate_outcome(
+  outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss", "nmb_loss", "nhb_loss_voi",
+    "nmb_loss_voi"),
+  cost,
+  effect,
+  wtp
+)
 }
 \arguments{
 \item{outcome}{choice of outcome}

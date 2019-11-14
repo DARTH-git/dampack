@@ -58,7 +58,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
 
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 
-  for (i in 1:nrow(psa_samp)) {
+  for (i in seq_len(nrow(psa_samp))) {
     fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
     sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
   }

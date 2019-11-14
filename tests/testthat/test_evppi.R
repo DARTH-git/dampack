@@ -15,9 +15,9 @@ test_that("evppi runs", {
                            outcome = "nmb"))
 })
 
-psa_obj$cost <- psa_obj$cost[1,]
-psa_obj$effectiveness <- psa_obj$effectiveness[1,]
-psa_obj$parameters <- psa_obj$parameters[1,]
+psa_obj$cost <- psa_obj$cost[1, ]
+psa_obj$effectiveness <- psa_obj$effectiveness[1, ]
+psa_obj$parameters <- psa_obj$parameters[1, ]
 psa_obj$n_sim <- 1
 
 test_that("evppi produces error when nsamps < nparams", {

@@ -4,8 +4,15 @@
 \alias{create_sa}
 \title{An generic sensitivity analysis object}
 \usage{
-create_sa(parameters, parnames, effectiveness, strategies, cost, currency,
-  other_outcome)
+create_sa(
+  parameters,
+  parnames,
+  effectiveness,
+  strategies,
+  cost,
+  currency,
+  other_outcome
+)
 }
 \arguments{
 \item{parameters}{A data frame with parameter values for each model run. Each

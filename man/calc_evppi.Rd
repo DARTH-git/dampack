@@ -5,8 +5,16 @@
 \title{Estimation of the Expected Value of Partial Perfect Information (EVPPI)
 using a linear regression metamodel approach}
 \usage{
-calc_evppi(psa, wtp, params = NULL, outcome = c("nmb", "nhb"),
-  type = c("gam", "poly"), poly.order = 2, k = -1, pop = 1)
+calc_evppi(
+  psa,
+  wtp,
+  params = NULL,
+  outcome = c("nmb", "nhb"),
+  type = c("gam", "poly"),
+  poly.order = 2,
+  k = -1,
+  pop = 1
+)
 }
 \arguments{
 \item{psa}{object of class psa, produced by \code{\link{make_psa_obj}}}
@@ -28,8 +36,8 @@ polynomial models (\code{"poly"})}
 \item{pop}{A scalar that corresponds to the total population}
 }
 \value{
-evppi A numeric vector of size one with the EVPPI of the selected
-parameters
+A data.frame with WTP thresholds and corresponding EVPPIs
+for the selected parameters
 }
 \description{
 \code{evppi} is used to estimate the Expected Value of Partial Perfect

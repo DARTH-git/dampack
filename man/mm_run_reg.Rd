@@ -22,8 +22,8 @@ Default: 2}
     The default depends on the number of variables that the smooth is a
     function of. \code{k} should not be less than the dimension of the
     null space of the penalty for the term (see
-    \code{\link{null.space.dimension}}), but will be reset if
-  it is. See \code{\link{choose.k}} for further information.}
+    \code{\link[mgcv]{null.space.dimension}}), but will be reset if
+  it is. See \code{\link[mgcv]{choose.k}} for further information.}
 
 \item{all_params}{all params in PSA}
 }

@@ -109,6 +109,46 @@ calc_evppi <- function(psa,
 
   # data.frame to store EVPPI for each WTP threshold
   df_evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
-  class(df_evppi) <- "data.frame"
+  class(df_evppi) <- c("evppi", "data.frame")
   return(df_evppi)
+}
+
+#' Plot of Expected Value of Partial Perfect Information (EVPPI)
+#'
+#' @description
+#' Plots the \code{evppi} object created by \code{\link{calc_evppi}}.
+#'
+#' @param x object of class \code{evppi}, produced by function
+#'  \code{\link{calc_evppi}}
+#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
+#' @param effect_units Units of effectiveness. Default: QALY
+#' @inheritParams add_common_aes
+#' @keywords expected value of perfect information
+#' @return A \code{ggplot2} plot with the EVPPI
+#' @seealso \code{\link{calc_evppi}}
+#' @import ggplot2
+#' @importFrom scales comma
+#' @export
+plot.evppi <- function(x,
+                       txtsize = 12,
+                       currency = "$",
+                       effect_units = "QALY",
+                       n_y_ticks = 8,
+                       n_x_ticks = 20,
+                       xbreaks = NULL,
+                       ybreaks = NULL,
+                       xlim = c(0, NA),
+                       ylim = NULL,
+                       ...) {
+  x$WTP_thou <- x$WTP / 1000
+  g <- ggplot(data = x,
+              aes_(x = as.name("WTP_thou"), y = as.name("EVPPI"))) +
+    geom_line() +
+    xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
+    ylab(paste("EVPPI (", currency, ")", sep = ""))
+  add_common_aes(g, txtsize, continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim)
 }

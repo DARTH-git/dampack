@@ -24,11 +24,15 @@ calc_evsi <- function(psa,
 
   # number of wtp thresholds
   n_wtps <- length(wtp)
-  # vector to store evsi
-  evsi <- rep(0, n_wtps)
 
-  # calculate evppi at each wtp
-  for (l in 1:n_wtps) {
+  # number of new sample sizes
+  n_n <- length(n)
+
+  # matrix to store evsi
+  evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
+
+  # calculate evppi at each wtp and new sample size
+  for (l in seq_len(n_wtps)) {
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,
@@ -39,19 +43,23 @@ calc_evsi <- function(psa,
                      poly.order = poly.order,
                      k = k)
 
-    # predict from the regression models
-    predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
+    for (i in seq_len(n_n)) {
+      # predict from the regression models
+      predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
 
-    # bind the columns to get a dataframe
-    predicted_loss_df <- bind_cols(predicted_loss_list)
+      # bind the columns to get a dataframe
+      predicted_loss_df <- bind_cols(predicted_loss_list)
 
-    # calculate the evsi as the average of the row maxima
-    row_maxes <- apply(predicted_loss_df, 1, max)
-    evsi[l] <- mean(row_maxes) * pop
+      # calculate the evsi as the average of the row maxima
+      row_maxes <- apply(predicted_loss_df, 1, max)
+      evsi[l, i] <- mean(row_maxes) * pop
+    }
   }
 
   # data.frame to store EVPPI for each WTP threshold
-  df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
+  df_evsi <- data.frame("WTP" = rep(wtp, n_n),
+                        "n" = rep(n, each = n_wtps),
+                        "EVSI" = c(evsi))
   class(df_evsi) <- "data.frame"
   return(df_evsi)
 }

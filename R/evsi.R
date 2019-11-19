@@ -90,8 +90,7 @@ calc_evsi <- function(psa,
                           "n" = rep(n, each = n_wtps),
                           "EVSI" = c(evsi))
   }
-
-  class(df_evsi) <- c("data.frame", "evsi")
+  class(df_evsi) <- c("evsi", "data.frame")
   return(df_evsi)
 }
 
@@ -250,4 +249,47 @@ predict_matrix_tensor_smooth_ga <- function(object,
   t_ga <- tensor.prod.model.matrix(x_ga)
 
   return(t_ga)
+}
+
+#' Plot of Expected Value of Sample Information (EVSI)
+#'
+#' @description
+#' Plots the \code{evsi} object created by \code{\link{calc_evsi}}.
+#'
+#' @param x object of class \code{evsi}, produced by function
+#'  \code{\link{calc_evsi}}
+#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
+#' @param effect_units Units of effectiveness. Default: QALY
+#' @inheritParams add_common_aes
+#' @keywords expected value of sample information
+#' @return A \code{ggplot2} plot with the EVSI
+#' @seealso \code{\link{calc_evsi}}
+#' @import ggplot2
+#' @importFrom scales comma
+#' @export
+plot.evsi <- function(x,
+                       txtsize = 12,
+                       currency = "$",
+                       effect_units = "QALY",
+                       n_y_ticks = 8,
+                       n_x_ticks = 20,
+                       xbreaks = NULL,
+                       ybreaks = NULL,
+                       xlim = c(0, NA),
+                       ylim = NULL,
+                       col = c("full", "bw"),
+                       ...) {
+  x$WTP_thou <- as.factor(x$WTP / 1000)
+  col <- match.arg(col)
+  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
+  g <- ggplot(data = x,
+              aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
+    geom_line() +
+    xlab("Additional Sample Size") +
+    ylab(paste("EVSI (", currency, ")", sep = ""))
+  add_common_aes(g, txtsize, continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim, scale_name = scale_text, ...)
 }

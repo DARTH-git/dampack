@@ -3,6 +3,7 @@
 S3method(plot,ceac)
 S3method(plot,evpi)
 S3method(plot,evppi)
+S3method(plot,evsi)
 S3method(plot,exp_loss)
 S3method(plot,icers)
 S3method(plot,owsa)

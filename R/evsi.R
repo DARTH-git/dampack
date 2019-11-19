@@ -3,6 +3,14 @@
 #' @inheritParams calc_evppi
 #' @param n additional sample size
 #' @param n0 initial sample size
+#' @param n_by_param if \code{TRUE}, each parameter in the metamodel can have a unique
+#' initial and additional sample size. \code{n} and \code{n0} must be numerical
+#' vectors of equal length to \code{params}, with each value corresponding to the
+#' initial and additional sample sizes for each parameter in the metamodel. By default,
+#' \code{n_by_param = FALSE}, and each value of \code{n} and \code{n0} is shared by
+#' each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a single
+#' numeric value, and \code{n} must be a numerical vector of additional sample sizes for
+#' which EVSI is calculated from the metamodel.
 #'
 #' @export
 calc_evsi <- function(psa,
@@ -14,6 +22,7 @@ calc_evsi <- function(psa,
                       k = -1,
                       n = 100,
                       n0 = 10,
+                      n_by_param = FALSE,
                       pop = 1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
@@ -28,8 +37,13 @@ calc_evsi <- function(psa,
   # number of new sample sizes
   n_n <- length(n)
 
-  # matrix to store evsi
-  evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
+  if(n_by_param == TRUE) {
+    # vector to store evsi
+    evsi <- rep(0, n_wtps)
+  } else {
+    # matrix to store evsi
+    evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
+  }
 
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
@@ -43,24 +57,41 @@ calc_evsi <- function(psa,
                      poly.order = poly.order,
                      k = k)
 
-    for (i in seq_len(n_n)) {
+    if(n_by_param == TRUE) {
       # predict from the regression models
-      predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
+      predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
       # bind the columns to get a dataframe
       predicted_loss_df <- bind_cols(predicted_loss_list)
 
       # calculate the evsi as the average of the row maxima
       row_maxes <- apply(predicted_loss_df, 1, max)
-      evsi[l, i] <- mean(row_maxes) * pop
+      evsi[l] <- mean(row_maxes) * pop
+    } else {
+      for (i in seq_len(n_n)) {
+        # predict from the regression models
+        predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
+
+        # bind the columns to get a dataframe
+        predicted_loss_df <- bind_cols(predicted_loss_list)
+
+        # calculate the evsi as the average of the row maxima
+        row_maxes <- apply(predicted_loss_df, 1, max)
+        evsi[l, i] <- mean(row_maxes) * pop
+      }
     }
   }
 
-  # data.frame to store EVPPI for each WTP threshold
-  df_evsi <- data.frame("WTP" = rep(wtp, n_n),
-                        "n" = rep(n, each = n_wtps),
-                        "EVSI" = c(evsi))
-  class(df_evsi) <- "data.frame"
+  if(n_by_param == TRUE) {
+    df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
+  } else {
+    # data.frame to store EVPPI for each WTP threshold
+    df_evsi <- data.frame("WTP" = rep(wtp, n_n),
+                          "n" = rep(n, each = n_wtps),
+                          "EVSI" = c(evsi))
+  }
+
+  class(df_evsi) <- c("data.frame", "evsi")
   return(df_evsi)
 }
 

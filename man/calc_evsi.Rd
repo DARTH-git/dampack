@@ -14,6 +14,7 @@ calc_evsi(
   k = -1,
   n = 100,
   n0 = 10,
+  n_by_param = FALSE,
   pop = 1
 )
 }
@@ -37,6 +38,15 @@ polynomial models (\code{"poly"})}
 \item{n}{additional sample size}
 
 \item{n0}{initial sample size}
+
+\item{n_by_param}{if \code{TRUE}, each parameter in the metamodel can have a unique
+initial and additional sample size. \code{n} and \code{n0} must be numerical
+vectors of equal length to \code{params}, with each value corresponding to the
+initial and additional sample sizes for each parameter in the metamodel. By default,
+\code{n_by_param = FALSE}, and each value of \code{n} and \code{n0} is shared by
+each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a single
+numeric value, and \code{n} must be a numerical vector of additional sample sizes for
+which EVSI is calculated from the metamodel.}
 
 \item{pop}{A scalar that corresponds to the total population}
 }

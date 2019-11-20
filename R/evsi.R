@@ -3,6 +3,14 @@
 #' @inheritParams calc_evppi
 #' @param n additional sample size
 #' @param n0 initial sample size
+#' @param n_by_param if \code{TRUE}, each parameter in the metamodel can have a unique
+#' initial and additional sample size. \code{n} and \code{n0} must be numerical
+#' vectors of equal length to \code{params}, with each value corresponding to the
+#' initial and additional sample sizes for each parameter in the metamodel. By default,
+#' \code{n_by_param = FALSE}, and each value of \code{n} and \code{n0} is shared by
+#' each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a single
+#' numeric value, and \code{n} must be a numerical vector of additional sample sizes for
+#' which EVSI is calculated from the metamodel.
 #'
 #' @export
 calc_evsi <- function(psa,
@@ -14,6 +22,7 @@ calc_evsi <- function(psa,
                       k = -1,
                       n = 100,
                       n0 = 10,
+                      n_by_param = FALSE,
                       pop = 1) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
@@ -24,11 +33,20 @@ calc_evsi <- function(psa,
 
   # number of wtp thresholds
   n_wtps <- length(wtp)
-  # vector to store evsi
-  evsi <- rep(0, n_wtps)
 
-  # calculate evppi at each wtp
-  for (l in 1:n_wtps) {
+  # number of new sample sizes
+  n_n <- length(n)
+
+  if (n_by_param == TRUE) {
+    # vector to store evsi
+    evsi <- rep(0, n_wtps)
+  } else {
+    # matrix to store evsi
+    evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
+  }
+
+  # calculate evppi at each wtp and new sample size
+  for (l in seq_len(n_wtps)) {
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,
@@ -39,20 +57,40 @@ calc_evsi <- function(psa,
                      poly.order = poly.order,
                      k = k)
 
-    # predict from the regression models
-    predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
+    if (n_by_param == TRUE) {
+      # predict from the regression models
+      predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
-    # bind the columns to get a dataframe
-    predicted_loss_df <- bind_cols(predicted_loss_list)
+      # bind the columns to get a dataframe
+      predicted_loss_df <- bind_cols(predicted_loss_list)
 
-    # calculate the evsi as the average of the row maxima
-    row_maxes <- apply(predicted_loss_df, 1, max)
-    evsi[l] <- mean(row_maxes) * pop
+      # calculate the evsi as the average of the row maxima
+      row_maxes <- apply(predicted_loss_df, 1, max)
+      evsi[l] <- mean(row_maxes) * pop
+    } else {
+      for (i in seq_len(n_n)) {
+        # predict from the regression models
+        predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
+
+        # bind the columns to get a dataframe
+        predicted_loss_df <- bind_cols(predicted_loss_list)
+
+        # calculate the evsi as the average of the row maxima
+        row_maxes <- apply(predicted_loss_df, 1, max)
+        evsi[l, i] <- mean(row_maxes) * pop
+      }
+    }
   }
 
-  # data.frame to store EVPPI for each WTP threshold
-  df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
-  class(df_evsi) <- "data.frame"
+  if (n_by_param == TRUE) {
+    df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
+  } else {
+    # data.frame to store EVPPI for each WTP threshold
+    df_evsi <- data.frame("WTP" = rep(wtp, n_n),
+                          "n" = rep(n, each = n_wtps),
+                          "EVSI" = c(evsi))
+  }
+  class(df_evsi) <- c("evsi", "data.frame")
   return(df_evsi)
 }
 
@@ -211,4 +249,65 @@ predict_matrix_tensor_smooth_ga <- function(object,
   t_ga <- tensor.prod.model.matrix(x_ga)
 
   return(t_ga)
+}
+
+#' Plot of Expected Value of Sample Information (EVSI)
+#'
+#' @description
+#' Plots the \code{evsi} object created by \code{\link{calc_evsi}}.
+#'
+#' @param x object of class \code{evsi}, produced by function
+#'  \code{\link{calc_evsi}}
+#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
+#' @param effect_units Units of effectiveness. Default: QALY
+#' @inheritParams add_common_aes
+#' @keywords expected value of sample information
+#' @return A \code{ggplot2} plot with the EVSI
+#' @seealso \code{\link{calc_evsi}}
+#' @import ggplot2
+#' @importFrom scales comma
+#' @export
+plot.evsi <- function(x,
+                       txtsize = 12,
+                       currency = "$",
+                       effect_units = "QALY",
+                       n_y_ticks = 8,
+                       n_x_ticks = 20,
+                       xbreaks = NULL,
+                       ybreaks = NULL,
+                       xlim = c(0, NA),
+                       ylim = NULL,
+                       col = c("full", "bw"),
+                       ...) {
+  x$WTP_thou <- x$WTP / 1000
+  col <- match.arg(col)
+  if (length(unique(x$WTP)) == 1) {
+    col <- "bw"
+  }
+  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
+
+  if (length(unique(x$WTP)) == 1 & "n" %in% names(x)) {
+    g <- ggplot(data = x,
+                aes_(x = as.name("n"), y = as.name("EVSI"))) +
+      xlab("Additional Sample Size")
+  } else if (!("n" %in% names(x))) {
+    g <- ggplot(data = x,
+                aes_(x = as.name("WTP_thou"), y = as.name("EVSI"))) +
+      xlab(scale_text)
+  } else {
+    x$WTP_thou <- as.factor(x$WTP_thou)
+    g <- ggplot(data = x,
+                aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
+      xlab("Additional Sample Size")
+  }
+
+  g <- g +
+    geom_line() +
+    ylab(paste("EVSI (", currency, ")", sep = ""))
+  add_common_aes(g, txtsize, continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim, scale_name = scale_text,
+                 col = col, ...)
 }

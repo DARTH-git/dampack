@@ -15,6 +15,7 @@
   ybreaks = NULL,
   xlim = c(0, NA),
   ylim = NULL,
+  col = c("full", "bw"),
   ...
 )
 }
@@ -42,6 +43,8 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
 
 \item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+
+\item{col}{either none, full color, or black and white}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

@@ -280,25 +280,34 @@ plot.evsi <- function(x,
                        ylim = NULL,
                        col = c("full", "bw"),
                        ...) {
-  x$WTP_thou <- as.factor(x$WTP / 1000)
+  x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
   if(length(unique(x$WTP)) == 1) {
     col = "bw"
   }
   scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
-  g <- ggplot(data = x,
-              aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
+
+  if(length(unique(x$WTP)) == 1 & "n" %in% names(x)) {
+    g <- ggplot(data = x,
+                aes_(x = as.name("n"), y = as.name("EVSI"))) +
+      xlab("Additional Sample Size")
+  } else if(!("n" %in% names(x))) {
+    g <- ggplot(data = x,
+                aes_(x = as.name("WTP_thou"), y = as.name("EVSI"))) +
+      xlab(scale_text)
+  } else {
+    x$WTP_thou <- as.factor(x$WTP_thou)
+    g <- ggplot(data = x,
+                aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
+      xlab("Additional Sample Size")
+  }
+
+  g <- g +
     geom_line() +
-    xlab("Additional Sample Size") +
     ylab(paste("EVSI (", currency, ")", sep = ""))
-  g <- add_common_aes(g, txtsize, continuous = c("x", "y"),
+  add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,
                  xlim = xlim, ylim = ylim, scale_name = scale_text,
                  col = col, ...)
-  if(length(unique(x$WTP)) == 1) {
-    g + guides(color = "none")
-  } else {
-    g
-  }
 }

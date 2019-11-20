@@ -282,14 +282,23 @@ plot.evsi <- function(x,
                        ...) {
   x$WTP_thou <- as.factor(x$WTP / 1000)
   col <- match.arg(col)
+  if(length(unique(x$WTP)) == 1) {
+    col = "bw"
+  }
   scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
   g <- ggplot(data = x,
               aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
     geom_line() +
     xlab("Additional Sample Size") +
     ylab(paste("EVSI (", currency, ")", sep = ""))
-  add_common_aes(g, txtsize, continuous = c("x", "y"),
+  g <- add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,
-                 xlim = xlim, ylim = ylim, scale_name = scale_text, ...)
+                 xlim = xlim, ylim = ylim, scale_name = scale_text,
+                 col = col, ...)
+  if(length(unique(x$WTP)) == 1) {
+    g + guides(color = "none")
+  } else {
+    g
+  }
 }

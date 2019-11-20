@@ -37,7 +37,7 @@ calc_evsi <- function(psa,
   # number of new sample sizes
   n_n <- length(n)
 
-  if(n_by_param == TRUE) {
+  if (n_by_param == TRUE) {
     # vector to store evsi
     evsi <- rep(0, n_wtps)
   } else {
@@ -57,7 +57,7 @@ calc_evsi <- function(psa,
                      poly.order = poly.order,
                      k = k)
 
-    if(n_by_param == TRUE) {
+    if (n_by_param == TRUE) {
       # predict from the regression models
       predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
@@ -82,7 +82,7 @@ calc_evsi <- function(psa,
     }
   }
 
-  if(n_by_param == TRUE) {
+  if (n_by_param == TRUE) {
     df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
   } else {
     # data.frame to store EVPPI for each WTP threshold
@@ -282,16 +282,16 @@ plot.evsi <- function(x,
                        ...) {
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
-  if(length(unique(x$WTP)) == 1) {
-    col = "bw"
+  if (length(unique(x$WTP)) == 1) {
+    col <- "bw"
   }
   scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
 
-  if(length(unique(x$WTP)) == 1 & "n" %in% names(x)) {
+  if (length(unique(x$WTP)) == 1 & "n" %in% names(x)) {
     g <- ggplot(data = x,
                 aes_(x = as.name("n"), y = as.name("EVSI"))) +
       xlab("Additional Sample Size")
-  } else if(!("n" %in% names(x))) {
+  } else if (!("n" %in% names(x))) {
     g <- ggplot(data = x,
                 aes_(x = as.name("WTP_thou"), y = as.name("EVSI"))) +
       xlab(scale_text)

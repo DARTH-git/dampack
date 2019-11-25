@@ -1,7 +1,7 @@
 #' Calculate the expected loss at a range of willingness-to-pay thresholds
 #'
 #' @description
-#' The expected loss is the the quantification of the foregone benefits
+#' The expected loss is the quantification of the foregone benefits
 #' when choosing a suboptimal strategy given current evidence.
 #'
 #' @param wtp vector of willingness to pay thresholds
@@ -68,9 +68,9 @@ calc_exp_loss <- function(psa, wtp) {
 #'
 #' @param x object of class \code{exp_loss}, produced by function
 #'  \code{\link{calc_exp_loss}}
-#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units Units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness. Default: QALY
 #' @param log_y take the base 10 log of the y axis
 #' @param frontier indicate the frontier (also the expected value of perfect information).
 #' To only plot the EVPI see \code{\link{calc_evpi}}.

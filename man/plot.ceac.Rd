@@ -22,13 +22,13 @@
 )
 }
 \arguments{
-\item{x}{Object of class \code{ceac}.}
+\item{x}{object of class \code{ceac}.}
 
-\item{frontier}{Whether to plot acceptability frontier (TRUE) or not (FALSE)}
+\item{frontier}{whether to plot acceptability frontier (TRUE) or not (FALSE)}
 
-\item{points}{Whether to plot points (TRUE) or not (FALSE)}
+\item{points}{whether to plot points (TRUE) or not (FALSE)}
 
-\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
+\item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
 Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)}
 
 \item{min_prob}{minimum probability to show strategy in plot.

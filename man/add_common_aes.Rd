@@ -54,11 +54,11 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 
 \item{xlim, ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
-\item{xtrans, ytrans}{transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.}
+\item{xtrans, ytrans}{transformations for the axes. See \code{\link[ggplot2]{scale_continuous}} for details.}
 
-\item{xexpand, yexpand}{Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
-The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
-to see how to modify this.}
+\item{xexpand, yexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
+The default behavior in ggplot2 is \code{expand_scale(0.05)}. See \code{\link[ggplot2]{expand_scale}}
+for how to modify this.}
 
 \item{facet_lab_txtsize}{text size for plot facet labels}
 

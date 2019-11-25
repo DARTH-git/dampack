@@ -33,7 +33,7 @@ polynomial models (\code{"poly"})}
 
 \item{k}{basis dimension, if \code{type == "gam"}}
 
-\item{pop}{A scalar that corresponds to the total population}
+\item{pop}{scalar that corresponds to the total population}
 }
 \value{
 A data.frame with WTP thresholds and corresponding EVPPIs
@@ -47,13 +47,13 @@ probabilistic sensitivity analysis (PSA) dataset.
 \details{
 The expected value of partial pefect information (EVPPI) is the expected
 value of perfect information from a subset of parameters of interest,
-\eqn{\theta_I} of a cost-effectiveness analysis (CEA) of \eqn{D} different
+\eqn{\theta_I}, of a cost-effectiveness analysis (CEA) of \eqn{D} different
 strategies with parameters \eqn{\theta = \{ \theta_I, \theta_C\}}, where
 \eqn{\theta_C} is the set of complimenatry parameters of the CEA. The
-function \code{evppi_lrmm} computes the EVPPI of \eqn{\theta_I} from a
+function \code{calc_evppi} computes the EVPPI of \eqn{\theta_I} from a
 matrix of net monetary benefits \eqn{B} of the CEA. Each column of \eqn{B}
 corresponds to the net benefit \eqn{B_d} of strategy \eqn{d}. The function
-\code{evppi_lrmm} computes the EVPPI using a linear regression metamodel
+\code{calc_evppi} computes the EVPPI using a linear regression metamodel
 approach following these steps:
 \enumerate{
 \item Determine the optimal strategy \eqn{d^*} from the expected net

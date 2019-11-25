@@ -25,10 +25,10 @@
 
 \item{txtsize}{base text size}
 
-\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
+\item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
-\item{effect_units}{Units of effectiveness. Default: QALY}
+\item{effect_units}{units of effectiveness. Default: QALY}
 
 \item{n_y_ticks}{number of axis ticks}
 
@@ -54,6 +54,11 @@ A \code{ggplot2} plot with the EVSI
 }
 \description{
 Plots the \code{evsi} object created by \code{\link{calc_evsi}}.
+EVSI is either plotted as a function of additional sample size
+for each willingness-to-pay threshold provided, or
+as a function of each willingness-to-pay
+threshold, depending upon the usage of \code{\link{calc_evsi}}
+used to create the \code{evsi} object.
 }
 \seealso{
 \code{\link{calc_evsi}}

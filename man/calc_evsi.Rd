@@ -2,7 +2,7 @@
 % Please edit documentation in R/evsi.R
 \name{calc_evsi}
 \alias{calc_evsi}
-\title{Calculate Expected Value of Sample Information}
+\title{Calculate Expected Value of Sample Information (EVSI)}
 \usage{
 calc_evsi(
   psa,
@@ -48,8 +48,8 @@ each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a
 numeric value, and \code{n} must be a numerical vector of additional sample sizes for
 which EVSI is calculated from the metamodel.}
 
-\item{pop}{A scalar that corresponds to the total population}
+\item{pop}{scalar that corresponds to the total population}
 }
 \description{
-Calculate Expected Value of Sample Information
+Calculate Expected Value of Sample Information (EVSI)
 }

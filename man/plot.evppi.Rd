@@ -24,10 +24,10 @@
 
 \item{txtsize}{base text size}
 
-\item{currency}{String with currency used in the cost-effectiveness analysis (CEA).
+\item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
 Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
 
-\item{effect_units}{Units of effectiveness. Default: QALY}
+\item{effect_units}{units of effectiveness. Default: QALY}
 
 \item{n_y_ticks}{number of axis ticks}
 

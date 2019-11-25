@@ -16,7 +16,7 @@ calc_exp_loss(psa, wtp)
 object with classes \code{exp_loss} and \code{data.frame}
 }
 \description{
-The expected loss is the the quantification of the foregone benefits
+The expected loss is the quantification of the foregone benefits
 when choosing a suboptimal strategy given current evidence.
 }
 \details{

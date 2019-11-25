@@ -2,9 +2,9 @@
 #'
 #' \code{calc_evpi} is used to compute the expected value of perfect information
 #' (EVPI) from a probabilistic sensitivity analysis (PSA) dataset.
-#' @param wtp Numeric vector with willingness-to-pay (WTP) thresholds
+#' @param wtp numeric vector with willingness-to-pay (WTP) thresholds
 #' @param psa psa object from \code{\link{make_psa_obj}}
-#' @param pop A scalar that corresponds to the total population
+#' @param pop scalar that corresponds to the total population
 #' @keywords expected value of perfect information; net monetary benefit
 #' @section Details:
 #' \code{evpi} calculates the value of eliminating all the uncertainty of a
@@ -61,9 +61,9 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 #'
 #' @param x object of class \code{evpi}, produced by function
 #'  \code{\link{calc_evpi}}
-#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units Units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPI

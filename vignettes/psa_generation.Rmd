@@ -165,21 +165,21 @@ my_params <- c("p_HS1", "p_S1H", "p_S1S2",
                "u_S1","u_S2", "u_D",
                "u_Trt", "d_e", "d_c")
 
-my_dist <- c("beta", "beta", "beta",
+my_dists <- c("beta", "beta", "beta",
               "beta", "log-normal", "log-normal",
               "gamma", "gamma", "gamma",
               "gamma", "constant", "truncated-normal", 
               "truncated-normal", "truncated-normal", "constant", 
               "truncated-normal", "constant", "constant")
 
-my_parameterization_type <- c("a, b", "a, b", "a, b",
+my_parameterization_types <- c("a, b", "a, b", "a, b",
                              "a, b", "meanlog, sdlog", "meanlog, sdlog",
                              "shape, scale", "shape, scale", "shape, scale",
                              "shape, scale", "val", "mean, sd, ll, ul", 
                              "mean, sd, ll, ul", "mean, sd, ll, ul", "val",
                              "mean, sd, ll, ul", "val", "val")
 
-my_dist_params <- list(c(30, 170), c(60, 60), c(84, 716),
+my_dists_params <- list(c(30, 170), c(60, 60), c(84, 716),
                        c(10, 1990), c(log(3), 0.01), c(log(10), 0.02),
                        c(100, 20), c(177.8, 22.5), c(225, 66.7),
                        c(73.5, 163.3), 0, c(1, 0.01, NA, 1),
@@ -187,9 +187,9 @@ my_dist_params <- list(c(30, 170), c(60, 60), c(84, 716),
                        c(0.95, 0.02, NA, 1), 0.03, 0.03)
                        
 l_params_all <- gen_psa_samp(params = my_params,
-                               dist = my_dist,
-                               parameterization_type = my_parameterization_type,
-                               dist_params = my_dist_params)
+                               dists = my_dists,
+                               parameterization_types = my_parameterization_types,
+                               dists_params = my_dists_params)
 
 psa_output <- run_psa(psa_samp = l_params_all, 
                       FUN = calculate_ce_out,

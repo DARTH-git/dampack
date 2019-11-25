@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_sa.R
 \name{create_sa}
 \alias{create_sa}
-\title{An generic sensitivity analysis object}
+\title{A generic sensitivity analysis object}
 \usage{
 create_sa(
   parameters,
@@ -15,18 +15,18 @@ create_sa(
 )
 }
 \arguments{
-\item{parameters}{A data frame with parameter values for each model run. Each
+\item{parameters}{a data frame with parameter values for each model run. Each
 column should represent a different parameter, and each row should represent a
 simulation (in the same order as \code{cost} and \code{effectiveness})}
 
 \item{parnames}{names for the parameters.}
 
-\item{strategies}{Vector with the names of the strategies. Due to requirements in
+\item{strategies}{vector with the names of the strategies. Due to requirements in
 certain uses of this vector, this function uses \code{\link{make.names}} to modify
 strategy names as necessary. It is strongly suggested that you follow the rules
 in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
-\item{cost, effectiveness, other_outcome}{Data frames containing data for costs,
+\item{cost, effectiveness, other_outcome}{data frames containing data for costs,
 effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
@@ -35,7 +35,8 @@ the \code{strategies} vector.}
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }
 \description{
-This object is called by \code{\link{make_psa_obj}}
+This function is called by \code{\link{make_psa_obj}},
+\code{\link{create_dsa_oneway}},
 and \code{\link{create_dsa_oneway}}, and checks the structure of
 each of the arguments before creating an SA object.
 }

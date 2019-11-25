@@ -1,19 +1,20 @@
-#' An generic sensitivity analysis object
+#' A generic sensitivity analysis object
 #'
-#' @description This object is called by \code{\link{make_psa_obj}}
+#' @description This function is called by \code{\link{make_psa_obj}},
+#' \code{\link{create_dsa_oneway}},
 #' and \code{\link{create_dsa_oneway}}, and checks the structure of
 #' each of the arguments before creating an SA object.
 #'
-#' @param parameters A data frame with parameter values for each model run. Each
+#' @param parameters a data frame with parameter values for each model run. Each
 #' column should represent a different parameter, and each row should represent a
 #' simulation (in the same order as \code{cost} and \code{effectiveness})
 #' @param parnames names for the parameters.
-#' @param cost,effectiveness,other_outcome Data frames containing data for costs,
+#' @param cost,effectiveness,other_outcome data frames containing data for costs,
 #' effectiveness or another outcome (user-defined), respectively.
 #' Each simulation should be a row of the data frame, and each strategy should be a column.
 #' Naming the columns of the data frames is not necessary, as they will be renamed with
 #' the \code{strategies} vector.
-#' @param strategies Vector with the names of the strategies. Due to requirements in
+#' @param strategies vector with the names of the strategies. Due to requirements in
 #' certain uses of this vector, this function uses \code{\link{make.names}} to modify
 #' strategy names as necessary. It is strongly suggested that you follow the rules
 #' in the \code{\link{make.names}} help page, to avoid unexpected errors.
@@ -22,7 +23,7 @@
 #'
 create_sa <- function(parameters, parnames, effectiveness, strategies,
                       cost, currency, other_outcome) {
-  # checking that each is a dataframe
+  # checks that each is a dataframe
   if (!is.null(cost)) {
     cost <- check_df_and_coerce(cost)
   }
@@ -37,7 +38,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 
   parameters <- check_df_and_coerce(parameters)
 
-  ### argument checks and defining other variables ###
+  ### argument checks and definitions of other variables ###
 
   # costs, effectiveness, and parameters have same number of rows
   if (!is.null(effectiveness)) {
@@ -106,7 +107,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
     n_strategies <- n_strategies_effectiveness
   }
 
-  # If the name of the strategies is not provided, generate a generic vector
+  # If the strategy names are not provided, generate a generic vector
   # with strategy names
   if (is.null(strategies)) {
     strategies <- paste(rep("Strategy_", n_strategies), seq(1, n_strategies), sep = "")

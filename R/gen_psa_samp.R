@@ -5,70 +5,70 @@
 #' to be used in a probabilistic sensitivity analysis (PSA)
 
 #' @details
-#' Length of vectors \code{params}, \code{dist}, \code{parameterization_type}, and list \code{dist_params} must all
+#' Length of vectors \code{params}, \code{dists}, \code{parameterization_types}, and list \code{dists_params} must all
 #' be the same.
-#' The nth element of \code{dist}, \code{parameterization_type}, and \code{dist_params}
+#' The nth element of \code{dists}, \code{parameterization_types}, and \code{dists_params}
 #' all define the distribution that will be
 #' used to draw samples of the corresponding nth element of the \code{params} vector.
 #'
 #' For a given element of \code{params}:
 #' \itemize{
-#' \item If \code{dist == "normal"}, \code{parameterization_type} can only be \code{"mean, sd"},
-#' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
+#' \item If \code{dists == "normal"}, \code{parameterization_types} can only be \code{"mean, sd"},
+#' and the corresponding element of list \code{dists_params} must be the the vector \code{c(mean, sd)}
 #'
-#' \item If \code{dist == "log-normal"}, \code{parameterization_type} can be either \code{"mean, sd"} or
-#' \code{"meanlog, sdlog"}, and the corresponding element of list \code{dist_params} must be either
+#' \item If \code{dists == "log-normal"}, \code{parameterization_types} can be either \code{"mean, sd"} or
+#' \code{"meanlog, sdlog"}, and the corresponding element of list \code{dists_params} must be either
 #' the the vector \code{c(mean, sd)} or \code{c(meanlog, sdlog)}. Use \code{"mean, sd"} if you have
 #' sample mean and sample standard deviation of an empirical sample of the random variable, and use
 #' \code{"meanlog, sdlog"} if you want to directly specify the parameters of the log-normal distribution
 #' as specified by \code{\link{rlnorm}}
 #'
-#' \item If \code{dist == "truncated-normal"}, \code{parameterization_type} can only be \code{"mean, sd, ll, ul"},
-#' and \code{dist_params} must be the vector \code{c(mean, sd, ll, ul)}, where ll is
-#' the lower limit of the distribution and ul
+#' \item If \code{dists == "truncated-normal"}, \code{parameterization_types} can only be \code{"mean, sd, ll, ul"},
+#' and \code{dists_params} must be the vector \code{c(mean, sd, ll, ul)}, where \code{ll} is
+#' the lower limit of the distribution and \code{ul}
 #' is the upper limit of the distribution. If either the lower limit or the upper
-#' limit does not exist, simply specify NA in
-#' the corresponding position of the dist_params vector.
+#' limit does not exist, simply specify \code{NA} in
+#' the corresponding position of the dists_params vector.
 #'
-#' \item If \code{dist == "beta"}, \code{parameterization_type} can be \code{"mean, sd"} or \code{"a, b"}
-#' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
+#' \item If \code{dists == "beta"}, \code{parameterization_types} can be \code{"mean, sd"} or \code{"a, b"}
+#' and the corresponding element of list \code{dists_params} must be the the vector \code{c(mean, sd)}
 #' or \code{c(a, b)}, respectively.
 #'
-#' \item If \code{dist == "gamma"}, \code{parameterization_type} can be \code{"mean, sd"} or \code{"shape, scale"}
-#' and the corresponding element of list \code{dist_params} must be the the vector \code{c(mean, sd)}
+#' \item If \code{dists == "gamma"}, \code{parameterization_types} can be \code{"mean, sd"} or \code{"shape, scale"}
+#' and the corresponding element of list \code{dists_params} must be the the vector \code{c(mean, sd)}
 #' or \code{c(shape, scale)}, respectively.
 #'
-#' \item If \code{dist == "dirichlet"}, \code{parameterization_type} can be \code{"value, mean_prop, sd"},
+#' \item If \code{dists == "dirichlet"}, \code{parameterization_types} can be \code{"value, mean_prop, sd"},
 #' \code{"value, n"}, or \code{"value, alpha"}.
 #' \itemize{
-#' \item If \code{parameterization_type == "value, mean_prop, sd"},
-#' then the corresponding element of list \code{dist_params} must be a data.frame where the first column
+#' \item If \code{parameterization_types == "value, mean_prop, sd"},
+#' then the corresponding element of list \code{dists_params} must be a data.frame where the first column
 #' is a string vector of the the different multinomial outcomes. These multinomial outcomes will become column names
 #' in the data.frame returned by \code{gen_psa_samp}, and therefore the strings in this column should correspond to
 #' variable names used in \code{FUN} for \code{\link{run_psa}}. The second and
-#' third columns of this \code{dist_params}
+#' third columns of this \code{dists_params}
 #' should be numerical vectors containing the sample means and sample standard errors for
 #' each of the multinomial outcomes.
 #'
-#' \item If \code{parameterization_type == "value, n"}, then \code{dist_params} must be a
+#' \item If \code{parameterization_types == "value, n"}, then \code{dists_params} must be a
 #' data.frame with the first column
 #' being a string vector of the multinomial outcomes, and the second column being a
 #' vector of the observed number of each
 #' multinomial outcome in a sample.
 #'
-#' \item If \code{parameterization_type == "value, alpha"}, then \code{dist_params} must be a data.frame with
+#' \item If \code{parameterization_types == "value, alpha"}, then \code{dists_params} must be a data.frame with
 #' the first column being a string vector of the multinomial outcomes, and
 #'  the second column must be a numerical vector
 #' of the alpha parameter values for each multinomial outcome in the dirichlet distribution.
 #' }
 #'
-#' \item If \code{dist == "bootstrap"}, \code{parameterization_type} can only be
-#'  \code{"value, weight"}, and \code{dist_params}
+#' \item If \code{dists == "bootstrap"}, \code{parameterization_types} can only be
+#'  \code{"value, weight"}, and \code{dists_params}
 #' must be a data.frame with the first column being a numerical vector
 #' containing all of the bootstrap sample values, and
 #' the second column being an integer vector designating the
 #' sampling weights of each bootstrap sample value.  For example,
-#' the number of rows in the \code{dist_params} data.frame
+#' the number of rows in the \code{dists_params} data.frame
 #' is the number of individuals in the population to be sampled
 #' from (with replacement) or the number of values an
 #' empirical distribution (e.g. a histogram). If each individual value in the
@@ -77,16 +77,16 @@
 #' the weights should be equal to the number of
 #' observations for each unique value in the empirical distribution.
 #'
-#' \item If \code{dist == "constant"}, \code{parameterization_type} can only be \code{"val"},
-#' and \code{dist_params} must be a single numerical value.
+#' \item If \code{dists == "constant"}, \code{parameterization_types} can only be \code{"val"},
+#' and \code{dists_params} must be a single numerical value.
 #' }
 #'
-#' @param params String vector with the names of parameters to be generated by \code{gen_psa_samp}
+#' @param params string vector with the names of parameters to be generated by \code{gen_psa_samp}
 #' and used by a user-defined function in \code{run_psa} to calculate outcomes.
-#' @param dist String vector with the distributions from which \code{params} will be drawn.
-#' @param parameterization_type String vector with parameterization types for each \code{dist}
-#' @param dist_params list of input parameters required to
-#'  by specific \code{dist} and \code{parameterization_type}
+#' @param dists string vector with the distributions from which \code{params} will be drawn.
+#' @param parameterization_types string vector with parameterization types for each \code{dists}
+#' @param dists_params list of input parameters required to
+#'  by specific \code{dists} and \code{parameterization_types}
 #' to fully describe distribution and generate parameter samples.
 #' @param nsamp number of sets of parameter values to be generated
 #'
@@ -102,16 +102,16 @@
 #'             "gamma_param", "dirichlet_param", "bootstrap_param")
 #'
 #' #indicate parent distribution types for each parameter
-#' dist <- c("normal", "log-normal", "truncated-normal", "beta", "gamma", "dirichlet", "bootstrap")
+#' dists <- c("normal", "log-normal", "truncated-normal", "beta", "gamma", "dirichlet", "bootstrap")
 #'
 #' #indicate which type of parameterization is used for each parent distribution
-#' parameterization_type <- c("mean, sd", "mean, sd", "mean, sd, ll, ul", "mean, sd", "mean, sd",
+#' parameterization_types <- c("mean, sd", "mean, sd", "mean, sd, ll, ul", "mean, sd", "mean, sd",
 #'                           "value, mean_prop, sd", "value, weight")
 #'
 #' #provide distribution parameters that fully define each parent distribution, and
-#' #ensure that these distribution parameters match the form expected by each combination of dist
-#' #and parameterization_type
-#' dist_params <- list(c(1, 2), c(1, 3), c(1, 0.1, NA, 1), c(.5, .2), c(100, 1),
+#' #ensure that these distribution parameters match the form expected by each combination of dists
+#' #and parameterization_types
+#' dists_params <- list(c(1, 2), c(1, 3), c(1, 0.1, NA, 1), c(.5, .2), c(100, 1),
 #'                    data.frame(value = c("level1", "level2", "level3"),
 #'                               mean_prop = c(.1, .4, .5), sd = c(.05, .01, .1)),
 #'                    data.frame(value = c(1, 2, 4, 6, 7, 8),
@@ -119,9 +119,9 @@
 #'
 #' #generate 100 samples of parameter values to be used in a probabilistic sensitivity analysis
 #' gen_psa_samp(params = params,
-#'              dist = dist,
-#'              parameterization_type = parameterization_type,
-#'              dist_params = dist_params,
+#'              dists = dists,
+#'              parameterization_types = parameterization_types,
+#'              dists_params = dists_params,
 #'              nsamp = 100)
 #'
 #' @importFrom stats rbeta rgamma rlnorm rnorm
@@ -129,36 +129,36 @@
 #' @export
 
 gen_psa_samp <- function(params = NULL,
-                         dist = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
+                         dists = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
                                   "dirichlet", "bootstrap", "constant"),
-                         parameterization_type = c("mean, sd", "a, b", "shape, scale",
+                         parameterization_types = c("mean, sd", "a, b", "shape, scale",
                                                    "value, mean_prop, sd", "value, n",
                                                    "value, alpha", "mean, sd, ll, ul", "val", "meanlog, sdlog"),
-                         dist_params = NULL,
+                         dists_params = NULL,
                          nsamp = 100) {
 
-  dist <- match.arg(dist, several.ok = TRUE)
-  parameterization_type <- match.arg(parameterization_type, several.ok = TRUE)
+  dists <- match.arg(dists, several.ok = TRUE)
+  parameterization_types <- match.arg(parameterization_types, several.ok = TRUE)
 
   n_params <- length(params)
   params_df <- vector(mode = "list", length = n_params)
 
   for (i in 1:n_params) {
     #normal
-    if (dist[i] == "normal") {
-      params_df[[i]] <- data.frame(param_val = rnorm(nsamp, mean = dist_params[[i]][1],
-                                                     sd = dist_params[[i]][2]))
+    if (dists[i] == "normal") {
+      params_df[[i]] <- data.frame(param_val = rnorm(nsamp, mean = dists_params[[i]][1],
+                                                     sd = dists_params[[i]][2]))
       names(params_df[[i]]) <- paste0(params[i])
     }
 
     #log normal
-    if (dist[i] == "log-normal") {
-      if (parameterization_type[i] == "mean, sd") {
-        mu <- lnorm_params(dist_params[[i]][1], (dist_params[[i]][2]) ^ 2)[[1]]
-        sd <- lnorm_params(dist_params[[i]][1], (dist_params[[i]][2]) ^ 2)[[2]]
-      } else if (parameterization_type[i] == "meanlog, sdlog") {
-        mu <- dist_params[[i]][1]
-        sd <- dist_params[[i]][2]
+    if (dists[i] == "log-normal") {
+      if (parameterization_types[i] == "mean, sd") {
+        mu <- lnorm_params(dists_params[[i]][1], (dists_params[[i]][2]) ^ 2)[[1]]
+        sd <- lnorm_params(dists_params[[i]][1], (dists_params[[i]][2]) ^ 2)[[2]]
+      } else if (parameterization_types[i] == "meanlog, sdlog") {
+        mu <- dists_params[[i]][1]
+        sd <- dists_params[[i]][2]
       }
 
       params_df[[i]] <- data.frame(param_val = rlnorm(nsamp, meanlog = mu, sdlog = sd))
@@ -166,80 +166,80 @@ gen_psa_samp <- function(params = NULL,
     }
 
     #truncated normal
-    if (dist[i] == "truncated-normal") {
-      sample_mean <- dist_params[[i]][1]
-      sample_sd <- dist_params[[i]][2]
-      lowerbound <- ifelse(!is.na(dist_params[[i]][3]), dist_params[[i]][3], -Inf)
-      upperbound <- ifelse(!is.na(dist_params[[i]][4]), dist_params[[i]][4], Inf)
+    if (dists[i] == "truncated-normal") {
+      sample_mean <- dists_params[[i]][1]
+      sample_sd <- dists_params[[i]][2]
+      lowerbound <- ifelse(!is.na(dists_params[[i]][3]), dists_params[[i]][3], -Inf)
+      upperbound <- ifelse(!is.na(dists_params[[i]][4]), dists_params[[i]][4], Inf)
       params_df[[i]] <- data.frame(param_val = rtruncnorm(nsamp, a = lowerbound,
                                                           b = upperbound, mean = sample_mean,
                                                           sd = sample_sd))
       names(params_df[[i]]) <- paste0(params[i])
     }
     #beta
-    if (dist[i] == "beta") {
-      if (parameterization_type[i] == "mean, sd") {
-        a <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[1]]
-        b <- beta_params(dist_params[[i]][1], dist_params[[i]][2])[[2]]
+    if (dists[i] == "beta") {
+      if (parameterization_types[i] == "mean, sd") {
+        a <- beta_params(dists_params[[i]][1], dists_params[[i]][2])[[1]]
+        b <- beta_params(dists_params[[i]][1], dists_params[[i]][2])[[2]]
         params_df[[i]] <- as.data.frame(rbeta(nsamp, a, b))
-      } else if (parameterization_type[i] == "a, b") {
-        a <- dist_params[[i]][1]
-        b <- dist_params[[i]][2]
+      } else if (parameterization_types[i] == "a, b") {
+        a <- dists_params[[i]][1]
+        b <- dists_params[[i]][2]
         params_df[[i]] <- as.data.frame(rbeta(nsamp, a, b))
       }
       names(params_df[[i]]) <- paste0(params[i])
     }
 
     #gamma
-    if (dist[i] == "gamma") {
-      if (parameterization_type[i] == "mean, sd") {
-        shape <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[1]]
-        scale <- gamma_params(dist_params[[i]][1], dist_params[[i]][2], scale = TRUE)[[2]]
+    if (dists[i] == "gamma") {
+      if (parameterization_types[i] == "mean, sd") {
+        shape <- gamma_params(dists_params[[i]][1], dists_params[[i]][2], scale = TRUE)[[1]]
+        scale <- gamma_params(dists_params[[i]][1], dists_params[[i]][2], scale = TRUE)[[2]]
         params_df[[i]] <- as.data.frame(rgamma(nsamp, shape = shape, scale = scale))
-      } else if (parameterization_type[i] == "shape, scale") {
-        shape <- dist_params[[i]][1]
-        scale <- dist_params[[i]][2]
+      } else if (parameterization_types[i] == "shape, scale") {
+        shape <- dists_params[[i]][1]
+        scale <- dists_params[[i]][2]
         params_df[[i]] <- as.data.frame(rgamma(nsamp, shape = shape, scale = scale))
       }
       names(params_df[[i]]) <- paste0(params[i])
     }
 
     #dirichlet
-    if (dist[i] == "dirichlet") {
-      if (parameterization_type[i] == "value, mean_prop, sd") {
-        alpha <- dirichlet_params(dist_params[[i]][, 2], dist_params[[i]][, 3])
+    if (dists[i] == "dirichlet") {
+      if (parameterization_types[i] == "value, mean_prop, sd") {
+        alpha <- dirichlet_params(dists_params[[i]][, 2], dists_params[[i]][, 3])
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
-      } else if (parameterization_type[i] == "value, n") {
-        val_n <- as.data.frame(dist_params[[i]])
+      } else if (parameterization_types[i] == "value, n") {
+        val_n <- as.data.frame(dists_params[[i]])
         total <- sum(val_n[, 2])
         p_mean <- val_n[, 2] / total
         sd <- sqrt((p_mean * (1 - p_mean)) / total)
         alpha <- dirichlet_params(p_mean, sd)
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
-        } else if (parameterization_type[i] == "value, alpha") {
-        alpha <- dist_params[[i]][, 2]
+        } else if (parameterization_types[i] == "value, alpha") {
+        alpha <- dists_params[[i]][, 2]
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
       }
-      names(params_df[[i]]) <- paste0(dist_params[[i]][, 1])
+      names(params_df[[i]]) <- paste0(dists_params[[i]][, 1])
     }
 
-    #for size = length(dist_params[[i]][,1]) or size = sum(dist_params[[i]][,2])?
+    #for size = length(dists_params[[i]][,1]) or size = sum(dists_params[[i]][,2])?
     #bootstrap
-    if (dist[i] == "bootstrap") {
+    if (dists[i] == "bootstrap") {
       samp_vec <- vector(mode = "numeric", length = nsamp)
       for (k in 1:nsamp) {
-        samp_vec[k] <- mean(sample(x = dist_params[[i]][, 1],
-                                   size = sum(dist_params[[i]][, 2]),
+        samp_vec[k] <- mean(sample(x = dists_params[[i]][, 1],
+                                   size = sum(dists_params[[i]][, 2]),
                                    replace = TRUE,
-                                   prob = dist_params[[i]][, 2]))
+                                   prob = dists_params[[i]][, 2]))
       }
       params_df[[i]] <- as.data.frame(samp_vec)
       names(params_df[[i]]) <- paste0(params[i])
     }
 
     #constant
-    if (dist[i] == "constant") {
-      val <- dist_params[[i]]
+    if (dists[i] == "constant") {
+      val <- dists_params[[i]]
       params_df[[i]] <- data.frame(param_val = rep(val, nsamp))
       names(params_df[[i]]) <- paste0(params[i])
     }

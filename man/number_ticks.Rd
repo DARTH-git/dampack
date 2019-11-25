@@ -7,11 +7,11 @@
 number_ticks(n)
 }
 \arguments{
-\item{n}{integer giving the desired number of number of ticks in axis of
+\item{n}{integer giving the desired number of ticks on axis of
 \code{ggplot2} plots. Non-integer values are rounded down.}
 }
 \description{
-Function for number of ticks in axis of \code{ggplot2} plots.
+Function for determining number of ticks on axis of \code{ggplot2} plots.
 }
 \section{Details}{
 

@@ -1,4 +1,4 @@
-#' Calculate Expected Value of Sample Information
+#' Calculate Expected Value of Sample Information (EVSI)
 #'
 #' @inheritParams calc_evppi
 #' @param n additional sample size
@@ -255,12 +255,17 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #'
 #' @description
 #' Plots the \code{evsi} object created by \code{\link{calc_evsi}}.
+#' EVSI is either plotted as a function of additional sample size
+#' for each willingness-to-pay threshold provided, or
+#' as a function of each willingness-to-pay
+#' threshold, depending upon the usage of \code{\link{calc_evsi}}
+#' used to create the \code{evsi} object.
 #'
 #' @param x object of class \code{evsi}, produced by function
 #'  \code{\link{calc_evsi}}
-#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units Units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of sample information
 #' @return A \code{ggplot2} plot with the EVSI

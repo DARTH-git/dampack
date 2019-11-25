@@ -14,10 +14,10 @@
 #' will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.
 #' @param facet_lab_txtsize text size for plot facet labels
 #' @param xlim,ylim vector of axis limits, or NULL, which sets limits automatically
-#' @param xtrans,ytrans transformations for the axes. see \code{\link[ggplot2]{scale_continuous}} for details.
-#' @param xexpand,yexpand Padding around data. see \code{\link[ggplot2]{scale_continuous}} for details.
-#' The default behavior in ggplot2 is \code{expand_scale(0.05)} - see \code{\link[ggplot2]{expand_scale}}
-#' to see how to modify this.
+#' @param xtrans,ytrans transformations for the axes. See \code{\link[ggplot2]{scale_continuous}} for details.
+#' @param xexpand,yexpand Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
+#' The default behavior in ggplot2 is \code{expand_scale(0.05)}. See \code{\link[ggplot2]{expand_scale}}
+#' for how to modify this.
 #' @param ... further arguments to plot.
 #' This is not used by \code{dampack} but required for generic consistency.
 #'
@@ -115,8 +115,8 @@ labfun <- function(x) {
 
 #' Number of ticks for \code{ggplot2} plots
 #'
-#' Function for number of ticks in axis of \code{ggplot2} plots.
-#' @param n integer giving the desired number of number of ticks in axis of
+#' Function for determining number of ticks on axis of \code{ggplot2} plots.
+#' @param n integer giving the desired number of ticks on axis of
 #' \code{ggplot2} plots. Non-integer values are rounded down.
 #' @section Details:
 #' Based on function \code{pretty}.

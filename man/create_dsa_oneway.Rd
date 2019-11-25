@@ -14,7 +14,7 @@ create_dsa_oneway(
 )
 }
 \arguments{
-\item{parameters}{parameter values associated with effectiveness and outcomes.
+\item{parameters}{parameter values associated with costs, effectiveness, or other outcomes.
 The table must have two columns, with each parameter name in the first column
 and the associated parameter value in the second column:
 
@@ -26,18 +26,18 @@ param2 name     \tab  param2 val1 \cr
 ...            \tab ... \cr
 }}
 
-\item{effectiveness}{Data frames containing data for costs,
+\item{effectiveness}{data frames containing data for costs,
 effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
-\item{strategies}{Vector with the names of the strategies. Due to requirements in
+\item{strategies}{vector with the names of the strategies. Due to requirements in
 certain uses of this vector, this function uses \code{\link{make.names}} to modify
 strategy names as necessary. It is strongly suggested that you follow the rules
 in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
-\item{cost}{Data frames containing data for costs,
+\item{cost}{data frames containing data for costs,
 effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
@@ -45,7 +45,7 @@ the \code{strategies} vector.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 
-\item{other_outcome}{Data frames containing data for costs,
+\item{other_outcome}{data frames containing data for costs,
 effectiveness or another outcome (user-defined), respectively.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with

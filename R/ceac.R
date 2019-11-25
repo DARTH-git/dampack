@@ -5,8 +5,8 @@
 #' \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 #' curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 #'
-#' @param wtp Numeric vector with willingness-to-pay (WTP) thresholds
-#' @param psa A psa object from \code{\link{make_psa_obj}}
+#' @param wtp numeric vector with willingness-to-pay (WTP) thresholds
+#' @param psa psa object from \code{\link{make_psa_obj}}
 #' @keywords cost-effectiveness acceptability curves
 #' @details
 #' \code{ceac} computes the probability of each of the strategies being
@@ -118,10 +118,10 @@ ceac <- function(wtp, psa) {
 #'
 #' Plots the CEAC, using the object created by \code{\link{ceac}}.
 #'
-#' @param x Object of class \code{ceac}.
-#' @param frontier Whether to plot acceptability frontier (TRUE) or not (FALSE)
-#' @param points Whether to plot points (TRUE) or not (FALSE)
-#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#' @param x object of class \code{ceac}.
+#' @param frontier whether to plot acceptability frontier (TRUE) or not (FALSE)
+#' @param points whether to plot points (TRUE) or not (FALSE)
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)
 #' @param min_prob minimum probability to show strategy in plot.
 #' For example, if the min_prob is 0.05, only strategies that ever

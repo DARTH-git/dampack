@@ -9,9 +9,9 @@ calc_evpi(psa, wtp, pop = 1)
 \arguments{
 \item{psa}{psa object from \code{\link{make_psa_obj}}}
 
-\item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
+\item{wtp}{numeric vector with willingness-to-pay (WTP) thresholds}
 
-\item{pop}{A scalar that corresponds to the total population}
+\item{pop}{scalar that corresponds to the total population}
 }
 \value{
 A data frame and \code{evpi} object with the EVPI at each WTP threshold.

@@ -14,7 +14,7 @@
 #' polynomial models (\code{"poly"})
 #' @param poly.order order of the polynomial, if \code{type == "poly"}
 #' @param k basis dimension, if \code{type == "gam"}
-#' @param pop A scalar that corresponds to the total population
+#' @param pop scalar that corresponds to the total population
 #'
 #' @return A data.frame with WTP thresholds and corresponding EVPPIs
 #' for the selected parameters
@@ -22,13 +22,13 @@
 #' @details
 #' The expected value of partial pefect information (EVPPI) is the expected
 #' value of perfect information from a subset of parameters of interest,
-#' \eqn{\theta_I} of a cost-effectiveness analysis (CEA) of \eqn{D} different
+#' \eqn{\theta_I}, of a cost-effectiveness analysis (CEA) of \eqn{D} different
 #' strategies with parameters \eqn{\theta = \{ \theta_I, \theta_C\}}, where
 #' \eqn{\theta_C} is the set of complimenatry parameters of the CEA. The
-#' function \code{evppi_lrmm} computes the EVPPI of \eqn{\theta_I} from a
+#' function \code{calc_evppi} computes the EVPPI of \eqn{\theta_I} from a
 #' matrix of net monetary benefits \eqn{B} of the CEA. Each column of \eqn{B}
 #' corresponds to the net benefit \eqn{B_d} of strategy \eqn{d}. The function
-#' \code{evppi_lrmm} computes the EVPPI using a linear regression metamodel
+#' \code{calc_evppi} computes the EVPPI using a linear regression metamodel
 #' approach following these steps:
 #' \enumerate{
 #' \item Determine the optimal strategy \eqn{d^*} from the expected net
@@ -120,9 +120,9 @@ calc_evppi <- function(psa,
 #'
 #' @param x object of class \code{evppi}, produced by function
 #'  \code{\link{calc_evppi}}
-#' @param currency String with currency used in the cost-effectiveness analysis (CEA).
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units Units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPPI

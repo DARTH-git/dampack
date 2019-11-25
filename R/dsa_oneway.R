@@ -6,7 +6,7 @@
 #'
 #' @inheritParams create_sa
 #'
-#' @param parameters parameter values associated with effectiveness and outcomes.
+#' @param parameters parameter values associated with costs, effectiveness, or other outcomes.
 #' The table must have two columns, with each parameter name in the first column
 #' and the associated parameter value in the second column:
 #'

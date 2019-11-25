@@ -7,9 +7,9 @@
 ceac(wtp, psa)
 }
 \arguments{
-\item{wtp}{Numeric vector with willingness-to-pay (WTP) thresholds}
+\item{wtp}{numeric vector with willingness-to-pay (WTP) thresholds}
 
-\item{psa}{A psa object from \code{\link{make_psa_obj}}}
+\item{psa}{psa object from \code{\link{make_psa_obj}}}
 }
 \value{
 An object of class \code{ceac} that can be visualized with \code{plot}.

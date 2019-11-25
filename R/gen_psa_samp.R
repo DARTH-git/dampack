@@ -260,6 +260,7 @@ gen_psa_samp <- function(params = NULL,
 #'
 #'
 #'  @importFrom stats rgamma
+#'  @export
 
 rdirichlet <- function(n, alpha) {
     k <- length(alpha)
@@ -289,7 +290,7 @@ rdirichlet <- function(n, alpha) {
 #'
 #' @return alpha Alpha parameter of beta distribution
 #' @return beta Beta parameter of beta distribution
-#'
+#' @export
 beta_params <- function(mean, sigma) {
   alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
   beta  <- alpha * (1 / mean - 1)
@@ -307,7 +308,7 @@ beta_params <- function(mean, sigma) {
 #' deviation \eqn{\sigma} of the random variables of interest.
 #' @param p.mean Vector of means of the random variables.
 #' @param sigma Vector of standard deviation of the random variables
-#' (i.e., standar error).
+#' (i.e., standard error).
 #' @keywords dirichlet distribution; method of moments
 #' @section Details:
 #' Based on methods of moments. If \eqn{\mu} is a vector of means and
@@ -333,6 +334,7 @@ beta_params <- function(mean, sigma) {
 #' dirichlet_params(p.mean, p.se)
 #' # True values: 100, 30, 70
 #' }
+#' @export
 dirichlet_params <- function(p.mean, sigma) {
   n.params <- length(p.mean)
   if (n.params != length(sigma)) {
@@ -392,7 +394,7 @@ dirichlet_params <- function(p.mean, sigma) {
 #' # Rate specification
 #' gamma_params(mu, sigma, scale = FALSE)
 #' }
-#'
+#' @export
 gamma_params <- function(mu, sigma, scale = TRUE) {
   if (scale) {
     shape <- (mu ^ 2) / (sigma ^ 2)
@@ -448,7 +450,7 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
 #' lnorm_params(m, v)
 #' # True values: 100, 30, 70
 #' }
-#'
+#' @export
 lnorm_params <- function(m = 1, v = 1) {
   ### Sanity checkd
   if (m <= 0) {

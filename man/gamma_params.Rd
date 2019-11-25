@@ -46,7 +46,6 @@ gamma_params(mu, sigma)
 # Rate specification
 gamma_params(mu, sigma, scale = FALSE)
 }
-
 }
 \references{
 \itemize{

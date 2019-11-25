@@ -40,7 +40,6 @@ v <- 0.01
 lnorm_params(m, v)
 # True values: 100, 30, 70
 }
-
 }
 \references{
 \enumerate{

@@ -12,7 +12,8 @@ rdirichlet(n, alpha)
 \item{alpha}{vector of parameters defining dirichlet distribution
 
 
- @importFrom stats rgamma}
+ @importFrom stats rgamma
+ @export}
 }
 \description{
 Random number generation for the dirichlet distribution with parameter vector alpha.

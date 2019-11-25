@@ -10,7 +10,7 @@ dirichlet_params(p.mean, sigma)
 \item{p.mean}{Vector of means of the random variables.}
 
 \item{sigma}{Vector of standard deviation of the random variables
-(i.e., standar error).}
+(i.e., standard error).}
 }
 \value{
 alpha Alpha parameters of dirichlet distribution

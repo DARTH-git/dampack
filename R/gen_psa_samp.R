@@ -279,7 +279,7 @@ rdirichlet <- function(n, alpha) {
 #' based on the method of moments using the mean \eqn{\mu} and standard
 #' deviation \eqn{\sigma} of the random variable of interest.
 #' @param mean Mean of the random variable.
-#' @param sigma Standard deviation of the random variable (i.e., standar error).
+#' @param sigma Standard deviation of the random variable (i.e., standard error).
 #' @keywords beta distribution; methods of moments
 #' @section Details:
 #' Based on methods of moments. If \eqn{\mu} is the mean and

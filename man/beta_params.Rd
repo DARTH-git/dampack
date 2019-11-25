@@ -9,7 +9,7 @@ beta_params(mean, sigma)
 \arguments{
 \item{mean}{Mean of the random variable.}
 
-\item{sigma}{Standard deviation of the random variable (i.e., standar error).}
+\item{sigma}{Standard deviation of the random variable (i.e., standard error).}
 }
 \value{
 alpha Alpha parameter of beta distribution

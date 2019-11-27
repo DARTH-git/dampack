@@ -14,7 +14,7 @@
 #'
 #' @param analysis either "oneway" or "twoway"
 #' @param psa psa object
-#' @param params String vector with the name(s) of the parameter of interest. Defaults to all.
+#' @param params string vector with the name(s) of the parameter of interest. Defaults to all.
 #' @param strategies vector of strategies to consider. The default (NULL) is that all strategies are considered.
 #' @param outcome either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 #' net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
@@ -22,7 +22,7 @@
 #' used in internal function calls of metamodel within other VOI functions.
 #' @param wtp if outcome is NHB or NMB (or the associated loss), must provide the willingness-to-pay threshold
 #' @param type type of metamodel
-#' @param poly.order Order of polynomial for the linear regression metamodel.
+#' @param poly.order order of polynomial for the linear regression metamodel.
 #' Default: 2
 #' @inheritParams mgcv::s
 #'
@@ -260,7 +260,7 @@ summary.metamodel <- function(object, ...) {
 #' Predict from a metamodel
 #'
 #' @param object object with class "metamodel"
-#' @param ranges A named list of the form c("param" = c(0, 1), ...)
+#' @param ranges a named list of the form c("param" = c(0, 1), ...)
 #' that gives the ranges for the parameter of interest. If NULL,
 #' parameter values from the middle 95% of the PSA samples are used. The number of samples
 #' from this range is determined by \code{nsamp}.

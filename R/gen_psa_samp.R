@@ -253,10 +253,10 @@ gen_psa_samp <- function(params = NULL,
 }
 
 
-#' Random number generation for the dirichlet distribution with parameter vector alpha.
+#' Random number generation for the Dirichlet distribution with parameter vector alpha.
 #'
-#' @param n Number of observations
-#' @param alpha vector of parameters defining dirichlet distribution
+#' @param n number of observations
+#' @param alpha vector of parameters defining Dirichlet distribution
 #'
 #'
 #'  @importFrom stats rgamma
@@ -273,13 +273,13 @@ rdirichlet <- function(n, alpha) {
 
 
 
-#' Calculate alpha and beta parameters of Beta distribution.
+#' Calculate alpha and beta parameters of beta distribution.
 #'
-#' Function to calculate the alpha and beta parameters of the Beta distribution
+#' Function to calculate the alpha and beta parameters of the beta distribution
 #' based on the method of moments using the mean \eqn{\mu} and standard
 #' deviation \eqn{\sigma} of the random variable of interest.
-#' @param mean Mean of the random variable.
-#' @param sigma Standard deviation of the random variable (i.e., standard error).
+#' @param mean mean of the random variable.
+#' @param sigma standard deviation of the random variable (i.e., standard error).
 #' @keywords beta distribution; methods of moments
 #' @section Details:
 #' Based on methods of moments. If \eqn{\mu} is the mean and
@@ -357,18 +357,18 @@ dirichlet_params <- function(p.mean, sigma) {
 #' Calculate shape and scale (or rate) parameters of a gamma distribution.
 #'
 #' Function to calculate the shape, \eqn{\alpha}, and scale, \eqn{\theta}, (or rate, \eqn{\beta})
-#' parameteres of a gamma distribution based on the method of moments (MoM)
+#' parameters of a gamma distribution based on the method of moments (MoM)
 #' using the mean \eqn{\mu} and standard deviation \eqn{\sigma} of the random
 #' variable of interest.
-#' @param mu Scalar with the mean of the random variable.
-#' @param sigma Scalar with the standard deviation of the random variable.
-#' @param scale Logical variable indicating scale parameterization of gamma distribution
+#' @param mu scalar with the mean of the random variable.
+#' @param sigma scalar with the standard deviation of the random variable.
+#' @param scale logical variable indicating scale parameterization of the gamma distribution
 #' (Default is TRUE). If FALSE, rate parameterization is retrieved
 #' @keywords gamma distribution; method of moments
 #' @section Details:
 #' Based on method of moments. If \eqn{\mu} is the mean and
 #' \eqn{\sigma} is the standard deviation of the random variable, then the
-#' the shape, \eqn{\alpha}, scale, \eqn{\theta}, and rate, \eqn{\beta}, parameteres are computed
+#' the shape, \eqn{\alpha}, scale, \eqn{\theta}, and rate, \eqn{\beta}, parameters are computed
 #' as follows
 #' \deqn{\alpha=\frac{\mu^2}{\sigma^2},}
 #' \deqn{\theta = \frac{\sigma^2}{\mu}}

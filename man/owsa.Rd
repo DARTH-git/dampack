@@ -20,9 +20,9 @@ owsa(
 either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
 
-\item{params}{String vector with the name(s) of the parameter of interest. Defaults to all.}
+\item{params}{string vector with the name(s) of the parameter of interest. Defaults to all.}
 
-\item{ranges}{A named list of the form c("param" = c(0, 1), ...)
+\item{ranges}{a named list of the form c("param" = c(0, 1), ...)
 that gives the ranges for the parameter of interest. If NULL,
 parameter values from the middle 95% of the PSA samples are used. The number of samples
 from this range is determined by \code{nsamp}.}
@@ -38,7 +38,7 @@ used in internal function calls of metamodel within other VOI functions.}
 
 \item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
-\item{poly.order}{Order of polynomial for the linear regression metamodel.
+\item{poly.order}{order of polynomial for the linear regression metamodel.
 Default: 2}
 }
 \value{

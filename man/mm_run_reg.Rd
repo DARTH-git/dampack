@@ -9,13 +9,13 @@ mm_run_reg(dep, params, dat, type, poly.order, k)
 \arguments{
 \item{dep}{dependent variable in regression}
 
-\item{params}{String vector with the name(s) of the parameter of interest. Defaults to all.}
+\item{params}{string vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{dat}{data to use in regression}
 
 \item{type}{type of metamodel}
 
-\item{poly.order}{Order of polynomial for the linear regression metamodel.
+\item{poly.order}{order of polynomial for the linear regression metamodel.
 Default: 2}
 
 \item{k}{ the dimension of the basis used to represent the smooth term.

@@ -2,14 +2,14 @@
 % Please edit documentation in R/gen_psa_samp.R
 \name{beta_params}
 \alias{beta_params}
-\title{Calculate alpha and beta parameters of Beta distribution.}
+\title{Calculate alpha and beta parameters of beta distribution.}
 \usage{
 beta_params(mean, sigma)
 }
 \arguments{
-\item{mean}{Mean of the random variable.}
+\item{mean}{mean of the random variable.}
 
-\item{sigma}{Standard deviation of the random variable (i.e., standard error).}
+\item{sigma}{standard deviation of the random variable (i.e., standard error).}
 }
 \value{
 alpha Alpha parameter of beta distribution
@@ -17,7 +17,7 @@ alpha Alpha parameter of beta distribution
 beta Beta parameter of beta distribution
 }
 \description{
-Function to calculate the alpha and beta parameters of the Beta distribution
+Function to calculate the alpha and beta parameters of the beta distribution
 based on the method of moments using the mean \eqn{\mu} and standard
 deviation \eqn{\sigma} of the random variable of interest.
 }

@@ -7,11 +7,11 @@
 gamma_params(mu, sigma, scale = TRUE)
 }
 \arguments{
-\item{mu}{Scalar with the mean of the random variable.}
+\item{mu}{scalar with the mean of the random variable.}
 
-\item{sigma}{Scalar with the standard deviation of the random variable.}
+\item{sigma}{scalar with the standard deviation of the random variable.}
 
-\item{scale}{Logical variable indicating scale parameterization of gamma distribution
+\item{scale}{logical variable indicating scale parameterization of the gamma distribution
 (Default is TRUE). If FALSE, rate parameterization is retrieved}
 }
 \value{
@@ -21,7 +21,7 @@ rate Rate parameter of gamma distribution (If scale=FALSE)
 }
 \description{
 Function to calculate the shape, \eqn{\alpha}, and scale, \eqn{\theta}, (or rate, \eqn{\beta})
-parameteres of a gamma distribution based on the method of moments (MoM)
+parameters of a gamma distribution based on the method of moments (MoM)
 using the mean \eqn{\mu} and standard deviation \eqn{\sigma} of the random
 variable of interest.
 }
@@ -29,7 +29,7 @@ variable of interest.
 
 Based on method of moments. If \eqn{\mu} is the mean and
 \eqn{\sigma} is the standard deviation of the random variable, then the
-the shape, \eqn{\alpha}, scale, \eqn{\theta}, and rate, \eqn{\beta}, parameteres are computed
+the shape, \eqn{\alpha}, scale, \eqn{\theta}, and rate, \eqn{\beta}, parameters are computed
 as follows
 \deqn{\alpha=\frac{\mu^2}{\sigma^2},}
 \deqn{\theta = \frac{\sigma^2}{\mu}}

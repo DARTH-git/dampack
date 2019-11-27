@@ -2,19 +2,19 @@
 % Please edit documentation in R/gen_psa_samp.R
 \name{rdirichlet}
 \alias{rdirichlet}
-\title{Random number generation for the dirichlet distribution with parameter vector alpha.}
+\title{Random number generation for the Dirichlet distribution with parameter vector alpha.}
 \usage{
 rdirichlet(n, alpha)
 }
 \arguments{
-\item{n}{Number of observations}
+\item{n}{number of observations}
 
-\item{alpha}{vector of parameters defining dirichlet distribution
+\item{alpha}{vector of parameters defining Dirichlet distribution
 
 
  @importFrom stats rgamma
  @export}
 }
 \description{
-Random number generation for the dirichlet distribution with parameter vector alpha.
+Random number generation for the Dirichlet distribution with parameter vector alpha.
 }

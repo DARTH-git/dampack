@@ -22,7 +22,7 @@ metamodel(
 
 \item{psa}{psa object}
 
-\item{params}{String vector with the name(s) of the parameter of interest. Defaults to all.}
+\item{params}{string vector with the name(s) of the parameter of interest. Defaults to all.}
 
 \item{strategies}{vector of strategies to consider. The default (NULL) is that all strategies are considered.}
 
@@ -35,7 +35,7 @@ used in internal function calls of metamodel within other VOI functions.}
 
 \item{type}{type of metamodel}
 
-\item{poly.order}{Order of polynomial for the linear regression metamodel.
+\item{poly.order}{order of polynomial for the linear regression metamodel.
 Default: 2}
 
 \item{k}{ the dimension of the basis used to represent the smooth term.

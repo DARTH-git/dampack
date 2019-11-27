@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object with class "metamodel"}
 
-\item{ranges}{A named list of the form c("param" = c(0, 1), ...)
+\item{ranges}{a named list of the form c("param" = c(0, 1), ...)
 that gives the ranges for the parameter of interest. If NULL,
 parameter values from the middle 95% of the PSA samples are used. The number of samples
 from this range is determined by \code{nsamp}.}

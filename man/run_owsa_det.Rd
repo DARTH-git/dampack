@@ -5,8 +5,8 @@
 \title{Run deterministic one-way sensitivity analysis (OWSA)}
 \usage{
 run_owsa_det(
-  params = NULL,
-  params_all,
+  params_range = NULL,
+  params_basecase,
   nsamp = 100,
   FUN,
   outcomes = NULL,
@@ -15,12 +15,6 @@ run_owsa_det(
 )
 }
 \arguments{
-\item{params}{vector with strings with the name of the parameters of interest}
-
-\item{params_all}{data.frame with 4 columns with following column order: "pars",
-"basecase", "min", and "max". The number of samples from this range is
-determined by \code{nsamp}}
-
 \item{nsamp}{number of sets of parameter values to be generated. If \code{NULL}, 100 parameter
 values are used}
 
@@ -35,6 +29,12 @@ produced by \code{nsamp}}
 strategy names in \code{FUN}}
 
 \item{...}{Additional arguments to user-defined \code{FUN}}
+
+\item{params}{vector with strings with the name of the parameters of interest}
+
+\item{params_all}{data.frame with 4 columns with following column order: "pars",
+"basecase", "min", and "max". The number of samples from this range is
+determined by \code{nsamp}}
 }
 \value{
 A list containing dataframes with the results of the sensitivity analyses.

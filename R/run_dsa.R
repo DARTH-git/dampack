@@ -42,9 +42,8 @@
 #' @export
 run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                      outcomes = NULL, strategies = NULL, ...) {
-  browser()
-  params <- as.character(params_range[, 1])
 
+    params <- as.character(params_range[, 1])
 
   if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
 
@@ -60,7 +59,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     stop("the first column of params_range should consist only of parameter names from params_basecase")
   }
 
-  if (!all(is.numeric(params_range[, 2]), is.numeric(params_range[, 3]), is.numeric(params_basecase))) {
+  if (!all(is.numeric(params_range[, 2]), is.numeric(params_range[, 3]), sapply(params_basecase, is.numeric))) {
     stop("min and max in params_range and elements of params_basecase must be numeric")
   }
 
@@ -68,7 +67,6 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
          (params_basecase[params] <= params_range[, 3]))) {
     stop("basecase has to be in between min and max")
   }
-  params_basecase[names]
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_ls)
@@ -200,6 +198,7 @@ if (n_outcomes == 1) {
 #' @export
 run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes = NULL,
                      strategies = NULL, ...) {
+  browser()
   if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
 
   if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")

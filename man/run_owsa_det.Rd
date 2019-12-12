@@ -5,7 +5,7 @@
 \title{Run deterministic one-way sensitivity analysis (OWSA)}
 \usage{
 run_owsa_det(
-  params_range = NULL,
+  params_range,
   params_basecase,
   nsamp = 100,
   FUN,

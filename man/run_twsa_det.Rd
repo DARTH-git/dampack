@@ -5,9 +5,8 @@
 \title{Run deterministic two-way sensitivity analysis (TWSA)}
 \usage{
 run_twsa_det(
-  param1,
-  param2,
-  params_all,
+  params_range,
+  params_basecase,
   nsamp = 40,
   FUN,
   outcomes = NULL,
@@ -16,14 +15,6 @@ run_twsa_det(
 )
 }
 \arguments{
-\item{param1}{String with the name of the first parameter of interest}
-
-\item{param2}{String with the name of the second parameter of interest}
-
-\item{params_all}{A data.frame with 4 columns with following column order: "pars",
-"basecase", "min", and "max". The number of samples from this range is
-determined by \code{nsamp}}
-
 \item{nsamp}{number of parameter values. If \code{NULL}, 40 parameter values are
 used}
 
@@ -38,6 +29,14 @@ produced by \code{nsamp}}
 strategy names in FUN}
 
 \item{...}{Additional arguments to user-defined \code{FUN}}
+
+\item{param1}{String with the name of the first parameter of interest}
+
+\item{param2}{String with the name of the second parameter of interest}
+
+\item{params_all}{A data.frame with 4 columns with following column order: "pars",
+"basecase", "min", and "max". The number of samples from this range is
+determined by \code{nsamp}}
 }
 \value{
 A list containing dataframes with the results of the sensitivity analyses.

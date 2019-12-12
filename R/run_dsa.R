@@ -43,7 +43,7 @@
 run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                      outcomes = NULL, strategies = NULL, ...) {
 
-    params <- as.character(params_range[, 1])
+  params <- as.character(params_range[, 1])
 
   if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
 
@@ -196,16 +196,18 @@ if (n_outcomes == 1) {
 #' }
 #'
 #' @export
-run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes = NULL,
+run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcomes = NULL,
                      strategies = NULL, ...) {
   browser()
-  if (!is.data.frame(params_all)) stop("params_all must be a data.frame")
+  if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
 
-  if (ncol(params_all) != 4) stop("params_all must have 4 columns: 'pars', 'basecase', 'min', and 'max'")
+  if (ncol(params_range) != 3) stop("params_all must have 4 columns: 'pars', 'min', and 'max'")
 
-  poi <- unique(c(param1, param2))
-  params_basecase <- params_all[, 2]
-  names(params_basecase) <- as.character(params_all[, 1])
+  if (!is.list(params_basecase) | is.null(names(params_basecase)))
+    stop("params_basecase must be a named list")
+
+  poi <- unique(as.character(params_range[, 1]))
+
   opt_arg_val <- list(...)
   fun_input_ls <- c(list(params_basecase), opt_arg_val)
 
@@ -214,20 +216,19 @@ run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes =
   }
 
   if (!all(poi %in% names(params_basecase))) {
-    stop("param1 and param2 should be in the parameters provided in params_all")
+    stop("the first column of params_range should consist only of parameter names from params_basecase")
   }
 
-  if (!all(is.numeric(params_all[, 2]), is.numeric(params_all[, 3]), is.numeric(params_all[, 4]))) {
-    stop("basecase, min and max in params_all must be numeric")
+  if (!all(is.numeric(params_range[, 2]), is.numeric(params_range[, 3]), sapply(params_basecase, is.numeric))) {
+    stop("min and max in params_range and elements of params_basecase must be numeric")
   }
 
-  ix <- match(poi, params_all$pars)
-  if (!all((params_all[ix, 2] >= params_all[ix, 3]) &
-           (params_all[ix, 2] <= params_all[ix, 4]))) {
+  if (!all((params_basecase[poi] >= params_range[, 2]) &
+           (params_basecase[poi] <= params_range[, 3]))) {
     stop("basecase has to be in between min and max")
   }
 
-  names(params_all) <- c("pars", "basecase", "min", "max")
+  names(params_range) <- c("pars", "min", "max")
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_ls)
@@ -260,7 +261,7 @@ run_twsa_det <- function(param1, param2, params_all, nsamp = 40, FUN, outcomes =
   sim_out_df <- NULL
 
   ### Generate matrix of inputs
-  range_df <- params_all[ix, c("min", "max")]
+  range_df <- params_range[, c("min", "max")]
   param_table <- expand.grid(param1 = seq(range_df[1, "min"],
                                          range_df[1, "max"],
                                          length.out = nsamp),

@@ -190,10 +190,10 @@ if (n_outcomes == 1) {
 #' @export
 run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcomes = NULL,
                      strategies = NULL, ...) {
-  browser()
+
   if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
 
-  if (ncol(params_range) != 3) stop("params_all must have 4 columns: 'pars', 'min', and 'max'")
+  if (ncol(params_range) != 3) stop("params_all must have 3 columns: 'pars', 'min', and 'max'")
 
   if (!is.list(params_basecase) | is.null(names(params_basecase)))
     stop("params_basecase must be a named list")

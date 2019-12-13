@@ -10,6 +10,7 @@
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}.
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
+#'@param currency symbol for the currency being used (ex. "$", "£")
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
 #'
@@ -23,7 +24,7 @@
 #' @export
 
 run_psa <- function(psa_samp, FUN, outcomes = NULL,
-                    strategies = NULL, ...) {
+                    strategies = NULL, currency = "$", ...) {
 
   opt_arg_val <- list(...)
   fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
@@ -82,15 +83,22 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
       psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
                                    other_outcome = sim_out_df[[j]],
                                    parameters = psa_samp[, -1], strategies = strategies,
-                                   currency = "$")
+                                   currency = currency)
     }
 
 
     names(psa_out) <- outcomes
 
-    if (!is.null(cost_outcome) & !is.null(effectiveness_outcome)) {
+
+    effect_outcome <- intersect(outcomes, c("EFFECTIVENESS", "effectiveness", "Effectiveness",
+                                            "EFFECT", "effect", "Effect",
+                                            "EFFECTS", "effects", "Effects"))
+    cost_outcome <- intersect(outcomes, c("COST", "cost", "Cost",
+                                          "COSTS", "costs", "Costs"))
+
+    if (!is.null(cost_outcome) & !is.null(effect_outcome)) {
       cea_psa <- make_psa_obj(cost = sim_out_df[[cost_outcome]],
-                              effectiveness = sim_out_df[[effectiveness_outcome]],
+                              effectiveness = sim_out_df[[effect_outcome]],
                               parameters = psa_samp[, -1], strategies = strategies,
                               currency = currency)
       psa_out <- append(list(cea_psa), psa_out)

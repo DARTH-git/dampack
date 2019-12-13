@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 ```{r}
 library(dampack)
 rm(list = ls())
@@ -174,38 +173,19 @@ my_params_basecase <- list(p_HS1 = 0.15,
                            u_Trt = 0.95,
                            d_e = 0.03,
                            d_c = 0.03)
+
 my_params_range <- data.frame(pars = c("p_HS1", "p_S1S2", "p_S1H",
                                        "u_S2", "u_Trt", "c_Trt"),
-                              min = c())
-
-params_min <- c(0, 0, 0,
-                0, 1, 1,
-                0, 0, 0,
-                0, 0, 0,
-                0, 0, 0,
-                0.9, 0.03, 0.03)
-
-params_max <- c(1, 1, 1,
-                1, 10, 10,
-                4000, 8000, 30000,
-                24000, 0, 1,
-                1, 1, 0,
-                1, 0.03, 0.03)
-
-
-my_params_all <- data.frame(pars = my_params,
-                            basecase = params_basecase,
-                            min = params_min,
-                            max = params_max)
-
-
+                              min = c(0, 0, 0,
+                                      0, 0.9, 12000),
+                              max = c(1, 1, 1,
+                                      1, 1, 24000))
 ```
 
 
 ```{r}
-o <- run_owsa_det(params = c("p_HS1", "p_S1S2", "p_S1H",
-                             "u_S2", "u_Trt", "c_Trt"),
-                         params_all = my_params_all,
+o <- run_owsa_det(params_range = my_params_range,
+                         params_basecase = my_params_basecase,
                          nsamp = 100,
                          FUN = calculate_ce_out,
                          outcomes = c("NMB"),
@@ -233,9 +213,12 @@ owsa_opt_strat(o, return = "data")
 ```
 
 ```{r}
-tw <- run_twsa_det(param1 = "c_Trt",
-                   param2 = "u_Trt",
-                   params_all = my_params_all,
+my_params_range_twsa <- data.frame(pars = c("u_Trt", "c_Trt"),
+                              min = c(0.9, 12000),
+                              max = c(1, 24000))
+
+tw <- run_twsa_det(params_range = my_params_range_twsa,
+                   params_basecase = my_params_basecase,
                    nsamp = 100,
                    FUN = calculate_ce_out,
                    outcomes = c("NMB"),

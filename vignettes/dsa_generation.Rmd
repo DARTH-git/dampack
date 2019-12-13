@@ -155,41 +155,31 @@ n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
 v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
 n_s <- length(v_n)                            # number of health states 
 
-my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
-               "p_HD", "hr_S1", "hr_S2", 
-               "c_H", "c_S1", "c_S2", 
-               "c_Trt", "c_D","u_H",
-               "u_S1","u_S2", "u_D",
-               "u_Trt", "d_e", "d_c")
+my_params_basecase <- list(p_HS1 = 0.15,
+                           p_S1H = 0.5,
+                           p_S1S2 = 0.105,
+                           p_HD = 0.005, 
+                           hr_S1 = 3, 
+                           hr_S2 = 10, 
+                           c_H = 2000,
+                           c_S1 = 4000,
+                           c_S2 = 15000, 
+                           c_Trt = 12000,
+                           c_D = 0,
+                           u_H = 1,
+                           u_S1 = 0.75,
+                           u_S2 = 0.5,
+                           u_D = 0,
+                           u_Trt = 0.95,
+                           d_e = 0.03,
+                           d_c = 0.03)
 
-params_basecase <- c(0.15, 0.5, 0.105,
-                     0.005, 3, 10,
-                     2000, 4000, 15000,
-                     12000, 0, 1,
-                     0.75, 0.5, 0,
-                     0.95, 0.03, 0.03)
-params_min <- c(0, 0, 0,
-                0, 1, 1,
-                0, 0, 0,
-                0, 0, 0,
-                0, 0, 0,
-                0.9, 0.03, 0.03)
+my_params_range <- data.frame(pars = c("u_Trt", "c_Trt"),
+                              min = c(0.9, 12000),
+                              max = c(1, 24000))
 
-params_max <- c(1, 1, 1,
-                1, 10, 10,
-                4000, 8000, 30000,
-                24000, 0, 1,
-                1, 1, 0,
-                1, 0.03, 0.03)
-
-
-my_params_all <- data.frame(pars = my_params,
-                            basecase = params_basecase,
-                            min = params_min,
-                            max = params_max)
-
-owsa_det <- run_owsa_det(params = c("c_Trt", "u_Trt"),
-                         params_all = my_params_all,
+owsa_det <- run_owsa_det(params_range = my_params_range,
+                         params_basecase = my_params_basecase,
                          nsamp = 100,
                          FUN = calculate_ce_out,
                          outcomes = c("Cost", "Effect", "NMB"),
@@ -198,9 +188,8 @@ owsa_det <- run_owsa_det(params = c("c_Trt", "u_Trt"),
 ###when multiple outcomes are specified, individual owsa objects are found within the list output of run_owsa_det
 plot(owsa_det$owsa_NMB)
 
-twsa_det <- run_twsa_det(param1 = "c_Trt",
-                         param2 = "u_Trt",
-                         params_all = my_params_all,
+twsa_det <- run_twsa_det(params_range = my_params_range,
+                         params_basecase = my_params_basecase,
                          nsamp = 100,
                          FUN = calculate_ce_out,
                          outcomes = c("Cost", "Effect", "NMB"),

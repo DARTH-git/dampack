@@ -5,9 +5,8 @@
 \title{Run deterministic two-way sensitivity analysis (TWSA)}
 \usage{
 run_twsa_det(
-  param1,
-  param2,
-  params_all,
+  params_range,
+  params_basecase,
   nsamp = 40,
   FUN,
   outcomes = NULL,
@@ -16,13 +15,13 @@ run_twsa_det(
 )
 }
 \arguments{
-\item{param1}{String with the name of the first parameter of interest}
+\item{params_range}{data.frame with 2 rows and 3 columns in the following order: "pars",
+"min", and "max". The number of samples from this range is
+determined by \code{nsamp}. "pars" are the 2 parameters of interest, which must be a subset of
+the parameters from \code{params_basecase}.}
 
-\item{param2}{String with the name of the second parameter of interest}
-
-\item{params_all}{A data.frame with 4 columns with following column order: "pars",
-"basecase", "min", and "max". The number of samples from this range is
-determined by \code{nsamp}}
+\item{params_basecase}{a named list of basecase values for input parameters needed by \code{FUN},
+the user-defined function.}
 
 \item{nsamp}{number of parameter values. If \code{NULL}, 40 parameter values are
 used}
@@ -50,17 +49,11 @@ given function that produces outcomes.
 \section{Details}{
 
 \itemize{
-\item \code{params_all}
+\item \code{params_range}
 \itemize{
-\item "pars" are the names of the input parameters in the
-user defined function. "pars" should include all parameters of interest provided in
-\code{params}.
-\item "basecase" are the base value of input parameters in user defined \code{FUN}.
-\item "min" and "max" are the mininum and maximum values of the parameters of interest.
-Users only need to provide the "min" and "max" of the parameters of interest.
-For the rest of the parameter inputs into the user defined function,
-"min" and "max" can be any value or \code{NA} but these values are not evaluated in
-\code{run_twsa_det}}
+\item "pars" are the names of the two input parameters of interest. The two variables in "pars" column
+ must be a subset of variables in \code{params_basecase}
+\item "min" and "max" are the mininum and maximum values of the parameters of interest.}
 }
 }
 

@@ -5,8 +5,8 @@
 \title{Run deterministic one-way sensitivity analysis (OWSA)}
 \usage{
 run_owsa_det(
-  params = NULL,
-  params_all,
+  params_range,
+  params_basecase,
   nsamp = 100,
   FUN,
   outcomes = NULL,
@@ -15,16 +15,18 @@ run_owsa_det(
 )
 }
 \arguments{
-\item{params}{vector with strings with the name of the parameters of interest}
+\item{params_range}{data.frame with 3 columns in the following order: "pars",
+"min", and "max". The number of samples from this range is
+determined by \code{nsamp}. "pars" are the parameters of interest and must be a subset of
+the parameters from \code{params_basecase}.}
 
-\item{params_all}{data.frame with 4 columns with following column order: "pars",
-"basecase", "min", and "max". The number of samples from this range is
-determined by \code{nsamp}}
+\item{params_basecase}{a named list of basecase values for input parameters needed by \code{FUN},
+the user-defined function.}
 
 \item{nsamp}{number of sets of parameter values to be generated. If \code{NULL}, 100 parameter
 values are used}
 
-\item{FUN}{function that takes the basecase in \code{params_all} and \code{...} to
+\item{FUN}{function that takes the basecase in \code{params_basecase} and \code{...} to
 produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 where the first column are the strategy names and the rest of the columns must be outcomes.}
 
@@ -50,17 +52,12 @@ given function that produces outcomes.
 \section{Details}{
 
 \itemize{
-\item \code{params_all}
+\item \code{params_range}
 \itemize{
-\item "pars" are the names of the input parameters in the
-user defined function. "pars" should include all parameters of interest provided in
-\code{params}.
-\item "basecase" are the base value of input parameters in user defined \code{FUN}.
-\item "min" and "max" are the mininum and maximum values of the parameters of interest.
-Users only need to provide the "min" and "max" of the parameters of interest.
-For the rest of the parameter inputs into the user defined function,
-"min" and "max" can be any value or \code{NA} but these values are not evaluated in
-\code{run_owsa_det}}
+\item "pars" are the names of the input parameters of interest. These are the parameters that will
+ be varied in the deterministic sensitivity analysis. variables in "pars" column
+ must be a subset of variables in \code{params_basecase}
+\item "min" and "max" are the mininum and maximum values of the parameters of interest.}
 }
 }
 

@@ -223,7 +223,6 @@ gen_psa_samp <- function(params = NULL,
       names(params_df[[i]]) <- paste0(dists_params[[i]][, 1])
     }
 
-    #for size = length(dists_params[[i]][,1]) or size = sum(dists_params[[i]][,2])?
     #bootstrap
     if (dists[i] == "bootstrap") {
       samp_vec <- vector(mode = "numeric", length = nsamp)

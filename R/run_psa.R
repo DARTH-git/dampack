@@ -85,6 +85,17 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
                                    currency = "$")
     }
 
+
     names(psa_out) <- outcomes
+
+    if (!is.null(cost_outcome) & !is.null(effectiveness_outcome)) {
+      cea_psa <- make_psa_obj(cost = sim_out_df[[cost_outcome]],
+                              effectiveness = sim_out_df[[effectiveness_outcome]],
+                              parameters = psa_samp[, -1], strategies = strategies,
+                              currency = currency)
+      psa_out <- append(list(cea_psa), psa_out)
+      names(psa_out) <- c("cea_psa", outcomes)
+    }
+
     return(psa_out)
   }

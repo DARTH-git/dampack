@@ -200,12 +200,17 @@ psa_output <- run_psa(psa_samp = l_params_all,
 # with downstream dampack functions was automatically created as the first list element of psa_output
 cea_psa <- psa_output[[1]]
 
+cea_psa <- make_psa_obj(cost = "Cost",
+                        effectiveness = "Effect", 
+                        run_psa_obj = psa_output, 
+                        strategies = c("No_Treatment", "Treatment"))
+
 ### demonstrating the passing of extra parameters to calculated_ce_out (n_wtp)
 psa_output2 <- run_psa(psa_samp = l_params_all, 
-                      FUN = calculate_ce_out,
-                      outcomes = c("Cost", "Effect", "NMB"),
-                      strategies = c("No_Treatment", "Treatment"), 
-                      n_wtp = 50000)
+                       FUN = calculate_ce_out,
+                       outcomes = c("Cost", "Effect", "NMB"),
+                       strategies = c("No_Treatment", "Treatment"), 
+                       n_wtp = 50000)
 
 ```
 

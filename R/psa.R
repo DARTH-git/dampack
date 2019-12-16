@@ -7,6 +7,28 @@
 #'
 #' @param parameters Data frame with values for each simulation (rows) and parameter (columns).
 #' The column names should be the parameter names.
+#'
+#' @param cost data frame containing data for costs if \code{run_psa_obj = NULL},
+#' or the name of the cost outcome if run_psa_obj is provided.
+#' For the data.frame, each simulation should be a row and each strategy should be a column.
+#' Naming the columns of the data frames is not necessary, as they will be renamed with
+#' the \code{strategies} vector.
+#' @param effectiveness data frame containing data for effectiveness if \code{run_psa_obj = NULL},
+#' or the name of the effectiveness outcome if run_psa_obj is provided.
+#' For the data.frame, each simulation should be a row and each strategy should be a column.
+#' Naming the columns of the data frames is not necessary, as they will be renamed with
+#' the \code{strategies} vector.
+#' @param other_outcome data frame containing data another outcome (user-defined).
+#' Each simulation should be a row of the data frame, and each strategy should be a column.
+#' Naming the columns of the data frames is not necessary, as they will be renamed with
+#' the \code{strategies} vector.
+#' @param strategies vector with the names of the strategies. Due to requirements in
+#' certain uses of this vector, this function uses \code{\link{make.names}} to modify
+#' strategy names as necessary. It is strongly suggested that you follow the rules
+#' in the \code{\link{make.names}} help page, to avoid unexpected errors.
+#'
+#' @param currency symbol for the currency being used (ex. "$", "£")
+#' @param run_psa_obj output from \code{\link{run_psa}}.
 #' @inheritParams create_sa
 #'
 #' @details
@@ -48,8 +70,34 @@
 #'
 #' @importFrom stringr str_replace
 #' @export
-make_psa_obj <- function(cost, effectiveness, parameters,
-                         strategies = NULL, currency = "$", other_outcome = NULL) {
+make_psa_obj <- function(cost, effectiveness, parameters = NULL,
+                         strategies = NULL, currency = "$", other_outcome = NULL,
+                         run_psa_obj = NULL) {
+
+  if (!is.null(run_psa_obj)) {
+
+    if (!is.character(c(cost, effectiveness))) {
+      stop(paste0("cost and effectiveness inputs must be corresponding outcome names from user-defined function if
+                  run_psa_obj is provided. Use the default, run_psa_obj = NULL, if  providing cost, effectiveness, and
+                  parameters data.frames directly."))
+    }
+
+    parameters <- run_psa_obj[[1]]$parameters
+    effectiveness <- run_psa_obj[[effectiveness]]$other_outcome
+    cost <- run_psa_obj[[cost]]$other_outcome
+  }
+
+  if (is.null(run_psa_obj)) {
+    if (!is.data.frame(other_outcome) & (!is.data.frame(cost) | !is.data.frame(cost))) {
+      stop(paste0("cost, effectiveness, and other_outcome inputs must be corresponding data.frames if
+                  run_psa_obj input is NULL"))
+    }
+  }
+
+  if (is.null(parameters)) {
+    stop(paste0("parameters data.frame must be provided if run_psa_obj input is NULL"))
+  }
+
   # parameter names
   parnames <- names(parameters)
 

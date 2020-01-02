@@ -92,7 +92,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
   if (!all(outcomes %in% v_outcomes)) {
     stop("at least one outcome is not in FUN outcomes")
     }
-
+  if (is.null(outcomes)) outcomes <- v_outcomes
 
   param_table_all <- NULL
   sim_out_df <- NULL
@@ -248,6 +248,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   if (!all(outcomes %in% v_outcomes)) {
       stop("at least one outcome is not in FUN outcomes")
   }
+  if (is.null(outcomes)) outcomes <- v_outcomes
 
   n_outcomes <- length(outcomes)
   sim_out_df <- NULL

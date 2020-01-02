@@ -29,7 +29,6 @@
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #' @param run_psa_obj output from \code{\link{run_psa}}.
-#' @inheritParams create_sa
 #'
 #' @details
 #' The PSA object forms the backbone of one part of the \code{dampack} package.

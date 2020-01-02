@@ -55,7 +55,7 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
   if (!all(outcomes %in% v_outcomes)) {
     stop("at least one outcome is not in FUN outcomes")
   }
-
+  if (is.null(outcomes)) outcomes <- v_outcomes
 
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 

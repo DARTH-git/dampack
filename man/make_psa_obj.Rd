@@ -7,22 +7,23 @@
 make_psa_obj(
   cost,
   effectiveness,
-  parameters,
+  parameters = NULL,
   strategies = NULL,
   currency = "$",
-  other_outcome = NULL
+  other_outcome = NULL,
+  run_psa_obj = NULL
 )
 }
 \arguments{
-\item{cost}{data frames containing data for costs,
-effectiveness or another outcome (user-defined), respectively.
-Each simulation should be a row of the data frame, and each strategy should be a column.
+\item{cost}{data frame containing data for costs if \code{run_psa_obj = NULL},
+or the name of the cost outcome if run_psa_obj is provided.
+For the data.frame, each simulation should be a row and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
-\item{effectiveness}{data frames containing data for costs,
-effectiveness or another outcome (user-defined), respectively.
-Each simulation should be a row of the data frame, and each strategy should be a column.
+\item{effectiveness}{data frame containing data for effectiveness if \code{run_psa_obj = NULL},
+or the name of the effectiveness outcome if run_psa_obj is provided.
+For the data.frame, each simulation should be a row and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
@@ -36,11 +37,12 @@ in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 
-\item{other_outcome}{data frames containing data for costs,
-effectiveness or another outcome (user-defined), respectively.
+\item{other_outcome}{data frame containing data another outcome (user-defined).
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
+
+\item{run_psa_obj}{output from \code{\link{run_psa}}.}
 }
 \value{
 An object of class \code{psa}

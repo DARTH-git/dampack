@@ -4,7 +4,7 @@
 \alias{run_psa}
 \title{Calculate outcomes for a PSA using a user-defined function.}
 \usage{
-run_psa(psa_samp, FUN, outcomes = NULL, strategies = NULL, ...)
+run_psa(psa_samp, FUN, outcomes = NULL, strategies = NULL, currency = "$", ...)
 }
 \arguments{
 \item{psa_samp}{A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)}
@@ -17,6 +17,8 @@ where the first column are the strategy names and the rest of the columns must b
 
 \item{strategies}{vector of strategy names. The default \code{NULL} will use
 strategy names in \code{FUN}}
+
+\item{currency}{symbol for the currency being used (ex. "$", "£")}
 
 \item{...}{Additional arguments to user-defined \code{FUN}}
 }

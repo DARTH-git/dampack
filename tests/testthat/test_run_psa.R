@@ -38,6 +38,9 @@ test <- gen_psa_samp(params = c("normal_param", "lognorm_param", "beta_param",
                      nsamp = 100)
 
 test_that("run_psa runs", {
-  expect_silent(runtest <- run_psa(test, test_func, outcomes = c("cost", "effect"),
-                                  strategies = c("customstrat1", "customstrat2"), extra_param = 1.5))
-})
+  expect_silent(runtest <- run_psa(psa_samp = test,
+                                   FUN = test_func,
+                                   outcomes = c("cost", "effect"),
+                                   strategies = c("customstrat1", "customstrat2"),
+                                   extra_param = 1.5))
+  })

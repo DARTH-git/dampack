@@ -161,37 +161,37 @@ n_s <- length(v_n)                            # number of health states
 my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
                "p_HD", "hr_S1", "hr_S2", 
                "c_H", "c_S1", "c_S2", 
-               "c_Trt", "c_D","u_H",
-               "u_S1","u_S2", "u_D",
-               "u_Trt", "d_e", "d_c")
+               "c_Trt","u_H",
+               "u_S1","u_S2", "u_Trt")
 
 my_dists <- c("beta", "beta", "beta",
               "beta", "log-normal", "log-normal",
               "gamma", "gamma", "gamma",
-              "gamma", "constant", "truncated-normal", 
-              "truncated-normal", "truncated-normal", "constant", 
-              "truncated-normal", "constant", "constant")
+              "gamma", "truncated-normal", "truncated-normal", 
+              "truncated-normal", "truncated-normal")
 
 my_parameterization_types <- c("a, b", "a, b", "a, b",
                              "a, b", "meanlog, sdlog", "meanlog, sdlog",
                              "shape, scale", "shape, scale", "shape, scale",
-                             "shape, scale", "val", "mean, sd, ll, ul", 
-                             "mean, sd, ll, ul", "mean, sd, ll, ul", "val",
-                             "mean, sd, ll, ul", "val", "val")
+                             "shape, scale", "mean, sd, ll, ul", "mean, sd, ll, ul", 
+                             "mean, sd, ll, ul", "mean, sd, ll, ul")
 
 my_dists_params <- list(c(30, 170), c(60, 60), c(84, 716),
                        c(10, 1990), c(log(3), 0.01), c(log(10), 0.02),
                        c(100, 20), c(177.8, 22.5), c(225, 66.7),
-                       c(73.5, 163.3), 0, c(1, 0.01, NA, 1),
-                       c(0.75, 0.02, NA, 1), c(0.5, 0.03, NA, 1), 0,
-                       c(0.95, 0.02, NA, 1), 0.03, 0.03)
+                       c(73.5, 163.3), c(1, 0.01, NA, 1),
+                       c(0.75, 0.02, NA, 1), c(0.5, 0.03, NA, 1),
+                       c(0.95, 0.02, NA, 1))
                        
 l_params_all <- gen_psa_samp(params = my_params,
-                               dists = my_dists,
-                               parameterization_types = my_parameterization_types,
-                               dists_params = my_dists_params)
+                             dists = my_dists,
+                             parameterization_types = my_parameterization_types,
+                             dists_params = my_dists_params)
 
-psa_output <- run_psa(psa_samp = l_params_all, 
+l_params_basecase <- list(u_D = 0, c_D = 0, d_e = 0.03, d_c = 0.03)
+
+psa_output <- run_psa(psa_samp = l_params_all,
+                      params_basecase = l_params_basecase,
                       FUN = calculate_ce_out,
                       outcomes = c("Cost", "Effect", "NMB"),
                       strategies = c("No_Treatment", "Treatment"))
@@ -208,6 +208,7 @@ cea_psa <- make_psa_obj(cost = "Cost",
 ### demonstrating the passing of extra parameters to calculated_ce_out (n_wtp)
 psa_output2 <- run_psa(psa_samp = l_params_all, 
                        FUN = calculate_ce_out,
+                       params_basecase = l_params_basecase,
                        outcomes = c("Cost", "Effect", "NMB"),
                        strategies = c("No_Treatment", "Treatment"), 
                        n_wtp = 50000)

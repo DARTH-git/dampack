@@ -4,6 +4,8 @@
 #' corresponding to the specified outcomes.
 #'
 #' @param psa_samp A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
+#' @param params_basecase a named list of basecase values for input parameters needed by \code{FUN},
+#' the user-defined function.
 #' @param FUN Function that takes the parameter values in \code{psa_samp} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
@@ -23,11 +25,14 @@
 #' \code{\link{gen_psa_samp}},
 #' @export
 
-run_psa <- function(psa_samp, FUN, outcomes = NULL,
+run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
                     strategies = NULL, currency = "$", ...) {
-
   opt_arg_val <- list(...)
-  fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
+  if (!is.null(params_basecase)) {
+    fun_input_test <- c(list(c(psa_samp[1, ], params_basecase)), opt_arg_val)
+  } else {
+    fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
+  }
 
   jj <- tryCatch({
     userfun <- do.call(FUN, fun_input_test)
@@ -59,9 +64,16 @@ run_psa <- function(psa_samp, FUN, outcomes = NULL,
 
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 
-  for (i in seq_len(nrow(psa_samp))) {
-    fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
-    sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+  if (!is.null(params_basecase)) {
+    for (i in seq_len(nrow(psa_samp))) {
+      fun_input_ls <- c(list(c(psa_samp[i, ], params_basecase)), opt_arg_val)
+      sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+    }
+  } else {
+    for (i in seq_len(nrow(psa_samp))) {
+      fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
+      sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+    }
   }
 
   n_outcomes <- length(outcomes)

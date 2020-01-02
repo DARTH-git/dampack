@@ -4,10 +4,21 @@
 \alias{run_psa}
 \title{Calculate outcomes for a PSA using a user-defined function.}
 \usage{
-run_psa(psa_samp, FUN, outcomes = NULL, strategies = NULL, currency = "$", ...)
+run_psa(
+  psa_samp,
+  params_basecase = NULL,
+  FUN,
+  outcomes = NULL,
+  strategies = NULL,
+  currency = "$",
+  ...
+)
 }
 \arguments{
 \item{psa_samp}{A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)}
+
+\item{params_basecase}{a named list of basecase values for input parameters needed by \code{FUN},
+the user-defined function.}
 
 \item{FUN}{Function that takes the parameter values in \code{psa_samp} and \code{...} to
 produce the \code{outcome} of interest. The \code{FUN} must return a dataframe

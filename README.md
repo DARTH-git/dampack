@@ -1,7 +1,7 @@
 # dampack
 [![Build Status](https://travis-ci.com/DARTH-git/dampack.svg?branch=master)](https://travis-ci.com/DARTH-git/dampack)
 
-The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and visualing the health economic outputs of mathematical models.
+The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and visualizing the health economic outputs of mathematical models.
 
 Created and maintained by Fernando Alarid-Escudero ([@feralaes](https://github.com/feralaes)), Greg Knowlton ([@gknowlt](https://github.com/gknowlt)), and Eva Enns ([@evaenns](https://github.com/evaenns)).
 

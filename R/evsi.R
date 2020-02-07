@@ -285,6 +285,7 @@ plot.evsi <- function(x,
                        ylim = NULL,
                        col = c("full", "bw"),
                        ...) {
+  browser()
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
   if (length(unique(x$WTP)) == 1) {
@@ -296,15 +297,17 @@ plot.evsi <- function(x,
     g <- ggplot(data = x,
                 aes_(x = as.name("n"), y = as.name("EVSI"))) +
       xlab("Additional Sample Size")
-  } else if (!("n" %in% names(x))) {
+  } else if (!("n" %in% names(x)) | ("n" %in% names(x) & length(unique(x$n)) == 1)) {
     g <- ggplot(data = x,
                 aes_(x = as.name("WTP_thou"), y = as.name("EVSI"))) +
       xlab(scale_text)
-  } else {
+  } else if (length(unique(x$WTP > 1)) & length(unique(x$n)) > 1 ) {
     x$WTP_thou <- as.factor(x$WTP_thou)
     g <- ggplot(data = x,
                 aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
       xlab("Additional Sample Size")
+  } else {
+    stop("Insufficient data to plot")
   }
 
   g <- g +

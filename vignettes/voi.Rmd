@@ -19,6 +19,37 @@ knitr::opts_chunk$set(
 )
 ```
 
+Value of information analysis (VoI) is a method for estimating the expected monetary or health gains from reducing uncertainty in the input parameters of a decision analytic model. Although a particular strategy is optimal because it maximizes expected net benefit given current information, this strategy could be suboptimal for certain plausible combinations of parameter values.  Therefore, the greater the uncertainty in the model input parameters, the greater the risk that the decision that is optimal in expectation is actually suboptimal in reality.  Parameter uncertainty can be reduced through new clinical trials and/or observational studies, and therefore VoI analysis is a useful tool for guiding the optimal allocation of research funds. The decision to fund a future research effort is only advisable if the expected benefit of the resulting reduction in parameter uncertainty outweighs the cost of executing the research effort. 
+
+The expected value of perfect information (EVPI) is the expected benefit per patient of performing a future study with an infinite sample size that would eliminate all parameter uncertainty. EVPI is calculated as the average opportunity loss across all samples in the probabilistic sensitivity analysis. The opportunity loss per sample is defined as the difference between the maximum expected benefit in that sample (had we known the parameters perfectly and made the optimal choice) and the sample's expected benefit given the strategy chosen (the choice being made based on the average expected benefit).
+
+EVPI is frequently reported in terms of the net benefit of perfect information per patient, but \code{calc_evpi} also provides an option to specify the population size to calculate the EVPI for the total population.
+
+The expected value of partial pefect information (EVPPI) is the expected value of perfect information from a subset of parameters of interest, θ_I, of a cost-effectiveness analysis (CEA) of D different strategies with parameters θ = \{ θ_I, θ_C\}, where θ_C is the set of complementary parameters of the CEA. The function calc_evppi computes the EVPPI of θ_I from a matrix of net monetary benefits B of the CEA. Each column of B corresponds to the net benefit B_d of strategy d. The function calc_evppi computes the EVPPI using a linear regression metamodel approach following these steps:
+
+1. Determine the optimal strategy d^* from the expected net benefits \bar{B}
+
+d^* = argmax_{d} \{\bar{B}\}
+
+2. Compute the opportunity loss for each d strategy, L_d
+
+L_d = B_d - B_{d^*}
+
+3. Estimate a linear metamodel for the opportunity loss of each d strategy, L_d, by regressing them on the spline basis functions of θ_I, f(θ_I)
+
+L_d = β_0 + f(θ_I) + ε,
+
+where ε is the residual term that captures the complementary parameters θ_C and the difference between the original simulation model and the metamodel.
+
+4. Compute the EVPPI of θ_I using the estimated losses for each d strategy, \hat{L}_d from the linear regression metamodel and applying the following equation:
+
+EVPPI_{θ_I} = \frac{1}{K}∑_{i=1}^{K}\max_d(\hat{L}_d)
+
+The spline model in step 3 is fitted using the 'mgcv' package.
+
+Whereas EVPI and EVPPI calculate the expected benefit of removing all uncertainty from the parameters, obtaining such perfect information is in practice impossible. We can only hope to reduce uncertainty. This is because of the finite sample size of every study, and limits to the generalizability of the study population to the general population. If we want a precise estimate, we need to calculate the expected value of sample information that will actually be obtained from a new study with finite sample size n. The EVSI is best presented in a graph as a function of sample size, and this graph will asymptotically reach EVPPI/EVPI.
+Put in more about the EVSI implementation in the package.
+
 ```{r}
 library(dampack)
 ```
@@ -49,6 +80,8 @@ pred_mm <- predict(mm,
                    nsamp = 10)
 head(pred_mm)
 ```
+
+The expected value of perfect information (EVPI) is the difference between the expected value of the decision made with perfect information about the uncertain parameters, and the decision made on the basis of existing evidence (Drummond). EVPI represents the maximum price that one would be willing to pay in order to gain access to perfect information.
 
 ```{r}
 evpi_obj <- calc_evpi(psa = psa_big,

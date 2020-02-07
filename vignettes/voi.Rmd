@@ -69,6 +69,7 @@ Whereas EVPI and EVPPI considers the benefit of removing all uncertainty from al
 
 * Questions * 
 Should we export all of these metamodel functions? Would a user ever want diagnose these functions directly?
+Should we go into detail about the metamodel functions within the vignette?
 For EVSI, should I remove the n_by_param option and only allow initial and additional sample sizes to be applied uniformly to all parameters?
 
 

@@ -285,7 +285,6 @@ plot.evsi <- function(x,
                        ylim = NULL,
                        col = c("full", "bw"),
                        ...) {
-  browser()
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
   if (length(unique(x$WTP)) == 1) {

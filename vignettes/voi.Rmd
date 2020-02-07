@@ -19,42 +19,55 @@ knitr::opts_chunk$set(
 )
 ```
 
-Value of information analysis (VoI) is a method for estimating the expected monetary or health gains from reducing uncertainty in the input parameters of a decision analytic model. Although a particular strategy is optimal because it maximizes expected net benefit given current information, this strategy could be suboptimal for certain plausible combinations of parameter values.  Therefore, the greater the uncertainty in the model input parameters, the greater the risk that the decision that is optimal in expectation is actually suboptimal in reality.  Parameter uncertainty can be reduced through new clinical trials and/or observational studies, and therefore VoI analysis is a useful tool for guiding the optimal allocation of research funds. The decision to fund a future research effort is only advisable if the expected benefit of the resulting reduction in parameter uncertainty outweighs the cost of executing the research effort. 
+# Background
 
-The expected value of perfect information (EVPI) is the expected benefit per patient of performing a future study with an infinite sample size that would eliminate all parameter uncertainty. EVPI is calculated as the average opportunity loss across all samples in the probabilistic sensitivity analysis. The opportunity loss per sample is defined as the difference between the maximum expected benefit in that sample (had we known the parameters perfectly and made the optimal choice) and the sample's expected benefit given the strategy chosen (the choice being made based on the average expected benefit).
+Value of information analysis (VoI) is a method for estimating the expected monetary or health gains from reducing uncertainty in the input parameters of a decision analytic model. Although a particular strategy is optimal because it maximizes expected net benefit given current information, this strategy could be suboptimal for certain plausible combinations of parameter values.  Therefore, the greater the uncertainty in the model input parameters, the greater the risk that the decision that is optimal in expectation is actually suboptimal in reality.  Parameter uncertainty can be reduced through new clinical trials and/or observational studies, and VoI analysis is a useful tool for guiding the optimal allocation of research funds. The decision to fund a future research effort is only advisable if the expected benefit of the resulting reduction in parameter uncertainty outweighs the cost of executing the research effort. 
 
-EVPI is frequently reported in terms of the net benefit of perfect information per patient, but \code{calc_evpi} also provides an option to specify the population size to calculate the EVPI for the total population.
+# EVPI
 
-The expected value of partial pefect information (EVPPI) is the expected value of perfect information from a subset of parameters of interest, θ_I, of a cost-effectiveness analysis (CEA) of D different strategies with parameters θ = \{ θ_I, θ_C\}, where θ_C is the set of complementary parameters of the CEA. The function calc_evppi computes the EVPPI of θ_I from a matrix of net monetary benefits B of the CEA. Each column of B corresponds to the net benefit B_d of strategy d. The function calc_evppi computes the EVPPI using a linear regression metamodel approach following these steps:
+The expected value of perfect information (EVPI) can be framed as the expected benefit of performing a study with an infinite sample size that would allow us to know the values of all the input parameters with complete certainty. EVPI is calculated as the average opportunity loss across all samples in a probabilistic sensitivity analysis. The opportunity loss for each sample in the PSA is the difference between the expected benefit of the optimal strategy in that specific sample and the expected benefit of the strategy that would have been chosen on the basis of average expected benefit over the entire PSA. In other words, opportunity loss is the benefit that is foregone when making the optimal decision given imperfect information if the parameter values in that sample are true.
 
-1. Determine the optimal strategy d^* from the expected net benefits \bar{B}
+* Hunink et al., Decision Making in Health and Medicine, 2nd ed., 2001, Cambridge University Press 
 
-d^* = argmax_{d} \{\bar{B}\}
+In 'dampack', EVPI is calculated using the function `calc_evpi()`, which requires a `psa` object (see *add in links?* `make_psa_object`, `gen_psa_samp`, `run_psa`), and a vector of numeric willingness-to-pay (`wtp`) thresholds as function inputs. EVPI is frequently reported in terms of the net benefit of perfect information per patient, but `calc_evpi` also provides an option to calculate the total EVPI for an entire population. If the benefits in the `psa` object already reflect the aggregated benefits for the entire population of interest, leave the `pop` input at its default value of `1`. `calc_evpi()` returns a data.frame of object class `evpi` containing the calculated EVPI at each WTP threshold provided in the input vector.
 
-2. Compute the opportunity loss for each d strategy, L_d
+```{r}
+evpi_obj <- calc_evpi(psa = psa_big,
+                      wtp = example_psa$wtp,
+                      pop = 1)
+evpi_obj
+```
 
-L_d = B_d - B_{d^*}
+The results contained in `evpi_obj` can be visualized using the `plot()` function, which has its own method for the `evpi` object class.
 
-3. Estimate a linear metamodel for the opportunity loss of each d strategy, L_d, by regressing them on the spline basis functions of θ_I, f(θ_I)
+```{r}
+p <- plot(evpi_obj,
+          txtsize = 16, effect_units = "QALY", currency = "Dollars ($)",
+          xbreaks = seq(0, 200, by = 10), ylim = c(0, 100000))
+p
+```
 
-L_d = β_0 + f(θ_I) + ε,
+For a full listing of the options for customizing the EVPI plot, type `?plot.evpi` in the console. Like all plots in `dampack`, the evpi plot object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is hosted at https://ggplot2.tidyverse.org/.
 
-where ε is the residual term that captures the complementary parameters θ_C and the difference between the original simulation model and the metamodel.
+# EVPPI
 
-4. Compute the EVPPI of θ_I using the estimated losses for each d strategy, \hat{L}_d from the linear regression metamodel and applying the following equation:
+The expected value of partial pefect information (EVPPI) is the expected value of perfect information from a subset of parameters of interest in a PSA. The function `calc_evppi` computes the EVPPI from a PSA using the following these steps:
 
-EVPPI_{θ_I} = \frac{1}{K}∑_{i=1}^{K}\max_d(\hat{L}_d)
+1. The optimal strategy given current information is determined from the PSA.
+2. The opportunity loss for each strategy is computed relative to the optimal strategy.
+3. Using either generalized additive models (GAM) or polynomial models, the opportunity loss for each strategy across each PSA sample is regressed on the basis functions of the parameters of interest.
+4. For each strategy, the opportunity loss attributable to the parameters of interest is estimated by the fitted metamodel, and the expected benefit of completely removing the uncertainty in these parameters is calculated in a fashion analogous to `calc_evpi`
 
 The spline model in step 3 is fitted using the 'mgcv' package.
 
-Whereas EVPI and EVPPI calculate the expected benefit of removing all uncertainty from the parameters, obtaining such perfect information is in practice impossible. We can only hope to reduce uncertainty. This is because of the finite sample size of every study, and limits to the generalizability of the study population to the general population. If we want a precise estimate, we need to calculate the expected value of sample information that will actually be obtained from a new study with finite sample size n. The EVSI is best presented in a graph as a function of sample size, and this graph will asymptotically reach EVPPI/EVPI.
-Put in more about the EVSI implementation in the package.
+Whereas EVPI and EVPPI consider the expected benefit of removing all uncertainty from all of or a subset of parameters, EVSI considers the benefit of removing some uncertainty through a further study of finite sample size. EVPI and EVPPI obtaining such perfect information is in practice impossible. We can only hope to reduce uncertainty. This is because of the finite sample size of every study, and limits to the generalizability of the study population to the general population. If we want a precise estimate, we need to calculate the expected value of sample information that will actually be obtained from a new study with finite sample size n. The EVSI is best presented in a graph as a function of sample size, and this graph will asymptotically reach EVPPI/EVPI.
+The proposed approach uses a single
+probabilistic sensitivity analysis (PSA) data set and involves 2 steps: 1) a linear metamodel step to compute the EVSI
+on the preposterior distributions and 2) a GA step to compute the preposterior distribution of the parameters of
+interest.
 
 ```{r}
 library(dampack)
-```
-
-```{r}
 data("example_psa")
 psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
                         example_psa$parameters, example_psa$strategies)
@@ -81,21 +94,8 @@ pred_mm <- predict(mm,
 head(pred_mm)
 ```
 
-The expected value of perfect information (EVPI) is the difference between the expected value of the decision made with perfect information about the uncertain parameters, and the decision made on the basis of existing evidence (Drummond). EVPI represents the maximum price that one would be willing to pay in order to gain access to perfect information.
 
-```{r}
-evpi_obj <- calc_evpi(psa = psa_big,
-                      wtp = example_psa$wtp,
-                      pop = 1)
-evpi_obj
-```
 
-```{r}
-p <- plot(evpi_obj,
-          txtsize = 16, effect_units = "QALY", currency = "Dollars ($)",
-          xbreaks = seq(0, 200, by = 10), ylim = c(0, 100000))
-p
-```
 
 ```{r}
 evppi <- calc_evppi(psa = psa_big,

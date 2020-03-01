@@ -12,7 +12,7 @@
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}.
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
-#'@param currency symbol for the currency being used (ex. "$", "£")
+#' @param currency symbol for the currency being used (ex. "$", "£")
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
 #'
@@ -100,22 +100,6 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
 
 
     names(psa_out) <- outcomes
-
-
-    effect_outcome <- intersect(outcomes, c("EFFECTIVENESS", "effectiveness", "Effectiveness",
-                                            "EFFECT", "effect", "Effect",
-                                            "EFFECTS", "effects", "Effects"))
-    cost_outcome <- intersect(outcomes, c("COST", "cost", "Cost",
-                                          "COSTS", "costs", "Costs"))
-
-    if (!is.null(cost_outcome) & !is.null(effect_outcome)) {
-      cea_psa <- make_psa_obj(cost = sim_out_df[[cost_outcome]],
-                              effectiveness = sim_out_df[[effect_outcome]],
-                              parameters = psa_samp[, -1], strategies = strategies,
-                              currency = currency)
-      psa_out <- append(list(cea_psa), psa_out)
-      names(psa_out) <- c("cea_psa", outcomes)
-    }
 
     return(psa_out)
   }

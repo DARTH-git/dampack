@@ -196,14 +196,13 @@ psa_output <- run_psa(psa_samp = l_params_all,
                       outcomes = c("Cost", "Effect", "NMB"),
                       strategies = c("No_Treatment", "Treatment"))
 
-# Becasue cost and effect outcomes were present, a psa object compatible 
-# with downstream dampack functions was automatically created as the first list element of psa_output
-cea_psa <- psa_output[[1]]
-
-cea_psa <- make_psa_obj(cost = "Cost",
-                        effectiveness = "Effect", 
-                        run_psa_obj = psa_output, 
-                        strategies = c("No_Treatment", "Treatment"))
+### outcomes are stored in "other_outcome" and we need to make a psa object 
+### that specifies which outcomes are costs and effects in order to do CEA
+cea_psa <- make_psa_obj(cost = psa_output$Cost$other_outcome, 
+                        effect = psa_output$Effect$other_outcome, 
+                        parameters = psa_output$Cost$parameters,
+                        strategies = psa_output$Cost$strategies,
+                        currency = "$")
 
 ### demonstrating the passing of extra parameters to calculated_ce_out (n_wtp)
 psa_output2 <- run_psa(psa_samp = l_params_all, 

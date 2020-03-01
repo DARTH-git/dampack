@@ -10,8 +10,7 @@ make_psa_obj(
   parameters = NULL,
   strategies = NULL,
   currency = "$",
-  other_outcome = NULL,
-  run_psa_obj = NULL
+  other_outcome = NULL
 )
 }
 \arguments{
@@ -41,8 +40,6 @@ in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
-
-\item{run_psa_obj}{output from \code{\link{run_psa}}.}
 }
 \value{
 An object of class \code{psa}

@@ -300,7 +300,7 @@ plot.evsi <- function(x,
     g <- ggplot(data = x,
                 aes_(x = as.name("WTP_thou"), y = as.name("EVSI"))) +
       xlab(scale_text)
-  } else if (length(unique(x$WTP > 1)) & length(unique(x$n)) > 1 ) {
+  } else if (length(unique(x$WTP > 1)) & length(unique(x$n)) > 1) {
     x$WTP_thou <- as.factor(x$WTP_thou)
     g <- ggplot(data = x,
                 aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +

@@ -19,13 +19,56 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r}
-library(dampack)
-```
+The probabilistic sensitivity analysis (PSA) object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` PSA object from an existing PSA dataset, and what can be done once the PSA object is created in `dampack`.
+
+`dampack` has additional functionality for generating your own PSA dataset with a user-defined decision model and specified parameter distributions, and those methods are covered in the `psa_generation` vignette. Even if you intend to generate your own PSA dataset using `dampack`, it is recommended that you continue reading this vignette (`psa_analysis`) first.
+
+## Probability Sensitivity Analysis: An Introduction
+
+The purpose of a PSA is to translate model parameter uncertainty into decision uncertainty, reflected as uncertainty as to which strategy is optimal (i.e. has the highest probability of maximizing net monetary benefit). Each uncertain parameter that factors into the decision model is defined by a probability distribution that is independent of the other input parameter distributions. To generate a single PSA sample, a single value is randomly drawn for each parameter from its respective distribution, and those parameter values are plugged into the decision model to calculate the resulting outcomes of interest for each strategy. A large number of samples, say 10,000, are generated in this way, with each iteration using one set of values from the distributions of the parameters and each iteration yielding one set of outcome values. The resulting distribution of outcome values across the PSA samples can translate into decision uncertainty when certain strategies are favored in some samples but not in others.
+
+
+## PSA in dampack
+
+The PSA object is created using the function `make_psa_obj`. We can see the types of data we need by examining what arguments this function takes. To see more information, you can write `?make_psa_obj` in the R console. As the arguments (and the help text) show, we need the `cost`, `effectiveness`, `strategies` (optional), and `currency` (also optional). 
+
+### Read in data
+
+**explanation of data here?**
+There is example data provided with dampack that allows us to illustrate the required structure of each of these parts of a PSA.
 
 ```{r}
+library(dampack)
 data("example_psa")
 ```
+
+
+We can see the structure of the object with `str()`:
+```{r}
+str(example_psa)
+```
+
+We can ignore the `wtp` part for now. The other parts of the `example_psa` object are:
+
+- `strategies`: a list of three strategy names
+```{r}
+example_psa$strategies
+```
+
+- `cost`: a data frame of the cost of carrying out each strategy. The columns are the strategies and the
+rows are the PSA samples (of which there were 10,000).
+```{r}
+head(example_psa$cost)
+```
+
+- `effectiveness`: a data frame of the effects of carrying out each strategy, with the same structure as `costs`
+```{r}
+head(example_psa$effectiveness)
+```
+
+Note that the columns have names that suggest the strategy and the outcome type in the `example_psa`. When using the `make_psa_obj()` function, it is not actually necessary for the column names in the `cost` and `effectiveness` data.frame inputs to follow this convention; however, it is *critical* that the vector of strategies (`example_psa$strategies`) and the columns of the `cost` and `effectiveness` data.frames be in the same order.
+
+Now, let's make the PSA object and look at its structure:
 
 ```{r}
 psa_obj <- make_psa_obj(cost = example_psa$cost,
@@ -33,25 +76,35 @@ psa_obj <- make_psa_obj(cost = example_psa$cost,
                         parameters = example_psa$parameters,
                         strategies = example_psa$strategies,
                         currency = "$")
+str(psa_obj)
 ```
 
+The `psa` object has its own specialized plotting functionality, and the input options for `plot.psa` can be displayed by typing `?plot.psa` in the console. Each dot in the plot represents the the cost and effectiveness of a specific strategy for a single sample of the PSA. The ellipses (shown by default) helps to visualize the clustering of each strategy in the cost-effectiveness space.
 
 ```{r fig.width = 7, fig.height = 5, fig.align = "center"}
 plot(psa_obj)
 ```
 
+When you call `summary()` on a `psa` object, a data.frame is returned that displays the mean cost and mean effect across all of the PSA samples for each strategy. If `calc_sds` is set to `TRUE`, then the standard deviations for these outcomes are displayed as well.
+
 ```{r}
-psa_sum <- summary(psa_obj)
+psa_sum <- summary(psa_obj, calc_sds = TRUE)
+psa_sum
 ```
+
+For more information about how to use `dampack` to calculate, visualize, and analyze the ICERs for the different strategies compared in a PSA, please see the `basic_cea` vignette.
 
 ```{r fig.height = 5, fig.width = 7}
 icers <- calculate_icers(cost = psa_sum$meanCost, effect = psa_sum$meanEffect, strategies = psa_sum$Strategy)
 plot(icers)
 ```
 
-```{r fig.height = 5, fig.width = 7}
-plot(icers, label = "all")
-```
+##
+
+
+A strategy's cost-effectiveness is frequently discussed in terms of either net health benefit or net monetary benefit. To calculate a strategy's net health benefit, the cost associated with the strategy is divided by the willingness-to-pay threshold (WTP) and added to the QALYs gained, and to calculate a strategy's net monetary benefit, the number of QALYs gained is multiplied by the WTP threshold and added to the cost. Describing strategies in terms of net health benefit or net monetary benefit is convenient because it allows one to compare the cost-effectiveness of the strategies using a single metric, but these comparisons are sometimes very sensitive to the exact WTP threshold that is used to convert QALYs to currency, or vice versa. The degree to which the choice of willingness-to-pay threshold influences the decision can be analyzed using a cost-effectiveness acceptability curve. The acceptability curves plot the relative frequency or probability that each strategy is cost-effective compared to the alternatives for varying values for society's willingness-to-pay.
+
+`ceac` stands for cost-effectiveness acceptability curve(s), and the `ceac()` function takes a `psa` object and a numeric vector of willingness to pay thresholds to create a `ceac` object, which is essentially a data.frame with special plotting functionality.
 
 ```{r}
 ceac_obj <- ceac(wtp = example_psa$wtp, psa = psa_obj)
@@ -67,17 +120,15 @@ plot(ceac_obj, frontier = TRUE, points = TRUE)
 plot(ceac_obj, frontier = FALSE, points = FALSE)
 ```
 
-```{r}
-evpi <- calc_evpi(wtp = example_psa$wtp, psa = psa_obj)
-head(evpi)
-plot(evpi)
-```
+##
 
 ```{r}
 el <- calc_exp_loss(wtp = example_psa$wtp, psa = psa_obj)
 head(el)
 plot(el, n_x_ticks = 8, n_y_ticks = 6)
 ```
+
+##
 
 ```{r}
 o <- owsa(psa_obj)
@@ -88,6 +139,7 @@ o <- owsa(psa_obj)
 plot(o)
 ```
 
+##
 
 ```{r}
 owsa_tornado(o)
@@ -103,6 +155,8 @@ owsa_tornado(o, min_rel_diff = 0.05)
 owsa_tornado(o, return = "data")
 ```
 
+##
+
 ```{r, fig.height = 6, fig.width = 8}
 owsa_opt_strat(o)
 ```
@@ -110,6 +164,8 @@ owsa_opt_strat(o)
 ```{r}
 owsa_opt_strat(o, return = "data")
 ```
+
+##
 
 ```{r}
 tw <- twsa(psa_obj, param1 = "pFailChemo", param2 = "muDieCancer")

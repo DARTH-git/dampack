@@ -157,7 +157,11 @@ n_age_max  <- 55                # maximum age of follow up
 n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
 v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
 n_s <- length(v_n)                            # number of health states 
+```
 
+
+
+```{r}
 my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
                "p_HD", "hr_S1", "hr_S2", 
                "c_H", "c_S1", "c_S2", 

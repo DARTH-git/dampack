@@ -21,11 +21,13 @@ knitr::opts_chunk$set(
 
 # Overview
 
-Value of information analysis (VoI) is a method for estimating the expected monetary gain from reducing uncertainty in the input parameters of a decision analytic model. Although a particular strategy is optimal because it maximizes expected net benefit given current information, this strategy could be suboptimal for certain plausible combinations of parameter values.  Therefore, the greater the uncertainty in the model input parameters, the greater the risk that the decision that is optimal in expectation is actually suboptimal in reality.  Parameter uncertainty can be reduced through new clinical trials and/or observational studies, and VoI analysis is a useful tool for guiding the optimal allocation of research funds. The decision to fund a future research effort is only advisable if the expected benefit of the resulting reduction in parameter uncertainty outweighs the cost of executing the research effort. 
+Value of information analysis (VoI) is a method for estimating the expected monetary gain from reducing uncertainty in the input parameters of a decision analytic model.  Although a particular strategy is optimal because it maximizes expected net benefit given current information, this strategy could be suboptimal for certain plausible combinations of parameter values.  Therefore, the greater the uncertainty in the model input parameters, the greater the risk that the decision that is optimal in expectation is actually suboptimal in reality.  Parameter uncertainty can be reduced through new clinical trials and/or observational studies, and VoI analysis is a useful tool for guiding the optimal allocation of research funds. The decision to fund a future research effort is only advisable if the expected benefit of the resulting reduction in parameter uncertainty outweighs the cost of executing the research effort. 
+
+Although there are multiple methods for estimating value of information, the `dampack` package exclusively uses the probabilistic sensitivity analysis (PSA) for all of its VoI estimation functions. For more information about creation and analysis of PSAs in `dampack`, please refer to the vignettes for `psa_generation` and `psa_analysis` before proceeding.
 
 # EVPI
 
-The expected value of perfect information (EVPI) can be framed as the expected benefit of performing a study with an infinite sample size that would allow us to know the values of all the input parameters with complete certainty. EVPI is calculated as the average opportunity loss across all samples in a probabilistic sensitivity analysis. The opportunity loss for each sample in the PSA is the difference between the expected benefit of the optimal strategy in that specific sample and the expected benefit of the strategy that would have been chosen on the basis of average expected benefit over the entire PSA. In other words, opportunity loss is the benefit that is foregone when making the optimal decision given imperfect information if the parameter values in that sample are true.
+The expected value of perfect information (EVPI) can be framed as the expected benefit of performing a study with an infinite sample size that would allow us to know the values of all the input parameters with complete certainty. With perfect information, there would be no uncertainty in the output of the decision model and the truly optimal strategy could be identified. In `dampack`, EVPI is calculated as the average opportunity loss across all samples in a probabilistic sensitivity analysis. The opportunity loss for each sample in the PSA is the difference between the expected benefit of the optimal strategy in that specific sample and the expected benefit of the strategy that would have been chosen on the basis of average expected benefit over the entire PSA. In other words, opportunity loss is the benefit that is foregone when making the optimal decision given imperfect information if the parameter values in that sample are true.
 
 In 'dampack', EVPI is calculated using the function `calc_evpi()`, which requires a `psa` object (see *add in links?* `make_psa_object`, `gen_psa_samp`, `run_psa`), and a vector of numeric willingness-to-pay (`wtp`) thresholds as function inputs. EVPI is frequently reported in terms of the net benefit of perfect information per patient, but `calc_evpi` also provides an option to calculate the total EVPI for an entire population. If the benefits in the `psa` object already reflect the aggregated benefits for the entire population of interest, leave the `pop` input at its default value of `1`. `calc_evpi()` returns a data.frame of object class `evpi` containing the calculated EVPI at each WTP threshold provided in the input vector.
 
@@ -54,6 +56,12 @@ p
 
 For a full listing of the options for customizing the EVPI plot, type `?plot.evpi` in the console. Like all plots in `dampack`, the evpi plot object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is hosted at https://ggplot2.tidyverse.org/.
 
+# Metamodeling VoI Functions
+
+`dampack` uses a technique known as metamodeling in its approach to estimating two other VoI measures, the expected value of partial perfect information (EVPPI) and the expected value of sample information (EVSI). In this context, a metamodel is a regression model that treats the expected loss of each strategy as the dependent variable and the decision model parameters of interest as the predictors. The expected losses for each row and strategy form a set of observations of the dependent variable, and the corresponding parameter values for those PSA samples form a set of predictor values for the regression.
+
+The metamodeling functions are internal to `dampack`'s VoI functions, but they can also be manually called by the user for the diagnosis model fit, among other things. These metamodeling functions will be explored in greater detail at the end of this vignette.  
+
 # EVPPI
 
 The expected value of partial pefect information (EVPPI) is the expected value of perfect information from only a subset of parameters of interest in a PSA. The function `calc_evppi` computes the EVPPI from a PSA using the following these steps:
@@ -65,18 +73,21 @@ The expected value of partial pefect information (EVPPI) is the expected value o
 
 # EVSI
 
-Whereas EVPI and EVPPI considers the benefit of removing all uncertainty from all or some parameters, expected value of sample information (EVSI) considers the benefit of reducing only some uncertainty through a future study of finite sample size. In some sense, EVSI is more practical than EVPI and EVPPI because it is impossible to obtain absolutely perfect information about the model parameters. EVPI and EVPPI can give us an upper limit on how much money should be allocated to future research projects, but EVSI can provide an estimate for the return on investment for a financially realistic research design of effective sample size n. As the proposed sample size (n) approaches infinity, the EVSI approaches either the EVPPI or EVPI of the PSA, depending upon the parameters of interest.
+Whereas EVPI and EVPPI considers the benefit of removing all uncertainty from all or some parameters, expected value of sample information (EVSI) considers the benefit of reducing only some uncertainty through a future study of finite sample size. In some sense, EVSI is more practical than EVPI and EVPPI because it is impossible to obtain absolutely perfect information about the model parameters. EVPI and EVPPI can give us an upper limit on how much money should be allocated to future research projects, but EVSI can provide an estimate for the return on investment for a financially realistic research design of effective sample size n. As the proposed effective sample size (n) approaches infinity, the EVSI approaches either the EVPPI or EVPI of the PSA, depending upon the parameters of interest.
 
-* Questions * 
-Should we export all of these metamodel functions? Would a user ever want diagnose these functions directly?
-Should we go into detail about the metamodel functions within the vignette?
-For EVSI, should I remove the n_by_param option and only allow initial and additional sample sizes to be applied uniformly to all parameters?
+`dampack`'s calculation of EVSI follows the same steps as the calculation for EVPPI until the point at which the metamodel is used to estimate the opportunity loss of each strategy for each PSA sample. Assuming that the means and variances of the underlying parameter distributions in the PSA came from a previous study of effective sample size n0, a Gaussian approximation is used to estimate the new means and variances of these parameters after a hypothetical study of effective sample size n has been completed. For in-depth details on `dampack`'s methodology for estimating EVPPI and EVSI, please refer to:
 
+Jalal H, Alarid-Escudero F. A General Gaussian Approximation Approach for Value of Information Analysis. Med Decis Making. 2018;38(2):174-188.
 
+# Metamodeling Appendix
 
 ```{r}
-mm <- metamodel(analysis = "twoway", psa = psa_big, params = c("pFailChemo", "cChemo"), 
-                strategies = "Chemo", outcome = "eff", type = "gam")
+mm <- metamodel(analysis = "twoway",
+                psa = psa_big, 
+                params = c("pFailChemo", "cChemo"), 
+                strategies = "Chemo", 
+                outcome = "eff", 
+                type = "gam")
 ```
 
 ```{r}

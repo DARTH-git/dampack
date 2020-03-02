@@ -104,7 +104,7 @@ plot(icers)
 
 A strategy's cost-effectiveness is frequently discussed in terms of either net health benefit or net monetary benefit. To calculate a strategy's net health benefit, the cost associated with the strategy is divided by the willingness-to-pay threshold (WTP) and added to the QALYs gained, and to calculate a strategy's net monetary benefit, the number of QALYs gained is multiplied by the WTP threshold and added to the cost. Describing strategies in terms of net health benefit or net monetary benefit is convenient because it allows one to compare the cost-effectiveness of the strategies using a single metric, but these comparisons are sometimes very sensitive to the exact WTP threshold that is used to convert QALYs to currency, or vice versa. The degree to which the choice of willingness-to-pay threshold influences the decision can be analyzed using a cost-effectiveness acceptability curve. The acceptability curves plot the relative frequency or probability that each strategy is cost-effective compared to the alternatives for varying values for society's willingness-to-pay.
 
-`ceac` stands for cost-effectiveness acceptability curve(s), and the `ceac()` function takes a `psa` object and a numeric vector of willingness to pay thresholds to create a `ceac` object, which is essentially a data.frame with special plotting functionality.
+The `ceac()` function (`ceac` stands for cost-effectiveness acceptability curve) takes a `psa` object and a numeric vector of willingness to pay thresholds to create a `ceac` object, which is essentially a data.frame with special plotting functionality.
 
 ```{r}
 ceac_obj <- ceac(wtp = example_psa$wtp, psa = psa_obj)

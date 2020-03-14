@@ -79,7 +79,7 @@ psa_obj <- make_psa_obj(cost = example_psa$cost,
 str(psa_obj)
 ```
 
-The `psa` object has its own specialized plotting functionality, and the input options for `plot.psa` can be displayed by typing `?plot.psa` in the console. Each dot in the plot represents the the cost and effectiveness of a specific strategy for a single sample of the PSA. The ellipses (shown by default) helps to visualize the clustering of each strategy in the cost-effectiveness space.
+The `psa` object has its own specialized plotting functionality, and the input options for `plot.psa` can be displayed by typing `?plot.psa` in the console. Each dot in the plot represents the the cost and effectiveness of a specific strategy for a single sample of the PSA. The ellipses (shown by default) helps to visualize the clustering of each strategy on the cost-effectiveness plane.
 
 ```{r fig.width = 7, fig.height = 5, fig.align = "center"}
 plot(psa_obj)
@@ -104,23 +104,29 @@ plot(icers)
 
 A strategy's cost-effectiveness is frequently discussed in terms of either net health benefit or net monetary benefit. To calculate a strategy's net health benefit, the cost associated with the strategy is divided by the willingness-to-pay threshold (WTP) and added to the QALYs gained, and to calculate a strategy's net monetary benefit, the number of QALYs gained is multiplied by the WTP threshold and added to the cost. Describing strategies in terms of net health benefit or net monetary benefit is convenient because it allows one to compare the cost-effectiveness of the strategies using a single metric, but these comparisons are sometimes very sensitive to the exact WTP threshold that is used to convert QALYs to currency, or vice versa. The degree to which the choice of willingness-to-pay threshold influences the decision can be analyzed using a cost-effectiveness acceptability curve. The acceptability curves plot the relative frequency or probability that each strategy is cost-effective compared to the alternatives for varying values for society's willingness-to-pay.
 
-The `ceac()` function (`ceac` stands for cost-effectiveness acceptability curve) takes a `psa` object and a numeric vector of willingness to pay thresholds to create a `ceac` object, which is essentially a data.frame with special plotting functionality.
+The `ceac()` function (`ceac` stands for cost-effectiveness acceptability curve) takes a `psa` object and a numeric vector of willingness to pay thresholds to create a `ceac` object, which is essentially a data.frame with special plotting functionality. The proportion column of the `ceac` object is the proportion of PSA samples in which that particular strategy had the maximum benefit at the corresponding WTP. The `On_Frontier` column indicates whether a strategy was on the cost-effectiveness acceptability frontier at the corresponding WTP. A strategy is on the cost-effectiveness acceptability frontier if it maximizes expected benefit *on average* across all samples of the PSA at the WTP being considered. Note that this designation is fundamentally different than identifying the strategy that has the highest probability of being cost-effective across all samples of the PSA.
 
 ```{r}
 ceac_obj <- ceac(wtp = example_psa$wtp, psa = psa_obj)
 head(ceac_obj)
 ```
 
+Using the `summary()` function on a `ceac` object yields a data.frame that reports the strategies that are on the cost-effectiveness acceptability frontier along with the ranges of WTP values for which these optimal strategies are most cost-effective.
+
 ```{r}
 summary(ceac_obj)
 ```
 
+Plotting a `ceac` object yields a `ggplot2` graph showing the cost-effectiveness acceptability curves for all strategies where the y-axis indicates the probability that each strategy is cost-effective and the x-axis indicates the WTP threshold. By default, the strategies on the cost-effectiveness acceptability frontier are marked with black boxes, and the exact values calculated within the `ceac` object at each provided WTP threshold are marked with points. For more plotting details, see `?plot.ceac`.
+
 ```{r}
 plot(ceac_obj, frontier = TRUE, points = TRUE)
-plot(ceac_obj, frontier = FALSE, points = FALSE)
 ```
 
 ##
+Alternatively, the degree to which cost-effectiveness varies with respect to the WTP threshold can be visualized using an expected loss curve (ELC). Expected loss is a quantification of the consequences of choosing a suboptimal strategy in terms of expected foregone benefits. The strategy that minimizes the expected loss at a given WTP value is the optimal decision given current information, and consequently the graph's relationship to the cost-effectiveness acceptability frontier is somewhat more intutive than for CEACs. For an in-depth discussion on the advantages of ELCs in cost-effectiveness analysis, please refer to:
+
+Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability Curves and Frontier. Value Health. 2019;22(5):611-618.
 
 ```{r}
 el <- calc_exp_loss(wtp = example_psa$wtp, psa = psa_obj)

@@ -28,7 +28,6 @@
 #' in the \code{\link{make.names}} help page, to avoid unexpected errors.
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
-#' @param run_psa_obj output from \code{\link{run_psa}}.
 #'
 #' @details
 #' The PSA object forms the backbone of one part of the \code{dampack} package.
@@ -70,32 +69,7 @@
 #' @importFrom stringr str_replace
 #' @export
 make_psa_obj <- function(cost, effectiveness, parameters = NULL,
-                         strategies = NULL, currency = "$", other_outcome = NULL,
-                         run_psa_obj = NULL) {
-
-  if (!is.null(run_psa_obj)) {
-
-    if (!is.character(c(cost, effectiveness))) {
-      stop(paste0("cost and effectiveness inputs must be corresponding outcome names from user-defined function if
-                  run_psa_obj is provided. Use the default, run_psa_obj = NULL, if  providing cost, effectiveness, and
-                  parameters data.frames directly."))
-    }
-
-    parameters <- run_psa_obj[[1]]$parameters
-    effectiveness <- run_psa_obj[[effectiveness]]$other_outcome
-    cost <- run_psa_obj[[cost]]$other_outcome
-  }
-
-  if (is.null(run_psa_obj)) {
-    if (!is.data.frame(other_outcome) & (!is.data.frame(cost) | !is.data.frame(cost))) {
-      stop(paste0("cost, effectiveness, and other_outcome inputs must be corresponding data.frames if
-                  run_psa_obj input is NULL"))
-    }
-  }
-
-  if (is.null(parameters)) {
-    stop(paste0("parameters data.frame must be provided if run_psa_obj input is NULL"))
-  }
+                         strategies = NULL, currency = "$", other_outcome = NULL) {
 
   # parameter names
   parnames <- names(parameters)

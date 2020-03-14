@@ -5,7 +5,7 @@
 #'
 #' @param sa_obj sensitivity analysis object;
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
-#' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
+#' a deterministic sensitivity analysis object (\code{\link{run_owsa_det}})
 #' @param nsamps number of samples to take from the ranges
 #' @inheritParams metamodel
 #' @inheritParams predict.metamodel

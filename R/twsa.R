@@ -6,7 +6,7 @@
 #'
 #' @param sa_obj sensitivity analysis object;
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
-#' a deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
+#' a deterministic sensitivity analysis object (\code{\link{run_owsa_det}})
 #'
 #' @param param1 String with the name of the first parameter of interest
 #' @param param2 String with the name of the second parameter of interest

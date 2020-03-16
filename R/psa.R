@@ -152,7 +152,6 @@ plot.psa <- function(x,
                      xlim = NULL,
                      ylim = NULL,
                      ...) {
-
   effectiveness <- x$effectiveness
   cost <- x$cost
   strategies <- x$strategies

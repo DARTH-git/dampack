@@ -228,8 +228,8 @@ plot.icers <- function(x,
                        ybreaks = NULL,
                        xlim = NULL,
                        ylim = NULL,
-                       xexpand = expand_scale(0.1),
-                       yexpand = expand_scale(0.1),
+                       xexpand = expansion(0.1),
+                       yexpand = expansion(0.1),
                        ...) {
   # type checking
   label <- match.arg(label)

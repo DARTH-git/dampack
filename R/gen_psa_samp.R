@@ -126,14 +126,16 @@
 #'
 #' @importFrom stats rbeta rgamma rlnorm rnorm
 #' @importFrom truncnorm rtruncnorm
+#' @importFrom triangle rtriangle
 #' @export
 
 gen_psa_samp <- function(params = NULL,
                          dists = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
-                                  "dirichlet", "bootstrap", "constant"),
+                                  "dirichlet", "bootstrap", "constant", "triangle"),
                          parameterization_types = c("mean, sd", "a, b", "shape, scale",
                                                    "value, mean_prop, sd", "value, n",
-                                                   "value, alpha", "mean, sd, ll, ul", "val", "meanlog, sdlog"),
+                                                   "value, alpha", "mean, sd, ll, ul", "val",
+                                                   "meanlog, sdlog", "ll, ul, mode"),
                          dists_params = NULL,
                          nsamp = 100) {
 
@@ -233,6 +235,17 @@ gen_psa_samp <- function(params = NULL,
                                    prob = dists_params[[i]][, 2]))
       }
       params_df[[i]] <- as.data.frame(samp_vec)
+      names(params_df[[i]]) <- paste0(params[i])
+    }
+
+    #triangle
+    if (dists[i] == "triangle") {
+      if (parameterization_types[i] == "ll, ul, mode") {
+        a <- dists_params[[i]][1]
+        b <- dists_params[[i]][2]
+        c <- dists_params[[i]][3]
+        params_df[[i]] <- as.data.frame(rtriangle(n = nsamp, a = a, b = b, c = c))
+      }
       names(params_df[[i]]) <- paste0(params[i])
     }
 

@@ -26,7 +26,8 @@ Imports:
     scales,
     stringr,
     mgcv,
-    truncnorm
+    truncnorm,
+    triangle
 Suggests:
     testthat,
     lintr,

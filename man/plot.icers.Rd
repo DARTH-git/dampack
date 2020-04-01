@@ -19,8 +19,8 @@
   ybreaks = NULL,
   xlim = NULL,
   ylim = NULL,
-  xexpand = expand_scale(0.1),
-  yexpand = expand_scale(0.1),
+  xexpand = expansion(0.1),
+  yexpand = expansion(0.1),
   ...
 )
 }
@@ -58,11 +58,11 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
 
 \item{xexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
-The default behavior in ggplot2 is \code{expand_scale(0.05)}. See \code{\link[ggplot2]{expand_scale}}
+The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
 for how to modify this.}
 
 \item{yexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
-The default behavior in ggplot2 is \code{expand_scale(0.05)}. See \code{\link[ggplot2]{expand_scale}}
+The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
 for how to modify this.}
 
 \item{...}{further arguments to plot.

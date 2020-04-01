@@ -16,7 +16,7 @@
 #' @param xlim,ylim vector of axis limits, or NULL, which sets limits automatically
 #' @param xtrans,ytrans transformations for the axes. See \code{\link[ggplot2]{scale_continuous}} for details.
 #' @param xexpand,yexpand Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
-#' The default behavior in ggplot2 is \code{expand_scale(0.05)}. See \code{\link[ggplot2]{expand_scale}}
+#' The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
 #' for how to modify this.
 #' @param ... further arguments to plot.
 #' This is not used by \code{dampack} but required for generic consistency.

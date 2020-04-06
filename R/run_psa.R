@@ -28,8 +28,13 @@
 run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
                     strategies = NULL, currency = "$", ...) {
   opt_arg_val <- list(...)
+
   if (!is.null(params_basecase)) {
-    fun_input_test <- c(list(c(psa_samp[1, ], params_basecase)), opt_arg_val)
+      replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
+      new_params <- params_basecase
+      # replace values in new_params
+      new_params[replace_var] <- psa_samp[1, replace_var]
+      fun_input_test <- c(list(new_params), opt_arg_val)
   } else {
     fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
   }
@@ -64,9 +69,15 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
 
   sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
 
+
+
   if (!is.null(params_basecase)) {
+    replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
+    new_params <- params_basecase
     for (i in seq_len(nrow(psa_samp))) {
-      fun_input_ls <- c(list(c(psa_samp[i, ], params_basecase)), opt_arg_val)
+      # replace values in new_params
+      new_params[replace_var] <- psa_samp[i, replace_var]
+      fun_input_ls <- c(list(new_params), opt_arg_val)
       sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
     }
   } else {

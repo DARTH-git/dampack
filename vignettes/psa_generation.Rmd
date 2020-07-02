@@ -192,11 +192,7 @@ l_params_all <- gen_psa_samp(params = my_params,
                              parameterization_types = my_parameterization_types,
                              dists_params = my_dists_params)
 
-l_params_basecase <- list(u_D = 0, c_D = 0, d_e = 0.03, d_c = 0.03,
-                          p_HS1 = NA, p_S1H = NA, p_S1S2 = NA, p_HD = NA,
-                          hr_S1 = NA, hr_S2 = NA, c_H = NA, c_S1 = NA,
-                          c_S2 = NA, c_Trt = NA, u_H = NA, u_S1 = NA, u_S2 = NA,
-                          u_Trt = NA)
+l_params_basecase <- list(u_D = 0, c_D = 0, d_e = 0.03, d_c = 0.03)
 
 psa_output <- run_psa(psa_samp = l_params_all,
                       params_basecase = l_params_basecase,

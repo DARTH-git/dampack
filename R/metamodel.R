@@ -43,6 +43,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
                                   "nhb_loss_voi", "nmb_loss_voi"),
                       wtp = NULL,
                       type = c("linear", "gam", "poly"), poly.order = 2, k = -1) {
+
   # get parameter names
   pnames <- psa$parnames
 
@@ -142,18 +143,24 @@ mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
   if (type == "linear") {
     # build formula
     ## dependent variable
-    fdep <- paste0(dep, " ~ ")
+    fbeg <- paste0(dep, " ~ ")
 
-    ## parameter of interest
-    fparam <- params
+    if (n_params > 1) {
+      ## parameters of interest
+      fparam <- paste(params, collapse = " + ")
+    } else {
+      ## parameter of interest
+      fparam <- params
+    }
 
     ## combine
-    f <- as.formula(paste0(fdep, fparam))
+    f <- as.formula(paste0(fbeg, fparam))
 
     # run metamodel
     metamod <- lm(f, data = dat)
     metamod$call <- call("lm", formula = f, data = quote(dat))
   }
+
   if (type == "poly") {
     # build formula
     ## dependent variable
@@ -171,6 +178,7 @@ mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
     metamod <- lm(f, data = dat)
     metamod$call <- call("lm", formula = f, data = quote(dat))
   }
+
   if (type == "gam") {
     # build formula
     fbeg <- paste0(dep, " ~ ")

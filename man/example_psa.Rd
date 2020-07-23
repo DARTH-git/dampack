@@ -4,7 +4,9 @@
 \name{example_psa}
 \alias{example_psa}
 \title{Sample PSA data for testing}
-\format{An object of class \code{list} of length 5.}
+\format{
+An object of class \code{list} of length 5.
+}
 \usage{
 example_psa
 }

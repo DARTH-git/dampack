@@ -71,17 +71,15 @@ test_that("check output of run_owsa_det", {
 
   min_val <- o %>%
     group_by(parameter) %>%
-    summarise(min_val = min(param_val)) %>%
-    select(min_val)
+    summarise(min_val = min(param_val))
   expect_equal(min_val$min_val,
-               params_range2[, "min"])
+               params_range2[order(match(params_range2$pars,min_val$parameter)), "min"])
 
   max_val <- o %>%
     group_by(parameter) %>%
-    summarise(max_val = max(param_val)) %>%
-    select(max_val)
+    summarise(max_val = max(param_val))
   expect_equal(max_val$max_val,
-               params_range2[, "max"])
+               params_range2[order(match(params_range2$pars,max_val$parameter)), "max"])
 })
 
 

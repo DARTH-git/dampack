@@ -4,7 +4,9 @@
 \name{psa_cdiff}
 \alias{psa_cdiff}
 \title{Sample PSA dataset}
-\format{An object of class \code{psa} (inherits from \code{sa}) of length 6.}
+\format{
+An object of class \code{psa} (inherits from \code{sa}) of length 6.
+}
 \usage{
 psa_cdiff
 }

@@ -8,9 +8,9 @@ gen_psa_samp(
   params = NULL,
   dists = c("normal", "log-normal", "truncated-normal", "beta", "gamma", "dirichlet",
     "bootstrap", "constant", "triangle"),
-  parameterization_types = c("mean, sd", "a, b", "shape, scale", "value, mean_prop, sd",
-    "value, n", "value, alpha", "mean, sd, ll, ul", "val", "meanlog, sdlog",
-    "ll, ul, mode"),
+  parameterization_types = c("mean, sd", "a, b", "shape, scale",
+    "value, mean_prop, sd", "value, n", "value, alpha", "mean, sd, ll, ul", "val",
+    "meanlog, sdlog", "ll, ul, mode"),
   dists_params = NULL,
   nsamp = 100
 )

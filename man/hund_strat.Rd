@@ -4,7 +4,9 @@
 \name{hund_strat}
 \alias{hund_strat}
 \title{Sample deterministic data for testing}
-\format{An object of class \code{data.frame} with 100 rows and 3 columns.}
+\format{
+An object of class \code{data.frame} with 100 rows and 3 columns.
+}
 \usage{
 hund_strat
 }

@@ -230,6 +230,7 @@ plot.icers <- function(x,
                        ylim = NULL,
                        xexpand = expansion(0.1),
                        yexpand = expansion(0.1),
+                       label_repel_iter=20000,
                        ...) {
   # type checking
   label <- match.arg(label)
@@ -294,23 +295,14 @@ plot.icers <- function(x,
     if (label == "frontier") {
       lab_data <- plt_data[plt_data$Status == nd_name, ]
     }
-    # create nudge columns
-    # the nudging is so labels don't get cut off
-    range_x <- range(lab_data[, eff_name])
-    width_x <- range_x[2] - range_x[1]
-
-    range_y <- range(lab_data[, cost_name])
-    width_y <- range_y[2] - range_y[1]
-
-    nudge_x <- width_x / 50
-    nudge_y <- - width_y / 30
 
     icer_plot <- icer_plot +
-      geom_label(data = lab_data,
-                aes_(label = as.name(strat_name)),
-                nudge_x = nudge_x,
-                nudge_y = nudge_y,
-                size = 3, show.legend = FALSE)
+      geom_label_repel(data = lab_data,
+                       aes_(label = as.name(strat_name)),
+                       size = 3,
+                       show.legend = FALSE,
+                       max.iter = label_repel_iter,
+                       direction = "both")
   }
   return(icer_plot)
 }

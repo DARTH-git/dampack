@@ -21,7 +21,7 @@
   ylim = NULL,
   xexpand = expansion(0.1),
   yexpand = expansion(0.1),
-  label_repel_iter = 20000,
+  max.iter = 20000,
   ...
 )
 }
@@ -65,6 +65,9 @@ for how to modify this.}
 \item{yexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
 The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
 for how to modify this.}
+
+\item{max.iter}{Maximum number of iterations to try to resolve overlaps.
+Defaults to 2000.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

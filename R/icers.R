@@ -209,6 +209,7 @@ compute_icers <- function(non_d) {
 #' longer strategies are truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
 #' @param alpha opacity of points
+#' @inheritParams ggrepel::geom_label_repel
 #'
 #' @return a ggplot2 object which can be modified by adding additional geoms
 #'
@@ -231,7 +232,7 @@ plot.icers <- function(x,
                        ylim = NULL,
                        xexpand = expansion(0.1),
                        yexpand = expansion(0.1),
-                       label_repel_iter=20000,
+                       max.iter = 20000,
                        ...) {
   # type checking
   label <- match.arg(label)
@@ -302,7 +303,7 @@ plot.icers <- function(x,
                        aes_(label = as.name(strat_name)),
                        size = 3,
                        show.legend = FALSE,
-                       max.iter = label_repel_iter,
+                       max.iter = max.iter,
                        direction = "both")
   }
   return(icer_plot)

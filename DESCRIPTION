@@ -12,8 +12,11 @@ Authors@R: c(
   person("Greg", "Knowlton", email="gsknowlton@gmail.com",
     role = "aut")
   )
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and 
+    visualizing the health economic outputs of mathematical models. This package was developed with funding from 
+    the National Institutes of Allergy and Infectious Diseases of the National Institutes of Health under award 
+    no. R01AI138783. The content of this package is solely the responsibility of the authors and does not necessarily 
+    represent the official views of the National Institutes of Health.
 License: file LICENSE
 Encoding: UTF-8
 Depends:
@@ -27,7 +30,8 @@ Imports:
     stringr,
     mgcv,
     truncnorm,
-    triangle
+    triangle,
+    ggrepel
 Suggests:
     testthat,
     lintr,

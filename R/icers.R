@@ -213,6 +213,7 @@ compute_icers <- function(non_d) {
 #' @return a ggplot2 object which can be modified by adding additional geoms
 #'
 #' @importFrom stringr str_sub
+#' @importFrom ggrepel geom_label_repel
 #' @export
 plot.icers <- function(x,
                        txtsize = 12,

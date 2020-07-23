@@ -21,7 +21,7 @@ License: file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 3.5),
-    ggplot2
+    ggplot2 (>= 3.3.0)
 Imports:
     reshape2,
     ellipse,

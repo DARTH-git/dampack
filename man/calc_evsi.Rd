@@ -15,7 +15,8 @@ calc_evsi(
   n = 100,
   n0 = 10,
   n_by_param = FALSE,
-  pop = 1
+  pop = 1,
+  progress = TRUE
 )
 }
 \arguments{
@@ -49,6 +50,9 @@ numeric value, and \code{n} must be a numerical vector of additional sample size
 which EVSI is calculated from the metamodel.}
 
 \item{pop}{scalar that corresponds to the total population}
+
+\item{progress}{\code{TRUE} or \code{FALSE} for whether or not function progress
+should be displayed in console.}
 }
 \description{
 Calculate Expected Value of Sample Information (EVSI)

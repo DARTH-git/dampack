@@ -13,6 +13,8 @@
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
 #' @param currency symbol for the currency being used (ex. "$", "£")
+#' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
+#'  should be displayed in console.
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
 #'
@@ -26,7 +28,7 @@
 #' @export
 
 run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
-                    strategies = NULL, currency = "$", ...) {
+                    strategies = NULL, currency = "$", progress = TRUE, ...) {
   opt_arg_val <- list(...)
 
   if (!is.null(params_basecase)) {
@@ -79,11 +81,23 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
       new_params[replace_var] <- psa_samp[i, replace_var]
       fun_input_ls <- c(list(new_params), opt_arg_val)
       sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+      # display progress every 10%
+      if (progress == TRUE) {
+        if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) & progress == TRUE) {
+          cat('\r', paste(i / nrow(psa_samp) * 100, "% done", sep = " "))
+        }
+      }
     }
   } else {
     for (i in seq_len(nrow(psa_samp))) {
       fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
       sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+      # display progress every 10%
+      if (progress == TRUE) {
+        if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) & progress == TRUE) {
+          cat('\r', paste(i / nrow(psa_samp) * 100, "% done", sep = " "))
+        }
+      }
     }
   }
 

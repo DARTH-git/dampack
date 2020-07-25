@@ -202,7 +202,8 @@ psa_output <- run_psa(psa_samp = l_params_all,
                       params_basecase = l_params_basecase,
                       FUN = calculate_ce_out,
                       outcomes = c("Cost", "Effect", "NMB"),
-                      strategies = c("No_Treatment", "Treatment"))
+                      strategies = c("No_Treatment", "Treatment"),
+                      progress = FALSE)
 
 ### outcomes are stored in "other_outcome" and we need to make a psa object 
 ### that specifies which outcomes are costs and effects in order to do CEA
@@ -218,7 +219,8 @@ psa_output2 <- run_psa(psa_samp = l_params_all,
                        params_basecase = l_params_basecase,
                        outcomes = c("Cost", "Effect", "NMB"),
                        strategies = c("No_Treatment", "Treatment"), 
-                       n_wtp = 50000)
+                       n_wtp = 50000,
+                       progress = FALSE)
 
 ```
 

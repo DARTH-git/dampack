@@ -11,7 +11,8 @@ test_that("evsi runs", {
   expect_silent(calc_evsi(wtp = 1e5,
                           psa = psa_obj,
                           params = c("pFailSurg", "pFailChemo"),
-                          outcome = "nmb"))
+                          outcome = "nmb",
+                          progress = FALSE))
 })
 
 
@@ -25,7 +26,8 @@ test_that("evsi produces error when nsamps < nparams", {
   expect_error(calc_evsi(wtp = 1e5,
                          psa = psa_obj,
                          params = c("pFailSurg", "pFailChemo"),
-                         outcome = "nmb"),
+                         outcome = "nmb",
+                         progress = FALSE),
                "The number of parameters to be estimated by the metamodel
                      cannot be greater than the number of PSA samples")
 })

@@ -11,6 +11,7 @@ run_psa(
   outcomes = NULL,
   strategies = NULL,
   currency = "$",
+  progress = TRUE,
   ...
 )
 }
@@ -30,6 +31,9 @@ where the first column are the strategy names and the rest of the columns must b
 strategy names in \code{FUN}}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
+
+\item{progress}{\code{TRUE} or \code{FALSE} for whether or not function progress
+should be displayed in console.}
 
 \item{...}{Additional arguments to user-defined \code{FUN}}
 }

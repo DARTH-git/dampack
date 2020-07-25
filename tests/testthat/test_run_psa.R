@@ -42,5 +42,6 @@ test_that("run_psa runs", {
                                    FUN = test_func,
                                    outcomes = c("cost", "effect"),
                                    strategies = c("customstrat1", "customstrat2"),
-                                   extra_param = 1.5))
+                                   extra_param = 1.5,
+                                   progress = FALSE))
   })

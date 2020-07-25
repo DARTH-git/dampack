@@ -11,6 +11,8 @@
 #' each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a single
 #' numeric value, and \code{n} must be a numerical vector of additional sample sizes for
 #' which EVSI is calculated from the metamodel.
+#' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
+#' should be displayed in console.
 #'
 #' @export
 calc_evsi <- function(psa,
@@ -23,7 +25,8 @@ calc_evsi <- function(psa,
                       n = 100,
                       n0 = 10,
                       n_by_param = FALSE,
-                      pop = 1) {
+                      pop = 1,
+                      progress = TRUE) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
@@ -47,6 +50,7 @@ calc_evsi <- function(psa,
 
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
+
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,
@@ -56,6 +60,12 @@ calc_evsi <- function(psa,
                      type = type,
                      poly.order = poly.order,
                      k = k)
+
+    if (progress == TRUE) {
+      if (l / (n_wtps / 10) == round(l / (n_wtps / 10), 0)) { # display progress every 10%
+        cat('\r', paste(l / n_wtps * 100, "% done", sep = " "))
+      }
+    }
 
     if (n_by_param == TRUE) {
       # predict from the regression models

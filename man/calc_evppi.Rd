@@ -13,7 +13,8 @@ calc_evppi(
   type = c("gam", "poly"),
   poly.order = 2,
   k = -1,
-  pop = 1
+  pop = 1,
+  progress = TRUE
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ polynomial models (\code{"poly"})}
 \item{k}{basis dimension, if \code{type == "gam"}}
 
 \item{pop}{scalar that corresponds to the total population}
+
+\item{progress}{\code{TRUE} or \code{FALSE} for whether or not function progress
+should be displayed in console.}
 }
 \value{
 A data.frame with WTP thresholds and corresponding EVPPIs

@@ -4,7 +4,16 @@
 \alias{wrapper_of_user_model}
 \title{Wrapper function for owsa_det and twsa_det}
 \usage{
-wrapper_of_user_model(x, user_fun, param_name, tmp_input, tmp_replace)
+wrapper_of_user_model(
+  x,
+  user_fun,
+  param_name,
+  tmp_input,
+  tmp_replace,
+  progress_bar = NULL,
+  param_counter = NULL,
+  nsamp = NULL
+)
 }
 \arguments{
 \item{x}{iteration}

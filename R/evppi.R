@@ -15,6 +15,8 @@
 #' @param poly.order order of the polynomial, if \code{type == "poly"}
 #' @param k basis dimension, if \code{type == "gam"}
 #' @param pop scalar that corresponds to the total population
+#' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
+#' should be displayed in console.
 #'
 #' @return A data.frame with WTP thresholds and corresponding EVPPIs
 #' for the selected parameters
@@ -70,7 +72,8 @@ calc_evppi <- function(psa,
                        type = c("gam", "poly"),
                        poly.order = 2,
                        k = -1,
-                       pop = 1) {
+                       pop = 1,
+                       progress = TRUE) {
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
@@ -85,6 +88,7 @@ calc_evppi <- function(psa,
 
   # calculate evppi at each wtp
   for (l in 1:n_wtps) {
+
     # run the metamodels
     mms <- metamodel(analysis = "multiway",
                      psa = psa,
@@ -105,6 +109,12 @@ calc_evppi <- function(psa,
     # calculate the evppi as the average of the row maxima
     row_maxes <- apply(fitted_loss_df, 1, max)
     evppi[l] <- mean(row_maxes) * pop
+
+    if (progress == TRUE) {
+      if (l / (n_wtps / 10) == round(l / (n_wtps / 10), 0)) { # display progress every 10%
+        cat('\r', paste(l / n_wtps * 100, "% done", sep = " "))
+      }
+    }
   }
 
   # data.frame to store EVPPI for each WTP threshold

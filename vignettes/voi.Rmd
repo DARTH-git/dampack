@@ -83,7 +83,8 @@ evppi <- calc_evppi(psa = psa_big,
                     outcome = "nmb",
                     type = "gam",
                     k = -1,
-                    pop = 1)
+                    pop = 1,
+                    progress = FALSE)
 evppi
 
 plot(evppi)
@@ -106,7 +107,8 @@ evsi <- calc_evsi(psa = psa_big,
                   k = -1,
                   n = seq(from = 10, to = 200, by = 10),
                   n0 = 50,
-                  pop = 1)
+                  pop = 1,
+                  progress = FALSE)
 
 #evsi <- calc_evsi(psa = psa_big,
 #                  wtp = c(5e4, 1e5, 2e5, 3e5),

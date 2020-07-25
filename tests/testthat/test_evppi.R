@@ -12,7 +12,8 @@ test_that("evppi runs", {
   expect_silent(calc_evppi(wtp = 1e5,
                            psa = psa_obj,
                            params = c("pFailSurg", "pFailChemo"),
-                           outcome = "nmb"))
+                           outcome = "nmb",
+                           progress = FALSE))
 })
 
 psa_obj$cost <- psa_obj$cost[1, ]
@@ -24,7 +25,8 @@ test_that("evppi produces error when nsamps < nparams", {
  expect_error(calc_evppi(wtp = 1e5,
                          psa = psa_obj,
                          params = c("pFailSurg", "pFailChemo"),
-                         outcome = "nmb"),
+                         outcome = "nmb",
+                         progress = FALSE),
               "The number of parameters to be estimated by the metamodel
                      cannot be greater than the number of PSA samples")
 })

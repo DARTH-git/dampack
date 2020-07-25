@@ -11,6 +11,7 @@ run_owsa_det(
   FUN,
   outcomes = NULL,
   strategies = NULL,
+  progress = TRUE,
   ...
 )
 }
@@ -35,6 +36,9 @@ produced by \code{nsamp}}
 
 \item{strategies}{vector of strategy names. The default \code{NULL} will use
 strategy names in \code{FUN}}
+
+\item{progress}{\code{TRUE} or \code{FALSE} for whether or not function progress
+should be displayed in console.}
 
 \item{...}{Additional arguments to user-defined \code{FUN}}
 }

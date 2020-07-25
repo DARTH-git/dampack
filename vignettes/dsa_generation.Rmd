@@ -183,7 +183,8 @@ owsa_det <- run_owsa_det(params_range = my_params_range,
                          nsamp = 100,
                          FUN = calculate_ce_out,
                          outcomes = c("Cost", "Effect", "NMB"),
-                         strategies = c("No_Treatment", "Treatment"))
+                         strategies = c("No_Treatment", "Treatment"),
+                         progress = FALSE)
 
 ###when multiple outcomes are specified, individual owsa objects are found within the list output of run_owsa_det
 plot(owsa_det$owsa_NMB)
@@ -193,6 +194,7 @@ twsa_det <- run_twsa_det(params_range = my_params_range,
                          nsamp = 100,
                          FUN = calculate_ce_out,
                          outcomes = c("Cost", "Effect", "NMB"),
-                         strategies = c("No_Treatment", "Treatment"))
+                         strategies = c("No_Treatment", "Treatment"), 
+                         progress = FALSE)
 plot(twsa_det$twsa_NMB)
 ```

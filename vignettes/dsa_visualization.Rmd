@@ -185,11 +185,12 @@ my_params_range <- data.frame(pars = c("p_HS1", "p_S1S2", "p_S1H",
 
 ```{r}
 o <- run_owsa_det(params_range = my_params_range,
-                         params_basecase = my_params_basecase,
-                         nsamp = 100,
-                         FUN = calculate_ce_out,
-                         outcomes = c("NMB"),
-                         strategies = c("No_Treatment", "Treatment"))
+                  params_basecase = my_params_basecase,
+                  nsamp = 100,
+                  FUN = calculate_ce_out,
+                  outcomes = c("NMB"),
+                  strategies = c("No_Treatment", "Treatment"),
+                  progress = FALSE)
 ```
 
 ```{r}
@@ -222,7 +223,8 @@ tw <- run_twsa_det(params_range = my_params_range_twsa,
                    nsamp = 100,
                    FUN = calculate_ce_out,
                    outcomes = c("NMB"),
-                   strategies = c("No_Treatment", "Treatment"))
+                   strategies = c("No_Treatment", "Treatment"),
+                   progress = FALSE)
 
 ```
 

@@ -18,6 +18,8 @@
 #'  produced by \code{nsamp}
 #' @param strategies vector of strategy names. The default \code{NULL} will use
 #' strategy names in \code{FUN}
+#' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
+#'  should be displayed in console.
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
 #' @return A list containing dataframes with the results of the sensitivity analyses.
@@ -36,9 +38,11 @@
 #' \item "min" and "max" are the mininum and maximum values of the parameters of interest.}
 #' }
 #'
+#' @importFrom  utils txtProgressBar
 #' @export
 run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
-                     outcomes = NULL, strategies = NULL, ...) {
+                     outcomes = NULL, strategies = NULL, progress = TRUE,
+                     ...) {
   params <- as.character(params_range[, 1])
 
   if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
@@ -109,13 +113,23 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                             length.out = nsamp)))
     colnames(v_owsa_input) <- pars_i
 
+    # Define progress bar
+    if (progress == TRUE) {
+      pb <- txtProgressBar(min = 0, max = nsamp * n_params, style = 3)
+    } else {
+      pb <- NULL
+    }
+
     # Run model and capture outcome(s)
     sim_out <- lapply(c(1:nsamp),
                       wrapper_of_user_model,
                       user_fun = FUN,
                       param_name = pars_i,
                       tmp_input = fun_input_ls,
-                      tmp_replace = v_owsa_input)
+                      tmp_replace = v_owsa_input,
+                      progress_bar = pb,
+                      param_counter = i,
+                      nsamp = nsamp)
 
     for (j in 1:n_outcomes) {
       sim_out_df[[j]] <- lapply(sim_out,
@@ -173,6 +187,8 @@ if (n_outcomes == 1) {
 #'  produced by \code{nsamp}
 #' @param strategies vector of strategy names. The default (NULL) will use
 #' strategy names in FUN
+#' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
+#'  should be displayed in console.
 #' @param ... Additional arguments to user-defined \code{FUN}
 #'
 #' @return A list containing dataframes with the results of the sensitivity analyses.
@@ -187,9 +203,10 @@ if (n_outcomes == 1) {
 #' \item "min" and "max" are the mininum and maximum values of the parameters of interest.}
 #' }
 #'
+#' @importFrom  utils txtProgressBar
 #' @export
 run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcomes = NULL,
-                     strategies = NULL, ...) {
+                     strategies = NULL, progress = TRUE, ...) {
   if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
 
   if (ncol(params_range) != 3) stop("params_all must have 3 columns: 'pars', 'min', and 'max'")
@@ -264,12 +281,24 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 
   # Run model and capture outcome
   n_run <- nrow(param_table)
+
+  # Define progress bar
+  if (progress == TRUE) {
+    pb <- txtProgressBar(min = 0, max = n_run, style = 3)
+  } else {
+    pb <- NULL
+  }
+
+
   sim_out <- lapply(c(1:n_run),
                     wrapper_of_user_model,
                     user_fun = FUN,
                     param_name = poi,
                     tmp_input = fun_input_ls,
-                    tmp_replace = param_table)
+                    tmp_replace = param_table,
+                    progress_bar = pb,
+                    param_counter = 1,
+                    nsamp = n_run)
 
   for (j in 1:n_outcomes) {
     sim_out_df[[j]] <- lapply(sim_out,
@@ -309,9 +338,14 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 #' @param tmp_input basecase values
 #' @param tmp_replace values from predetermined DSA samples that will replace some values in \code{tmp_input}
 #'
+#' @importFrom  utils setTxtProgressBar
 #' @keywords internal
 wrapper_of_user_model <- function(x, user_fun, param_name,
-                                  tmp_input, tmp_replace) {
+                                  tmp_input, tmp_replace,
+                                  progress_bar = NULL, param_counter = NULL, nsamp = NULL) {
   tmp_input[[1]][param_name] <- tmp_replace[x, param_name]
+  if (!is.null(progress_bar)) {
+    setTxtProgressBar(progress_bar, x + (param_counter - 1) * nsamp)
+  }
   do.call(user_fun, tmp_input)
 }

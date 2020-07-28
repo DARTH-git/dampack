@@ -112,7 +112,7 @@ calc_evppi <- function(psa,
 
     if (progress == TRUE) {
       if (l / (n_wtps / 10) == round(l / (n_wtps / 10), 0)) { # display progress every 10%
-        cat('\r', paste(l / n_wtps * 100, "% done", sep = " "))
+        cat("\r", paste(l / n_wtps * 100, "% done", sep = " "))
       }
     }
   }

@@ -95,7 +95,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
       # display progress every 10%
       if (progress == TRUE) {
         if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) & progress == TRUE) {
-          cat('\r', paste(i / nrow(psa_samp) * 100, "% done", sep = " "))
+          cat("\r", paste(i / nrow(psa_samp) * 100, "% done", sep = " "))
         }
       }
     }

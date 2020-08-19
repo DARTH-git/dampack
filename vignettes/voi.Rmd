@@ -27,9 +27,9 @@ Although there are multiple methods for estimating value of information, the `da
 
 # EVPI
 
-The expected value of perfect information (EVPI) can be framed as the expected benefit of performing a study with an infinite sample size that would allow us to know the values of all the input parameters with complete certainty. With perfect information, there would be no uncertainty in the output of the decision model and the truly optimal strategy could be identified. In `dampack`, EVPI is calculated as the average opportunity loss across all samples in a probabilistic sensitivity analysis. The opportunity loss for each sample in the PSA is the difference between the expected benefit of the optimal strategy in that specific sample and the expected benefit of the strategy that would have been chosen on the basis of average expected benefit over the entire PSA. In other words, opportunity loss is the benefit that is foregone when making the optimal decision given imperfect information if the parameter values in that sample are true.
+The expected value of perfect information (EVPI) can be framed as the expected benefit of performing a study with an infinite sample size that would allow us to know the values of all the input parameters with complete certainty. With perfect information, there would be no uncertainty in the output of the decision model and the truly optimal strategy could be identified. In `dampack`, EVPI is calculated as the average opportunity loss across all samples in a probabilistic sensitivity analysis. The opportunity loss for each sample in the PSA is the difference between the expected benefit of the optimal strategy in that specific sample and the expected benefit of the strategy that would have been chosen on the basis of average expected benefit over the entire PSA. In other words, opportunity loss is the benefit that is foregone when making the optimal decision given imperfect information if the parameter values in that sample are correct.
 
-In 'dampack', EVPI is calculated using the function `calc_evpi()`, which requires a `psa` object (see *add in links?* `make_psa_object`, `gen_psa_samp`, `run_psa`), and a vector of numeric willingness-to-pay (`wtp`) thresholds as function inputs. EVPI is frequently reported in terms of the net benefit of perfect information per patient, but `calc_evpi` also provides an option to calculate the total EVPI for an entire population. If the benefits in the `psa` object already reflect the aggregated benefits for the entire population of interest, leave the `pop` input at its default value of `1`. `calc_evpi()` returns a data.frame of object class `evpi` containing the calculated EVPI at each WTP threshold provided in the input vector.
+In 'dampack', EVPI is calculated using the function `calc_evpi()`, which requires a `psa` object (see `?make_psa_object`, `?gen_psa_samp`, `?run_psa`), and a vector of numeric willingness-to-pay (`wtp`) thresholds as function inputs. EVPI is frequently reported in terms of the net benefit of perfect information per patient, but `calc_evpi` also provides an option to calculate the total EVPI for an entire population. If the benefits in the `psa` object already reflect the aggregated benefits for the entire population of interest, leave the `pop` input at its default value of `1`. `calc_evpi()` returns a data.frame of object class `evpi` containing the calculated EVPI at each WTP threshold provided in the input vector.
 
 ```{r}
 library(dampack)
@@ -59,7 +59,7 @@ p <- plot(evpi_obj,
 p
 ```
 
-For a full listing of the options for customizing the EVPI plot, type `?plot.evpi` in the console. Like all plots in `dampack`, the evpi plot object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is hosted at https://ggplot2.tidyverse.org/.
+For a full listing of the options for customizing the EVPI plot, type `?plot.evpi` in the console. Like all plots in `dampack`, the evpi plot object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. A introduction to ggplot2 is hosted at https://ggplot2.tidyverse.org/.
 
 # Metamodeling VoI Functions
 
@@ -110,21 +110,20 @@ evsi <- calc_evsi(psa = psa_big,
                   pop = 1,
                   progress = FALSE)
 
-#evsi <- calc_evsi(psa = psa_big,
-#                  wtp = c(5e4, 1e5, 2e5, 3e5),
-#                  params = c("pFailSurg", "pFailChemo"),
-#                  outcome = "nmb",
-#                  type = "gam",
-#                  k = -1,
-#                  n = 100,
-#                  n0 = 50,
-#                  pop = 1)
 head(evsi)
 
 plot(evsi)
 ```
 
 # Metamodeling Appendix
+
+In essence, the metamodel function take a PSA object and creates a regression model for each strategy specified that predicts the `outcome` using the parameters specified in the `params` argument. These regression models are stored in a nested list within the `metamodel` object, where they can be accessed to diagnose model fit, predict outcomes conditional on specific parameter values, and perform any other supported functions allowed by the model type.
+
+The simplest type of metamodel that can be fit is an ordinary linear regression model via `lm`, which can be specified by setting `type = "linear"`. Linear models fit by `metamodel` utilize the `outcome` specified as the dependent variable (see `?calculate_outcomes`), and contain terms only for the parameters in `params` without interaction terms. Although linear models are useful for their interpretability and simplicity, they do not adequately capture the nonlinear relationships that often arise in mathematical models.
+
+More flexible polynomial regression models can be fit by setting `type = "poly"` and specifying the maximum polynomial degree with the `poly.order` argument. This model type is also fit via the `lm` function, but rather than predicting the outcome based on only the first degree term for each parameter in the `params` argument, a separate term is included for each parameter from the first degree up to and including the degree specified by the `poly.order` argument. Using a `poly.order` that is too high can lead to overfitting.
+
+Although both first degree and higher order linear regression models are capable of utilizing interaction terms, the formulae for these model types in `dampack` do not contain interaction terms. When a few influential parameters exhibit significant interaction and/or nonlinear effects, it is recommended that one fit the metamodel with a generalized additive model by setting `type = "gam"`. The generalized additive model (GAM) is fit through the `gam()` function of the package `mgcv`, and in-depth advice on customizing the models, diagnosing model fit, and interpreting the results can be found in the help documentation for that package. In short, generalized additive models are generalized linear models in which the linear predictor depends linearly on smooth functions (i.e. penalized regression splines) of some predictor variables. Interactions between the parameters in `params` are fit using tensor product interaction smooths (see `?mgcv::ti`). A smooth term of one or several variables is just the sum of some number of basis functions that combine to flexibly fit the data. The number of basis functions used to fit the GAM model in `metamodel()` is pulled from the argument `k`, and the higher the number of basis functions, the more flexible the resulting GAM model. Generally, GAM models are susceptible to overfitting, and care should be taken to choose the minimum `k` value that adequately captures any nonlinear main effects and interactions.
 
 ```{r}
 mm <- metamodel(analysis = "twoway",

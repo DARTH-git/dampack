@@ -278,7 +278,7 @@ summary.metamodel <- function(object, ...) {
 #' @importFrom stats quantile predict
 #' @export
 predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
-  browser()
+
   # type checking
   ## make sure ranges is NULL or list
   if (!is.null(ranges)) {

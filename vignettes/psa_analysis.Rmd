@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 ```
+ 
+# Overview
 
 The probabilistic sensitivity analysis (PSA) object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` PSA object from an existing PSA dataset, and what can be done once the PSA object is created in `dampack`.
 
@@ -99,8 +101,7 @@ icers <- calculate_icers(cost = psa_sum$meanCost, effect = psa_sum$meanEffect, s
 plot(icers)
 ```
 
-##
-
+## Cost-effectiveness Acceptability Curve
 
 A strategy's cost-effectiveness is frequently discussed in terms of either net health benefit or net monetary benefit. To calculate a strategy's net health benefit, the cost associated with the strategy is divided by the willingness-to-pay threshold (WTP) and added to the QALYs gained, and to calculate a strategy's net monetary benefit, the number of QALYs gained is multiplied by the WTP threshold and added to the cost. Describing strategies in terms of net health benefit or net monetary benefit is convenient because it allows one to compare the cost-effectiveness of the strategies using a single metric, but these comparisons are sometimes very sensitive to the exact WTP threshold that is used to convert QALYs to currency, or vice versa. The degree to which the choice of willingness-to-pay threshold influences the decision can be analyzed using a cost-effectiveness acceptability curve. The acceptability curves plot the relative frequency or probability that each strategy is cost-effective compared to the alternatives for varying values for society's willingness-to-pay.
 
@@ -123,7 +124,8 @@ Plotting a `ceac` object yields a `ggplot2` graph showing the cost-effectiveness
 plot(ceac_obj, frontier = TRUE, points = TRUE)
 ```
 
-##
+## Expected Loss Curve
+
 Alternatively, the degree to which cost-effectiveness varies with respect to the WTP threshold can be visualized using an expected loss curve (ELC). Expected loss is a quantification of the consequences of choosing a suboptimal strategy in terms of expected foregone benefits. The strategy that minimizes the expected loss at a given WTP value is the optimal decision given current information, and consequently the graph's relationship to the cost-effectiveness acceptability frontier is somewhat more intutive than for CEACs. For an in-depth discussion on the advantages of ELCs in cost-effectiveness analysis, please refer to:
 
 Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability Curves and Frontier. Value Health. 2019;22(5):611-618.
@@ -134,18 +136,22 @@ head(el)
 plot(el, n_x_ticks = 8, n_y_ticks = 6)
 ```
 
-##
+## One-way Sensitivity Analysis
+
+A one-way sensitivity analysis (OWSA) illustrates how the expected outcome of a decision model changes as function of a single input parameter in the PSA. Knowing that the parameters in a decision model can interact in complex and nonlinear ways to influence outcomes, the characterization of the role of a single parameter is not straightforward. To disentangle the effect of the parameter of interest, a regression model, or 'metamodel', is fit using the entire PSA that treats the specified outcome (Net-monetary benefit, QALYs, etc) as the dependent variable and the parameter as the independent variable. By omitting the other input parameters in the PSA in the regression model, the variation in the outcome that cannot be directly attributed to variation in the parameter of interest is treated as random statistical error (even if the model is purely deterministic). Consequently, any predicted outcome value derived from the metamodel is essentially conditional on the average value of all the other PSA parameters. Separate models are produced for each strategy included in the `strategies` argument of the `owsa()` function, and these models are used to predict outcome values over a range values of the parameter of interest.
+
+The first input of the `owsa()` function is `sa_obj`, which stands for "sensitivity analysis object", because the owsa() function can also be used in the context of a determinstic sensitivity analysis on a `dsa` object. For an illustration of this functionality, enter `vignette("dsa_visualization", package = "dampack")` in the console. The `params` argument allows the user to execute a series of separate one-way sensitivity analyses with a single function call by specifying a vector of different parameters of interest. By default, the regression model used to quantify the effect of the parameter of interest on the expected outcome value is a second order polynomial linear model. The order of the polynomial in the regression model can be altered by changing the argument `poly.order`.
 
 ```{r}
 o <- owsa(psa_obj)
 ```
-
+The output of the `owsa()` function has customized plotting functionality that can be explored by typing `?plot.owsa` in the console. Like all other plots produced by `dampack`, plots derived from the `owsa` object are `ggplot` objects and can be readily customized. 
 
 ```{r}
 plot(o)
 ```
 
-##
+## Tornado Plot
 
 ```{r}
 owsa_tornado(o)
@@ -161,7 +167,7 @@ owsa_tornado(o, min_rel_diff = 0.05)
 owsa_tornado(o, return = "data")
 ```
 
-##
+## Optimal Strategy Plot
 
 ```{r, fig.height = 6, fig.width = 8}
 owsa_opt_strat(o)
@@ -171,7 +177,7 @@ owsa_opt_strat(o)
 owsa_opt_strat(o, return = "data")
 ```
 
-##
+## Two-way Sensitivty Analysis
 
 ```{r}
 tw <- twsa(psa_obj, param1 = "pFailChemo", param2 = "muDieCancer")

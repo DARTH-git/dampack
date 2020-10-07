@@ -36,7 +36,6 @@ The PSA object is created using the function `make_psa_obj`. We can see the type
 
 ### Read in data
 
-**explanation of data here?**
 There is example data provided with dampack that allows us to illustrate the required structure of each of these parts of a PSA.
 
 ```{r}

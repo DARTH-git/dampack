@@ -14,15 +14,11 @@ make_psa_obj(
 )
 }
 \arguments{
-\item{cost}{data frame containing data for costs if \code{run_psa_obj = NULL},
-or the name of the cost outcome if run_psa_obj is provided.
-For the data.frame, each simulation should be a row and each strategy should be a column.
+\item{cost}{For the data.frame, each simulation should be a row and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
-\item{effectiveness}{data frame containing data for effectiveness if \code{run_psa_obj = NULL},
-or the name of the effectiveness outcome if run_psa_obj is provided.
-For the data.frame, each simulation should be a row and each strategy should be a column.
+\item{effectiveness}{For the data.frame, each simulation should be a row and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 
@@ -36,7 +32,7 @@ in the \code{\link{make.names}} help page, to avoid unexpected errors.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 
-\item{other_outcome}{data frame containing data another outcome (user-defined).
+\item{other_outcome}{data.frame containing values for another user-defined outcome.
 Each simulation should be a row of the data frame, and each strategy should be a column.
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
@@ -45,7 +41,7 @@ the \code{strategies} vector.}
 An object of class \code{psa}
 }
 \description{
-Creates an object to hold probabilistic sensivity analysis data,
+Creates an object to hold probabilistic sensitivity analysis data,
 while checking the data for validity. The object can then be
 used for many standard cost-effectiveness analyses (see Details below).
 }

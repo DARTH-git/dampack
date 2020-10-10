@@ -106,9 +106,7 @@ plot.exp_loss <- function(x,
   x_melt <- melt(x,
                  id.vars = "WTP",
                  variable.name = strat_name)
-  # coerce strategy factor to character,
-  # so empty factors don't get put in the legend
-  x_melt$Strategy <- as.character(x_melt$Strategy)
+
   x_melt[, wtp_name] <- x_melt$WTP / 1000
 
   # split into on frontier and not on frontier
@@ -119,6 +117,9 @@ plot.exp_loss <- function(x,
   nofront <- x_melt[!on_frontier, ]
   front <- x_melt[on_frontier, ]
 
+  # Drop unused levels from strategy names
+  nofront$Strategy <- droplevels(nofront$Strategy)
+  front$Strategy <- droplevels(front$Strategy)
   # formatting if logging the y axis
   if (log_y) {
     tr <- "log10"

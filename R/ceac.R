@@ -92,9 +92,6 @@ ceac <- function(wtp, psa) {
   ceac <- melt(cea_df, id.vars = c("WTP", "fstrat"),
                variable.name = "Strategy", value.name = "Proportion")
 
-  # replace factors with strings (melt creates factors)
-  ceac$Strategy <- as.character(ceac$Strategy)
-
   # boolean for on frontier or not
   ceac$On_Frontier <- (ceac$fstrat == ceac$Strategy)
 
@@ -193,6 +190,10 @@ plot.ceac <- function(x,
     # filter dataframe
     x <- filter(x, .data$Strategy %in% strat_to_keep)
   }
+
+  # Drop unused strategy names
+  x$Strategy <- droplevels(x$Strategy)
+
   p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
                              y = as.name(prop_name),
                              color = as.name(strat_name))) +

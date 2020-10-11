@@ -239,6 +239,7 @@ plot.ceac <- function(x,
 #' @export
 summary.ceac <- function(object, ...) {
   front <- object[object$On_Frontier == TRUE, ]
+  front$Strategy <- as.character(front$Strategy)
   wtp <- front$WTP
   wtp_range <- range(wtp)
   n_wtps <- length(wtp)

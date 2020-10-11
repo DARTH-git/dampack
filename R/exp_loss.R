@@ -132,18 +132,21 @@ plot.exp_loss <- function(x,
     xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
     ylab(paste0("Expected Loss (", currency, ")"))
 
-  if (points) {
-    p <- p + geom_point()
-  }
-
   # color
   col <- match.arg(col)
   ## change linetype too if color is black and white
   if (col == "full") {
+    if (points) {
+      p <- p + geom_point(aes_(color = as.name(strat_name)))
+    }
     p <- p +
       geom_line(size = lsize, aes_(color = as.name(strat_name)))
+
   }
   if (col == "bw") {
+    if (points) {
+      p <- p + geom_point()
+    }
     p <- p +
       geom_line(aes_(linetype = as.name(strat_name)))
   }

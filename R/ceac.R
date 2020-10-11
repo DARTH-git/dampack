@@ -200,9 +200,11 @@ plot.ceac <- function(x,
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
     ylab("Pr Cost-Effective")
+
   if (points) {
-    p <- p + geom_point()
+    p <- p + geom_point(aes_(color = as.name(strat_name)))
   }
+
   if (frontier) {
     front <- x[x$On_Frontier, ]
     p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),

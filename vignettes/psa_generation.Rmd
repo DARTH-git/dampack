@@ -17,15 +17,88 @@ knitr::opts_chunk$set(
   fig.height = 5,
   fig.align = "center"
 )
-```
-
-```{r}
 library(dampack)
 rm(list = ls())
+```
+
+# Probablistic Sensitivty Analysis Generation
+
+## Decision Model Format
+
+In order to generate a PSA in `dampack`, the user must input the code for the decision analytic model in a standardized format that is compatible with the `run_psa` function.
+
+1) The user-defined model function must accept a single input containing a list of the parameters from the `params_basecase` argument. In the example model shown below, this list is named `l_params_all`, and the variables contained in this list are the only variables that are allowed to be varied through the `params_range` argument in the DSA. Optionally, additional function inputs for `FUN` can be supplied through the `...` argument of `run_owsa_det`/`run_twsa_det`, but these inputs are not allowed to vary in the sensitivity analysis. These additional inputs must be arguments of `FUN`, like `n_wtp` in the example of `calculate_ce_out()` below. `FUN` and its component functions are also able to incorporate variables stored in the global environment, such as `n_age_init` or `n_age_max` in the example.
+
+2) The user-defined model function must return a data.frame where the first column contains a character vector of the strategy names, and the subsequent columns contain numeric vectors of all relevant model outcomes. Each row of the data.frame will consist of a strategy name followed by the corresponding outcome values for that strategy. These model outcomes must be calculated internally within `FUN`. The model outcomes are not limited to typical outcomes like cost or effectiveness and can be any numerical outcome that the user chooses to model.
+
+```{r}
+v_names_str <- c("No Treatment", "Treatment")  
+## Number of strategies
+n_str <- length(v_names_str)
+## Markov model parameters
+n_age_init <- 25                # age at baseline
+n_age_max  <- 55                # maximum age of follow up
+n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
+v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
+n_s <- length(v_n)                            # number of health states 
+
+calculate_ce_out <- function(l_params_all, n_wtp = 100000){
+  # User defined
+  with(as.list(l_params_all), {
+    ## Create discounting vectors
+    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_t))) # vector with discount weights for costs
+    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_t))) # vector with discount weights for QALYs
+    
+    ## Run STM model at a parameter set for each intervention
+    l_model_out_no_trt <- decision_model(l_params_all = l_params_all)
+    l_model_out_trt    <- decision_model(l_params_all = l_params_all)
+    
+    ## Cohort trace by treatment
+    m_M_no_trt <- l_model_out_no_trt$m_M # No treatment
+    m_M_trt    <- l_model_out_trt$m_M    # Treatment
+    
+    ## Vectors with costs and utilities by treatment
+    v_u_no_trt <- c(u_H, u_S1, u_S2, u_D)
+    v_u_trt    <- c(u_H, u_Trt, u_S2, u_D)
+    
+    v_c_no_trt <- c(c_H, c_S1, c_S2, c_D)
+    v_c_trt    <- c(c_H, c_S1 + c_Trt, c_S2 + c_Trt, c_D)
+    
+    ## Mean Costs and QALYs for Treatment and NO Treatment
+    v_tu_no_trt <- m_M_no_trt %*% v_u_no_trt
+    v_tu_trt    <- m_M_trt %*% v_u_trt
+    
+    v_tc_no_trt <- m_M_no_trt %*% v_c_no_trt
+    v_tc_trt    <- m_M_trt %*% v_c_trt
+    
+    ## Total discounted mean Costs and QALYs
+    tu_d_no_trt <- t(v_tu_no_trt) %*% v_dwe 
+    tu_d_trt    <- t(v_tu_trt) %*% v_dwe
+    
+    tc_d_no_trt <- t(v_tc_no_trt) %*% v_dwc
+    tc_d_trt    <- t(v_tc_trt)    %*% v_dwc
+    
+    ## Vector with total discounted mean Costs and QALYs
+    v_tc_d <- c(tc_d_no_trt, tc_d_trt)
+    v_tu_d <- c(tu_d_no_trt, tu_d_trt)
+    
+    ## Vector with discounted net monetary benefits (NMB)
+    v_nmb_d <- v_tu_d * n_wtp - v_tc_d
+    
+    ## Dataframe with discounted costs, effectiveness and NMB
+    df_ce <- data.frame(Strategy = v_names_str,
+                        Cost     = v_tc_d,
+                        Effect   = v_tu_d,
+                        NMB      = v_nmb_d)
+    
+    return(df_ce)
+  }
+  )
+}
 
 decision_model <- function(l_params_all, verbose = FALSE) {
   with(as.list(l_params_all), {
-    # compute internal paramters as a function of external parameters
+    # compute internal parameters as a function of external parameters
     r_HD    = - log(1 - p_HD) # rate of death in healthy
     r_S1D   = hr_S1 * r_HD 	  # rate of death in sick
     r_S2D   = hr_S2 * r_HD  	# rate of death in sicker
@@ -93,73 +166,9 @@ decision_model <- function(l_params_all, verbose = FALSE) {
   }
   )
 }
-
-calculate_ce_out <- function(l_params_all, n_wtp = 100000){
-  # User defined
-  with(as.list(l_params_all), {
-    ## Create discounting vectors
-    v_dwc <- 1 / ((1 + d_e) ^ (0:(n_t))) # vector with discount weights for costs
-    v_dwe <- 1 / ((1 + d_c) ^ (0:(n_t))) # vector with discount weights for QALYs
-    
-    ## Run STM model at a parameter set for each intervention
-    l_model_out_no_trt <- decision_model(l_params_all = l_params_all)
-    l_model_out_trt    <- decision_model(l_params_all = l_params_all)
-    
-    ## Cohort trace by treatment
-    m_M_no_trt <- l_model_out_no_trt$m_M # No treatment
-    m_M_trt    <- l_model_out_trt$m_M    # Treatment
-    
-    ## Vectors with costs and utilities by treatment
-    v_u_no_trt <- c(u_H, u_S1, u_S2, u_D)
-    v_u_trt    <- c(u_H, u_Trt, u_S2, u_D)
-    
-    v_c_no_trt <- c(c_H, c_S1, c_S2, c_D)
-    v_c_trt    <- c(c_H, c_S1 + c_Trt, c_S2 + c_Trt, c_D)
-    
-    ## Mean Costs and QALYs for Treatment and NO Treatment
-    v_tu_no_trt <- m_M_no_trt %*% v_u_no_trt
-    v_tu_trt    <- m_M_trt %*% v_u_trt
-    
-    v_tc_no_trt <- m_M_no_trt %*% v_c_no_trt
-    v_tc_trt    <- m_M_trt %*% v_c_trt
-    
-    ## Total discounted mean Costs and QALYs
-    tu_d_no_trt <- t(v_tu_no_trt) %*% v_dwe 
-    tu_d_trt    <- t(v_tu_trt) %*% v_dwe
-    
-    tc_d_no_trt <- t(v_tc_no_trt) %*% v_dwc
-    tc_d_trt    <- t(v_tc_trt)    %*% v_dwc
-    
-    ## Vector with total discounted mean Costs and QALYs
-    v_tc_d <- c(tc_d_no_trt, tc_d_trt)
-    v_tu_d <- c(tu_d_no_trt, tu_d_trt)
-    
-    ## Vector with discounted net monetary benefits (NMB)
-    v_nmb_d <- v_tu_d * n_wtp - v_tc_d
-    
-    ## Dataframe with discounted costs, effectiveness and NMB
-    df_ce <- data.frame(Strategy = v_names_str,
-                        Cost     = v_tc_d,
-                        Effect   = v_tu_d,
-                        NMB      = v_nmb_d)
-    
-    return(df_ce)
-  }
-  )
-}
-
-v_names_str <- c("No Treatment", "Treatment")  
-## Number of strategies
-n_str <- length(v_names_str)
-## Markov model parameters
-n_age_init <- 25                # age at baseline
-n_age_max  <- 55                # maximum age of follow up
-n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
-v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
-n_s <- length(v_n)                            # number of health states 
 ```
 
-
+## Generating Parameter Samples for PSA
 
 ```{r}
 my_params <- c("p_HS1", "p_S1H", "p_S1S2", 

@@ -92,9 +92,6 @@ ceac <- function(wtp, psa) {
   ceac <- melt(cea_df, id.vars = c("WTP", "fstrat"),
                variable.name = "Strategy", value.name = "Proportion")
 
-  # replace factors with strings (melt creates factors)
-  ceac$Strategy <- as.character(ceac$Strategy)
-
   # boolean for on frontier or not
   ceac$On_Frontier <- (ceac$fstrat == ceac$Strategy)
 
@@ -193,15 +190,21 @@ plot.ceac <- function(x,
     # filter dataframe
     x <- filter(x, .data$Strategy %in% strat_to_keep)
   }
+
+  # Drop unused strategy names
+  x$Strategy <- droplevels(x$Strategy)
+
   p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
                              y = as.name(prop_name),
                              color = as.name(strat_name))) +
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
     ylab("Pr Cost-Effective")
+
   if (points) {
-    p <- p + geom_point()
+    p <- p + geom_point(aes_(color = as.name(strat_name)))
   }
+
   if (frontier) {
     front <- x[x$On_Frontier, ]
     p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),
@@ -236,6 +239,7 @@ plot.ceac <- function(x,
 #' @export
 summary.ceac <- function(object, ...) {
   front <- object[object$On_Frontier == TRUE, ]
+  front$Strategy <- as.character(front$Strategy)
   wtp <- front$WTP
   wtp_range <- range(wtp)
   n_wtps <- length(wtp)

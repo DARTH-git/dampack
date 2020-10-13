@@ -20,6 +20,10 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
                  poly.order = 2) {
   outcome <- match.arg(outcome)
   if (inherits(sa_obj, "psa")) {
+    # Use other_outcome if available
+    if (!is.null(sa_obj$other_outcome)) {
+      sa_obj$effectiveness <- sa_obj$other_outcome
+    }
     # create metamodel
     mm <- metamodel("oneway", sa_obj, params,
                     strategies, outcome, wtp, "poly", poly.order)

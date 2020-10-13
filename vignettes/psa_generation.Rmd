@@ -23,6 +23,8 @@ rm(list = ls())
 
 # Probablistic Sensitivty Analysis Generation
 
+This vignette explains how to use `dampack` to generate your own PSA using only a decision analytic model and information about the distributions that define your model parameters of interest. If both costs and effects are calculated within the decision model, the resulting `psa` object will be compatible with all of `dampack`'s PSA analysis functions, which are explained at length in the `psa_analysis` vignette (type `vignette("psa_generation", package = "dampack")` in the console to view this vignette).
+
 ## Decision Model Format
 
 In order to generate a PSA in `dampack`, the user must input the code for the decision analytic model in a standardized format that is compatible with the `run_psa` function. This is the same format required for the `FUN` argument of `run_owsa_det` and `run_twsa_det`.
@@ -172,71 +174,108 @@ decision_model <- function(l_params_all, verbose = FALSE) {
 
 The `gen_psa_samp` function creates a `data.frame` of parameter value samples based on the underlying distributions specified by the user. Each row of the returned `data.frame` is an independently sampled set of the parameters varied in the PSA. To produce a `psa` object, the `run_psa` function will take each row of this `data.frame` and calculate the outcomes for each strategy in the user-defined model. The `data.frame` returned by `gen_psa_samp` matches the format required by the `parameters` argument of the `make_psa_obj` function.
 
-`gen_psa_samp` has five arguments: `params` is a vector containing the names of each parameter to be varied in the PSA; `dists` is a vector of the same length indicating which type of distribution this parameter will be drawn from; `parameterization_types` is a vector indicating the format of how these parameter distributions are defined; dists_params is a list of vectors, where each element of the list contains the values necessary to define the distribution for a parameter based upon its corresponding element of `dists` and `parameterization_types`; and finally, `nsamp` is a numeric value indicating the number of PSA samples to be generated. 
+`gen_psa_samp` has five arguments: `params` is a vector containing the names of each parameter to be varied in the PSA; `dists` is a vector of the same length indicating which type of distribution this parameter will be drawn from; `parameterization_types` is a vector indicating the format of how these parameter distributions are defined; `dists_params` is a list of vectors, where each element of the list contains the values necessary to define the distribution for a parameter based upon its corresponding element of `dists` and `parameterization_types`; and finally, `nsamp` is a numeric value indicating the number of PSA samples to be generated. 
 
-
+Details about the allowable distributions, their parameterization types and the corresponding formats for `dists_params` can be found in the help documentation by typing `?gen_psa_samp` in the console. Within the example below, the first parameter in the PSA, `"p_HS1"`, follows a `"beta"` distribution, which has an `"a, b"` parameterization type (which stands for alpha, beta), and the two values for alpha and beta are `30` and `170`, respectively. If the user does not possess estimates for the alpha and beta parameters for the beta distribution but does have estimates for the mean and standard deviation of `"p_HS1"`, they also could choose to parameterize this distribution using `parameterization_types = "mean, sd"`. In this case, the first element of the dists_params list would need to be a numeric vector of length 2 containing the estimated mean and standard deviation for `"p_HS1"`. `dampack` would then use a method-of-moments estimator to calculate an alpha and beta parameter for this distribution from which the PSA sample values are drawn.
 
 ```{r}
-my_params <- c("p_HS1", "p_S1H", "p_S1S2", 
-               "p_HD", "hr_S1", "hr_S2", 
-               "c_H", "c_S1", "c_S2", 
-               "c_Trt","u_H",
-               "u_S1","u_S2", "u_Trt")
+my_params <- c("p_HS1", 
+               "p_S1H", 
+               "p_S1S2", 
+               "p_HD", 
+               "hr_S1", 
+               "hr_S2", 
+               "c_H", 
+               "c_S1", 
+               "c_S2", 
+               "c_Trt",
+               "u_H",
+               "u_S1",
+               "u_S2", 
+               "u_Trt")
 
-my_dists <- c("beta", "beta", "beta",
-              "beta", "log-normal", "log-normal",
-              "gamma", "gamma", "gamma",
-              "gamma", "truncated-normal", "truncated-normal", 
-              "truncated-normal", "truncated-normal")
+my_dists <- c("beta", 
+              "beta", 
+              "beta",
+              "beta", 
+              "log-normal", 
+              "log-normal",
+              "gamma", 
+              "gamma", 
+              "gamma",
+              "gamma", 
+              "truncated-normal", 
+              "truncated-normal", 
+              "truncated-normal", 
+              "truncated-normal")
 
-my_parameterization_types <- c("a, b", "a, b", "a, b",
-                             "a, b", "meanlog, sdlog", "meanlog, sdlog",
-                             "shape, scale", "shape, scale", "shape, scale",
-                             "shape, scale", "mean, sd, ll, ul", "mean, sd, ll, ul", 
-                             "mean, sd, ll, ul", "mean, sd, ll, ul")
+my_parameterization_types <- c("a, b", 
+                               "a, b", 
+                               "a, b",
+                               "a, b", 
+                               "meanlog, sdlog", 
+                               "meanlog, sdlog",
+                               "shape, scale", 
+                               "shape, scale", 
+                               "shape, scale",
+                               "shape, scale", 
+                               "mean, sd, ll, ul", 
+                               "mean, sd, ll, ul", 
+                               "mean, sd, ll, ul", 
+                               "mean, sd, ll, ul")
 
-my_dists_params <- list(c(30, 170), c(60, 60), c(84, 716),
-                       c(10, 1990), c(log(3), 0.01), c(log(10), 0.02),
-                       c(100, 20), c(177.8, 22.5), c(225, 66.7),
-                       c(73.5, 163.3), c(1, 0.01, NA, 1),
-                       c(0.75, 0.02, NA, 1), c(0.5, 0.03, NA, 1),
-                       c(0.95, 0.02, NA, 1))
+my_dists_params <- list(c(30, 170), 
+                        c(60, 60), 
+                        c(84, 716),
+                        c(10, 1990), 
+                        c(log(3), 0.01), 
+                        c(log(10), 0.02),
+                        c(100, 20), 
+                        c(177.8, 22.5), 
+                        c(225, 66.7),
+                        c(73.5, 163.3), 
+                        c(1, 0.01, NA, 1),
+                        c(0.75, 0.02, NA, 1), 
+                        c(0.5, 0.03, NA, 1),
+                        c(0.95, 0.02, NA, 1))
                        
-l_params_all <- gen_psa_samp(params = my_params,
-                             dists = my_dists,
-                             parameterization_types = my_parameterization_types,
-                             dists_params = my_dists_params,
-                             n = 100)
+my_psa_params <- gen_psa_samp(params = my_params,
+                              dists = my_dists,
+                              parameterization_types = my_parameterization_types,
+                              dists_params = my_dists_params,
+                              n = 100)
+```
 
+## Generating Outcomes for the PSA
+
+The `run_psa` function is used to calculate outcomes for each strategy for every PSA sample through the user-defined decision model, `FUN`. In this example, the `data.frame` of PSA parameters generated by `gen_psa_samp` should be used as the input for the `psa_samp` argument. The combination of the parameters in the `psa_samp` and the `params_basecase` argument must define every parameter that `FUN` expects within its `l_params_all` input argument. Other parameters for `FUN` that are not contained within `l_params_all` list, like the `n_wtp` argument of `calculate_ce_out` can be passed through `...` as an additional argument in `run_psa`. If the decision model in `FUN` is computationally slow and/or the number of PSA samples is extremely large, `run_psa` could take a long time to run. Under these circumstances, it is recommended that you set the `progress` argument to `TRUE` in order to print a progress bar in the console while the function is running to monitor its progress.
+
+```{r}
 l_params_basecase <- list(u_D = 0, c_D = 0, d_e = 0.03, d_c = 0.03,
                           p_HS1 = NA, p_S1H = NA, p_S1S2 = NA, p_HD = NA,
                           hr_S1 = NA, hr_S2 = NA, c_H = NA, c_S1 = NA,
                           c_S2 = NA, c_Trt = NA, u_H = NA, u_S1 = NA, u_S2 = NA,
                           u_Trt = NA)
 
-psa_output <- run_psa(psa_samp = l_params_all,
+psa_output <- run_psa(psa_samp = my_psa_params,
                       params_basecase = l_params_basecase,
                       FUN = calculate_ce_out,
                       outcomes = c("Cost", "Effect", "NMB"),
                       strategies = c("No_Treatment", "Treatment"),
+                      n_wtp = 150000,
                       progress = FALSE)
+```
 
-### outcomes are stored in "other_outcome" and we need to make a psa object 
-### that specifies which outcomes are costs and effects in order to do CEA
+## Creating a Fully-functional PSA Object
+
+`run_psa` will return a named list containing a `psa` object for each outcome specified in the `outcomes` argument. Each `psa` object in the list is compatible with `owsa()`, `twsa()`, and their associated downstream functions described in the `psa_analysis` vignette. However, most PSA analysis functions in `dampack` rely on the clear designation of both a cost and effectiveness outcome. To create a PSA object that is compatible with these functions related to cost-effectiveness you must input the results of `run_psa` into the `make_psa_obj` function in the following manner. `make_psa_obj()` requires data.frames for `cost`, `effect`, and `parameters`, and a character vector for `strategies`. The `data.frame`s containing each outcome in the list returned by `run_psa` are stored within `other_outcome`. In this example, the outcome associated with `effect` is named `"Effect"`, and so `psa_output$Effect$other_outcome` is supplied to the corresponding argument of `make_psa_obj`.
+
+```{r}
 cea_psa <- make_psa_obj(cost = psa_output$Cost$other_outcome, 
                         effect = psa_output$Effect$other_outcome, 
                         parameters = psa_output$Cost$parameters,
                         strategies = psa_output$Cost$strategies,
                         currency = "$")
-
-### demonstrating the passing of extra parameters to calculated_ce_out (n_wtp)
-psa_output2 <- run_psa(psa_samp = l_params_all, 
-                       FUN = calculate_ce_out,
-                       params_basecase = l_params_basecase,
-                       outcomes = c("Cost", "Effect", "NMB"),
-                       strategies = c("No_Treatment", "Treatment"), 
-                       n_wtp = 50000,
-                       progress = FALSE)
 
 ```
 

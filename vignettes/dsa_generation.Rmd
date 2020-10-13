@@ -171,6 +171,8 @@ decision_model <- function(l_params_all, verbose = FALSE) {
 }
 ```
 
+## DSA Parameter Format
+
 The `params_range` input tells `run_owsa_det` or `run_twsa_det` which parameters will be varied in the DSA and over what ranges. This input must be a data.frame with 3 columns in the following order: "pars", "min", and "max". The number of samples from this range is determined by the input `nsamp`. The "pars" column is a character vector with the parameters of interest and must be a subset of the parameters from `params_basecase`.
 
 when using `run_owsa_det`, supplying multiple parameters in `params_range` will instruct the function to execute a series of separate one-way deterministic sensitivity analyses and compile the results into a single `owsa` object for each requested `outcome`. When using `run_twsa_det`, exactly two parameters must be supplied in the `pars` column of the `params_range` data.frame argument.

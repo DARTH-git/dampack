@@ -151,7 +151,7 @@ The output of the `owsa()` function has customized plotting functionality that c
 plot(o)
 ```
 
-## Tornado Plot
+### Tornado Plot
 
 Using the `owsa()` function on a PSA object will produce an `owsa` class object, and this object is compatible with two special plotting functions in addition to `plot.owsa()`. The first of these plotting functions is `owsa_tornado`, which produces a tornado plot. A tornado plot is a visual aid used to identify which parameters are driving most of the variation in a specified model outcome. In addition, the plot shows whether high or low expected outcome values result from parameter values that are above or below the median value of the parameter in question (indicated by the fill color corresponding to "Parameter Level High/Low". For example, the tornado plot below tells us that the parameter `"muDieCancer"` has the most leverage in affecting the effectiveness model outcome, and that values below the median value of `"muDieCancer"` in the one-way sensitivity analysis are associated with higher expected effectiveness outcomes.
 
@@ -172,7 +172,7 @@ In order to attain the data.frame used to produce the tornado plot, use the `ret
 owsa_tornado(o, return = "data")
 ```
 
-## Optimal Strategy Plot
+### Optimal Strategy Plot
 
 The second special plotting function designed for the visualization of the `owsa` object is `owsa_opt_strat`, which directly addresses the crucial information that is missing from the tornado plot. The output of `owsa_opt_strat` allows us to see how the strategy that maximizes the expectation of the outcome of interest changes as a function of each parameter of interest.
 

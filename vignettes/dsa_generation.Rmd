@@ -28,11 +28,11 @@ A simple single-parameter DSA starts with choosing a parameter of interest from 
 
 ## Decision Model Format
 
-In order to perform a DSA in `dampack`, the user must input the code for the decision analytic model in a standardized format that is compatible with the functions `run_owsa_det`, `run_twsa_det`, and `run_psa`. `dampack` uses the function `run_owsa_det` to execute one-way DSAs and the function `run_twsa_det` to execute two-way DSAs.
+`dampack` uses the function `run_owsa_det` to execute one-way DSAs and the function `run_twsa_det` to execute two-way DSAs. In order to perform a DSA in `dampack`, the user must input the code for the decision analytic model in a standardized format that is compatible with `run_owsa_det`, and `run_twsa_det`. This is the same format required for the `FUN` argument of `run_psa`.
 
-1) The user-defined model function must accept a single input containing a list of the parameters from the `params_basecase` argument. In the example model shown below, this list is named `l_params_all`, and the variables contained in this list are the only variables that are allowed to be varied through the `params_range` argument in the DSA. Optionally, additional function inputs for `FUN` can be supplied through the `...` argument of `run_owsa_det`/`run_twsa_det`, but these inputs are not allowed to vary in the sensitivity analysis. These additional inputs must be arguments of `FUN`, like `n_wtp` in the example of `calculate_ce_out()` below. `FUN` and its component functions are also able to incorporate variables stored in the global environment, such as `n_age_init` or `n_age_max` in the example.
+The user-defined model function must accept a single input containing a list of the parameters from the `params_basecase` argument. In the example model shown below, this list is named `l_params_all`, and the variables contained in this list are the only variables that are allowed to be varied through the `params_range` argument in the DSA. Optionally, additional function inputs for `FUN` can be supplied through the `...` argument of `run_owsa_det`/`run_twsa_det`, but these inputs are not allowed to vary in the sensitivity analysis. These additional inputs must be arguments of `FUN`, like `n_wtp` in the example of `calculate_ce_out()` below. `FUN` and its component functions are also able to incorporate variables stored in the global environment, such as `n_age_init` or `n_age_max` in the example.
 
-2) The user-defined model function must return a data.frame where the first column contains a character vector of the strategy names, and the subsequent columns contain numeric vectors of all relevant model outcomes. Each row of the data.frame will consist of a strategy name followed by the corresponding outcome values for that strategy. These model outcomes must be calculated internally within `FUN`. The model outcomes are not limited to typical outcomes like cost or effectiveness and can be any numerical outcome that the user chooses to model.
+The user-defined model function must return a data.frame where the first column contains a character vector of the strategy names, and the subsequent columns contain numeric vectors of all relevant model outcomes. Each row of the data.frame will consist of a strategy name followed by the corresponding outcome values for that strategy. These model outcomes must be calculated internally within `FUN`. The model outcomes are not limited to typical outcomes like cost or effectiveness and can be any numerical outcome that the user chooses to model.
 
 ```{r}
 v_names_str <- c("No Treatment", "Treatment")  
@@ -226,9 +226,9 @@ plot(owsa_det$owsa_NMB)
 
 ## Two-way Deterministic Sensitivty Analysis
 
-A two-way sensitivity analysis is used to assess how model outcomes vary over pre-specified ranges of two model parameters jointly. The general format of the function arguments for `dampack`'s two-way DSA function, `run_twsa_det`, are the same as those for `run_owsa_det`. In `run_twsa_det`, equally spaced sequences of length `nsamp` are created for the two parameters in `params_range` based on their respective ranges. These two sequences of parameter values define an `nsamp` by `nsamp` grid over which `FUN` is applied to produce outcomes for every combination of the two parameters.
+A two-way sensitivity analysis is used to assess how model outcomes vary over pre-specified ranges of two model parameters jointly. The general format of the function arguments for `dampack`'s two-way DSA function, `run_twsa_det`, are the same as those for `run_owsa_det`. In `run_twsa_det`, equally spaced sequences of length `nsamp` are created for the two parameters based on the inputs provided in the `params_range` argument. These two sequences of parameter values define an `nsamp` by `nsamp` grid over which `FUN` is applied to produce outcomes for every combination of the two parameters.
 
-If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. Each `twsa` object is a `data.frame` in long format that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
+If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. Each `twsa` object is a long form `data.frame` that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
 
 ```{r}
 twsa_det <- run_twsa_det(params_range = my_params_range,
@@ -243,5 +243,6 @@ twsa_det <- run_twsa_det(params_range = my_params_range,
 In the same manner To access a single `twsa` object associated with the `"NMB"` outcome within the returned list, we write `twsa_det$twsa_NMB`. The results contained in `twsa_det$twsa_NMB` can be visualized using the `plot()` function, which has its own S3 method for `twsa` object class. Unlike `plot.owsa`, `plot.twsa` does not show the outcome values that correspond with each parameter value combination and strategy, but instead displays which strategy is optimal as a function of the selected parameters. In the case of net monetary benefit (NMB) show here, the optimal strategy is the strategy that maximizes the outcome value. If the optimal strategy should minimize rather than maximize the selected outcome, set argument `maximize = FALSE` in `plot.twsa`.
 
 ```{r}
-plot(twsa_det$twsa_NMB)
+plot(twsa_det$twsa_NMB,
+     maximize = TRUE)
 ```

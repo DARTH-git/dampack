@@ -9,7 +9,7 @@ Authors@R: c(
     role = "aut"),
   person("Eva", "Enns", email="eenns@umn.edu",
     role = "aut"),
-  person("Greg", "Knowlton", email="gsknowlton@gmail.com",
+  person("Greg", "Knowlton", email="knowl193@umn.edu",
     role = "aut")
   )
 Description: The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and 

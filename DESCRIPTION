@@ -4,13 +4,13 @@ Title: Decision-Analytic Modeling Package
 Version: 0.2.0
 Authors@R: c(
   person("Fernando", "Alarid-Escudero", email="fernando.alarid@cide.edu",
-    role = c("aut", "cre")),
+    role = "aut"),
   person("Caleb", "Easterly", email="easte080@umn.edu",
     role = "aut"),
   person("Eva", "Enns", email="eenns@umn.edu",
     role = "aut"),
   person("Greg", "Knowlton", email="knowl193@umn.edu",
-    role = "aut")
+    role = c("aut", "cre"))
   )
 Description: The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and 
     visualizing the health economic outputs of mathematical models. This package was developed with funding from 

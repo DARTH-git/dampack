@@ -282,6 +282,9 @@ summary.metamodel <- function(object, ...) {
 #' @export
 predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 
+  # analysis type
+  analysis <- object$analysis
+  # Predicting from multiway metamodels not yet implemented
   if (analysis == "multiway") {
     stop("metamodel predictions not available for multiway analyses")
   }
@@ -312,9 +315,6 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 
   # strategies
   strats <- object$strategies
-
-  # analysis type
-  analysis <- object$analysis
 
   # data frame to be used in predict - mean values repeated
   # the values for the parameter of interest are replaced

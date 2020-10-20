@@ -85,7 +85,7 @@ evppi <- calc_evppi(psa = psa_big,
                     k = -1,
                     pop = 1,
                     progress = FALSE)
-evppi
+head(evppi[[1]])
 
 plot(evppi)
 ```
@@ -103,17 +103,18 @@ evsi <- calc_evsi(psa = psa_big,
                   wtp = 5e4,
                   params = c("pFailSurg", "pFailChemo"),
                   outcome = "nmb",
-                  type = "gam",
                   k = -1,
                   n = seq(from = 10, to = 200, by = 10),
                   n0 = 50,
                   pop = 1,
                   progress = FALSE)
 
-head(evsi)
+head(evsi[[1]])
 
 plot(evsi)
 ```
+
+By default, `calc_evsi` will assume that all parameters included in `params` came from the same study of sample size `n0` and will both be informed by a new study of sample size `n`. Providing a sequence of values for `n` will allow the user to assess how EVSI changes as a function of the additional sample size. However, it may be the case that each parameter in `params` came from a separate study with a unique initial sample size `n0`, and a unique additional sample size `n`. If this is the case, the user should set argument `n_by_param` to `TRUE`, and provide a numeric vector of sample sizes for `n0` and `n` corresponding to the order of the parameters in `params`.
 
 # Metamodeling Appendix
 
@@ -149,7 +150,6 @@ Using the summary function on a metamodel object produces a data.frame with a ro
 summary(mm)
 ```
 In general, the predict function will create a data.frame of parameter values based off of user input and the supplied metamodel, and use the metamodel to predict outcome values over every combination of input values in the data.frame. `predict()` has slightly differing functionality depending on whether or not the `metamodel` object supplied was produced with `analysis = "oneway"` or `analysis = "twoway"`.  The `ranges` argument must be a named list that gives the ranges for the parameters of interest, and the `nsamp` argument must be an integer. The `nsamp` argument tells the function how many evenly spaced values between the ranges of each parameter should be drawn in constructing the data.frame of parameter inputs. 
-
 For one-way metamodels, the vector of parameter values dictated by `ranges` and `nsamp` will be sequentially fed into the corresponding regression model to yield a predicted output.  This process is performed separately for each parameter named in the `ranges` argument. For two-way metamodels, the same general process is applied, except that an `nsamp` by `nsamp` grid of the two relevant parameter inputs is ultimately fed into the regression model. For one-way analyses, these regression models only use the parameter of interest as the independent variable and therefore it is not necessary to supply the other parameter values. For the two-way analyses, both parameters of interest are incorporated as covariates in the regression model, and values for both must be supplied to produce outcome predictions.
 
 If a parameter name is supplied in the `ranges` argument but the vector of ranges itself is left as `NULL`, then the 2.5th and 97.5th quantiles of the parameter values from the PSA will be automatically supplied as the range. 

@@ -9,8 +9,6 @@ calc_evsi(
   wtp,
   params = NULL,
   outcome = c("nhb", "nmb"),
-  type = c("gam", "poly"),
-  poly.order = 2,
   k = -1,
   n = 100,
   n0 = 10,
@@ -28,11 +26,6 @@ calc_evsi(
 
 \item{outcome}{either net monetary benefit (\code{"nmb"})
 or net health benefit (\code{"nhb"})}
-
-\item{type}{either generalized additive models (\code{"gam"}) or
-polynomial models (\code{"poly"})}
-
-\item{poly.order}{order of the polynomial, if \code{type == "poly"}}
 
 \item{k}{basis dimension, if \code{type == "gam"}}
 
@@ -53,6 +46,11 @@ which EVSI is calculated from the metamodel.}
 
 \item{progress}{\code{TRUE} or \code{FALSE} for whether or not function progress
 should be displayed in console.}
+}
+\value{
+A list containing 1) a data.frame with WTP thresholds and corresponding EVSIs
+for the selected parameters and 2) a list of metamodels used to estimate EVSI for each
+strategy at each willingness to pay threshold.
 }
 \description{
 Calculate Expected Value of Sample Information (EVSI)

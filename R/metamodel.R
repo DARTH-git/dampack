@@ -217,7 +217,7 @@ print.metamodel <- function(x, ...) {
       "some details: ", "\n",
       "-------------------------", "\n",
       "analysis: this is a ", substr(x$analysis, 1, 3), "-way metamodel \n",
-      "mods: a nested list of linear metamodels \n",
+      "mods: a nested list of ", x$type, " metamodels \n",
       "outcome: ", x$outcome, "\n",
       "WTP: ", ifelse(!is.null(wtp), wtp, "NA"), "\n",
       "strategies: ", paste(x$strategies, collapse = ", "), "\n",
@@ -234,6 +234,9 @@ summary.metamodel <- function(object, ...) {
   analysis <- object$analysis
   type <- object$type
   summary_df <- NULL
+  if (analysis == "multiway") {
+    stop("metamodel summary not available for multiway analyses")
+  }
   if (analysis == "oneway") {
     for (p in object$params) {
       for (s in object$strategies) {
@@ -265,7 +268,7 @@ summary.metamodel <- function(object, ...) {
   return(summary_df)
 }
 
-#' Predict from a metamodel
+#' Predict from a one-way or two-way metamodel
 #'
 #' @param object object with class "metamodel"
 #' @param ranges a named list of the form c("param" = c(0, 1), ...)
@@ -278,6 +281,10 @@ summary.metamodel <- function(object, ...) {
 #' @importFrom stats quantile predict
 #' @export
 predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
+
+  if (analysis == "multiway") {
+    stop("metamodel predictions not available for multiway analyses")
+  }
 
   # type checking
   ## make sure ranges is NULL or list

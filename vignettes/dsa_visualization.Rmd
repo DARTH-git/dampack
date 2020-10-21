@@ -12,19 +12,18 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
 )
 ```
 
 # Overview
 
+This vignette describes how to visualize the results of the one-way and two-way deterministic sensitivity analyses produced by `run_owsa_det` and `run_twsa_det`. In this vignette we use the same custom decision-analytic model that was described in the `dsa_generation` vignette (see `vignette("dsa_generation", package = "dampack")`). In order to utilize the functionality described in this vignette, you must first adapt the functions from the `dsa_generation` vignette for your own decision analytic model. It is not possible to execute a DSA with PSA results, but it is possible to perform one-way and two-way sensitivity analyses using PSA results. For instructions on how to do this, please see the `psa_analysis` vignette (`vignette("psa_analysis", package = "dampack")`). Note that many of these visualization functions are identical to the `owsa` and `twsa` functions described in the `psa_analysis` vignette.
 
-
-
-```{r}
-library(dampack)
-rm(list = ls())
-
+```{r, include = FALSE}
 decision_model <- function(l_params_all, verbose = FALSE) {
   with(as.list(l_params_all), {
     # compute internal paramters as a function of external parameters
@@ -38,9 +37,9 @@ decision_model <- function(l_params_all, verbose = FALSE) {
     # create the cohort trace
     m_M <- matrix(NA, nrow = n_t + 1 , 
                   ncol = n_s,
-                  dimnames = list(0:n_t, v_n))     # create Markov trace (n_t + 1 because R doesn't understand  Cycle 0)
+                  dimnames = list(0:n_t, v_n)) # create Markov trace 
     
-    m_M[1, ] <- c(1, 0, 0, 0)                      # initialize Markov trace
+    m_M[1, ] <- c(1, 0, 0, 0)                  # initialize Markov trace
     
     # create transition probability matrix for NO treatment
     m_P <- matrix(0,
@@ -70,13 +69,13 @@ decision_model <- function(l_params_all, verbose = FALSE) {
     
     ############# PROCESS ###########################################
     
-    for (t in 1:n_t){                              # throughout the number of cycles
-      m_M[t + 1, ] <- m_M[t, ] %*% m_P           # estimate the Markov trace for cycle the next cycle (t + 1)
+    for (t in 1:n_t){   # throughout the number of cycles
+      m_M[t + 1, ] <- m_M[t, ] %*% m_P # estimate the Markov trace for cycle the next cycle (t + 1)
     }
     
     ####### EPIDEMIOLOGICAL OUTPUT  ###########################################
     #### Overall Survival (OS) ####
-    v_os <- 1 - m_M[, "D"]                # calculate the overall survival (OS) probability for no treatment
+    v_os <- 1 - m_M[, "D"]  # calculate the overall survival (OS) probability for no treatment
     
     #### Disease prevalence #####
     v_prev <- rowSums(m_M[, c("S1", "S2")])/v_os
@@ -157,9 +156,16 @@ n_str <- length(v_names_str)
 n_age_init <- 25                # age at baseline
 n_age_max  <- 55                # maximum age of follow up
 n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
-v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
-n_s <- length(v_n)                            # number of health states 
+v_n  <- c("H", "S1", "S2", "D") # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
+n_s <- length(v_n)              # number of health states 
+```
 
+## One-way Deterministic Sensitivity Analysis
+
+A one-way sensitivity analysis (OWSA) illustrates how the expected outcome of a decision model changes as function of a single input parameter. The function `run_owsa_det` produces an `owsa` object (or a list of `owsa` objects if multiple outcomes are requested), and you should not call the `owsa()` function on the output of `run_owsa_det`. In this example we simultaneously execute six independent deterministic one-way sensitivity analyses for the parameters and ranges shown in `my_params_range`. 
+
+```{r}
+library(dampack)
 my_params_basecase <- list(p_HS1 = 0.15,
                            p_S1H = 0.5,
                            p_S1S2 = 0.105,
@@ -185,10 +191,7 @@ my_params_range <- data.frame(pars = c("p_HS1", "p_S1S2", "p_S1H",
                                       0, 0.9, 12000),
                               max = c(1, 1, 1,
                                       1, 1, 24000))
-```
 
-
-```{r}
 o <- run_owsa_det(params_range = my_params_range,
                   params_basecase = my_params_basecase,
                   nsamp = 100,
@@ -198,25 +201,56 @@ o <- run_owsa_det(params_range = my_params_range,
                   progress = FALSE)
 ```
 
-```{r}
-plot(o)
+The output of the `owsa()` function has customized plotting functionality that can be explored by typing `?plot.owsa` in the console. Like all other plots produced by `dampack`, plots derived from the `owsa` object are `ggplot` objects and can be readily customized. These plots show the exact model outcomes for each strategy over a range of values for each parameter of interest. Within each facet of the entire plot, the only parameter that is varying is the parameter in the corresponding label, and all others are held at the basecase values provided to the `params_basecase` argument of `run_owsa_det`.
+
+```{r, fig.height = 6, fig.width = 8}
+plot(o, n_x_ticks = 3)
+```
+### Tornado Plot
+
+The `owsa` object is compatible with the `owsa_tornado` function, which was also demonstrated in the `psa_analysis` vignette. A tornado plot is a visual aid used to identify which parameters are driving most of the variation in a specified model outcome. In addition, the plot shows whether high or low expected outcome values result from parameter values that are above or below the median value of the parameter in question (indicated by the fill color corresponding to "Parameter Level High/Low". For example, the tornado plot below tells us that the parameter `"p_HS1"` has the most leverage in affecting the net monetary benefit (NMB) model outcome, and that values below the median value of `"p_HS1"` in the one-way sensitivity analysis are associated with higher net monetary benefit.
+
+It is important to note that some important information is obscured by tornado plots and caution should be exercised when interpreting it. As the parameter of interest varies across its range in the one-way sensitivity, the strategy that maximizes the outcome of interest can also change across this range. The plot is not showing how the expected outcome changes for a single strategy, but how the expected outcome of the optimal strategy changes. The designation of which strategy is optimal is liable to alternate over the range of the parameter of interest, and this is hidden in a tornado plot.
+
+```{r, fig.height = 6, fig.width = 8}
+owsa_tornado(o, 
+             n_y_ticks = 6)
 ```
 
-```{r}
-owsa_tornado(o)
+For owsa objects that contain many parameters that have minimal effect on the parameter of interest, you may want to consider producing a plot that highlights only the most influential parameters. Using the `min_rel_diff` argument, you can instruct `owsa_tornado` to exclude all parameters that fail to produce a relative change in the outcome below a specific fraction. 
+
+```{r, fig.height = 6, fig.width = 8}
+owsa_tornado(o, 
+             min_rel_diff = 0.05, 
+             n_y_ticks = 6)
 ```
 
+In order to attain the data.frame used to produce the tornado plot, use the `return` argument to change the type of object returned by the `owsa_tornado` function.
+
 ```{r}
-owsa_tornado(o, return = "data")
+owsa_tornado(o, 
+             return = "data", 
+             n_y_ticks = 6)
 ```
+
+### Optimal Strategy Plot
+
+The second special plotting function designed for the visualization of the `owsa` object is `owsa_opt_strat`, which directly addresses the crucial information that is missing from the tornado plot. The output of `owsa_opt_strat` allows us to see how the strategy that maximizes the expectation of the outcome of interest changes as a function of each parameter of interest.
 
 ```{r, fig.height = 6, fig.width = 8}
 owsa_opt_strat(o)
 ```
 
+Like `owsa_tornado()`, the `return` argument in `owsa_opt_strat()` allows the user to access a tidy data.frame that contains the exact values used to produce the plot.
+
 ```{r}
-owsa_opt_strat(o, return = "data")
+owsa_opt_strat(o, 
+               return = "data")
 ```
+
+## Two-way Sensitivty Analysis
+
+A two-way sensitivity analysis (TWSA) illustrates how the expected outcome of a decision-analytic model changes as function of two input parameters designated in `run_twsa_det`.
 
 ```{r}
 my_params_range_twsa <- data.frame(pars = c("u_Trt", "c_Trt"),
@@ -233,6 +267,8 @@ tw <- run_twsa_det(params_range = my_params_range_twsa,
 
 ```
 
-```{r}
+The results contained in `tw` can be visualized using the `plot()` function, which has its own S3 method for `twsa` object class. Unlike `plot.owsa`, `plot.twsa` does not show the outcome values that correspond with each parameter value combination and strategy, but instead displays which strategy is optimal as a function of the selected parameters. In the case of net monetary benefit (NMB) show here, the optimal strategy is the strategy that maximizes the outcome value. If the optimal strategy should minimize rather than maximize the selected outcome, set argument `maximize = FALSE` in `plot.twsa`.
+
+```{r, fig.height = 6, fig.width = 8}
 plot(tw)
 ```

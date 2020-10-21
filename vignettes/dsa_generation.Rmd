@@ -12,13 +12,14 @@ vignette: >
 ```{r, setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
 )
-library(dampack)
-rm(list = ls())
 ```
 
-# Deterministic Sensitivty Analysis Generation
+# Overview
 
 Deterministic sensitivity analysis (DSA) is a method for assessing how the results of a decision analytic model vary over a pre-specified range of a set of parameters of interest. 
 
@@ -35,6 +36,7 @@ The user-defined model function must accept a single input containing a list of 
 The user-defined model function must return a data.frame where the first column contains a character vector of the strategy names, and the subsequent columns contain numeric vectors of all relevant model outcomes. Each row of the data.frame will consist of a strategy name followed by the corresponding outcome values for that strategy. These model outcomes must be calculated internally within `FUN`. The model outcomes are not limited to typical outcomes like cost or effectiveness and can be any numerical outcome that the user chooses to model.
 
 ```{r}
+library(dampack)
 v_names_str <- c("No Treatment", "Treatment")  
 ## Number of strategies
 n_str <- length(v_names_str)
@@ -42,8 +44,8 @@ n_str <- length(v_names_str)
 n_age_init <- 25                # age at baseline
 n_age_max  <- 55                # maximum age of follow up
 n_t  <- n_age_max - n_age_init  # time horizon, number of cycles
-v_n  <- c("H", "S1", "S2", "D")               # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
-n_s <- length(v_n)                            # number of health states 
+v_n  <- c("H", "S1", "S2", "D") # the 4 states of the model: Healthy (H), Sick (S1), Sicker (S2), Dead (D)
+n_s <- length(v_n)              # number of health states 
 
 calculate_ce_out <- function(l_params_all, n_wtp = 100000){
   # User defined
@@ -112,9 +114,9 @@ decision_model <- function(l_params_all, verbose = FALSE) {
     # create the cohort trace
     m_M <- matrix(NA, nrow = n_t + 1 , 
                   ncol = n_s,
-                  dimnames = list(0:n_t, v_n))     # create Markov trace (n_t + 1 because R doesn't understand  Cycle 0)
+                  dimnames = list(0:n_t, v_n)) # create Markov trace
     
-    m_M[1, ] <- c(1, 0, 0, 0)                      # initialize Markov trace
+    m_M[1, ] <- c(1, 0, 0, 0) # initialize Markov trace
     
     # create transition probability matrix for NO treatment
     m_P <- matrix(0,
@@ -144,13 +146,13 @@ decision_model <- function(l_params_all, verbose = FALSE) {
     
     ############# PROCESS ###########################################
     
-    for (t in 1:n_t){                              # throughout the number of cycles
-      m_M[t + 1, ] <- m_M[t, ] %*% m_P           # estimate the Markov trace for cycle the next cycle (t + 1)
+    for (t in 1:n_t){ # throughout the number of cycles
+      m_M[t + 1, ] <- m_M[t, ] %*% m_P # estimate the Markov trace for cycle the next cycle (t + 1)
     }
     
     ####### EPIDEMIOLOGICAL OUTPUT  ###########################################
     #### Overall Survival (OS) ####
-    v_os <- 1 - m_M[, "D"]                # calculate the overall survival (OS) probability for no treatment
+    v_os <- 1 - m_M[, "D"]  # calculate the overall survival (OS) probability for no treatment
     
     #### Disease prevalence #####
     v_prev <- rowSums(m_M[, c("S1", "S2")])/v_os
@@ -208,6 +210,7 @@ In `run_owsa_det`, the user is free to specify any number of outcomes that are d
 
 Each `owsa` object returned by `run_owsa_det` is a `data.frame` with four columns, `parameter`, `strategy`, `param_val`, and `outcome_val`. Each row's value in the `parameter` column denotes which parameter was swapped into  the basecase parameters, and `param_val` indicates which particular value of this parameter was used in that iteration of the decision model. The `outcome_val`s corresponding to each combination of `strategy`, `parameter`, and `param_val` are provided in long format within the `owsa` object.
 
+To access a single `owsa` object associated with the `"NMB"` outcome within the returned list, we can simply write `owsa_det$owsa_NMB`.
 
 ```{r}
 owsa_det <- run_owsa_det(params_range = my_params_range,
@@ -219,18 +222,11 @@ owsa_det <- run_owsa_det(params_range = my_params_range,
                          progress = FALSE)
 ```
 
-To access a single `owsa` object associated with the `"NMB"` outcome within the returned list, we can simply write `owsa_det$owsa_NMB`. The results contained in `owsa_det$owsa_NMB` can be visualized using the `plot()` function, which has its own S3 method for `owsa` object class. The y-axis of each plot represents the value of the model outcome, and the x-axis represents the parameter value.
-
-```{r}
-plot(owsa_det$owsa_NMB)
-```
-
-
 ## Two-way Deterministic Sensitivty Analysis
 
 A two-way sensitivity analysis is used to assess how model outcomes vary over pre-specified ranges of two model parameters jointly. The general format of the function arguments for `dampack`'s two-way DSA function, `run_twsa_det`, are the same as those for `run_owsa_det`. In `run_twsa_det`, equally spaced sequences of length `nsamp` are created for the two parameters based on the inputs provided in the `params_range` argument. These two sequences of parameter values define an `nsamp` by `nsamp` grid over which `FUN` is applied to produce outcomes for every combination of the two parameters.
 
-If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. Each `twsa` object is a long form `data.frame` that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
+If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. To access a single `twsa` object associated with the `"NMB"` outcome within the returned list, we write `twsa_det$twsa_NMB`. Each `twsa` object is a long form `data.frame` that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
 
 ```{r}
 twsa_det <- run_twsa_det(params_range = my_params_range,
@@ -240,11 +236,4 @@ twsa_det <- run_twsa_det(params_range = my_params_range,
                          outcomes = c("Cost", "Effect", "NMB"),
                          strategies = c("No_Treatment", "Treatment"), 
                          progress = FALSE)
-```
-
-In the same manner To access a single `twsa` object associated with the `"NMB"` outcome within the returned list, we write `twsa_det$twsa_NMB`. The results contained in `twsa_det$twsa_NMB` can be visualized using the `plot()` function, which has its own S3 method for `twsa` object class. Unlike `plot.owsa`, `plot.twsa` does not show the outcome values that correspond with each parameter value combination and strategy, but instead displays which strategy is optimal as a function of the selected parameters. In the case of net monetary benefit (NMB) show here, the optimal strategy is the strategy that maximizes the outcome value. If the optimal strategy should minimize rather than maximize the selected outcome, set argument `maximize = FALSE` in `plot.twsa`.
-
-```{r}
-plot(twsa_det$twsa_NMB,
-     maximize = TRUE)
 ```

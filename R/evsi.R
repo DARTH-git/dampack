@@ -14,13 +14,16 @@
 #' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
 #' should be displayed in console.
 #'
+#' @return A list containing 1) a data.frame with WTP thresholds, new prospective sample sizes
+#'  (if \code{n_by_param == FALSE}), and corresponding EVSIs
+#' for the selected parameters and 2) a list of metamodels used to estimate EVSI for each
+#' strategy at each willingness to pay threshold.
+#'
 #' @export
 calc_evsi <- function(psa,
                       wtp,
                       params = NULL,
                       outcome = c("nhb", "nmb"),
-                      type = c("gam", "poly"),
-                      poly.order = 2,
                       k = -1,
                       n = 100,
                       n0 = 10,
@@ -28,7 +31,6 @@ calc_evsi <- function(psa,
                       pop = 1,
                       progress = TRUE) {
   # define parameter values and make sure they correspond to a valid option
-  type <- match.arg(type)
   outcome <- match.arg(outcome)
 
   # adjust outcome type
@@ -48,6 +50,8 @@ calc_evsi <- function(psa,
     evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
   }
 
+  mms_ls <- vector(mode = "list", length = n_wtps)
+
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
 
@@ -57,9 +61,11 @@ calc_evsi <- function(psa,
                      params = params,
                      outcome = outcome,
                      wtp = wtp[l],
-                     type = type,
-                     poly.order = poly.order,
+                     type = "gam",
+                     poly.order = 2,
                      k = k)
+
+    mms_ls[[l]] <- mms
 
     if (progress == TRUE) {
       if (l / (n_wtps / 10) == round(l / (n_wtps / 10), 0)) { # display progress every 10%
@@ -100,8 +106,9 @@ calc_evsi <- function(psa,
                           "n" = rep(n, each = n_wtps),
                           "EVSI" = c(evsi))
   }
-  class(df_evsi) <- c("evsi", "data.frame")
-  return(df_evsi)
+  evsi_ls <- list(df_evsi = df_evsi, metamodel_ls = mms_ls)
+  class(evsi_ls) <- c("evsi")
+  return(evsi_ls)
 }
 
 
@@ -115,7 +122,6 @@ calc_evsi <- function(psa,
 #' @param n0 scalar or vector of effective prior sample size
 #' @importFrom stats coef
 predict_ga <- function(object, n, n0) {
-
   # Name of parameters
   param_names <- colnames(object$model)
 
@@ -295,6 +301,8 @@ plot.evsi <- function(x,
                        ylim = NULL,
                        col = c("full", "bw"),
                        ...) {
+  # Select EVSI data.frame, discarding metamodel list
+  x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
   if (length(unique(x$WTP)) == 1) {

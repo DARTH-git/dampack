@@ -21,14 +21,14 @@ knitr::opts_chunk$set(
 
 # Background
 
-Cost-effectiveness analysis (CEA) is one form of economic evaluation that compares the cost, effectiveness, and efficiency of a set of mutually exclusive strategies in generating desired benefits. The goal of cost-effectiveness is to identify the strategy that yields that greatest benefit at an acceptable level of efficiency. Effectiveness is often measured in terms of quality-adjusted life-years (QALYs); however, life-years, infections/cases averted, or other measures of benefit could be used, depending on the goals of the decision maker. Costs reflect the cost of implementing the strategy, as well as any relevant downstream costs. The determiniation of which costs to include depends on the perspective of the analysis. For a more in-depth explanation of cost-effectiveness analysis, see:
+Cost-effectiveness analysis (CEA) is one form of economic evaluation that compares the cost, effectiveness, and efficiency of a set of mutually exclusive strategies in generating desired benefits. The goal of cost-effectiveness is to identify the strategy that yields that greatest benefit at an acceptable level of efficiency. Effectiveness is often measured in terms of quality-adjusted life-years (QALYs); however, life-years, infections/cases averted, or other measures of benefit could be used, depending on the goals of the decision maker. Costs reflect the cost of implementing the strategy, as well as any relevant downstream costs. The determination of which costs to include depends on the perspective of the analysis. For a more in-depth explanation of cost-effectiveness analysis, see:
 
 * Drummond et al., Methods for the Economic Evaluation of Health Care Programmes, 4th ed., 2015, Oxford University Press
 * Neumann et al., Cost-Effectiveness in Health and Medicine, 2nd ed., 2016, Oxford University Press
 
 Given a set of mutually exclusive strategies with associated costs and effectiveness, the first step in determining cost-effectiveness is to order strategies in order of increasing costs. As costs increase, effectiveness should also increase. Any strategy with lower effectiveness but higher costs than another strategy is said to be "strongly dominated". A rational decision-maker would never implement a dominated strategy because greater effectiveness could be achieved at lower cost by implementing a different strategy (and the strategies are mutually exclusive). Therefore, dominated strategies are eliminated from further consideration. 
 
-Next, the incremental cost and incremental effectiveness of moving from one strategy to the next (in order of increasing costs) are calculated. The incremental cost-effectiveness ratio (ICER) for each strategy is then its incremental costs divided by its incremental effectiveness and represents the cost per unit benefit of "upgrading" to that strategy from the next least costly (and next least effective) strategy. At this point, "weakly dominated" strategies are identified. These are strategies for which there is a linear combination of two different strategies that dominates the strategy (lower costs and/or higher effectivenss). **The concept of weak dominance is most easily explained through visualization. In Figure 1, strategy X is weakly dominated by a linear combination of Y and Z.** Weak dominance is also called "extended dominance". Operationally, weakly dominated strategies can be identified by checking that ICERs increase with increasingly costly (and effective) strategies. If there is a "kink" in the trend, then weak/extended dominance exists. Once weakly dominated strategies are removed (and incremental quantities recalculated), the set of remaining strategies form the efficient frontier and associated ICERs can be interpreted for decision-making.
+Next, the incremental cost and incremental effectiveness of moving from one strategy to the next (in order of increasing costs) are calculated. The incremental cost-effectiveness ratio (ICER) for each strategy is then its incremental costs divided by its incremental effectiveness and represents the cost per unit benefit of "upgrading" to that strategy from the next least costly (and next least effective) strategy. At this point, "weakly dominated" strategies are identified. These are strategies for which there is a linear combination of two different strategies that dominates the strategy (lower costs and/or higher effectivenss). Weak dominance is also called "extended dominance". Operationally, weakly dominated strategies can be identified by checking that ICERs increase with increasingly costly (and effective) strategies. If there is a "kink" in the trend, then weak/extended dominance exists. Once weakly dominated strategies are removed (and incremental quantities recalculated), the set of remaining strategies form the efficient frontier and associated ICERs can be interpreted for decision-making.
 
 The `dampack` function `calculate_icers()` completes all of the calculations and checks described above. As input, it requires a vector of strategy costs, a vector of strategy effectiveness, and a vector of strategy names. It outputs a specialized data frame that presents the costs and effectiveness of each strategy and, for non-dominated strategies, the incremental costs, effeciveness, and ICER. Dominated strategies are included at the end of the table with the type of dominance indicated as either strong dominance (D) or extended/weak dominance (ED) in the `Status` column.
 
@@ -50,6 +50,7 @@ Five strategies are considered: No specific screening recommendation (status quo
 
 We define a vector of short strategy names, which will be used in labeling our results in tables and in plots.
 ```{r}
+library(dampack)
 v_hiv_strat_names <- c("status quo", "one time", "5yr", "3yr", "annual")
 ```
 
@@ -67,8 +68,9 @@ v_hiv_qalys <- c(277.25, 277.57, 277.78, 277.83, 277.76) / 12
 
 Using these elements, we then use the `calculate_icers()` function in `dampack` to conduct our cost-effectiveness comparison of the five HIV testing strategies.
 ```{r}
-library(dampack)
-icer_hiv <- calculate_icers(cost=v_hiv_costs, effect=v_hiv_qalys, strategies=v_hiv_strat_names)
+icer_hiv <- calculate_icers(cost=v_hiv_costs, 
+                            effect=v_hiv_qalys, 
+                            strategies=v_hiv_strat_names)
 icer_hiv
 ```
 
@@ -96,12 +98,14 @@ In the plot, the points on the efficient frontier (consisting of all non-dominat
 
 Plot with all strategies labeled:
 ```{r}
-plot(icer_hiv, label="all")
+plot(icer_hiv, 
+     label="all")
 ```
 
 Plot with a different `ggplot` theme:
 ```{r}
-plot(icer_hiv, label="all") +
+plot(icer_hiv, 
+     label="all") +
   theme_classic() +
   ggtitle("Cost-effectiveness of HIV screening strategies")
 ```
@@ -115,7 +119,7 @@ From: Rajasingham R, Enns EA, Khoruts A, Vaughn BP. Cost-effectiveness of Treatm
 
 ***
 
-In this example, we use a probabilistic sensitivity analysis (PSA) as the basis of our cost-effectiveness calculations, as is now recommended by the Second Panel on Cost-Effectiveness in Health and Medicine (Neumann et al. 2016). For more explanation about PSA and its generation process, please see **our PSA vignette**. The PSA dataset in this example was conducted for a model of *Clostridioides difficile* (*C. diff*) infection that compared 48 possible treatment strategies, which varied in the treatment regimen used for initial versus recurrent CDI and for different infection severities. For didactic purposes, we have reduced the set of strategies down to the 11 most-relevant strategies; however, in a full CEA, all feasible strategies should be considered (as they are in Rajasingam et al. 2019).
+In this example, we use a probabilistic sensitivity analysis (PSA) as the basis of our cost-effectiveness calculations, as is now recommended by the Second Panel on Cost-Effectiveness in Health and Medicine (Neumann et al. 2016). For more explanation about PSA and its generation process, please see our PSA vignettes by typing `vignette("psa_generation", package = "dampack")` in the console after installing the package. The PSA dataset in this example was conducted for a model of *Clostridioides difficile* (*C. diff*) infection that compared 48 possible treatment strategies, which varied in the treatment regimen used for initial versus recurrent CDI and for different infection severities. For didactic purposes, we have reduced the set of strategies down to the 11 most-relevant strategies; however, in a full CEA, all feasible strategies should be considered (as they are in Rajasingam et al. 2019).
 
 Costs in this example include all treatment costs and lifetime downstream medical costs. Strategy effectiveness was measured in terms of quality-adjusted life-expectancy. Outcomes were evaluated for a 67-year-old patient, which is the median age of *C. diff* infection patients. 
 
@@ -127,7 +131,7 @@ library(dampack)
 data("psa_cdiff")
 ```
 
-This creates the object `cdiff_psa` which is a `psa` object class (specific to `dampack`), sharing some properties with data frames. For more information on the properties of `psa` objects, please see **our PSA vignette**. To use `calculate_icers()`, we first need to calculate the average cost and average effectiveness for each strategy across the PSA samples. To do this, we use `summary()`, which has its own specific method for `psa` objects that calculates the mean of each outcome over the PSA samples. For more information, type `?summary.psa` in the console.
+This creates the object `cdiff_psa` which is a `psa` object class (specific to `dampack`), sharing some properties with data frames. For more information on the properties of `psa` objects, please see `vignette("psa_analysis", package = "dampack")`. To use `calculate_icers()`, we first need to calculate the average cost and average effectiveness for each strategy across the PSA samples. To do this, we use `summary()`, which has its own specific method for `psa` objects that calculates the mean of each outcome over the PSA samples. For more information, type `?summary.psa` in the console.
 ```{r}
 df_cdiff_ce <- summary(psa_cdiff)
 head(df_cdiff_ce)
@@ -178,6 +182,8 @@ ggsave("icer_cdiff.png", width = 7, height = 5, dpi = 300)
 
 The table can also be written to a tabular or comma-separated file like a normal R data frame or data table.
 ```{r}
-write.table(icer_cdiff, file = "cdiff_icers.csv",
-            quote = FALSE, row.names = FALSE, sep=",")
+write.table(icer_cdiff, 
+            file = "cdiff_icers.csv",
+            quote = FALSE, 
+            row.names = FALSE, sep=",")
 ```

@@ -1,16 +1,16 @@
 Package: dampack
 Type: Package
 Title: Decision-Analytic Modeling Package
-Version: 0.2.0
+Version: 1.0.0
 Authors@R: c(
   person("Fernando", "Alarid-Escudero", email="fernando.alarid@cide.edu",
-    role = c("aut", "cre")),
+    role = "aut"),
   person("Caleb", "Easterly", email="easte080@umn.edu",
     role = "aut"),
   person("Eva", "Enns", email="eenns@umn.edu",
     role = "aut"),
-  person("Greg", "Knowlton", email="gsknowlton@gmail.com",
-    role = "aut")
+  person("Greg", "Knowlton", email="knowl193@umn.edu",
+    role = c("aut", "cre"))
   )
 Description: The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and 
     visualizing the health economic outputs of mathematical models. This package was developed with funding from 
@@ -18,6 +18,8 @@ Description: The Decision Analytic Modeling Package (dampack) is a suite of func
     no. R01AI138783. The content of this package is solely the responsibility of the authors and does not necessarily 
     represent the official views of the National Institutes of Health.
 License: file LICENSE
+URL: https://github.com/DARTH-git/dampack
+BugReports: https://github.com/DARTH-git/dampack/issues
 Encoding: UTF-8
 Depends:
     R (>= 3.5),

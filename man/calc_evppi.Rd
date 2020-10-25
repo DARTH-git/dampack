@@ -40,8 +40,9 @@ polynomial models (\code{"poly"})}
 should be displayed in console.}
 }
 \value{
-A data.frame with WTP thresholds and corresponding EVPPIs
-for the selected parameters
+A list containing 1) a data.frame with WTP thresholds and corresponding EVPPIs
+for the selected parameters and 2) a list of metamodels used to estimate EVPPI for each
+strategy at each willingness to pay threshold.
 }
 \description{
 \code{evppi} is used to estimate the Expected Value of Partial Perfect

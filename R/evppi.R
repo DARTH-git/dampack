@@ -18,8 +18,9 @@
 #' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
 #' should be displayed in console.
 #'
-#' @return A data.frame with WTP thresholds and corresponding EVPPIs
-#' for the selected parameters
+#' @return A list containing 1) a data.frame with WTP thresholds and corresponding EVPPIs
+#' for the selected parameters and 2) a list of metamodels used to estimate EVPPI for each
+#' strategy at each willingness to pay threshold.
 #'
 #' @details
 #' The expected value of partial pefect information (EVPPI) is the expected
@@ -86,6 +87,8 @@ calc_evppi <- function(psa,
   # vector to store evppi
   evppi <- rep(0, n_wtps)
 
+  mms_ls <- vector(mode = "list", length = n_wtps)
+
   # calculate evppi at each wtp
   for (l in 1:n_wtps) {
 
@@ -98,6 +101,8 @@ calc_evppi <- function(psa,
                      type = type,
                      poly.order = poly.order,
                      k = k)
+
+    mms_ls[[l]] <- mms
 
     # get the fitted loss values from the regression models
     # there is one for each strategy
@@ -119,8 +124,10 @@ calc_evppi <- function(psa,
 
   # data.frame to store EVPPI for each WTP threshold
   df_evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
-  class(df_evppi) <- c("evppi", "data.frame")
-  return(df_evppi)
+
+  evppi_ls <- list(df_evppi = df_evppi, metamodel_ls = mms_ls)
+  class(evppi_ls) <- c("evppi")
+  return(evppi_ls)
 }
 
 #' Plot of Expected Value of Partial Perfect Information (EVPPI)
@@ -151,6 +158,7 @@ plot.evppi <- function(x,
                        xlim = c(0, NA),
                        ylim = NULL,
                        ...) {
+  x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
               aes_(x = as.name("WTP_thou"), y = as.name("EVPPI"))) +

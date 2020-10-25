@@ -2,7 +2,7 @@
 % Please edit documentation in R/metamodel.R
 \name{predict.metamodel}
 \alias{predict.metamodel}
-\title{Predict from a metamodel}
+\title{Predict from a one-way or two-way metamodel}
 \usage{
 \method{predict}{metamodel}(object, ranges = NULL, nsamp = 100, ...)
 }
@@ -19,5 +19,5 @@ from this range is determined by \code{nsamp}.}
 \item{...}{further arguments to \code{predict} (not used)}
 }
 \description{
-Predict from a metamodel
+Predict from a one-way or two-way metamodel
 }

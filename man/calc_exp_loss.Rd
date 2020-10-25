@@ -35,7 +35,6 @@ plot(exp_loss)
 
 # the y axis is on a log scale by default
 plot(exp_loss, log_y = FALSE)
-
 }
 \references{
 \enumerate{

@@ -37,7 +37,7 @@
 #'
 #' # the y axis is on a log scale by default
 #' plot(exp_loss, log_y = FALSE)
-#'
+#' @importFrom reshape2 melt
 #' @export
 calc_exp_loss <- function(psa, wtp) {
   check_psa_object(psa)
@@ -54,13 +54,31 @@ calc_exp_loss <- function(psa, wtp) {
   # optimal strategy based on lowest expected loss (max of negative expected loss)
   # this was done because min.col isn't a function
   optimal_str <- max.col(-exp_loss)
-  # Expected loss of optimal strategy
-  optimal_el <- exp_loss[cbind(seq_len(length(wtp)), optimal_str)]
+
   # Format expected loss for plotting
-  exp_loss_df <- data.frame(wtp, exp_loss, optimal_el)
-  colnames(exp_loss_df) <- c("WTP", strategies, "Frontier_EVPI")
-  class(exp_loss_df) <- c("exp_loss", "data.frame")
-  return(exp_loss_df)
+  exp_loss_df <- data.frame(wtp, exp_loss, strategies[optimal_str])
+  colnames(exp_loss_df) <- c("WTP", strategies, "fstrat")
+
+  # Reformat df to long format
+  exp_loss_df_melt <- melt(exp_loss_df,
+                           id.vars = c("WTP", "fstrat"),
+                           variable.name = "Strategy",
+                           value.name = "Expected_Loss")
+
+  # boolean for on frontier or not
+  exp_loss_df_melt$On_Frontier <- (exp_loss_df_melt$fstrat == exp_loss_df_melt$Strategy)
+
+  # drop fstrat column
+  exp_loss_df_melt$fstrat <- NULL
+
+  # order by WTP
+  exp_loss_df_melt <- exp_loss_df_melt[order(exp_loss_df_melt$WTP), ]
+
+  # remove rownames
+  rownames(exp_loss_df_melt) <- NULL
+
+  class(exp_loss_df_melt) <- c("exp_loss", "data.frame")
+  return(exp_loss_df_melt)
 }
 
 
@@ -79,7 +97,6 @@ calc_exp_loss <- function(psa, wtp) {
 #' @inheritParams add_common_aes
 #'
 #' @return A \code{ggplot2} object with the expected loss
-#' @importFrom reshape2 melt
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export
@@ -99,23 +116,14 @@ plot.exp_loss <- function(x,
                           ylim = NULL,
                           col = c("full", "bw"),
                           ...) {
-  # melt for plotting in ggplot
   wtp_name <- "WTP_thou"
-  loss_name <- "value"
+  loss_name <- "Expected_Loss"
   strat_name <- "Strategy"
-  x_melt <- melt(x,
-                 id.vars = "WTP",
-                 variable.name = strat_name)
-
-  x_melt[, wtp_name] <- x_melt$WTP / 1000
+  x[, wtp_name] <- x$WTP / 1000
 
   # split into on frontier and not on frontier
-  fname <- "on_frontier"
-  frontier_char <- "Frontier_EVPI"
-  on_frontier <- x_melt[, strat_name] == frontier_char
-  x_melt[, fname] <- on_frontier
-  nofront <- x_melt[!on_frontier, ]
-  front <- x_melt[on_frontier, ]
+  nofront <- x
+  front <- x[x$On_Frontier, ]
 
   # Drop unused levels from strategy names
   nofront$Strategy <- droplevels(nofront$Strategy)
@@ -160,7 +168,7 @@ plot.exp_loss <- function(x,
   if (frontier) {
     p <- p + geom_point(data = front, aes_(x = as.name(wtp_name),
                                            y = as.name(loss_name),
-                                           shape = as.name(fname)),
+                                           shape = as.name("On_Frontier")),
                         size = 3, stroke = 1, color = "black") +
       scale_shape_manual(name = NULL, values = 0, labels = "Frontier & EVPI") +
       guides(color = guide_legend(order = 1),

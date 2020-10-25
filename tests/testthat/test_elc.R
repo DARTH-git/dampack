@@ -25,8 +25,8 @@ test_that("return object has classes evpi and data.frame", {
 
 
 # structure
-test_that("return object has column names WTP and 'Frontier & EVPI'", {
-  expect_true(all(c("WTP", "Frontier_EVPI") %in% names(elc_obj)))
+test_that("return object has correct column names", {
+  expect_true(all(c("WTP", "Strategy", "Expected_Loss", "On_Frontier") %in% names(elc_obj)))
 })
 
 
@@ -36,7 +36,7 @@ test_that("expected loss is what we'd expect", {
   max_str <- max.col(nmb)
   loss <- nmb[cbind(1:(psa_obj$n_sim), max_str)] - nmb
   exp_loss <- colMeans(loss)
-  obs_loss <- unlist(c(elc_obj[1, 2:4]))
+  obs_loss <- unlist(c(elc_obj[1:3, 3]))
   expect_equal(exp_loss, obs_loss, check.names = FALSE)
 })
 

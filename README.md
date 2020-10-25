@@ -32,7 +32,7 @@ defaults write org.R-project.R force.LANG en_US.UTF-8
 ## Vignettes
 dampack has a series of vignettes designed to showcase the functionality of the package and explain its underlying methodology. 
 The vignettes serve as a guide for proper usage, and it is highly recommended that new users read any relevant vignettes before using the package.
-After installing the package, vignettes can be accessed by typing `{r} vignette(topic, package = "dampack")`, where topic is a character string corresponding to the name of the vignette.
+After installing the package, vignettes can be accessed by typing `vignette(topic, package = "dampack")`, where topic is a character string corresponding to the name of the vignette.
 There is significant overlap between the topics and functions covered in the six vignettes, and they should ideally be read in the following order:
 1. basic_cea
 2. psa_analysis

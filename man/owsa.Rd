@@ -2,7 +2,7 @@
 % Please edit documentation in R/owsa.R
 \name{owsa}
 \alias{owsa}
-\title{One-way sensitivity analysis using linear regression metamodeling}
+\title{One-way sensitivity analysis}
 \usage{
 owsa(
   sa_obj,
@@ -46,6 +46,10 @@ A dataframe with the results of the sensitivity analysis.
 Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 }
 \description{
-This function uses a linear regression metamodel of a PSA for a given
-decision-analytic model to predict the desired outcome.
+When used on a PSA object, this function uses a polynomial regression metamodel to predict the
+average outcome of a decision-analytic model as a function of a single input parameter.
+When used on a DSA object, this function uses the DSA results directly to show how the selected outcome varies
+as a function of the input parameter of interest. In the DSA context, this function is called
+internally by \code{\link{run_owsa_det}} and should not be called by the user. In the PSA context,
+the user must use this function to produce an \code{owsa} object.
 }

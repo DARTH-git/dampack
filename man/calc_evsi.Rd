@@ -48,7 +48,8 @@ which EVSI is calculated from the metamodel.}
 should be displayed in console.}
 }
 \value{
-A list containing 1) a data.frame with WTP thresholds and corresponding EVSIs
+A list containing 1) a data.frame with WTP thresholds, new prospective sample sizes
+ (if \code{n_by_param == FALSE}), and corresponding EVSIs
 for the selected parameters and 2) a list of metamodels used to estimate EVSI for each
 strategy at each willingness to pay threshold.
 }

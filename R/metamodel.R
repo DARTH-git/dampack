@@ -139,6 +139,17 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 #' @inheritParams metamodel
 mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
   n_params <- length(params)
+  if (type == "gam" && k < 3 && n_params != 1) {
+    k <- 3
+    warning("k has been set to its minimum value of 3")
+  }
+
+  if (type == "gam" && ((k - 1) ^ n_params > 500)) {
+    stop(paste0("\nIn your proposed metamodel, k-1 to the power of the number of parameters must not
+ be greater than 500 (i.e. (k-1)^n_params < 500). This proposed model has ", n_params, " parameters,
+ and a k value of ", k, ". Models that exceed this approximate threshold will fail to execute
+ due to memory constraints and/or take an excessively long time to fit."))
+  }
 
   if (type == "linear") {
     # build formula

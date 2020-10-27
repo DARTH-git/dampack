@@ -4,9 +4,11 @@
 \alias{mm_run_reg}
 \title{Build formula and run linear regression for metamodel}
 \usage{
-mm_run_reg(dep, params, dat, type, poly.order, k)
+mm_run_reg(analysis, dep, params, dat, type, poly.order, k)
 }
 \arguments{
+\item{analysis}{either "oneway" or "twoway"}
+
 \item{dep}{dependent variable in regression}
 
 \item{params}{string vector with the name(s) of the parameter of interest. Defaults to all.}

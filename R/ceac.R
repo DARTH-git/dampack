@@ -104,6 +104,9 @@ ceac <- function(wtp, psa) {
   # remove rownames
   rownames(ceac) <- NULL
 
+  # make strategies in ceac object into ordered factors
+  ceac$Strategy <- factor(ceac$Strategy, levels = strategies, ordered = TRUE)
+
   # define classes
   # defining data.frame as well allows the object to use print.data.frame, for example
   class(ceac) <- c("ceac", "data.frame")

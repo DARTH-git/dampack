@@ -29,7 +29,7 @@ test_that("handles missing strategy", {
                               example_psa$effectiveness,
                               example_psa$parameters)
   c_missing <- ceac(wtp, psa_missing)
-  expected_generic_strat <- as.factor(c("Strategy_1", "Strategy_2", "Strategy_3"))
+  expected_generic_strat <- factor(c("Strategy_1", "Strategy_2", "Strategy_3"), ordered = TRUE)
   obtained_generic_strat <- sort(unique(c_missing$Strategy))
   expect_equal(expected_generic_strat, obtained_generic_strat)
 })

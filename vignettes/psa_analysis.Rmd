@@ -201,7 +201,7 @@ owsa_opt_strat(o,
 
 ## Two-way Sensitivty Analysis
 
-A two-way sensitivity analysis (TWSA) illustrates how the expected outcome of a decision-analytic model changes as function of two input parameters in the PSA. Just as a regression metamodel was used to isolate the effect of a single parameter in `dampack`'s `owsa` function, `twsa()` uses a regression metamodel that includes both of the specified parameters to predict the expected outcome as a function of the two parameters.
+A two-way sensitivity analysis (TWSA) illustrates how the expected outcome of a decision-analytic model changes as function of two input parameters in the PSA. Just as a regression metamodel was used to isolate the effect of a single parameter in `dampack`'s `owsa` function, `twsa()` uses a polynomial regression metamodel that includes both of the specified parameters to predict the expected outcome as a function of the two parameters. This regression metamodel includes polynomial terms up to and including the degree of the `poly.order` argument for both parameters, as well as all interaction terms between these polynomial terms.
 
 ```{r}
 tw <- twsa(psa_obj, 

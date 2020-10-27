@@ -77,6 +77,9 @@ calc_exp_loss <- function(psa, wtp) {
   # remove rownames
   rownames(exp_loss_df_melt) <- NULL
 
+  # make strategies in exp_loss object into ordered factors
+  exp_loss_df_melt$Strategy <- factor(exp_loss_df_melt$Strategy, levels = strategies, ordered = TRUE)
+
   class(exp_loss_df_melt) <- c("exp_loss", "data.frame")
   return(exp_loss_df_melt)
 }

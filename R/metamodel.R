@@ -102,7 +102,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
     for (p in params) {
       # loop over strategies
       for (s in strategies) {
-        mod <- mm_run_reg(s, p, dat, type, poly.order, k)
+        mod <- mm_run_reg(analysis, s, p, dat, type, poly.order, k)
         mod$param_of_int <- p
         mod$strat <- s
         lms[[p]][[s]] <- mod
@@ -112,7 +112,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   if (analysis == "twoway" | analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
-      mod <- mm_run_reg(s, params, dat, type, poly.order, k)
+      mod <- mm_run_reg(analysis, s, params, dat, type, poly.order, k)
       # for accessing later in predict
       mod$param_of_int <- params
       mod$strat <- s
@@ -137,8 +137,21 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 #' @importFrom mgcv gam
 #' @keywords internal
 #' @inheritParams metamodel
-mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
+mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
+
   n_params <- length(params)
+
+  if (type == "gam" && k < 3 && n_params != 1) {
+    k <- 3
+    warning("k has been set to its minimum value of 3")
+  }
+
+  if (type == "gam" && ((k - 1) ^ n_params > 500)) {
+    stop(paste0("\nIn your proposed metamodel, k-1 to the power of the number of parameters must not
+ be greater than 500 (i.e. (k-1)^n_params < 500). This proposed model has ", n_params, " parameters,
+ and a k value of ", k, ". Models that exceed this approximate threshold will fail to execute
+ due to memory constraints and/or take an excessively long time to fit."))
+  }
 
   if (type == "linear") {
     # build formula
@@ -169,8 +182,14 @@ mm_run_reg <- function(dep, params, dat, type, poly.order, k) {
     ## parameters of interest
     fparam <- ""
     list_of_ps <- lapply(params, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
-    fparam <- paste(list_of_ps, collapse = " + ")
 
+    if (analysis == "twoway") {
+      list_of_ps <- append(list_of_ps,
+                           paste0("poly(", params[1], ",", poly.order, ", raw=TRUE):",
+                                  "poly(", params[2], ",", poly.order, ", raw=TRUE)"))
+    }
+
+    fparam <- paste(list_of_ps, collapse = " + ")
     ## combine
     f <- as.formula(paste0(fbeg, fparam))
 

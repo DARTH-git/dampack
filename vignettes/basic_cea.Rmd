@@ -30,9 +30,9 @@ Given a set of mutually exclusive strategies with associated costs and effective
 
 Next, the incremental cost and incremental effectiveness of moving from one strategy to the next (in order of increasing costs) are calculated. The incremental cost-effectiveness ratio (ICER) for each strategy is then its incremental costs divided by its incremental effectiveness and represents the cost per unit benefit of "upgrading" to that strategy from the next least costly (and next least effective) strategy. At this point, "weakly dominated" strategies are identified. These are strategies for which there is a linear combination of two different strategies that dominates the strategy (lower costs and/or higher effectivenss). Weak dominance is also called "extended dominance". Operationally, weakly dominated strategies can be identified by checking that ICERs increase with increasingly costly (and effective) strategies. If there is a "kink" in the trend, then weak/extended dominance exists. Once weakly dominated strategies are removed (and incremental quantities recalculated), the set of remaining strategies form the efficient frontier and associated ICERs can be interpreted for decision-making.
 
-The `dampack` function `calculate_icers()` completes all of the calculations and checks described above. As input, it requires a vector of strategy costs, a vector of strategy effectiveness, and a vector of strategy names. It outputs a specialized data frame that presents the costs and effectiveness of each strategy and, for non-dominated strategies, the incremental costs, effeciveness, and ICER. Dominated strategies are included at the end of the table with the type of dominance indicated as either strong dominance (D) or extended/weak dominance (ED) in the `Status` column.
+The `dampack` function `calculate_icers()` completes all of the calculations and checks described above. It takes as inputs the cost, effectiveness outcome (usually QALYs), and strategy name for each strategy, passed as separate vectors. It outputs a specialized data frame that presents the costs and effectiveness of each strategy and, for non-dominated strategies, the incremental costs, effeciveness, and ICER. Dominated strategies are included at the end of the table with the type of dominance indicated as either strong dominance (D) or extended/weak dominance (ED) in the `Status` column.
 
-We present the application of `calculate_icers()` in two different examples below.
+We present the application of `calculate_icers()` in the two examples below.
 
 ***
 
@@ -46,27 +46,27 @@ In this example, a model was used to assess the costs, benefits, and cost-effect
 
 ## Data
 
-Five strategies are considered: No specific screening recommendation (status quo), one-time HIV test, HIV test every 5 years, HIV test every 3 years, and an annual HIV test.
+Five strategies are considered: No specific screening recommendation (status quo), one-time HIV test, HIV testing every 5 years, HIV testing every 3 years, and HIV test annually.
 
-We define a vector of short strategy names, which will be used in labeling our results in tables and in plots.
+We define a vector of short strategy names, which will be used in labeling our results in the tables and  plots.
 ```{r}
 library(dampack)
 v_hiv_strat_names <- c("status quo", "one time", "5yr", "3yr", "annual")
 ```
 
-Costs for each strategy included the cost of the screening strategy and lifetime downstream medical costs for the population. These are presented as the average cost per person. We store the cost of each strategy in a vector (in the same order as `v_strat_names`). These costs are taken from Table 4 in Paltiel et al. 2006.
+Costs for each strategy included the cost of the screening strategy and lifetime downstream medical costs for the population. These are presented as the average cost per person in Table 4 of Paltiel et al. 2006. We store the cost of each strategy in a vector (in the same order as in `v_strat_names`).
 ```{r}
 v_hiv_costs <- c(26000, 27000, 28020, 28440, 29440)
 ```
 
-The effectiveness of each strategy was measured in terms of quality-adjusted life expectancy of the population. This was reported in terms of quality-adjusted life-months, which we convert to quality-adjusted life-years (QALYs) by dividing by 12. Like for costs, we store the effectiveness of each strategy in a vector, with values also taken from Table 4 in Paltiel et al. 2006.
+The effectiveness of each strategy was measured in terms of quality-adjusted life-expectancy of the population, which captures both length of life and quality of life. This was reported in terms of quality-adjusted life-months in Table 4 in Paltiel et al. 2006, which we convert to quality-adjusted life-years (QALYs) by dividing by 12.
 ```{r}
 v_hiv_qalys <- c(277.25, 277.57, 277.78, 277.83, 277.76) / 12
 ```
 
 ## Calculate ICERs
 
-Using these elements, we then use the `calculate_icers()` function in `dampack` to conduct our cost-effectiveness comparison of the five HIV testing strategies.
+Using these elements, we then use the `calculate_icers()` function in `dampack` to conduct the cost-effectiveness comparison of the five HIV testing strategies.
 ```{r}
 icer_hiv <- calculate_icers(cost=v_hiv_costs, 
                             effect=v_hiv_qalys, 
@@ -74,7 +74,7 @@ icer_hiv <- calculate_icers(cost=v_hiv_costs,
 icer_hiv
 ```
 
-The resulting object `icer_hiv` is an `icer` object (unique to `dampack`) to facilitate visualization, but it can also be manipulated like a data frame. The default view is ordered by dominance status (ND = non-dominated, ED = extended/weak dominance, or D= strong dominance), and then ascending by cost. In our example, like in the Paltiel et al. 2006, we see that the annual screening strategy is strongly dominated, though our ICERs are slightly different from those in the published article due to rounding in the reporting of costs and effectiveness. 
+The resulting output `icer_hiv` is an `icer` object (unique to `dampack`) to facilitate visualization, but it can also be manipulated like a data frame. The default view is ordered by dominance status (ND = non-dominated, ED = extended/weak dominance, or D= strong dominance), and then ascending by cost. In our example, like in Paltiel et al. 2006, we see that the annual screening strategy is strongly dominated, though the ICERs calculated here are slightly different from those in the published article due to rounding in the reporting of costs and effectiveness. 
 
 The `icer` object can be easily formatted into a publication quality table using the `kableExtra` package.
 ```{r,message=FALSE,warning=FALSE}
@@ -93,7 +93,7 @@ The results contained in `icer_hiv` can be visualized in the cost-effectiveness 
 plot(icer_hiv)
 ```
 
-In the plot, the points on the efficient frontier (consisting of all non-dominated strategies) are connected with a solid line. By default, only strategies on the efficient frontier are labeled. However, this can be changed setting `label="all"`. There are a number of built-in options for customizing the cost-effectivenss plot. For a full listing, type `?plot.icers` in the console. Furthermore, the plot of an `icer` object is just a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is hosted at https://ggplot2.tidyverse.org/ .
+In the plot, the points on the efficient frontier (consisting of all non-dominated strategies) are connected with a solid line. By default, only strategies on the efficient frontier are labeled. However, this can be changed by setting `label="all"`. There are a number of built-in options for customizing the cost-effectivenss plot. To see a full listing, type `?plot.icers` in the console. Furthermore, the plot of an `icer` object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is available at https://ggplot2.tidyverse.org/ .
 
 
 Plot with all strategies labeled:
@@ -115,11 +115,11 @@ plot(icer_hiv,
 
 # Example 2: CEA using a probabilistic sensitivity analysis of treatment strategies for *Clostridioides difficile* infection 
 
-From: Rajasingham R, Enns EA, Khoruts A, Vaughn BP. Cost-effectiveness of Treatment Regimens for Clostridioides difficile Infection: An Evaluation of the 2018 Infectious Diseases Society of America Guidelines. *Clinical Infectious Diseases*. 2019 (Epub Apr 17). https://doi.org/10.1093/cid/ciz318
+From: Rajasingham R, Enns EA, Khoruts A, Vaughn BP. Cost-effectiveness of Treatment Regimens for Clostridioides difficile Infection: An Evaluation of the 2018 Infectious Diseases Society of America Guidelines. *Clinical Infectious Diseases*. 2020;70(5):754-762. https://doi.org/10.1093/cid/ciz318
 
 ***
 
-In this example, we use a probabilistic sensitivity analysis (PSA) as the basis of our cost-effectiveness calculations, as is now recommended by the Second Panel on Cost-Effectiveness in Health and Medicine (Neumann et al. 2016). For more explanation about PSA and its generation process, please see our PSA vignettes by typing `vignette("psa_generation", package = "dampack")` in the console after installing the package. The PSA dataset in this example was conducted for a model of *Clostridioides difficile* (*C. diff*) infection that compared 48 possible treatment strategies, which varied in the treatment regimen used for initial versus recurrent CDI and for different infection severities. For didactic purposes, we have reduced the set of strategies down to the 11 most-relevant strategies; however, in a full CEA, all feasible strategies should be considered (as they are in Rajasingam et al. 2019).
+In this example, we use a probabilistic sensitivity analysis (PSA) as the basis of our cost-effectiveness calculations, as is now recommended by the Second Panel on Cost-Effectiveness in Health and Medicine (Neumann et al. 2016). For more explanation about PSA and its generation process, please see our PSA vignettes by typing `vignette("psa_generation", package = "dampack")` in the console after installing the `dampack` package. The PSA dataset in this example was conducted for a model of *Clostridioides difficile* (*C. diff*) infection that compared 48 possible treatment strategies, which varied in the treatment regimen used for initial versus recurrent CDI and for different infection severities. For didactic purposes, we have reduced the set of strategies down to the 11 most-relevant strategies; however, in a full CEA, all feasible strategies should be considered (as they are in Rajasingam et al. 2020).
 
 Costs in this example include all treatment costs and lifetime downstream medical costs. Strategy effectiveness was measured in terms of quality-adjusted life-expectancy. Outcomes were evaluated for a 67-year-old patient, which is the median age of *C. diff* infection patients. 
 
@@ -137,7 +137,7 @@ df_cdiff_ce <- summary(psa_cdiff)
 head(df_cdiff_ce)
 ```
 
-Here, strategies are just named with a number (e.g., "s3" or "s39"). The specifications of each strategy can be found in Rajasingam et al. 2019.
+Here, strategies are just named with a number (e.g., "s3" or "s39"). The specifications of each strategy can be found in Rajasingam et al. 2020.
 
 ## Calculate ICERs
 
@@ -166,7 +166,7 @@ To visualize our results on the cost-effectiveness plane, we can use the `plot()
 plot(icer_cdiff)
 ```
 
-In the plot, we can clearly see the one weakly dominated strategy that is more expensive and less beneficial than a linear combination of strategies "s3" and "s31" (a point on the line connecting them).
+In the plot, we can clearly see the one weakly dominated strategy that is more expensive and less beneficial than a linear combination of strategies "s3" and "s31" (a point on the line connecting these two strategies).
 
 Here are some additional plotting options:
 ```{r}

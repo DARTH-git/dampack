@@ -21,9 +21,7 @@ knitr::opts_chunk$set(
 
 # Overview
 
-Deterministic sensitivity analysis (DSA) is a method for assessing how the results of a decision analytic model vary over a pre-specified range of values for a set of parameters of interest. 
-
-In contrast to the probabilistic sensitivity analysis (PSA), where the variation of the parameter of interest is derived from an underlying probability distribution, DSA allows the decision modeler to have exact control over the parameter values to be considered in the analysis. Additionally, in a PSA, all of the other parameters in the model are varying along with the parameter of interest, whereas in the DSA, all of the other parameters are held at their "base case" values.
+`dampack` has the functionality to interface with a user-defined decision model in `R` to conduct deterministic sensitivity analysis (DSA) on parameters of interest. DSA is a method for assessing how the results of a decision analytic model vary over a pre-specified range of values for a parameter of interest. In a DSA, the model is run for each value of the parameter of interest over the pre-specified range, while holding all other parameter values fixed. If one parameter is varied, this is called a one-way DSA. If two parameters are varied, it is called a two-way DSA. We typically do not vary more than two parameters at a time, as the output becomes difficult to visualize and interpret. A more comprehensive assessment of how model outptus depend on model parameters can be done through a probabilistic sensitivity analysis (PSA) (type `vignette("psa_generation", package = "dampack")` in the console after installing the `dampack` package to see a vignette describing how to use `dampack` for PSA).
 
 A simple single-parameter DSA starts with choosing the model parameter to be investigated. Next, the modeler specifies a range for this parameter and the number of evenly spaced points along this range at which to evaluate model outcomes. The model is then run for each element of the vector of parameter values by setting the parameter of interest to the value, holding all other model parameters at their default base case values.
 
@@ -31,7 +29,89 @@ A simple single-parameter DSA starts with choosing the model parameter to be inv
 
 `dampack` includes functionality to generate DSA results for any user-defined decision analytic model that is written in `R`. The user-defined model must be written as a function takes in a list of all model parameter values as its first argument and outputs a data frame of the model outcomes for each strategy evaluated by the model. The first column of the output data frame must be the strategy names (as strings) with any number of additional outcomes (costs, QALYs, but also additional epidemiological outcomes like infections averted) stored in subsequent columns. Thus, each row of the output data frame consists of the strategy's name followed by the corresponding outcome values for that strategy. The user-defined model function may have additional required or optional input arguments; values for these additional arguments will need to be passed to the function through the `dampack` DSA functions.
 
-As an example, we define the function `run_decision_model` below, which is a cohort state transition model (also known as a Markov model) that evaluates two strategies ("no treatment" and "treatment") for a hypothetical disease. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. `run_decision_model` has as inputs `l_params_all`, which is the input parameter values list. It also has an additional optional argument `wtp` which allows the user to change the willingness-to-pay used in the model when calculating the net monetary benefit model outcome.
+As an example, we define the function `run_decision_model` below, which is a four-state cohort state transition model (also known as a Markov model) that returns the total remaining life-years, quality-adjusted life-years, and costs incured by a cohort progressing through a disease known as the Sick-Sicker model. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. 
+
+```{r}
+run_decision_model <- function(l_params_all, verbose = FALSE) {
+  with(as.list(l_params_all), {
+    # l_params_all must include:
+    # -- transition probability parameters: p_HD, p_S1S2, hr_S1D, hr_S2D, 
+    # -- initial cohort distribution: v_init
+    # -- vector of state utilities: v_u = c(u_H, u_S1, u_S2, u_D)
+    # -- vector of state costs: v_c = c(c_H, c_S1, c_S2, c_D)
+    
+    # compute internal parameters as a function of external parameters
+    r_HD    = -log(1 - p_HD) # rate of death in healthy
+    r_S1D   = hr_S1D * r_HD 	# rate of death in sick
+    r_S2D   = hr_S2D * r_HD  	# rate of death in sicker
+    p_S1D   = 1 - exp(-r_S1D) # probability to die in sick
+    p_S2D   = 1 - exp(-r_S2D) # probability to die in sicker
+    
+    ####### INITIALIZATION ##########################################
+    # create the cohort trace
+    m_M <- matrix(NA, nrow = n_t + 1 , 
+                  ncol = n_s,
+                  dimnames = list(0:n_t, v_n)) # create Markov trace
+    
+    m_M[1, ] <- v_init # initialize Markov trace
+    
+    # initialize transition probability matrix
+    m_P <- matrix(0,
+                  nrow = n_s, 
+                  ncol = n_s,
+                  dimnames = list(v_n, v_n))
+    # fill in the transition probability array
+    ### From Healthy
+    m_P["H", "H"]  <- 1 - (p_HS1 + p_HD)
+    m_P["H", "S1"] <- p_HS1
+    m_P["H", "D"]  <- p_HD
+    ### From Sick
+    m_P["S1", "H"]  <- p_S1H
+    m_P["S1", "S1"] <- 1 - (p_S1H + p_S1S2 + p_S1D)
+    m_P["S1", "S2"] <- p_S1S2
+    m_P["S1", "D"]  <- p_S1D
+    ### From Sicker
+    m_P["S2", "S2"] <- 1 - p_S2D
+    m_P["S2", "D"]  <- p_S2D
+    ### From Dead
+    m_P["D", "D"] <- 1
+    
+    # check rows add up to 1
+    if (!isTRUE(all.equal(as.numeric(rowSums(m_P)), as.numeric(rep(1, n_s))))) {
+      stop("This is not a valid transition Matrix")
+    }
+    
+    ############# PROCESS ###########################################
+    
+    for (t in 1:n_t){ # throughout the number of cycles
+      m_M[t + 1, ] <- m_M[t, ] %*% m_P # estimate the Markov trace for cycle the next cycle (t + 1)
+    }
+    
+    ####### EPIDEMIOLOGICAL OUTPUT  ###########################################
+    #### Overall Survival (OS) ####
+    v_os <- 1 - m_M[, "D"]  # calculate the overall survival (OS) probability for no treatment
+    
+    #### Disease prevalence #####
+    v_prev <- rowSums(m_M[, c("S1", "S2")])/v_os
+    
+    #### Proportion of sick in S1 state #####
+    v_prop_S1 <- m_M[, "S1"] / v_prev
+    
+    ####### RETURN OUTPUT  ###########################################
+    out <- list(m_M = m_M,
+                m_P = m_P,
+                Surv = v_os[-1],
+                Prev = v_prev[-1],
+                PropSick = v_prop_S1[c(11, 21, 31)])
+    
+    return(out)
+  }
+  )
+}
+```
+
+
+that evaluates two strategies ("no treatment" and "treatment") for a hypothetical disease. `run_decision_model` has as inputs `l_params_all`, which is the input parameter values list. It also has an additional optional argument `wtp` which allows the user to change the willingness-to-pay used in the model when calculating the net monetary benefit (NMB) model outcome. 
 
 ```{r}
 library(dampack)
@@ -99,7 +179,7 @@ calculate_ce_out <- function(l_params_all, wtp = 100000){
   )
 }
 
-decision_model <- function(l_params_all, verbose = FALSE) {
+run_decision_model <- function(l_params_all, verbose = FALSE) {
   with(as.list(l_params_all), {
     # compute internal parameters as a function of external parameters
     r_HD    = - log(1 - p_HD) # rate of death in healthy

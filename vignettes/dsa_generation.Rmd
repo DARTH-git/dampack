@@ -133,8 +133,8 @@ calculate_ce_out <- function(l_params_all, wtp = 100000){
     v_dwe <- 1 / ((1 + d_c) ^ (0:(n_t))) # vector with discount weights for QALYs
     
     ## Run STM model at a parameter set for each intervention
-    l_model_out_no_trt <- decision_model(l_params_all = l_params_all)
-    l_model_out_trt    <- decision_model(l_params_all = l_params_all)
+    l_model_out_no_trt <- run_decision_model(l_params_all = l_params_all)
+    l_model_out_trt    <- run_decision_model(l_params_all = l_params_all)
     
     ## Cohort trace by treatment
     m_M_no_trt <- l_model_out_no_trt$m_M # No treatment

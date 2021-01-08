@@ -47,7 +47,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
 
   if (!is.data.frame(params_range)) stop("params_range must be a data.frame")
 
-  if (ncol(params_range) != 3) stop("params_all must have 4 columns: 'pars', 'min', and 'max'")
+  if (ncol(params_range) != 3) stop("params_all must have 3 columns: 'pars', 'min', and 'max'")
 
   if (!is.list(params_basecase) | is.null(names(params_basecase))) {
     stop("params_basecase must be a named list")
@@ -134,7 +134,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     for (j in 1:n_outcomes) {
       sim_out_df[[j]] <- lapply(sim_out,
                                 function(x, tmp_out = outcomes[j]) {
-                                  x[[outcomes[j]]]
+                                  t(x[outcomes[j]]) #x[[outcomes[j]]]
                                 })
       sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
       colnames(sim_out_df[[j]]) <- strategies

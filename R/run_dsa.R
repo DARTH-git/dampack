@@ -134,7 +134,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     for (j in 1:n_outcomes) {
       sim_out_df[[j]] <- lapply(sim_out,
                                 function(x, tmp_out = outcomes[j]) {
-                                  t(x[outcomes[j]]) #x[[outcomes[j]]]
+                                  t(x[outcomes[j]])
                                 })
       sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
       colnames(sim_out_df[[j]]) <- strategies
@@ -303,7 +303,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   for (j in 1:n_outcomes) {
     sim_out_df[[j]] <- lapply(sim_out,
                               function(x, tmp_out = outcomes[j]) {
-                                t(x[outcomes[j]]) #x[[outcomes[j]]]
+                                t(x[outcomes[j]])
                               })
     sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
     colnames(sim_out_df[[j]]) <- strategies

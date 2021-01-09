@@ -21,13 +21,14 @@ knitr::opts_chunk$set(
 
 # Overview
 
-`dampack` has the functionality to interface with a user-defined decision model in `R` to conduct deterministic sensitivity analysis (DSA) on parameters of interest. DSA is a method for assessing how the results of a decision analytic model vary over a pre-specified range of values for a parameter of interest. In a DSA, the model is run for each value of the parameter of interest over the pre-specified range, while holding all other parameter values fixed. If one parameter is varied, this is called a one-way DSA. If two parameters are varied, it is called a two-way DSA. We typically do not vary more than two parameters at a time, as the output becomes difficult to visualize and interpret. A more comprehensive assessment of how model outptus depend on model parameters can be done through a probabilistic sensitivity analysis (PSA) (type `vignette("psa_generation", package = "dampack")` in the console after installing the `dampack` package to see a vignette describing how to use `dampack` for PSA).
+`dampack` has the functionality to interface with a user-defined decision model in `R` to conduct a deterministic sensitivity analysis (DSA) on parameters of interest. DSA is a method for assessing how the results of a decision analytic model change as a parameter of interest in varied over a specified range of values. This includes both how model outcomes change (e.g. the expected cost of each strategy) as well as how the decision changes (e.g. which strategy is the most cost-effective) with the parameter of interest.
 
-A simple single-parameter DSA starts with choosing the model parameter to be investigated. Next, the modeler specifies a range for this parameter and the number of evenly spaced points along this range at which to evaluate model outcomes. The model is then run for each element of the vector of parameter values by setting the parameter of interest to the value, holding all other model parameters at their default base case values.
+In a DSA, the model is run for each value of the parameter of interest over the specified range, while holding all other parameter values fixed. If one parameter is varied, this is called a one-way DSA. If two parameters are varied, it is called a two-way DSA. We typically do not vary more than two parameters at a time, as the output becomes difficult to visualize and interpret. A more comprehensive assessment of how model outptus depend on model parameters can be done through a probabilistic sensitivity analysis (PSA) (type `vignette("psa_generation", package = "dampack")` in the console after installing the `dampack` package to see a vignette describing how to use `dampack` for PSA).
+
 
 ## Decision Model Format
 
-`dampack` includes functionality to generate DSA results for any user-defined decision analytic model that is written in `R`. The user-defined model must be written as a function takes in a list of all model parameter values as its first argument and outputs a data frame of the model outcomes for each strategy evaluated by the model. The first column of the output data frame must be the strategy names (as strings) with any number of additional outcomes (costs, QALYs, but also additional epidemiological outcomes like infections averted) stored in subsequent columns. Thus, each row of the output data frame consists of the strategy's name followed by the corresponding outcome values for that strategy. The user-defined model function may have additional required or optional input arguments; values for these additional arguments will need to be passed to the function through the `dampack` DSA functions.
+`dampack` includes functionality to generate DSA results for any user-defined decision analytic model that is written in `R`. The user-defined model must be written as a function takes in a list of all model parameter values as its first argument and outputs a data frame of modeled outcomes (e.g. costs, QALYs, etc.) for each strategy being evaluated by the model. The first column of the output data frame must be the strategy names (as strings) with any number of additional outcomes (costs, QALYs, infections averted, etc.) stored in subsequent columns. Thus, each row of the output data frame consists of the strategy's name followed by the corresponding outcome values for that strategy. The user-defined model function may have additional required or optional input arguments; values for these additional arguments will need to be passed to the function through the `dampack` DSA functions.
 
 As an example, we define the function `run_decision_model` below, which is a four-state cohort state transition model (also known as a Markov model) that returns the total discounted costs and QALYs incured by a cohort progressing through a hypothetical disease known as the Sick-Sicker model. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. 
 
@@ -88,7 +89,7 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
       stop("This is not a valid transition matrix (entries are not between 0 and 1")
     } else
       # check transition matrix rows add up to 1
-      if (!all(as.numeric(rowSums(m_P)) == 1)){
+      if (!all.equal(as.numeric(rowSums(m_P)),rep(1,n_states))){
         stop("This is not a valid transition matrix (rows do not sum to 1)")
       }
     
@@ -287,6 +288,8 @@ df_ce <- simulate_strategies(l_params_all)
 
 ## Generating DSA results
 
+A simple single-parameter DSA starts with choosing the model parameter to be investigated. Next, the modeler specifies a range for this parameter and the number of evenly spaced points along this range at which to evaluate model outcomes. The model is then run for each element of the vector of parameter values by setting the parameter of interest to the value, holding all other model parameters at their default base case values.
+
 `dampack` uses the function `run_owsa_det` to execute a one-way DSA and the function `run_twsa_det` to execute a two-way DSA.
 
 *** To be deleted / incorporated above ***
@@ -305,7 +308,7 @@ The user-defined model function must return a data.frame where the first column 
 
 ## DSA Parameter Format
 
-The `params_range` input tells `run_owsa_det` or `run_twsa_det` which parameters will be varied in the DSA and over what ranges. This input must be a data.frame with 3 columns in the following order: "pars", "min", and "max". The number of samples from this range is determined by the input `nsamp`. The "pars" column is a character vector with the parameters of interest and must be a subset of the parameters from `params_basecase`.
+The `params_range` input tells `run_owsa_det` or `run_twsa_det` which parameters will be varied in the DSA and over what ranges. This input must be a data frame with 3 columns in the following order: "pars", "min", and "max". The number of samples from this range is determined by the input `nsamp`. The "pars" column is a character vector with the parameters of interest and must be a subset of the parameters from `params_basecase`.
 
 when using `run_owsa_det`, supplying multiple parameters in `params_range` will instruct the function to execute a series of separate one-way deterministic sensitivity analyses and compile the results into a single `owsa` object for each requested `outcome`. When using `run_twsa_det`, exactly two parameters must be supplied in the `pars` column of the `params_range` data.frame argument.
 
@@ -332,13 +335,10 @@ my_params_basecase <- list(p_HS1 = 0.15,
                            v_s_init = c(1, 0, 0, 0),
                            r_disc = 0.03)
 
-my_params_range <- data.frame(pars = c("u_trtA", "c_trtA"),
-                              min = c(0.9, 12000),
-                              max = c(1, 24000))
+my_params_range <- data.frame(pars = c("u_trtA", "c_trtA", "hr_S1S2_trtB", "r_HD"),
+                              min = c(0.9, 9000, 0.3, 0.001),
+                              max = c(1,   24000, 0.9, 0.003))
 
-my_params_range <- data.frame(pars = c("c_trtA"),
-                              min = c(12000),
-                              max = c(24000))
 ```
 
 ## One-way Deterministic Sensitivity Analysis
@@ -347,30 +347,40 @@ In `run_owsa_det`, the user is free to specify any number of outcomes that are d
 
 Each `owsa` object returned by `run_owsa_det` is a `data.frame` with four columns, `parameter`, `strategy`, `param_val`, and `outcome_val`. Each row's value in the `parameter` column denotes which parameter was swapped into  the basecase parameters, and `param_val` indicates which particular value of this parameter was used in that iteration of the decision model. The `outcome_val`s corresponding to each combination of `strategy`, `parameter`, and `param_val` are provided in long format within the `owsa` object.
 
-To access a single `owsa` object associated with the `"NMB"` outcome within the returned list, we can simply write `owsa_det$owsa_NMB`.
+To access a single `owsa` object associated with the `"NMB"` outcome within the returned list, we can simply write `l_owsa_det$owsa_NMB`.
 
 ```{r}
-owsa_det <- run_owsa_det(params_range = my_params_range,
+l_owsa_det <- run_owsa_det(params_range = my_params_range,
                          params_basecase = my_params_basecase,
                          nsamp = 100,
                          FUN = simulate_strategies,
                          outcomes = c("Cost", "QALY", "LY", "NMB"),
                          strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                         progress = FALSE)
+                         progress = TRUE)
+
+my_owsa_NMB <- l_owsa_det$owsa_NMB
+
+owsa_opt_strat(my_owsa_NMB)
+
 ```
 
 ## Two-way Deterministic Sensitivty Analysis
 
 A two-way sensitivity analysis is used to assess how model outcomes vary over pre-specified ranges of two model parameters jointly. The general format of the function arguments for `dampack`'s two-way DSA function, `run_twsa_det`, are the same as those for `run_owsa_det`. In `run_twsa_det`, equally spaced sequences of length `nsamp` are created for the two parameters based on the inputs provided in the `params_range` argument. These two sequences of parameter values define an `nsamp` by `nsamp` grid over which `FUN` is applied to produce outcomes for every combination of the two parameters.
 
-If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. To access a single `twsa` object associated with the `"NMB"` outcome within the returned list, we write `twsa_det$twsa_NMB`. Each `twsa` object is a long form `data.frame` that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
+If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. To access a single `twsa` object associated with the `"NMB"` outcome within the returned list, we write `l_twsa_det$twsa_NMB`. Each `twsa` object is a long form `data.frame` that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
 
 ```{r}
-twsa_det <- run_twsa_det(params_range = my_params_range,
+l_twsa_det <- run_twsa_det(params_range = my_params_range[c(3,4),],
                          params_basecase = my_params_basecase,
-                         nsamp = 100,
+                         nsamp = 50,
                          FUN = simulate_strategies,
-                         outcomes = c("Cost", "QALY", "NMB"),
-                         strategies = c("No_Treatment", "Treatment"), 
-                         progress = FALSE)
+                         outcomes = c("Cost","QALY","NMB"),
+                         strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
+                         progress = TRUE)
+
+my_twsa_NMB <- l_twsa_det$twsa_NMB
+
+plot(my_twsa_NMB)
+
 ```

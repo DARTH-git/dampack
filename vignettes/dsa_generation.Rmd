@@ -30,7 +30,7 @@ In a DSA, the model is run for each value of the parameter of interest over the 
 
 `dampack` includes functionality to generate DSA results for any user-defined decision analytic model that is written in `R`. The user-defined model must be written as a function takes in a list of all model parameter values as its first argument and outputs a data frame of modeled outcomes (e.g. costs, QALYs, etc.) for each strategy being evaluated by the model. The first column of the output data frame must be the strategy names (as strings) with any number of additional outcomes (costs, QALYs, infections averted, etc.) stored in subsequent columns. Thus, each row of the output data frame consists of the strategy's name followed by the corresponding outcome values for that strategy. The user-defined model function may have additional required or optional input arguments; values for these additional arguments will need to be passed to the function through the `dampack` DSA functions.
 
-As an example, we define the function `run_decision_model` below, which is a four-state cohort state transition model (also known as a Markov model) that returns the total discounted costs and QALYs incured by a cohort progressing through a hypothetical disease known as the Sick-Sicker model. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. 
+As an example, we define the function `run_sick_sicker_model` below, which is a four-state cohort state transition model (also known as a Markov model) that returns the total discounted costs and QALYs incured by a cohort progressing through a hypothetical disease known as the Sick-Sicker model. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. 
 
 ```{r}
 run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
@@ -46,15 +46,15 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
     ####### SET INTERNAL PARAMETERS #########################################
     
     # state names
-    v_names_states <- c("H","S1","S2","D")
+    v_names_states <- c("H", "S1", "S2", "D")
     n_states <- length(v_names_states)
     
     # vector of discount weights
     v_dw  <- 1 / ((1 + r_disc) ^ (0:n_cycles))
     
     # state rewards
-    v_state_cost <- c("H"=c_H, "S1"=c_S1, "S2"=c_S2, "D"=c_D)
-    v_state_utility <- c("H"=u_H, "S1"=u_S1, "S2"=u_S2, "D"=u_D)
+    v_state_cost <- c("H" = c_H, "S1" = c_S1, "S2" = c_S2, "D" = c_D)
+    v_state_utility <- c("H" = u_H, "S1" = u_S1, "S2" = u_S2, "D" = u_D)
     
     # transition probability values
     r_S1D <- hr_S1D * r_HD 	 # rate of death in sick state
@@ -89,7 +89,7 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
       stop("This is not a valid transition matrix (entries are not between 0 and 1")
     } else
       # check transition matrix rows add up to 1
-      if (!all.equal(as.numeric(rowSums(m_P)),rep(1,n_states))){
+      if (!all.equal(as.numeric(rowSums(m_P)), rep(1, n_states))){
         stop("This is not a valid transition matrix (rows do not sum to 1)")
       }
     
@@ -128,7 +128,7 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
     #############  OTHER OUTPUTS   ###################################
     
     # Total discounted life-years (sometimes used instead of QALYs)
-    n_tot_ly <- t(m_Trace %*% c(1,1,1,0)) %*% v_dw
+    n_tot_ly <- t(m_Trace %*% c(1, 1, 1, 0)) %*% v_dw
     
     ####### RETURN OUTPUT  ###########################################
     out <- list(m_Trace = m_Trace,
@@ -145,10 +145,10 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
 ```
 
 
-that evaluates three strategies ("no treatment", "treatment A", and "treatment B") for a hypothetical disease. `run_decision_model` has as inputs `l_params_all`, which is the input parameter values list. It also has an additional optional argument `wtp` which allows the user to change the willingness-to-pay used in the model when calculating the net monetary benefit (NMB) model outcome. 
+`simulate_strategies` is a function that evaluates three strategies ("no treatment", "treatment A", and "treatment B") for a hypothetical disease. `run_sick_sicker_model` has as inputs `l_params_all`, which is the input parameter values list. It also has an additional optional argument `wtp` which allows the user to change the willingness-to-pay used in the model when calculating the net monetary benefit (NMB) model outcome. 
 
 ```{r}
-simulate_strategies <- function(l_params_all, wtp=100000){
+simulate_strategies <- function(l_params_all, wtp = 100000){
     # l_params_all must include:
     # -- *** Model parameters ***
     # -- disease progression parameters (annual): r_HD, p_S1S2, hr_S1D, hr_S2D, 
@@ -229,10 +229,6 @@ simulate_strategies <- function(l_params_all, wtp=100000){
 ```
 
 
-
-
-
-
 ```{r}
 library(dampack)
 
@@ -245,8 +241,8 @@ v_s_init <- c(1, 0, 0, 0)           # initial cohort distribution (all Healthy)
 
 # Transition probabilities (per annual cycle), hazard ratios and odds ratio
 r_HD        <- 0.002  # constant rate of dying when Healthy (all-cause mortality)
-hr_S1D       <- 3     # hazard ratio of death in Sick vs Healthy 
-hr_S2D       <- 10    # hazard ratio of death in Sicker vs Healthy
+hr_S1D      <- 3     # hazard ratio of death in Sick vs Healthy 
+hr_S2D      <- 10    # hazard ratio of death in Sicker vs Healthy
 p_HS1       <- 0.15   # probability of becoming Sick when Healthy conditional on surviving
 p_S1H       <- 0.5    # probability of becoming Healthy when Sick conditional on surviving
 p_S1S2      <- 0.105  # probability of becoming Sicker when Sick conditional on surviving
@@ -279,11 +275,8 @@ l_params_all <- list(n_cycles = n_cycles, r_disc = r_disc, v_s_init = v_s_init,
                    c_trtA = c_trtA, u_trtA = u_trtA, 
                    c_trtB = c_trtB, hr_S1S2_trtB)
 
-
 # Cost-effectiveness results 
 df_ce <- simulate_strategies(l_params_all)
-
-
 ```
 
 ## Generating DSA results
@@ -356,7 +349,7 @@ l_owsa_det <- run_owsa_det(params_range = my_params_range,
                          FUN = simulate_strategies,
                          outcomes = c("Cost", "QALY", "LY", "NMB"),
                          strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                         progress = TRUE)
+                         progress = FALSE)
 
 my_owsa_NMB <- l_owsa_det$owsa_NMB
 
@@ -377,7 +370,7 @@ l_twsa_det <- run_twsa_det(params_range = my_params_range[c(3,4),],
                          FUN = simulate_strategies,
                          outcomes = c("Cost","QALY","NMB"),
                          strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                         progress = TRUE)
+                         progress = FALSE)
 
 my_twsa_NMB <- l_twsa_det$twsa_NMB
 

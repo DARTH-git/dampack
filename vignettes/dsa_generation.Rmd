@@ -30,12 +30,16 @@ In a DSA, the model is run for each value of the parameter of interest over the 
 
 `dampack` includes functionality to generate DSA results for any user-defined decision analytic model that is written in `R`. The user-defined model must be written as a function takes in a list of all model parameter values as its first argument and outputs a data frame of modeled outcomes (e.g. costs, QALYs, etc.) for each strategy being evaluated by the model. The first column of the output data frame must be the strategy names (as strings) with any number of additional outcomes (costs, QALYs, infections averted, etc.) stored in subsequent columns. Thus, each row of the output data frame consists of the strategy's name followed by the corresponding outcome values for that strategy. The user-defined model function may have additional required or optional input arguments; values for these additional arguments will need to be passed to the function through the `dampack` DSA functions.
 
-As an example, we define the function `run_sick_sicker_model` below, which is a four-state cohort state transition model (also known as a Markov model) that returns the total discounted costs and QALYs incured by a cohort progressing through a hypothetical disease known as the Sick-Sicker model. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. 
+When using a decision analytic model to compare different potential strategies, it is often helpful to construct two functions: the model function that reflects the dynamic process being modeled and a wrapper function that runs the model with parameters that are modified to reflect the impact of different strategies. The example below will illustrate this kind of set up. 
+
+In this example, we consider a disease that can be represented as a four-state cohort state transition model (also known as a Markov model) with the health states "Healthy", "Sick", "Sicker", and "Dead". We aptly call this model the Sick-Sicker model. Individuals who are initially healthy are at risk of becomnig sick (transition to the "Sick" state). In the "Sick" state, individuals can either recover back to "Healthy" or progress to the worse "Sicker" health state, which has a lower utility and higher costs than the "Sick" and "Healthy" states. Once in the "Sicker" health states, individuals cannot recover. In every health state, individuals have a probability of dying, which is elevated for individuals in the "Sick" and "Sicker" states relative to the "Healthy" state. Individuals who die transition to the "Dead" state. For a deeper discusison of state transition models and more complex variations of this state transition model, see Alarid-Escudero F, Krijkamp EM, Enns EA, Yang A, Hunink MGM, Pechlivanoglou P, Jalal H. Cohort state-transition models in R: A Tutorial. arXiv:200107824v1. 2020:1-31. 
+
+The Sick-Sicker model is implemented as the function `run_sick_sicker_model` below:
 
 ```{r}
-run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
-  with(as.list(l_params_all), {
-    # l_params_all must include:
+run_sick_sicker_model <- function(l_params, verbose = FALSE) {
+  with(as.list(l_params), {
+    # l_params must include:
     # -- disease progression parameters (annual): r_HD, p_S1S2, hr_S1D, hr_S2D, 
     # -- initial cohort distribution: v_s_init
     # -- vector of annual state utilities: v_state_utility = c(u_H, u_S1, u_S2, u_D)
@@ -89,7 +93,7 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
       stop("This is not a valid transition matrix (entries are not between 0 and 1")
     } else
       # check transition matrix rows add up to 1
-      if (!all.equal(as.numeric(rowSums(m_P)), rep(1, n_states))){
+      if (!all.equal(as.numeric(rowSums(m_P)),rep(1,n_states))){
         stop("This is not a valid transition matrix (rows do not sum to 1)")
       }
     
@@ -133,7 +137,7 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
     ####### RETURN OUTPUT  ###########################################
     out <- list(m_Trace = m_Trace,
                 m_P = m_P,
-                l_params_all,
+                l_params,
                 n_tot_cost = n_tot_cost,
                 n_tot_qaly = n_tot_qaly,
                 n_tot_ly = n_tot_ly)
@@ -144,11 +148,12 @@ run_sick_sicker_model <- function(l_params_all, verbose = FALSE) {
 }
 ```
 
+Note that this function outputs costs, QALYs, and LYs for a given set of inputs (passed as the list `l_params`). Different strategies can be modeled by calling `run_sick_sicker_model` with different parameter values reflect the impacts of those strategies. In this example, we will use the Sick-Sicker model to evaluate three strateges: "No Treatment", "Treatment A", and "Treatment B". The "No Treatment" strategy is just the Sick-Sicker natural history, while both "Treatment A" and "Treatment B" improve some aspect of the disease. These treatments are taken whenever someone is ill (Sick or Sicker), which increases the cost of being in those states by the cost of treatment."Treatment A" improves the utility for those in the Sick states (but not in the Sicker state), while "Treatment B" reduces the rate of progressing from the Sick state to the Sicker state. Note that we assume that treatment cannot be targeted to just the Sick state because we assume that for this disease it is difficult to differentiate between patients in the Sick and Sicker states. Thus treatment costs are incurred by those in the Sicker state even if they do not benefit from it.
 
-`simulate_strategies` is a function that evaluates three strategies ("no treatment", "treatment A", and "treatment B") for a hypothetical disease. `run_sick_sicker_model` has as inputs `l_params_all`, which is the input parameter values list. It also has an additional optional argument `wtp` which allows the user to change the willingness-to-pay used in the model when calculating the net monetary benefit (NMB) model outcome. 
+We define a second function, `simulate_strategies` that calls the Sick-Sicker model with the approrpiate inputs values for these three strategies. The `simulate_strategies` function also takes a list of parameter values (`l_params`), which must include both parameters for the markov model and any parameters governing the three strategies to be evaluated. `simulate_strategies` outputs a data frame with costs, QALYs, life-years (LYs), and net monetary benefit (NMB) for each of the three strategies. It is this function that we will pass to `dampack`'s internal functions for conducting DSA.
 
 ```{r}
-simulate_strategies <- function(l_params_all, wtp = 100000){
+simulate_strategies <- function(l_params, wtp = 100000){
     # l_params_all must include:
     # -- *** Model parameters ***
     # -- disease progression parameters (annual): r_HD, p_S1S2, hr_S1D, hr_S2D, 
@@ -162,7 +167,7 @@ simulate_strategies <- function(l_params_all, wtp = 100000){
     # -- utility with treatment A (for Sick state only): u_trtA
     # -- hazard ratio of progression with treatment B: hr_S1S1_trtB
   
-  with(as.list(l_params_all), {
+  with(as.list(l_params), {
     
     ####### SET INTERNAL PARAMETERS #########################################
     # Strategy names
@@ -202,7 +207,7 @@ simulate_strategies <- function(l_params_all, wtp = 100000){
                               c_H =  c_H, c_S1 = c_S2, c_S2 = c_S1, c_D = c_D,
                               u_H =  u_H, u_S1 = u_S2, u_S2 = u_S1, u_D = u_D,
                               r_HD = r_HD, hr_S1D = hr_S1D, hr_S2D = hr_S2D,
-                              p_HS1 = p_HS1, p_S1S2 = p_S1S2)
+                              p_HS1 = p_HS1, p_S1H = p_S1H, p_S1S2 = p_S1S2)
       
       if (v_names_strat[i] == "Treatment A"){
         l_params_markov$u_S1 <- u_S1_trtA
@@ -217,10 +222,10 @@ simulate_strategies <- function(l_params_all, wtp = 100000){
 
       l_result <- run_sick_sicker_model(l_params_markov)
       
-      df_ce[i, c("Cost","QALY","LY")] <- c(l_result$n_tot_cost,
+      df_ce[i, c("Cost", "QALY", "LY")] <- c(l_result$n_tot_cost,
                                            l_result$n_tot_qaly,
                                            l_result$n_tot_ly)
-      df_ce[i,"NMB"] <- l_result$n_tot_qaly * wtp - l_result$n_tot_cost
+      df_ce[i, "NMB"] <- l_result$n_tot_qaly * wtp - l_result$n_tot_cost
     }
     
     return(df_ce)
@@ -228,82 +233,7 @@ simulate_strategies <- function(l_params_all, wtp = 100000){
 }
 ```
 
-
-```{r}
-library(dampack)
-
-## Set Markov model parameters
-n_age_init <- 25                    # start age
-n_age_max  <- 100                   # maximum age of follow up
-n_cycles  <- n_age_max - n_age_init # time horizon (annual cycles)
-r_disc <- 0.03                      # discount rate per cycle
-v_s_init <- c(1, 0, 0, 0)           # initial cohort distribution (all Healthy)
-
-# Transition probabilities (per annual cycle), hazard ratios and odds ratio
-r_HD        <- 0.002  # constant rate of dying when Healthy (all-cause mortality)
-hr_S1D      <- 3     # hazard ratio of death in Sick vs Healthy 
-hr_S2D      <- 10    # hazard ratio of death in Sicker vs Healthy
-p_HS1       <- 0.15   # probability of becoming Sick when Healthy conditional on surviving
-p_S1H       <- 0.5    # probability of becoming Healthy when Sick conditional on surviving
-p_S1S2      <- 0.105  # probability of becoming Sicker when Sick conditional on surviving
-
-# Costs
-c_H    <- 2000  # cost of one cycle in Healthy 
-c_S1   <- 4000  # cost of one cycle in Sick 
-c_S2   <- 15000 # cost of one cycle in Sicker 
-c_D    <- 0     # cost of one cycle in Dead
-
-# Utilities
-u_H    <- 1     # utility when Healthy 
-u_S1   <- 0.75  # utility when Sick 
-u_S2   <- 0.5   # utility when Sicker
-u_D    <- 0     # utility when Dead
-
-# Strategy-specific inputs
-c_trtA <- 12000 # cost of treatment A (applied to Sick and Sicker)
-u_trtA <- 0.95  # utility while Sick under treatment A
-
-c_trtB <- 13000     # cost of treatment B (applied to Sick and Sicker)
-hr_S1S2_trtB <- 0.6 # hazard ratio of becoming Sicker when Sick under B under treatment B
-
-# Create parameter list
-l_params_all <- list(n_cycles = n_cycles, r_disc = r_disc, v_s_init = v_s_init,
-                   c_H =  c_H, c_S1 = c_S2, c_S2 = c_S1, c_D = c_D,
-                   u_H =  u_H, u_S1 = u_S2, u_S2 = u_S1, u_D = u_D,
-                   r_HD = r_HD, hr_S1D = hr_S1D, hr_S2D = hr_S2D,
-                   p_HS1 = p_HS1, p_S1S2 = p_S1S2,
-                   c_trtA = c_trtA, u_trtA = u_trtA, 
-                   c_trtB = c_trtB, hr_S1S2_trtB)
-
-# Cost-effectiveness results 
-df_ce <- simulate_strategies(l_params_all)
-```
-
-## Generating DSA results
-
-A simple single-parameter DSA starts with choosing the model parameter to be investigated. Next, the modeler specifies a range for this parameter and the number of evenly spaced points along this range at which to evaluate model outcomes. The model is then run for each element of the vector of parameter values by setting the parameter of interest to the value, holding all other model parameters at their default base case values.
-
-`dampack` uses the function `run_owsa_det` to execute a one-way DSA and the function `run_twsa_det` to execute a two-way DSA.
-
-*** To be deleted / incorporated above ***
-
-and the function `run_twsa_det` to execute a two-way DSA. `run_owsa_det` and `run_twsa_det` generate the vector of parameter values for which the user-defined model should be run and then also runs the model.  
-
-containing a list of the parameters from the `params_basecase` argument. In the example model shown below, this list is named `l_params_all`, and the variables contained in this list are the only variables that are allowed to be varied through the `params_range` argument in the DSA. Optionally, additional function inputs for `FUN` can be supplied through the `...` argument of `run_owsa_det`/`run_twsa_det`, but these inputs are not allowed to vary in the sensitivity analysis. These additional inputs must be arguments of `FUN`, like `wtp` in the example of `calculate_ce_out()` below. `FUN` and its component functions are also able to incorporate variables stored in the global environment, such as `n_age_init` or `n_age_max` in the example.
-
-The user-defined model function must return a data.frame where the first column contains a character vector of the strategy names, and the subsequent columns contain numeric vectors of all relevant model outcomes. Each row of the data.frame will consist of a strategy name followed by the corresponding outcome values for that strategy. These model outcomes must be calculated internally within `FUN`. The model outcomes are not limited to typical outcomes like cost or effectiveness and can be any numerical outcome that the user chooses to model.
-
-`dampack` uses the function `run_owsa_det` to execute one-way DSAs and the function `run_twsa_det` to execute two-way DSAs. In order to perform a DSA in `dampack`, the user must input the code for the decision analytic model in a standardized format that is compatible with `run_owsa_det`, and `run_twsa_det`. This is the same format required for the `FUN` argument of `run_psa`.
-
-*** END DELETIONS ***
-
-
-
-## DSA Parameter Format
-
-The `params_range` input tells `run_owsa_det` or `run_twsa_det` which parameters will be varied in the DSA and over what ranges. This input must be a data frame with 3 columns in the following order: "pars", "min", and "max". The number of samples from this range is determined by the input `nsamp`. The "pars" column is a character vector with the parameters of interest and must be a subset of the parameters from `params_basecase`.
-
-when using `run_owsa_det`, supplying multiple parameters in `params_range` will instruct the function to execute a series of separate one-way deterministic sensitivity analyses and compile the results into a single `owsa` object for each requested `outcome`. When using `run_twsa_det`, exactly two parameters must be supplied in the `pars` column of the `params_range` data.frame argument.
+To demonstrate the `simulate_strategies` function, we define a list of model and strategy parameters. We call this our basecase list of parameters, as these will be the default parameter values used when conducting the DSA.
 
 ```{r}
 my_params_basecase <- list(p_HS1 = 0.15,
@@ -327,53 +257,95 @@ my_params_basecase <- list(p_HS1 = 0.15,
                            n_cycles = 75,
                            v_s_init = c(1, 0, 0, 0),
                            r_disc = 0.03)
+```
 
-my_params_range <- data.frame(pars = c("u_trtA", "c_trtA", "hr_S1S2_trtB", "r_HD"),
+If we then call `simulate_strategies` with the list `my_params_basecase`, we will get a data frame of strategy outcomes:
+
+```{r}
+df_ce <- simulate_strategies(my_params_basecase)
+
+df_ce
+```
+
+## Generating DSA results
+
+Next, we will use the functionality within `dampack` to generate one- and two-way DSAs using our user-defined function, `simulate_strategies`. A simple one-way DSA starts with choosing a model parameter to be investigated. Next, the modeler specifies a range for this parameter and the number of evenly spaced points along this range at which to evaluate model outcomes. The model is then run for each element of the vector of parameter values by setting the parameter of interest to the value, holding all other model parameters at their default base case values.
+
+The `dampack` functions `run_owsa_det` and `run_twsa_det` are used to execute one- and two-way DSA, respectively.
+
+## One-way DSA generation
+
+To execute a one-way DSA, we first create a data frame that contains the list of parameter names to be varied (first column) and the minimum (second column) and maximum (third column) values of the range of values for each parameter. In the example below, we will conduct four one-way DSAs separately on four different parameters: the utility benefit of Treatment A; the cost of Treatment A; the reduction, as a hazard ratio, on the rate of progressing from Sick to Sicker with Treatment B; and the rate of dying from the Healthy state.
+
+```{r}
+my_owsa_params_range <- data.frame(pars = c("u_trtA", "c_trtA", "hr_S1S2_trtB", "r_HD"),
                               min = c(0.9, 9000, 0.3, 0.001),
                               max = c(1,   24000, 0.9, 0.003))
 
 ```
 
-## One-way Deterministic Sensitivity Analysis
+To conduct the one-way DSA, we then call the function `run_owsa_det` with `my_owsa_params_range`, specifying the parameters to be varied and over which ranges, and `my_params_basecase` as the fixed parameter values to be used in the model when a parameter is not being explicitly varied in the one-way sensitivity analysis. Note that the parameters specified in `my_owsa_params_range$pars` are a subset of the parameters listed in `my_params_basecase`.
 
-In `run_owsa_det`, the user is free to specify any number of outcomes that are defined in the user-defined function (the `FUN` argument, which is `calculate_ce_out` in this example). If more than one outcome is provided, `run_owsa_det` will return a list containing one `owsa` object for each outcome. If the decision model in `FUN` is computationally slow and `nsamp` is large, `run_owsa_det` could take an extremely long time to run. Under these circumstances, it is recommended that you set the `progress` argument to `TRUE` in order to print a progress bar in the console while the function is running.
+Additional inputs are the number of equally-spaced samples (`nsamp`) to be used between the specified minimum and maximum of each range, the user-defined function (`FUN`) to be called to generate model outcomes for each strategy, the vector of outcomes to be stored (must be outcomes generated by the data frame output of the function passed in `FUN`), and the vector of strategy names to be evaluated. 
 
-Each `owsa` object returned by `run_owsa_det` is a `data.frame` with four columns, `parameter`, `strategy`, `param_val`, and `outcome_val`. Each row's value in the `parameter` column denotes which parameter was swapped into  the basecase parameters, and `param_val` indicates which particular value of this parameter was used in that iteration of the decision model. The `outcome_val`s corresponding to each combination of `strategy`, `parameter`, and `param_val` are provided in long format within the `owsa` object.
-
-To access a single `owsa` object associated with the `"NMB"` outcome within the returned list, we can simply write `l_owsa_det$owsa_NMB`.
+The input `progress=TRUE` allows the user to see a progress bar as the DSA is conducted. When many parameters are being varied, `nsamp` is large, and/or the user-defined function is computationally burdensome, the DSA may take a noticeable amount of time to compute and the progress display is recommended.
 
 ```{r}
-l_owsa_det <- run_owsa_det(params_range = my_params_range,
-                         params_basecase = my_params_basecase,
-                         nsamp = 100,
-                         FUN = simulate_strategies,
-                         outcomes = c("Cost", "QALY", "LY", "NMB"),
-                         strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                         progress = FALSE)
+l_owsa_det <- run_owsa_det(params_range = my_owsa_params_range,
+                           params_basecase = my_params_basecase,
+                           nsamp = 100,
+                           FUN = simulate_strategies,
+                           outcomes = c("Cost", "QALY", "LY", "NMB"),
+                           strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
+                           progress = TRUE)
+```
 
+Because we have defined multiple parameters in `my_owsa_params_range`, we have instructed `run_owsa_det` to execute a series of separate one-way sensitivity analyses and compile the results into a single `owsa` object for each requested `outcome`. When only one outcome is specified `run_owsa_det` returns a `owsa` data frame. When more than one outcome is specified, `run_owsa_det` returns a list containing one `owsa` data frame for each outcome. To access the `owsa` object corresponding to a given outcome, one can select the list item with the name "owsa_<outcome>". For example, the `owsa` object associated with the `NMB` outcome can be accessed as `l_owsa_det$owsa_NMB`. 
+
+Each `owsa` object returned by `run_owsa_det` is a data frame with four columns: `parameter`, `strategy`, `param_val`, and `outcome_val`. For each row, `param_val` is the value used for the parameter listed in `parameter` and `outcome_val` is the value of the specified outcome for the strategy listed in `strategy`. The `owsa` object can now be visualized using the functionality within `dampack`, which includes an `owsa` plot method and a visualization of the optimal strategy over each parameter range (function `owsa_opt_strat`).
+
+```{r}
+# Select the net monetary benefit (NMB) owsa object
 my_owsa_NMB <- l_owsa_det$owsa_NMB
 
+# Plot outcome of each strategy over each parameter range
+plot(my_owsa_NMB)
+
+# Visualize optimal strategy (max NMB) over each parameter range
 owsa_opt_strat(my_owsa_NMB)
+```
+
+## Two-way DSA Generation
+
+A two-way DSA is used to assess how model outcomes vary over specified ranges of two model parameters jointly. Similar to a one-way DSA, we first create a data frame with the (two) parameters that we wish to vary and their individual ranges. This data frame must have exactly two rows since the two-way DSA requires exactly two parameters.
+
+```{r}
+my_twsa_params_range <- data.frame(pars = c("hr_S1S2_trtB", "r_HD"),
+                              min = c(0.3, 0.001),
+                              max = c(0.9, 0.003))
 
 ```
 
-## Two-way Deterministic Sensitivty Analysis
-
-A two-way sensitivity analysis is used to assess how model outcomes vary over pre-specified ranges of two model parameters jointly. The general format of the function arguments for `dampack`'s two-way DSA function, `run_twsa_det`, are the same as those for `run_owsa_det`. In `run_twsa_det`, equally spaced sequences of length `nsamp` are created for the two parameters based on the inputs provided in the `params_range` argument. These two sequences of parameter values define an `nsamp` by `nsamp` grid over which `FUN` is applied to produce outcomes for every combination of the two parameters.
-
-If more than one outcome is provided, `run_twsa_det` will return a list containing one `twsa` object for each outcome. To access a single `twsa` object associated with the `"NMB"` outcome within the returned list, we write `l_twsa_det$twsa_NMB`. Each `twsa` object is a long form `data.frame` that reports the outcome value for each each strategy at every parameter combination. The first two columns are named according to the two parameters specified in `params_range`. 
+To conduct the two-way DSA, we then call the function `run_twsa_det` with `my_twsa_params_range`. The general format of the function arguments for `run_twsa_det` are the same as those for `run_owsa_det`. In `run_twsa_det`, equally spaced sequences of length `nsamp` are created for the two parameters based on the inputs provided in the `params_range` argument. These two sequences of parameter values define an `nsamp` by `nsamp` grid over which `FUN` is applied to produce outcomes for every combination of the two parameters.
 
 ```{r}
-l_twsa_det <- run_twsa_det(params_range = my_params_range[c(3,4),],
+l_twsa_det <- run_twsa_det(params_range = my_twsa_params_range,
                          params_basecase = my_params_basecase,
                          nsamp = 50,
                          FUN = simulate_strategies,
-                         outcomes = c("Cost","QALY","NMB"),
+                         outcomes = c("Cost", "QALY", "NMB"),
                          strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                         progress = FALSE)
+                         progress = TRUE)
+```
 
+Like in the one-way DSA, if only one outcome is specified, then `run_twsa_det` will return a `twsa` data frame. If more than one outcome is specified, `run_twsa_det` returns a list containing one `twsa` object for each outcome. To access the `twsa` object corresponding to a given outcome, one can select the list item with the name "twsa_<outcome>". For example, the `twsa` object associated with the `NMB` outcome can be accessed as `l_twsa_det$owsa_NMB`. 
+
+Each `twsa` object returned by `run_twsa_det` is a data frame with four columns. The first two columns are named according to the two parameters specified in `params_range`. Each row is the value of that parameter corresponding to the outcome value in the `outcome_val` (fourth) column  for the strategy listed in the  `strategy` (third) column. The `twsa` object can now be visualized using the functionality within `dampack`. The `twsa` plot method shows the optimal strategy as a function of the two parameters being varied in the two-way DSA, which is the primary way that two-way analyses are reported.
+
+```{r}
 my_twsa_NMB <- l_twsa_det$twsa_NMB
 
+# plot optimal strategy (max NMB) as a function of the two parameters varied in the two-way DSA
 plot(my_twsa_NMB)
 
 ```

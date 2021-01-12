@@ -107,7 +107,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   for (j in 1:n_outcomes) {
     sim_out_df[[j]] <- lapply(sim_out_ls,
                               function(x, tmp_out = outcomes[j]) {
-                                x[[outcomes[j]]]
+                                t(x[[outcomes[j]]])
                               })
     sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
     colnames(sim_out_df[[j]]) <- strategies

@@ -23,11 +23,17 @@ knitr::opts_chunk$set(
 
 The probabilistic sensitivity analysis (PSA) object is a key part of the `dampack` package. In this vignette, we discuss the goals of a probabilistic sensitivity analysis, how to create the `dampack` PSA object from an existing PSA dataset, and what can be done once the PSA object is created in `dampack`.
 
-`dampack` has additional functionality for generating your own PSA dataset with a user-defined decision model and specified parameter distributions, and those methods are covered in the `psa_generation` vignette. Even if you intend to generate your own PSA dataset using `dampack`, it is recommended that you continue reading this vignette (`psa_analysis`) first.
+`dampack` has additional functionality for generating a PSA dataset with a user-defined R-based decision model and specified parameter distributions. Those methods are covered in the `psa_generation` vignette (type `vignette("psa_generation", package = "dampack")` in the console after installing the `dampack` package). Even if you intend to generate your own PSA dataset using `dampack`, it is recommended that you continue reading this vignette (`psa_analysis`) first.
 
 ## Probability Sensitivity Analysis: An Introduction
 
-The purpose of a PSA is to translate model parameter uncertainty into decision uncertainty, reflected as uncertainty as to which strategy is optimal (i.e. has the highest probability of maximizing net monetary benefit). Each uncertain parameter that factors into the decision model is defined by a probability distribution that is independent of the other input parameter distributions. To generate a single PSA sample, a single value is randomly drawn for each parameter from its respective distribution, and those parameter values are plugged into the decision model to calculate the resulting outcomes of interest for each strategy. A large number of samples, say 10,000, are generated in this way, with each iteration using one set of values from the distributions of the parameters and each iteration yielding one set of outcome values. The resulting distribution of outcome values across the PSA samples can translate into decision uncertainty when certain strategies are favored in some samples but not in others.
+The purpose of a PSA is to translate model parameter uncertainty into decision uncertainty, measured as the probability that a given strategy is optimal. In the context of cost-effectiveness analysis, this is the probability that a given strategy is cost-effective, defined as achieving the maximum health benefit at a cost per unit benefit gained less than a defined maximum willingness-to-pay (WTP) per unit benefit. The cost-effective strategy is equivalently defined as the strategy that maximizes the net monetary benefit (NMB) calculated as WTP * Benefit - Cost, with an appropriately set WTP. Thus, in the PSA examples, we will generally use NMB as the outcome of each strategy.
+
+Parameter uncertainty is reflected in probability distributions defined for each model parameter. Common distributions include the normal, beta, gamma, and log-normal distributions. To generate a single PSA sample, a value is randomly drawn for each parameter from its respective distribution. The model is then run for that set of parameter values to calculate the resulting outcomes of interest for each strategy. A large number of PSA samples, say 10,000, are generated in this way, with each iteration using one set of values from the distributions of the parameters and each iteration yielding one set of outcome values. The resulting distribution of outcome values across the PSA samples translates into decision uncertainty when certain strategies are favored in some samples but not in others.
+
+For a more in-depth discussion of cost-effectiveness analysis and the role of PSA, we recommend the following readings:
+- Alarid-Escudero, Fernando, Eva A. Enns, Karen M. Kuntz, Tzeyu L. Michaud, and Hawre Jalal. "Time traveling is just too dangerous" but some methods are worth revisiting: the advantages of expected loss curves over cost-effectiveness acceptability curves and frontier. Value in Health 2019; 22(5):611-618.
+- Cost-Effectiveness in Health and Medicine, 2nd edition, eds: Neumann PJ, Ganiats TG, Russell LB, Sanders GD, Siegel JE. Oxford University Press, 2016.
 
 
 ## PSA in dampack
@@ -67,7 +73,7 @@ head(example_psa$cost)
 head(example_psa$effectiveness)
 ```
 
-Note that the columns have names that suggest the strategy and the outcome type in the `example_psa`. When using the `make_psa_obj()` function, it is not actually necessary for the column names in the `cost` and `effectiveness` data.frame inputs to follow this convention; however, it is *critical* that the vector of strategies (`example_psa$strategies`) and the columns of the `cost` and `effectiveness` data.frames be in the same order.
+Note that the columns have names that suggest the strategy and the outcome type in the `example_psa`. When using the `make_psa_obj()` function, it is not actually necessary for the column names in the `cost` and `effectiveness` data frame inputs to follow this convention; however, it is *critical* that the vector of strategies (`example_psa$strategies`) and the columns of the `cost` and `effectiveness` data frames be in the same order.
 
 Now, let's make the PSA object and look at its structure:
 

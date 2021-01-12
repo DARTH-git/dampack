@@ -291,6 +291,7 @@ Additional inputs are the number of equally-spaced samples (`nsamp`) to be used 
 The input `progress = TRUE` allows the user to see a progress bar as the DSA is conducted. When many parameters are being varied, `nsamp` is large, and/or the user-defined function is computationally burdensome, the DSA may take a noticeable amount of time to compute and the progress display is recommended.
 
 ```{r}
+library(dampack)
 l_owsa_det <- run_owsa_det(params_range = my_owsa_params_range,
                            params_basecase = my_params_basecase,
                            nsamp = 100,

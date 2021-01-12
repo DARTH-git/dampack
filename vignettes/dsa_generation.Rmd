@@ -148,7 +148,7 @@ run_sick_sicker_model <- function(l_params, verbose = FALSE) {
 }
 ```
 
-Note that this function outputs costs, QALYs, and LYs for a given set of inputs (passed as the list `l_params`). Different strategies can be modeled by calling `run_sick_sicker_model` with different parameter values reflect the impacts of those strategies. In this example, we will use the Sick-Sicker model to evaluate three strateges: "No Treatment", "Treatment A", and "Treatment B". The "No Treatment" strategy is just the Sick-Sicker natural history, while both "Treatment A" and "Treatment B" improve some aspect of the disease. These treatments are taken whenever someone is ill (Sick or Sicker), which increases the cost of being in those states by the cost of treatment."Treatment A" improves the utility for those in the Sick states (but not in the Sicker state), while "Treatment B" reduces the rate of progressing from the Sick state to the Sicker state. Note that we assume that treatment cannot be targeted to just the Sick state because we assume that for this disease it is difficult to differentiate between patients in the Sick and Sicker states. Thus treatment costs are incurred by those in the Sicker state even if they do not benefit from it.
+Note that this function outputs costs, QALYs, and LYs for a given set of inputs (passed as the list `l_params`). Different strategies can be modeled by calling `run_sick_sicker_model` with different parameter values reflect the impacts of those strategies. In this example, we will use the Sick-Sicker model to evaluate three strateges: "No_Treatment", "Treatment_A", and "Treatment_B". The "No_Treatment" strategy is just the Sick-Sicker natural history, while both "Treatment_A" and "Treatment_B" improve some aspect of the disease. These treatments are taken whenever someone is ill (Sick or Sicker), which increases the cost of being in those states by the cost of treatment."Treatment_A" improves the utility for those in the Sick states (but not in the Sicker state), while "Treatment_B" reduces the rate of progressing from the Sick state to the Sicker state. Note that we assume that treatment cannot be targeted to just the Sick state because we assume that for this disease it is difficult to differentiate between patients in the Sick and Sicker states. Thus treatment costs are incurred by those in the Sicker state even if they do not benefit from it.
 
 We define a second function, `simulate_strategies` that calls the Sick-Sicker model with the approrpiate inputs values for these three strategies. The `simulate_strategies` function also takes a list of parameter values (`l_params`), which must include both parameters for the markov model and any parameters governing the three strategies to be evaluated. `simulate_strategies` outputs a data frame with costs, QALYs, life-years (LYs), and net monetary benefit (NMB) for each of the three strategies. It is this function that we will pass to `dampack`'s internal functions for conducting DSA.
 
@@ -164,25 +164,25 @@ simulate_strategies <- function(l_params, wtp = 100000){
     # -- annual discount rate: r_disc
     # -- *** Strategy specific parameters ***
     # -- treartment costs (applied to Sick and Sicker states): c_trtA, c_trtB
-    # -- utility with treatment A (for Sick state only): u_trtA
-    # -- hazard ratio of progression with treatment B: hr_S1S1_trtB
+    # -- utility with Treatment_A (for Sick state only): u_trtA
+    # -- hazard ratio of progression with Treatment_B: hr_S1S1_trtB
   
   with(as.list(l_params), {
     
     ####### SET INTERNAL PARAMETERS #########################################
     # Strategy names
-    v_names_strat <- c("No Treatment", "Treatment A", "Treatment B")
+    v_names_strat <- c("No_Treatment", "Treatment_A", "Treatment_B")
     # Number of strategies
     n_strat <- length(v_names_strat)
     
-    ## Treatment A
+    ## Treatment_A
     # utility impacts
     u_S1_trtA <- u_trtA
     # include treatment costs
     c_S1_trtA <- c_S1 + c_trtA
     c_S2_trtA <- c_S2 + c_trtA
     
-    ## Treatment B
+    ## Treatment_B
     # progression impacts
     r_S1S2_trtB <- -log(1 - p_S1S2) * hr_S1S2_trtB 
     p_S1S2_trtB <- 1 - exp(-r_S1S2_trtB)
@@ -209,12 +209,12 @@ simulate_strategies <- function(l_params, wtp = 100000){
                               r_HD = r_HD, hr_S1D = hr_S1D, hr_S2D = hr_S2D,
                               p_HS1 = p_HS1, p_S1H = p_S1H, p_S1S2 = p_S1S2)
       
-      if (v_names_strat[i] == "Treatment A"){
+      if (v_names_strat[i] == "Treatment_A"){
         l_params_markov$u_S1 <- u_S1_trtA
         l_params_markov$c_S1 <- c_S1_trtA
         l_params_markov$c_S2 <- c_S2_trtA
         
-      } else if(v_names_strat[i] == "Treatment B"){
+      } else if(v_names_strat[i] == "Treatment_B"){
         l_params_markov$p_S1S2 <- p_S1S2_trtB
         l_params_markov$c_S1   <- c_S1_trtB
         l_params_markov$c_S2   <- c_S2_trtB
@@ -275,7 +275,7 @@ The `dampack` functions `run_owsa_det` and `run_twsa_det` are used to execute on
 
 ## One-way DSA generation
 
-To execute a one-way DSA, we first create a data frame that contains the list of parameter names to be varied (first column) and the minimum (second column) and maximum (third column) values of the range of values for each parameter. In the example below, we will conduct four one-way DSAs separately on four different parameters: the utility benefit of Treatment A; the cost of Treatment A; the reduction, as a hazard ratio, on the rate of progressing from Sick to Sicker with Treatment B; and the rate of dying from the Healthy state.
+To execute a one-way DSA, we first create a data frame that contains the list of parameter names to be varied (first column) and the minimum (second column) and maximum (third column) values of the range of values for each parameter. In the example below, we will conduct four one-way DSAs separately on four different parameters: the utility benefit of Treatment_A; the cost of Treatment_A; the reduction, as a hazard ratio, on the rate of progressing from Sick to Sicker with Treatment_B; and the rate of dying from the Healthy state.
 
 ```{r}
 my_owsa_params_range <- data.frame(pars = c("u_trtA", "c_trtA", "hr_S1S2_trtB", "r_HD"),

@@ -39,4 +39,3 @@ There is some overlap between the topics and functions covered in the six vignet
 3. voi
 4. psa_generation
 5. dsa_generation
-6. dsa_visualization

@@ -8,5 +8,4 @@
 There were no ERRORs or WARNINGs, or NOTEs. 
 
 ## Downstream dependencies
-I have also run R CMD check on downstream dependencies of httr 
-(https://github.com/wch/checkresults/blob/master/httr/r-release). 
+There are no downstream dependencies yet (first-time submission)

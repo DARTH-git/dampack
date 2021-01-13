@@ -9,7 +9,7 @@ This package was developed with funding from the National Institutes of Allergy 
 
 ## Installation
 ``` r
-# Install release version from CRAN # COMING SOON
+# Install release version from CRAN
 install.packages("dampack")
 ```
 

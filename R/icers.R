@@ -58,7 +58,7 @@
 calculate_icers <- function(cost, effect, strategies) {
   # checks on input
   n_cost <- length(cost)
-  n_eff <- length(cost)
+  n_eff <- length(effect)
   n_strat <- length(strategies)
   if (n_cost != n_eff | n_eff != n_strat) {
     stop("cost, effect, and strategies must all be vectors of the same length", call. = FALSE)

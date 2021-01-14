@@ -6,7 +6,8 @@
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
-win-builder (devel and release) both gave the same notes. The following notes were produced upon checking:
+win-builder (devel and release) both gave the same note. 
+The following issues were raised in the note associated with checking CRAN incoming feasibility:
 
 1) this package is a new submission (this is correct)
 

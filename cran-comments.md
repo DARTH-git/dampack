@@ -1,3 +1,13 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Added single quotes to the package name in the DESCRIPTION file.
+
+* Removed the LICENSE file and removed the reference to this file in the DESCRIPTION file.
+
+* Added a reference w/ doi for methods used in package.
+
+
 ## Test environments
 * local Win install, R 4.0.3
 * linux Ubuntu 16.04.6 (on travis-ci), R 4.0.2
@@ -9,14 +19,17 @@ There were no ERRORs or WARNINGs.
 win-builder (devel and release) both gave the same note. 
 The following issues were raised in the note associated with checking CRAN incoming feasibility:
 
-1) this package is a new submission (this is correct)
+1) this package is a new submission
 
-2) I followed StackOverflow instructions and Hadley's R package book's guide on how to put in the GPL-3 licensing information, 
-and this seems to have triggered a note that reproduced the full text of the license.
-The license.md file is an exact copy of the GPL-3 license linked on CRAN's website.
+This is a new submission in the sense that the package has not yet been accepted to CRAN, but this is not my first time submitting the package. I mistakenly deleted the file specifying that the package had already been submitted to CRAN and never committed the package after using devtools::release(). I'm not sure, but the inclusion of this file might have altered this particular note.
 
-3) there are possibly mis-spelled words in DESCRIPTION.
-There are no mis-spelled words in DESCRIPTION. The package name ("dampack") was incorrectly flagged.
+2) Possibly mis-spelled words in DESCRIPTION:
+   Hunink (27:50)
+   al (27:60)
+   dampack (27:9)
+   et (27:57)
+
+Hunink is a name that is correctly spelled, and the other possibly mis-spelled words are spelled correctly.
 
 Travis-CI checks and the local check all did not produce any ERRORs, WARNINGs, or NOTEs.
 

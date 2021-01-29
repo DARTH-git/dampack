@@ -60,8 +60,8 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     stop("the first column of params_range should consist only of parameter names from params_basecase")
   }
 
-  if (!all(is.numeric(params_range[, 2]), is.numeric(params_range[, 3]), sapply(params_basecase, is.numeric))) {
-    stop("min and max in params_range and elements of params_basecase must be numeric")
+  if (!all(is.numeric(params_range[, 2]), is.numeric(params_range[, 3]), sapply(params_basecase[params_range[, "pars"]], is.numeric))) {
+    stop("min and max in params_range and elements of params_basecase in pars must be numeric")
   }
 
   if (!all((params_basecase[params] >= params_range[, 2]) &

@@ -234,26 +234,6 @@ The `gen_psa_samp` function creates a `data.frame` of parameter value samples ba
 Details about the allowable distributions, their parameterization types and the corresponding formats for `dists_params` can be found in the help documentation by typing `?gen_psa_samp` in the console. Within the example below, the first parameter in the PSA, `"p_HS1"`, follows a `"beta"` distribution, which has an `"a, b"` parameterization type (which stands for alpha, beta), and the two values for alpha and beta are `30` and `170`, respectively. If the user does not possess estimates for the alpha and beta parameters for the beta distribution but does have estimates for the mean and standard deviation of `"p_HS1"`, they also could choose to parameterize this distribution using `parameterization_types = "mean, sd"`. In this case, the first element of the dists_params list would need to be a numeric vector of length 2 containing the estimated mean and standard deviation for `"p_HS1"`. `dampack` would then use a method-of-moments estimator to calculate an alpha and beta parameter for this distribution from which the PSA sample values are drawn.
 
 ```{r}
-my_params_basecase <- list(#Transition Probabilities
-                           p_HS1 = 0.15,
-                           p_S1H = 0.5,
-                           p_S1S2 = 0.105,
-                           #Hazard ratios
-                           hr_S1D = 3, 
-                           hr_S2D = 10,
-                           hr_S1S2_trtB = 0.6,
-                           #Costs
-                           c_H = 2000,
-                           c_S1 = 4000,
-                           c_S2 = 15000, 
-                           c_trtA = 12000,
-                           c_trtB = 13000,
-                           #Utilities
-                           u_H = 1,
-                           u_S1 = 0.75,
-                           u_S2 = 0.5,
-                           u_trtA = 0.95)
-
 my_params <- c(#Transition probabilities
                "p_HS1", 
                "p_S1H", 

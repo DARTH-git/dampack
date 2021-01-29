@@ -137,7 +137,7 @@ test_that("accurately producing warnings and errors in run_owsa_det", {
                         strategies = NULL,
                         state_name = state_name, cycle = cycle,
                         progress = FALSE),
-               "min and max in params_range and elements of params_basecase must be numeric")
+               "min and max in params_range and elements of params_basecase in pars must be numeric")
 
   params_basecase2 <- list(0.05, 0.8, 0.8, 0.01, 0.01)
   expect_error(run_owsa_det(params_range, params_basecase2, nsamp = 10,

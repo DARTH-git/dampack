@@ -228,7 +228,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   }
 
   if (!all(is.numeric(params_range[, 2]), is.numeric(params_range[, 3]), sapply(params_basecase[params_range[, "pars"]], is.numeric))) {
-    stop("min and max in params_range and elements of params_basecase must be numeric")
+    stop("min and max in params_range and elements of params_basecase in pars must be numeric")
   }
 
   if (!all((params_basecase[poi] >= params_range[, 2]) &

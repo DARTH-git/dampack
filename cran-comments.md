@@ -1,11 +1,11 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Added single quotes to the package name in the DESCRIPTION file.
+* removed the name of the package from the start of the description.
 
-* Removed the LICENSE file and removed the reference to this file in the DESCRIPTION file.
+* changed the quotes around package title to undirected quotation marks.
 
-* Added a reference w/ doi for methods used in package.
+* removed write.table() and ggsave() function uses from the basic_cea.rmd vignette to comply with CRAN's policies. These were the only offending functions I could find--if there are others that I am overlooking, please let me know and I will happily fix them!
 
 
 ## Test environments

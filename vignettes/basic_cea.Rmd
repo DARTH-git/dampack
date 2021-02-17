@@ -28,9 +28,9 @@ Cost-effectiveness analysis (CEA) is one form of economic evaluation that compar
 
 Given a set of mutually exclusive strategies with associated costs and effectiveness, the first step in determining cost-effectiveness is to order strategies in order of increasing costs. As costs increase, effectiveness should also increase. Any strategy with lower effectiveness but higher costs than another strategy is said to be "strongly dominated". A rational decision-maker would never implement a dominated strategy because greater effectiveness could be achieved at lower cost by implementing a different strategy (and the strategies are mutually exclusive). Therefore, dominated strategies are eliminated from further consideration. 
 
-Next, the incremental cost and incremental effectiveness of moving from one strategy to the next (in order of increasing costs) are calculated. The incremental cost-effectiveness ratio (ICER) for each strategy is then its incremental costs divided by its incremental effectiveness and represents the cost per unit benefit of "upgrading" to that strategy from the next least costly (and next least effective) strategy. At this point, "weakly dominated" strategies are identified. These are strategies for which there is a linear combination of two different strategies that dominates the strategy (lower costs and/or higher effectivenss). Weak dominance is also called "extended dominance". Operationally, weakly dominated strategies can be identified by checking that ICERs increase with increasingly costly (and effective) strategies. If there is a "kink" in the trend, then weak/extended dominance exists. Once weakly dominated strategies are removed (and incremental quantities recalculated), the set of remaining strategies form the efficient frontier and associated ICERs can be interpreted for decision-making.
+Next, the incremental cost and incremental effectiveness of moving from one strategy to the next (in order of increasing costs) are calculated. The incremental cost-effectiveness ratio (ICER) for each strategy is then its incremental costs divided by its incremental effectiveness and represents the cost per unit benefit of "upgrading" to that strategy from the next least costly (and next least effective) strategy. At this point, "weakly dominated" strategies are identified. These are strategies for which there is a linear combination of two different strategies that dominates the strategy (lower costs and/or higher effectiveness). Weak dominance is also called "extended dominance". Operationally, weakly dominated strategies can be identified by checking that ICERs increase with increasingly costly (and effective) strategies. If there is a "kink" in the trend, then weak/extended dominance exists. Once weakly dominated strategies are removed (and incremental quantities recalculated), the set of remaining strategies form the efficient frontier and associated ICERs can be interpreted for decision-making.
 
-The `dampack` function `calculate_icers()` completes all of the calculations and checks described above. It takes as inputs the cost, effectiveness outcome (usually QALYs), and strategy name for each strategy, passed as separate vectors. It outputs a specialized data frame that presents the costs and effectiveness of each strategy and, for non-dominated strategies, the incremental costs, effeciveness, and ICER. Dominated strategies are included at the end of the table with the type of dominance indicated as either strong dominance (D) or extended/weak dominance (ED) in the `Status` column.
+The `dampack` function `calculate_icers()` completes all of the calculations and checks described above. It takes as inputs the cost, effectiveness outcome (usually QALYs), and strategy name for each strategy, passed as separate vectors. It outputs a specialized data frame that presents the costs and effectiveness of each strategy and, for non-dominated strategies, the incremental costs, effectiveness, and ICER. Dominated strategies are included at the end of the table with the type of dominance indicated as either strong dominance (D) or extended/weak dominance (ED) in the `Status` column.
 
 We present the application of `calculate_icers()` in the two examples below.
 
@@ -93,7 +93,7 @@ The results contained in `icer_hiv` can be visualized in the cost-effectiveness 
 plot(icer_hiv)
 ```
 
-In the plot, the points on the efficient frontier (consisting of all non-dominated strategies) are connected with a solid line. By default, only strategies on the efficient frontier are labeled. However, this can be changed by setting `label="all"`. There are a number of built-in options for customizing the cost-effectivenss plot. To see a full listing, type `?plot.icers` in the console. Furthermore, the plot of an `icer` object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is available at https://ggplot2.tidyverse.org/ .
+In the plot, the points on the efficient frontier (consisting of all non-dominated strategies) are connected with a solid line. By default, only strategies on the efficient frontier are labeled. However, this can be changed by setting `label="all"`. There are a number of built-in options for customizing the cost-effectiveness plot. To see a full listing, type `?plot.icers` in the console. Furthermore, the plot of an `icer` object is a `ggplot` object, so we can add (`+`) any of the normal ggplot adjustments to the plot. To do this, `ggplot2` needs to be loaded with `library()`. A introduction to ggplot2 is available at https://ggplot2.tidyverse.org/ .
 
 
 Plot with all strategies labeled:
@@ -173,17 +173,4 @@ Here are some additional plotting options:
 plot(icer_cdiff, label = "all") # can lead to a 'busy' plot
 plot(icer_cdiff, plot_frontier_only = TRUE) # completely removes dominated strategies from plot
 plot(icer_cdiff, currency = "USD", effect_units = "quality-adjusted life-years") # customize axis labels
-```
-
-Finally, we can save this plot to a publication-ready image using `ggsave()`, which saves the most recent ggplot object. 
-```{r}
-ggsave("icer_cdiff.png", width = 7, height = 5, dpi = 300)
-```
-
-The table can also be written to a tabular or comma-separated file like a normal R data frame or data table.
-```{r}
-write.table(icer_cdiff, 
-            file = "cdiff_icers.csv",
-            quote = FALSE, 
-            row.names = FALSE, sep=",")
 ```

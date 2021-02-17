@@ -348,5 +348,4 @@ my_twsa_NMB <- l_twsa_det$twsa_NMB
 
 # plot optimal strategy (max NMB) as a function of the two parameters varied in the two-way DSA
 plot(my_twsa_NMB)
-
 ```

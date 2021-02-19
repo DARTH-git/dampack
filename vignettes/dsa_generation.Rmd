@@ -298,7 +298,7 @@ l_owsa_det <- run_owsa_det(params_range = my_owsa_params_range,
                            FUN = simulate_strategies,
                            outcomes = c("Cost", "QALY", "LY", "NMB"),
                            strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                           progress = TRUE)
+                           progress = FALSE)
 ```
 
 Because we have defined multiple parameters in `my_owsa_params_range`, we have instructed `run_owsa_det` to execute a series of separate one-way sensitivity analyses and compile the results into a single `owsa` object for each requested `outcome`. When only one outcome is specified `run_owsa_det` returns a `owsa` data frame. When more than one outcome is specified, `run_owsa_det` returns a list containing one `owsa` data frame for each outcome. To access the `owsa` object corresponding to a given outcome, one can select the list item with the name "owsa_<outcome>". For example, the `owsa` object associated with the `NMB` outcome can be accessed as `l_owsa_det$owsa_NMB`. 
@@ -336,7 +336,7 @@ l_twsa_det <- run_twsa_det(params_range = my_twsa_params_range,
                          FUN = simulate_strategies,
                          outcomes = c("Cost", "QALY", "NMB"),
                          strategies = c("No_Treatment", "Treatment_A", "Treatment_B"),
-                         progress = TRUE)
+                         progress = FALSE)
 ```
 
 Like in the one-way DSA, if only one outcome is specified, then `run_twsa_det` will return a `twsa` data frame. If more than one outcome is specified, `run_twsa_det` returns a list containing one `twsa` object for each outcome. To access the `twsa` object corresponding to a given outcome, one can select the list item with the name "twsa_<outcome>". For example, the `twsa` object associated with the `NMB` outcome can be accessed as `l_twsa_det$owsa_NMB`. 

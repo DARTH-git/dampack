@@ -1,0 +1,28 @@
+citHeader("To cite dampack in publications use:")
+
+citEntry(
+  entry    = "Misc",
+  title    = "Decision Analytic Modeling Package (dampack)",
+  author   = c(person(given = "Fernando",
+                      family = "Alarid-Escudero",
+                      role = "aut",
+                      email = "fernando.alarid@cide.edu"),
+               person(given = "Caleb",
+                      family = "Easterly",
+                      role = "aut",
+                      email = "easte080@umn.edu"),
+               person(given = "Eva",
+                      family = "Enns",
+                      role = "aut",
+                      email = "eenns@umn.edu"),
+               person(given = "Greg",
+                      family = "Knowlton",
+                      role = c("aut", "cre"),
+                      email = "knowl193@umn.edu")),
+  year     = 2021,
+  note     = "R package version 1.0.0",
+  url      = "https://github.com/DARTH-git/dampack",
+  textVersion = paste(
+  "Alarid-Escudero F (2021). Decision Analytic Modeling Package (dampack). R package version 1.0.0. https://github.com/DARTH-git/dampack"
+  )
+)

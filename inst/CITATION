@@ -7,6 +7,10 @@ citEntry(
                       family = "Alarid-Escudero",
                       role = "aut",
                       email = "fernando.alarid@cide.edu"),
+               person(given = "Greg",
+                      family = "Knowlton",
+                      role = c("aut", "cre"),
+                      email = "knowl193@umn.edu"),
                person(given = "Caleb",
                       family = "Easterly",
                       role = "aut",
@@ -14,15 +18,11 @@ citEntry(
                person(given = "Eva",
                       family = "Enns",
                       role = "aut",
-                      email = "eenns@umn.edu"),
-               person(given = "Greg",
-                      family = "Knowlton",
-                      role = c("aut", "cre"),
-                      email = "knowl193@umn.edu")),
+                      email = "eenns@umn.edu")),
   year     = 2021,
   note     = "R package version 1.0.0",
   url      = "https://github.com/DARTH-git/dampack",
   textVersion = paste(
-  "Alarid-Escudero F (2021). Decision Analytic Modeling Package (dampack). R package version 1.0.0. https://github.com/DARTH-git/dampack"
+  "Alarid-Escudero F, Knowlton G, Easterly C, Enns EA (2021). Decision Analytic Modeling Package (dampack). R package version 1.0.0. https://github.com/DARTH-git/dampack"
   )
 )

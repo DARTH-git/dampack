@@ -7,6 +7,10 @@ Authors@R:
              family = "Alarid-Escudero",
              role = "aut",
              email = "fernando.alarid@cide.edu"),
+             person(given = "Greg",
+             family = "Knowlton",
+             role = c("aut", "cre"),
+             email = "knowl193@umn.edu"),
       person(given = "Caleb",
              family = "Easterly",
              role = "aut",
@@ -14,11 +18,7 @@ Authors@R:
       person(given = "Eva",
              family = "Enns",
              role = "aut",
-             email = "eenns@umn.edu"),
-      person(given = "Greg",
-             family = "Knowlton",
-             role = c("aut", "cre"),
-             email = "knowl193@umn.edu"))
+             email = "eenns@umn.edu"))
 Description: A suite of functions for analyzing and visualizing the health economic outputs of mathematical models.
     This package was developed with funding from the National Institutes of Allergy and Infectious Diseases of the 
     National Institutes of Health under award no. R01AI138783. The content of this package is solely the 

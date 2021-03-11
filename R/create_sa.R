@@ -36,76 +36,31 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
     effectiveness <- check_df_and_coerce(effectiveness)
   }
 
-  parameters <- check_df_and_coerce(parameters)
+  if (!is.null(parameters)) {
+    parameters <- check_df_and_coerce(parameters)
+  }
 
   ### argument checks and definitions of other variables ###
 
   # costs, effectiveness, and parameters have same number of rows
-  if (!is.null(effectiveness)) {
-    n_sim_effectiveness <- nrow(effectiveness)
+  n_sim_ls <- list(effectiveness, cost, parameters, other_outcome)
+  if (length(unique(unlist(lapply(n_sim_ls[!unlist(lapply(n_sim_ls, is.null))], nrow)))) != 1) {
+    stop("Among those provided, the cost, effectiveness, parameter,
+         and other_outcome dataframes must all have the same number of rows.")
   }
-
-  if (!is.null(cost)) {
-    n_sim_costs <- nrow(cost)
-  }
-
-  n_sim_parameters <- nrow(parameters)
-
-
-  if (!is.null(cost) & !is.null(effectiveness)) {
-    if (n_sim_costs != n_sim_effectiveness | n_sim_parameters != n_sim_costs
-         | n_sim_parameters != n_sim_effectiveness) {
-      stop("The cost, effectiveness, and parameter dataframes must all have the same number of rows.")
-    }
-  }
-
-  if (is.null(cost) & is.null(other_outcome)) {
-    if (n_sim_effectiveness != n_sim_parameters) {
-      stop("The effectiveness and parameter dataframes must have the same number of rows.")
-    }
-  }
-
-
-  if (is.null(effectiveness) & is.null(other_outcome)) {
-    if (n_sim_costs != n_sim_parameters) {
-      stop("The cost and parameter dataframes must have the same number of rows.")
-   }
-  }
-
-
-
 
   # define n_sim
-  n_sim <- n_sim_parameters
+  n_sim <- unique(unlist(lapply(n_sim_ls[!unlist(lapply(n_sim_ls, is.null))], nrow)))
 
   # costs and effectiveness have same number of columns (strategies)
-  if (!is.null(other_outcome)) {
-    n_strategies_other_outcome <- ncol(other_outcome)
-    n_strategies <- n_strategies_other_outcome
+  n_strategies_ls <- list(effectiveness, cost, other_outcome)
+  if (length(unique(unlist(lapply(n_strategies_ls[!unlist(lapply(n_strategies_ls, is.null))], ncol)))) != 1) {
+    stop("Among those provided, the cost, effectiveness,
+         and other_outcome dataframes must all have the same number of columns.")
   }
 
-  if (!is.null(cost)) {
-    n_strategies_costs <- ncol(cost)
-    n_strategies <- n_strategies_costs
-  }
-
-  if (!is.null(effectiveness)) {
-    n_strategies_effectiveness <- ncol(effectiveness)
-    n_strategies <- n_strategies_effectiveness
-  }
-
-  if (!is.null(effectiveness) & !is.null(cost)) {
-    if (n_strategies_costs != n_strategies_effectiveness) {
-      stop("The number of columns of the cost and benefit matrices is different and must be the same.")
-    }
-  }
-
-  if  (!is.null(cost)) {
-    # define n.strat (could be either n_sim_costs or n_sim_effectiveness)
-    n_strategies <- n_strategies_costs
-  } else if (!is.null(effectiveness)) {
-    n_strategies <- n_strategies_effectiveness
-  }
+  # define n_strategies
+  n_strategies <- unique(unlist(lapply(n_strategies_ls[!unlist(lapply(n_strategies_ls, is.null))], ncol)))
 
   # If the strategy names are not provided, generate a generic vector
   # with strategy names

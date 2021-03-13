@@ -37,6 +37,12 @@ no strategies are filtered.}
 \item{ybreaks}{vector of axis breaks.
 will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 }
+\value{
+If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}
+object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
+A tornado plot is a visual aid used to identify which parameters are driving most of the variation
+in a specified model outcome.
+}
 \description{
 Tornado plot of a one-way sensitivity analysis
 }

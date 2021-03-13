@@ -13,6 +13,10 @@
 
 \item{...}{further arguments to summary (not used)}
 }
+\value{
+a \code{data.frame} containing the mean cost and effectiveness for each strategy and, if requested,
+the standard deviations of the cost and effectiveness for each strategy.
+}
 \description{
 summarize a psa object across all simulations
 }

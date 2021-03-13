@@ -20,7 +20,6 @@
 #' in the \code{\link{make.names}} help page, to avoid unexpected errors.
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
-#'
 create_sa <- function(parameters, parnames, effectiveness, strategies,
                       cost, currency, other_outcome) {
   # checks that each is a dataframe
@@ -120,6 +119,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 #' the strategy list to 5
 #' @param ... further arguments to print (not used)
 #'
+#' @return None (invisible NULL).
 #' @export
 print.sa <- function(x, all_strat = FALSE, ...) {
   xclass <- class(x)

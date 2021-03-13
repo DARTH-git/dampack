@@ -8,7 +8,7 @@ owsa(
   sa_obj,
   params = NULL,
   ranges = NULL,
-  nsamps = 100,
+  nsamp = 100,
   outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
   wtp = NULL,
   strategies = NULL,
@@ -27,7 +27,7 @@ that gives the ranges for the parameter of interest. If NULL,
 parameter values from the middle 95% of the PSA samples are used. The number of samples
 from this range is determined by \code{nsamp}.}
 
-\item{nsamps}{number of samples to take from the ranges}
+\item{nsamp}{number of samples to take from the ranges}
 
 \item{outcome}{either effectiveness ("eff"), cost ("cost"), net health benefit ("nhb"),
 net monetary benefit ("nmb"), or the opportunity loss in terms of NHB or
@@ -42,7 +42,7 @@ used in internal function calls of metamodel within other VOI functions.}
 Default: 2}
 }
 \value{
-A dataframe with the results of the sensitivity analysis.
+An object of class \code{data.frame} and \code{owsa} with the results of the sensitivity analysis.
 Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 }
 \description{

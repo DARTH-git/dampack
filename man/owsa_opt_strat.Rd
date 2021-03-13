@@ -49,6 +49,12 @@ changes in optimal strategy as they vary.}
 
 \item{n_x_ticks}{number of axis ticks}
 }
+\value{
+If \code{return == "plot"}, a \code{ggplot2} optimal strategy plot derived from the \code{owsa}
+object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
+The plot allows us to see how the strategy that maximizes the expectation of the outcome of interest
+changes as a function of each parameter of interest.
+}
 \description{
 plot the optimal strategy as the parameter values change
 }

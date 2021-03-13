@@ -12,9 +12,11 @@ beta_params(mean, sigma)
 \item{sigma}{standard deviation of the random variable (i.e., standard error).}
 }
 \value{
-alpha Alpha parameter of beta distribution
+a list containing the following:
 
-beta Beta parameter of beta distribution
+alpha The method-of-moments estimate for the alpha parameter of the beta distribution
+
+beta The method-of-moments estimate for the beta parameter of the beta distribution
 }
 \description{
 Function to calculate the alpha and beta parameters of the beta distribution

@@ -16,7 +16,8 @@
 #' param1 val2     \tab param2 val2 \cr
 #' ...            \tab ... \cr
 #' }
-#'
+#' @return a class \code{dsa_twoway} object that can be passed to the \code{\link{twsa}} function
+#' to visualize the two-way sensitivity analysis contained in the object.
 #' @export
 create_dsa_twoway <- function(parameters, effectiveness = NULL, strategies,
                               cost = NULL, currency = "$", other_outcome  = NULL) {

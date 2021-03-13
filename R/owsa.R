@@ -10,14 +10,14 @@
 #' @param sa_obj sensitivity analysis object;
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
 #' a deterministic sensitivity analysis object (\code{\link{run_owsa_det}})
-#' @param nsamps number of samples to take from the ranges
+#' @param nsamp number of samples to take from the ranges
 #' @inheritParams metamodel
 #' @inheritParams predict.metamodel
-#' @return A dataframe with the results of the sensitivity analysis.
+#' @return An object of class \code{data.frame} and \code{owsa} with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 #'
 #' @export
-owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
+owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
                  wtp = NULL,
                  strategies = NULL,
@@ -33,7 +33,7 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
                     strategies, outcome, wtp, "poly", poly.order)
 
     # predict outcomes using predict.metamodel
-    ow <- predict(mm, ranges, nsamps)
+    ow <- predict(mm, ranges, nsamp)
   } else if (inherits(sa_obj, "dsa_oneway")) {
     params <- sa_obj$parameters
     if (!is.null(sa_obj$other_outcome)) {
@@ -90,6 +90,8 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamps = 100,
 #' @param facet_nrow number of rows in plot facet.
 #' @inheritParams add_common_aes
 #'
+#' @return A \code{ggplot2} plot of the \code{owsa} object.
+#'
 #' @importFrom reshape2 melt
 #' @import ggplot2
 #' @export
@@ -136,6 +138,10 @@ plot.owsa <- function(x, txtsize = 12,
 #' no strategies are filtered.
 #' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
+#' @return If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}
+#' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
+#' A tornado plot is a visual aid used to identify which parameters are driving most of the variation
+#' in a specified model outcome.
 #' @importFrom stats median reorder
 #' @import ggplot2
 #' @export
@@ -227,6 +233,10 @@ offset_trans <- function(offset = 0) {
 #' @inheritParams add_common_aes
 #' @inheritParams plot.owsa
 #' @param facet_ncol Number of columns in plot facet.
+#' @return If \code{return == "plot"}, a \code{ggplot2} optimal strategy plot derived from the \code{owsa}
+#' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
+#' The plot allows us to see how the strategy that maximizes the expectation of the outcome of interest
+#' changes as a function of each parameter of interest.
 #' @import ggplot2
 #' @export
 owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,

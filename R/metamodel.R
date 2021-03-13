@@ -26,8 +26,7 @@
 #' Default: 2
 #' @inheritParams mgcv::s
 #'
-#' @return
-#' A metamodel object, which contains a list of metamodels and other relevant information.
+#' @return A metamodel object, which contains a list of metamodels and other relevant information.
 #'
 #' @seealso
 #' \code{\link{predict.metamodel}},
@@ -225,6 +224,7 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
 #'
 #' @param x metamodel to print
 #' @param ... further arguments to print
+#' @return None (invisible NULL)
 #' @export
 print.metamodel <- function(x, ...) {
   wtp <- x$wtp
@@ -248,6 +248,7 @@ print.metamodel <- function(x, ...) {
 #'
 #' @param object metamodel to summarize
 #' @param ... further arguments to summary
+#' @return a \code{data.frame} containing the r-squared for each strategy and parameter's metamodel.
 #' @export
 summary.metamodel <- function(object, ...) {
   analysis <- object$analysis
@@ -298,6 +299,8 @@ summary.metamodel <- function(object, ...) {
 #' @param ... further arguments to \code{predict} (not used)
 #'
 #' @importFrom stats quantile predict
+#' @return a \code{data.frame} containing the outcome values predicted by the metamodel
+#' for each strategy and each combination of parameter values defined by \code{ranges}.
 #' @export
 predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 

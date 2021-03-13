@@ -15,8 +15,12 @@ gamma_params(mu, sigma, scale = TRUE)
 (Default is TRUE). If FALSE, rate parameterization is retrieved}
 }
 \value{
+A list contianing the following:
+
 shape Shape parameter of gamma distribution
+
 scale Scale parameter of gamma distribution (If scale=TRUE)
+
 rate Rate parameter of gamma distribution (If scale=FALSE)
 }
 \description{
@@ -38,14 +42,12 @@ and
 }
 
 \examples{
-\dontrun{
 mu    <- 2
 sigma <- 1
 # Scale specification
 gamma_params(mu, sigma)
 # Rate specification
 gamma_params(mu, sigma, scale = FALSE)
-}
 }
 \references{
 \itemize{

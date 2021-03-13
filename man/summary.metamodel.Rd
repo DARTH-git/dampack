@@ -11,6 +11,9 @@
 
 \item{...}{further arguments to summary}
 }
+\value{
+a \code{data.frame} containing the r-squared for each strategy and parameter's metamodel.
+}
 \description{
 Summary of metamodel
 }

@@ -13,6 +13,7 @@ rdirichlet(n, alpha)
 
 
  @importFrom stats rgamma
+ @return A vector random values sampled from a dirichlet distribution
  @export}
 }
 \description{

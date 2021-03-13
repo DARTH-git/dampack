@@ -31,6 +31,9 @@
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}
 }
+\value{
+A \code{ggplot2} plot of the two-way sensitivity analysis.
+}
 \description{
 Two-way sensitivity analysis plot
 }

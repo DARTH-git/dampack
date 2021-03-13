@@ -26,7 +26,6 @@
 #' \code{\link{make_psa_obj}},
 #' \code{\link{gen_psa_samp}},
 #' @export
-
 run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
                     strategies = NULL, currency = "$", progress = TRUE, ...) {
   opt_arg_val <- list(...)

@@ -103,6 +103,8 @@ check_df_and_coerce <- function(obj) {
 #' @param ... further arguments to summary (not used)
 #'
 #' @importFrom stats sd
+#' @return a \code{data.frame} containing the mean cost and effectiveness for each strategy and, if requested,
+#' the standard deviations of the cost and effectiveness for each strategy.
 #' @export
 summary.psa <- function(object, calc_sds = FALSE, ...) {
 
@@ -137,6 +139,8 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @import reshape2
 #' @import ggplot2
 #' @importFrom scales dollar_format
+#' @return A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy
+#' on the cost-effectiveness plane.
 #' @export
 plot.psa <- function(x,
                      center = TRUE, ellipse = TRUE,

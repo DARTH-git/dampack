@@ -128,7 +128,6 @@
 #' @importFrom truncnorm rtruncnorm
 #' @importFrom triangle rtriangle
 #' @export
-
 gen_psa_samp <- function(params = NULL,
                          dists = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
                                   "dirichlet", "bootstrap", "constant", "triangle"),
@@ -272,8 +271,8 @@ gen_psa_samp <- function(params = NULL,
 #'
 #'
 #'  @importFrom stats rgamma
+#'  @return A vector random values sampled from a dirichlet distribution
 #'  @export
-
 rdirichlet <- function(n, alpha) {
     k <- length(alpha)
     out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
@@ -300,8 +299,9 @@ rdirichlet <- function(n, alpha) {
 #' and
 #' \deqn{\beta = \alpha (\frac{1}{\mu} -1)}
 #'
-#' @return alpha Alpha parameter of beta distribution
-#' @return beta Beta parameter of beta distribution
+#' @return a list containing the following:
+#' @return alpha The method-of-moments estimate for the alpha parameter of the beta distribution
+#' @return beta The method-of-moments estimate for the beta parameter of the beta distribution
 #' @export
 beta_params <- function(mean, sigma) {
   alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
@@ -338,14 +338,12 @@ beta_params <- function(mean, sigma) {
 #' \item Narayanan A. A note on parameter estimation in the multivariate beta
 #' distribution. Comput Math with Appl. 1992;24(10):11–7.
 #' }
-#' @return alpha Alpha parameters of dirichlet distribution
+#' @return numeric vector of method-of-moment estimates for the alpha parameters of the
+#'  dirichlet distribution
 #' @examples
-#' \dontrun{
 #' p.mean <- c(0.5, 0.15, 0.35)
 #' p.se   <- c(0.035, 0.025, 0.034)
 #' dirichlet_params(p.mean, p.se)
-#' # True values: 100, 30, 70
-#' }
 #' @export
 dirichlet_params <- function(p.mean, sigma) {
   n.params <- length(p.mean)
@@ -355,7 +353,7 @@ dirichlet_params <- function(p.mean, sigma) {
 
   # Compute second moment
   p.2 <- sigma ^ 2 + p.mean ^ 2
-  # Initialize alpa vector
+  # Initialize alpha vector
   alpha <- numeric(n.params)
   for (i in 1:(n.params - 1)) {
     alpha[i] <- (p.mean[1] - p.2[1]) * p.mean[i] / (p.2[1] - p.mean[1] ^ 2)
@@ -393,19 +391,17 @@ dirichlet_params <- function(p.mean, sigma) {
 #' Encyclopedia. Retrieved 17:23, February 11, 2018,
 #' from https://en.wikipedia.org/w/index.php?title=Gamma_distribution&oldid=824541785
 #' }
-#' @return
-#' shape Shape parameter of gamma distribution
-#' scale Scale parameter of gamma distribution (If scale=TRUE)
-#' rate Rate parameter of gamma distribution (If scale=FALSE)
+#' @return A list contianing the following:
+#' @return shape Shape parameter of gamma distribution
+#' @return scale Scale parameter of gamma distribution (If scale=TRUE)
+#' @return rate Rate parameter of gamma distribution (If scale=FALSE)
 #' @examples
-#' \dontrun{
 #' mu    <- 2
 #' sigma <- 1
 #' # Scale specification
 #' gamma_params(mu, sigma)
 #' # Rate specification
 #' gamma_params(mu, sigma, scale = FALSE)
-#' }
 #' @export
 gamma_params <- function(mu, sigma, scale = TRUE) {
   if (scale) {
@@ -421,8 +417,6 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
   }
   return(params)
 }
-
-
 
 
 #' Calculate location and scale parameters of a log-normal distribution.
@@ -452,16 +446,14 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
 #' Encyclopedia. Retrieved 16:47, April 23, 2017,
 #' from https://en.wikipedia.org/w/index.php?title=Log-normal_distribution&oldid=776357974
 #' }
-#' @return
-#' mu Location parameter of log-normal distribution
-#' sigma Scale parameter of log-normal distribution
+#' @return A list containing the following:
+#' @return mu Location parameter of log-normal distribution
+#' @return sigma Scale parameter of log-normal distribution
 #' @examples
-#' \dontrun{
 #' m <- 3
 #' v <- 0.01
 #' lnorm_params(m, v)
 #' # True values: 100, 30, 70
-#' }
 #' @export
 lnorm_params <- function(m = 1, v = 1) {
   ### Sanity checkd

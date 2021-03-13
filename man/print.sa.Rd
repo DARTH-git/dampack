@@ -14,6 +14,9 @@ the strategy list to 5}
 
 \item{...}{further arguments to print (not used)}
 }
+\value{
+None (invisible NULL).
+}
 \description{
 print a psa object
 }

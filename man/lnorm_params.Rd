@@ -13,7 +13,10 @@ lnorm_params(m = 1, v = 1)
 (i.e., squared standar error).}
 }
 \value{
+A list containing the following:
+
 mu Location parameter of log-normal distribution
+
 sigma Scale parameter of log-normal distribution
 }
 \description{
@@ -34,12 +37,10 @@ and
 }
 
 \examples{
-\dontrun{
 m <- 3
 v <- 0.01
 lnorm_params(m, v)
 # True values: 100, 30, 70
-}
 }
 \references{
 \enumerate{

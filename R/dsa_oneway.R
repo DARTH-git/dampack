@@ -18,6 +18,8 @@
 #' ...            \tab ... \cr
 #' }
 #'
+#' @return a class \code{dsa_oneway} object that can be passed to the \code{\link{owsa}} function
+#' to visualize the one-way sensitivity analyses contained in the object.
 #' @export
 create_dsa_oneway <- function(parameters, effectiveness = NULL, strategies,
                               cost = NULL, currency = "$", other_outcome = NULL) {

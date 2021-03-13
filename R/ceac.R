@@ -13,7 +13,10 @@
 #' cost-effective at each \code{wtp} threshold. The returned object has classes
 #' \code{ceac} and \code{data.frame}, and has its own plot method (\code{\link{plot.ceac}}).
 #'
-#' @return An object of class \code{ceac} that can be visualized with \code{plot}.
+#' @return An object of class \code{ceac} that can be visualized with \code{plot}. The \code{ceac}
+#' object is a data.frame that shows the proportion of PSA samples for which each strategy at each
+#' WTP threshold is cost-effective. The final column indicates whether or not the strategy at a
+#' particular WTP is on the cost-efficient frontier.
 #'
 #' @examples
 #' # psa input provided with package
@@ -38,7 +41,10 @@
 #' # the ceac object is also a data frame
 #' head(ceac_obj)
 #'
-#' # summary() tells us the regions of cost-effectiveness for each strategy
+#' # summary() tells us the regions of cost-effectiveness for each strategy.
+#' # Note that the range_max column is an open parenthesis, meaning that the
+#' # interval over which that strategy is cost-effective goes up to but does not include
+#' # the value in the range_max column.
 #' summary(ceac_obj)
 #'
 #' @seealso

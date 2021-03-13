@@ -18,6 +18,10 @@ from this range is determined by \code{nsamp}.}
 
 \item{...}{further arguments to \code{predict} (not used)}
 }
+\value{
+a \code{data.frame} containing the outcome values predicted by the metamodel
+for each strategy and each combination of parameter values defined by \code{ranges}.
+}
 \description{
 Predict from a one-way or two-way metamodel
 }

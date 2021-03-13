@@ -50,6 +50,10 @@ Each simulation should be a row of the data frame, and each strategy should be a
 Naming the columns of the data frames is not necessary, as they will be renamed with
 the \code{strategies} vector.}
 }
+\value{
+a class \code{dsa_twoway} object that can be passed to the \code{\link{twsa}} function
+to visualize the two-way sensitivity analysis contained in the object.
+}
 \description{
 The object returned by this function can be passed to
 \code{\link{owsa}} to do a one-way sensitivity analysis on each

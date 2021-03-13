@@ -43,6 +43,9 @@ which determines the number of rows and columns automatically.}
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}
 }
+\value{
+A \code{ggplot2} plot of the \code{owsa} object.
+}
 \description{
 Plot a sensitivity analysis
 }

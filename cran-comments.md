@@ -5,8 +5,11 @@ This is a resubmission. In this version I have:
 
 * changed the quotes around package title to undirected quotation marks.
 
-* removed write.table() and ggsave() function uses from the basic_cea.rmd vignette to comply with CRAN's policies. These were the only offending functions I could find--if there are others that I am overlooking, please let me know and I will happily fix them!
+* Added \value to .Rd files regarding exported methods and explained the functions results in the documentation.
 
+* Unwrapped examples previously wrapped with \dontrun{}
+
+* removed write.table() and ggsave() function uses from the basic_cea.rmd vignette to comply with CRAN's policies. These were the only offending functions I could find--if there are others that I am overlooking, please let me know and I will happily fix them!
 
 ## Test environments
 * local Win install, R 4.0.3
@@ -21,7 +24,7 @@ The following issues were raised in the note associated with checking CRAN incom
 
 1) this package is a new submission
 
-This is a new submission in the sense that the package has not yet been accepted to CRAN, but this is not my first time submitting the package. I mistakenly deleted the file specifying that the package had already been submitted to CRAN and never committed the package after using devtools::release(). I'm not sure, but the inclusion of this file might have altered this particular note.
+This is a new submission in the sense that the package has not yet been accepted to CRAN, but this is not my first time submitting the package.
 
 2) Possibly mis-spelled words in DESCRIPTION:
    Hunink (27:50)

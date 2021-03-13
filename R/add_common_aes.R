@@ -120,7 +120,7 @@ labfun <- function(x) {
 #' \code{ggplot2} plots. Non-integer values are rounded down.
 #' @section Details:
 #' Based on function \code{pretty}.
-#' @export
+#' @keywords internal
 number_ticks <- function(n) {
   function(limits) {
     pretty(limits, n + 1)

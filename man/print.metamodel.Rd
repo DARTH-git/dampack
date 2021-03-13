@@ -11,6 +11,9 @@
 
 \item{...}{further arguments to print}
 }
+\value{
+None (invisible NULL)
+}
 \description{
 Print metamodel
 }

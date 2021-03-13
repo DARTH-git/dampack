@@ -51,6 +51,10 @@ will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}
 }
+\value{
+A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy
+on the cost-effectiveness plane.
+}
 \description{
 Plot the psa object
 }

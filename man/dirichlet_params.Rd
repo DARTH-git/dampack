@@ -13,7 +13,8 @@ dirichlet_params(p.mean, sigma)
 (i.e., standard error).}
 }
 \value{
-alpha Alpha parameters of dirichlet distribution
+numeric vector of method-of-moment estimates for the alpha parameters of the
+ dirichlet distribution
 }
 \description{
 Function to calculate the \eqn{\alpha} parameters of the Dirichlet distribution
@@ -32,12 +33,9 @@ for \eqn{i = 1, \ldots, J-1}, and
 }
 
 \examples{
-\dontrun{
 p.mean <- c(0.5, 0.15, 0.35)
 p.se   <- c(0.035, 0.025, 0.034)
 dirichlet_params(p.mean, p.se)
-# True values: 100, 30, 70
-}
 }
 \references{
 \enumerate{

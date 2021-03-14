@@ -27,10 +27,9 @@ The following issues were raised in the note associated with checking CRAN incom
 This is a new submission in the sense that the package has not yet been accepted to CRAN, but this is not my first time submitting the package.
 
 2) Possibly mis-spelled words in DESCRIPTION:
-   Hunink (27:50)
-   al (27:60)
-   dampack (27:9)
-   et (27:57)
+  Hunink (26:91)
+  al (26:101)
+  et (26:98)
 
 Hunink is a name that is correctly spelled, and the other possibly mis-spelled words are spelled correctly.
 

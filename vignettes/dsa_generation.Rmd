@@ -310,7 +310,8 @@ Each `owsa` object returned by `run_owsa_det` is a data frame with four columns:
 my_owsa_NMB <- l_owsa_det$owsa_NMB
 
 # Plot outcome of each strategy over each parameter range
-plot(my_owsa_NMB)
+plot(my_owsa_NMB,
+     n_x_ticks = 3)
 
 # Visualize optimal strategy (max NMB) over each parameter range
 owsa_opt_strat(my_owsa_NMB)

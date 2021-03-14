@@ -163,7 +163,8 @@ o <- owsa(psa_obj)
 The output of the `owsa()` function has customized plotting functionality that can be explored by typing `?plot.owsa` in the console. Like all other plots produced by `dampack`, plots derived from the `owsa` object are `ggplot` objects and can be readily customized. 
 
 ```{r, fig.width = 7, fig.height = 5, fig.align = "center"}
-plot(o)
+plot(o,
+     n_x_ticks = 2)
 ```
 
 ### Tornado Plot

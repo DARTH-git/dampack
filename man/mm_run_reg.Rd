@@ -29,6 +29,9 @@ Default: 2}
 
 \item{all_params}{all params in PSA}
 }
+\value{
+a statistical metamodel
+}
 \description{
 Build formula and run linear regression for metamodel
 }

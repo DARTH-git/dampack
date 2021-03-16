@@ -341,6 +341,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 #' @param tmp_replace values from predetermined DSA samples that will replace some values in \code{tmp_input}
 #'
 #' @importFrom  utils setTxtProgressBar
+#' @return output of function defined by \code{user_fun}
 #' @keywords internal
 wrapper_of_user_model <- function(x, user_fun, param_name,
                                   tmp_input, tmp_replace,

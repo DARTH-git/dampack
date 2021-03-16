@@ -34,9 +34,13 @@ the \code{strategies} vector.}
 
 \item{currency}{symbol for the currency being used (ex. "$", "£")}
 }
+\value{
+returns "sa" sensitivity analysis object.
+}
 \description{
 This function is called by \code{\link{make_psa_obj}},
 \code{\link{create_dsa_oneway}},
 and \code{\link{create_dsa_oneway}}, and checks the structure of
 each of the arguments before creating an SA object.
 }
+\keyword{internal}

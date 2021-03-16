@@ -10,6 +10,9 @@ predict_matrix_tensor_smooth_ga(
   vrf = rep(1, ncol(param_vals))
 )
 }
+\value{
+tensor product based on list of pre-posterior distributions
+}
 \description{
 Function to compute the preposterior for each of the
 basis functions for one or more parameters and calculates

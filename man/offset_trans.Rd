@@ -9,6 +9,9 @@ offset_trans(offset = 0)
 \arguments{
 \item{offset}{the offset for the transformation (kind of the new 0)}
 }
+\value{
+offset value supplied to ytrans in \code{add_common_aes}
+}
 \description{
 transformation for owsa_tornado
 }

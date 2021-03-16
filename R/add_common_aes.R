@@ -20,6 +20,7 @@
 #' for how to modify this.
 #' @param ... further arguments to plot.
 #' This is not used by \code{dampack} but required for generic consistency.
+#' @return a \code{ggplot2} plot updated with a common aesthetic
 #'
 #' @import ggplot2
 #' @keywords internal
@@ -104,6 +105,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
 #' used to automatically label continuous scales
 #' @keywords internal
 #' @param x axis breaks
+#' @return  a character vector giving a label for each input value
 labfun <- function(x) {
   if (any(x > 999, na.rm = TRUE)) {
     comma(x)
@@ -120,6 +122,7 @@ labfun <- function(x) {
 #' \code{ggplot2} plots. Non-integer values are rounded down.
 #' @section Details:
 #' Based on function \code{pretty}.
+#' @return a vector of axis-label breaks
 #' @keywords internal
 number_ticks <- function(n) {
   function(limits) {

@@ -20,6 +20,8 @@
 #' in the \code{\link{make.names}} help page, to avoid unexpected errors.
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
+#' @return returns "sa" sensitivity analysis object.
+#' @keywords internal
 create_sa <- function(parameters, parnames, effectiveness, strategies,
                       cost, currency, other_outcome) {
   # checks that each is a dataframe

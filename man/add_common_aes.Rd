@@ -65,6 +65,9 @@ for how to modify this.}
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}
 }
+\value{
+a \code{ggplot2} plot updated with a common aesthetic
+}
 \description{
 Adds aesthetics to all plots to reduce code duplication
 }

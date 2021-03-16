@@ -120,6 +120,8 @@ calc_evsi <- function(psa,
 #' @param object gam object
 #' @param n scalar or vector of new sample size to compute evsi on
 #' @param n0 scalar or vector of effective prior sample size
+#' @return the conditional loss associated with a gam, effective prior sample size,
+#' and new sample size
 #' @importFrom stats coef
 predict_ga <- function(object, n, n0) {
   # Name of parameters
@@ -191,7 +193,7 @@ predict_ga <- function(object, n, n0) {
 #' basis functions of a smooth for one parameter
 #'
 #' @keywords internal
-#'
+#' @return Pre-posterior for each basis function
 #' @importFrom mgcv PredictMat
 predict_smooth_ga <- function(object, param_vals, vrf = 1) {
   # Produce basis functions for one parameter
@@ -219,7 +221,7 @@ predict_smooth_ga <- function(object, param_vals, vrf = 1) {
 #' the tensor product if more than one parameter is selected
 #' (Heavily based on function Predict.matrix.tensor.smooth from
 #' mgcv package)
-#'
+#' @return tensor product based on list of pre-posterior distributions
 #' @keywords internal
 #' @importFrom mgcv tensor.prod.model.matrix Predict.matrix PredictMat
 predict_matrix_tensor_smooth_ga <- function(object,

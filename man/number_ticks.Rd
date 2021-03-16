@@ -10,6 +10,9 @@ number_ticks(n)
 \item{n}{integer giving the desired number of ticks on axis of
 \code{ggplot2} plots. Non-integer values are rounded down.}
 }
+\value{
+a vector of axis-label breaks
+}
 \description{
 Function for determining number of ticks on axis of \code{ggplot2} plots.
 }

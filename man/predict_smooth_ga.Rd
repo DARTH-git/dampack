@@ -7,6 +7,9 @@ basis functions of a smooth for one parameter}
 \usage{
 predict_smooth_ga(object, param_vals, vrf = 1)
 }
+\value{
+Pre-posterior for each basis function
+}
 \description{
 Function to compute the preposterior for each of the
 basis functions of a smooth for one parameter

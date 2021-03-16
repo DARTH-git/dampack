@@ -135,6 +135,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 #'
 #' @importFrom mgcv gam
 #' @keywords internal
+#' @return a statistical metamodel
 #' @inheritParams metamodel
 mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
 
@@ -430,6 +431,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 #' @param nsamp number of points from the range
 #' @param psa_paramvals sampled values from the PSA. used to calculate the
 #' range if none is supplied
+#' @return a vector of parameter values spanning the range specified
 #' @keywords internal
 make_param_seq <- function(p, ranges, nsamp, psa_paramvals) {
   p_range <- ranges[[p]]

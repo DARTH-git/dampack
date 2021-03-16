@@ -9,6 +9,9 @@ labfun(x)
 \arguments{
 \item{x}{axis breaks}
 }
+\value{
+a character vector giving a label for each input value
+}
 \description{
 used to automatically label continuous scales
 }

@@ -213,6 +213,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
 
 #' transformation for owsa_tornado
 #' @param offset the offset for the transformation (kind of the new 0)
+#' @return offset value supplied to ytrans in \code{add_common_aes}
 #' @keywords internal
 #' @importFrom scales trans_new
 offset_trans <- function(offset = 0) {
@@ -322,7 +323,11 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   }
 }
 
-# check that is owsa object
+
+#' check that object is owsa object
+#' @param obj the object to be checked for the owsa class
+#' @return returns TRUE if object is "owsa" object and FALSE if not.
+#' @keywords internal
 is_owsa <- function(obj) {
   if (inherits(obj, "owsa")) {
     return(TRUE)

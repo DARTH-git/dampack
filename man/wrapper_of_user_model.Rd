@@ -26,6 +26,9 @@ wrapper_of_user_model(
 
 \item{tmp_replace}{values from predetermined DSA samples that will replace some values in \code{tmp_input}}
 }
+\value{
+output of function defined by \code{user_fun}
+}
 \description{
 Wrapper function for owsa_det and twsa_det
 }

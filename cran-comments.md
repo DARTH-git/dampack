@@ -1,15 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* removed the name of the package from the start of the description.
-
-* changed the quotes around package title to undirected quotation marks.
-
-* Added \value to .Rd files regarding exported methods and explained the functions results in the documentation.
-
-* Unwrapped examples previously wrapped with \dontrun{}
-
-* removed write.table() and ggsave() function uses from the basic_cea.rmd vignette to comply with CRAN's policies. These were the only offending functions I could find--if there are others that I am overlooking, please let me know and I will happily fix them!
+* Added \value to .Rd files regarding exported methods.
 
 ## Test environments
 * local Win install, R 4.0.3

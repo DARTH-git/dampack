@@ -14,6 +14,10 @@ predict_ga(object, n, n0)
 
 \item{n0}{scalar or vector of effective prior sample size}
 }
+\value{
+the conditional loss associated with a gam, effective prior sample size,
+and new sample size
+}
 \description{
 Function to compute the preposterior for each of the
 basis functions of the GAM model.

@@ -4,7 +4,7 @@
 #' @param cost data frame with costs
 #' @param effect data frame with effects
 #' @param wtp willingness-to-pay threshold
-#'
+#' @return a data.frame of the desired outcome values for each strategy
 #' @keywords internal
 calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss",
                                           "nmb_loss", "nhb_loss_voi", "nmb_loss_voi"),

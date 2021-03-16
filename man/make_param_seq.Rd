@@ -16,6 +16,9 @@ make_param_seq(p, ranges, nsamp, psa_paramvals)
 \item{psa_paramvals}{sampled values from the PSA. used to calculate the
 range if none is supplied}
 }
+\value{
+a vector of parameter values spanning the range specified
+}
 \description{
 make a parameter sequence
 }

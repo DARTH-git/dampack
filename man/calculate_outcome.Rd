@@ -21,6 +21,9 @@ calculate_outcome(
 
 \item{wtp}{willingness-to-pay threshold}
 }
+\value{
+a data.frame of the desired outcome values for each strategy
+}
 \description{
 A function that is used to calculate all outcomes
 }

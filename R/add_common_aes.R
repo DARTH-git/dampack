@@ -58,16 +58,30 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   col <- match.arg(col)
   col_aes <- match.arg(col_aes, several.ok = TRUE)
   if (col == "full") {
-    p <- p +
-      scale_color_discrete(name = scale_name, l = lval,
-                           aesthetics = col_aes,
-                           drop = FALSE)
+    if ("color" %in% col_aes) {
+      p <- p +
+        scale_color_discrete(name = scale_name, l = lval,
+                             aesthetics = "color",
+                             drop = FALSE)
+    } else if ("fill" %in% col_aes) {
+      p <- p +
+        scale_fill_discrete(name = scale_name, l = lval,
+                            aesthetics = "fill",
+                            drop = FALSE)
+    }
   }
   if (col == "bw") {
-    p <- p +
-      scale_color_grey(name = scale_name, start = greystart, end = greyend,
-                       aesthetics = col_aes,
-                       drop = FALSE)
+    if ("color" %in% col_aes) {
+      p <- p +
+        scale_color_grey(name = scale_name, start = greystart, end = greyend,
+                         aesthetics = "color",
+                         drop = FALSE)
+    } else if ("fill" %in% col_aes) {
+      p <- p +
+        scale_fill_grey(name = scale_name, start = greystart, end = greyend,
+                        aesthetics = "fill",
+                        drop = FALSE)
+    }
   }
 
   # axes and axis ticks

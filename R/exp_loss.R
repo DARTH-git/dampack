@@ -37,6 +37,7 @@
 #'
 #' # the y axis is on a log scale by default
 #' plot(exp_loss, log_y = FALSE)
+#' @importFrom tidyr pivot_longer
 #' @export
 calc_exp_loss <- function(psa, wtp) {
   check_psa_object(psa)

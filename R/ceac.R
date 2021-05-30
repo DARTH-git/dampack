@@ -51,6 +51,7 @@
 #' \code{\link{plot.ceac}}, \code{\link{summary.ceac}}
 #'
 #'
+#' @importFrom tidyr pivot_longer
 #' @export
 ceac <- function(wtp, psa) {
   # check that psa has class 'psa'

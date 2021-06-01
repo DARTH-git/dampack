@@ -141,6 +141,7 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @importFrom scales dollar_format
 #' @return A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy
 #' on the cost-effectiveness plane.
+#' @importFrom tidyr pivot_longer
 #' @export
 plot.psa <- function(x,
                      center = TRUE, ellipse = TRUE,
@@ -160,14 +161,16 @@ plot.psa <- function(x,
   # expect that effectiveness and costs have strategy column names
   # removes confusing 'No id variables; using all as measure variables'
   df_cost <- suppressMessages(
-    melt(cost, variable.name = "Strategy",
-         factorsAsStrings = TRUE,
-         value.name = "Cost")
+    pivot_longer(cost,
+                 everything(),
+                 names_to = "Strategy",
+                 values_to = "Cost")
   )
   df_effect <- suppressMessages(
-    melt(effectiveness, variable.name = "Strategy",
-         factorsAsStrings = TRUE,
-         value.name = "Effectiveness")
+    pivot_longer(effectiveness,
+                 cols = everything(),
+                 names_to = "Strategy",
+                 values_to = "Effectiveness")
   )
   ce_df <- data.frame("Strategy" = df_cost$Strategy,
                       "Cost" = df_cost$Cost,

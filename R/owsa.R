@@ -92,7 +92,6 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 #'
 #' @return A \code{ggplot2} plot of the \code{owsa} object.
 #'
-#' @importFrom reshape2 melt
 #' @import ggplot2
 #' @export
 plot.owsa <- function(x, txtsize = 12,

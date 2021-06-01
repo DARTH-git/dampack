@@ -137,7 +137,7 @@ labfun <- function(x) {
 #' @section Details:
 #' Based on function \code{pretty}.
 #' @return a vector of axis-label breaks
-#' @keywords internal
+#' @export
 number_ticks <- function(n) {
   function(limits) {
     pretty(limits, n + 1)

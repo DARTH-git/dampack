@@ -21,4 +21,3 @@ Function for determining number of ticks on axis of \code{ggplot2} plots.
 Based on function \code{pretty}.
 }
 
-\keyword{internal}

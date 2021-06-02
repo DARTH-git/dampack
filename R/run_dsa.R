@@ -177,11 +177,11 @@ if (n_outcomes == 1) {
 #' "min", and "max". The number of samples from this range is
 #' determined by \code{nsamp}. "pars" are the 2 parameters of interest, which must be a subset of
 #' the parameters from \code{params_basecase}.
-#' @param params_basecase a named list of basecase values for input parameters needed by \code{FUN},
+#' @param params_basecase a named list of base case values for input parameters needed by \code{FUN},
 #' the user-defined function.
 #' @param nsamp number of parameter values. If \code{NULL}, 40 parameter values are
 #' used
-#' @param FUN Function that takes the basecase in \code{params_all} and \code{...} to
+#' @param FUN Function that takes the base case in \code{params_all} and \code{...} to
 #' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}
@@ -235,7 +235,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 
   if (!all((params_basecase[poi] >= params_range[, 2]) &
            (params_basecase[poi] <= params_range[, 3]))) {
-    stop("basecase has to be in between min and max")
+    stop("base case has to be in between min and max")
   }
 
   names(params_range) <- c("pars", "min", "max")
@@ -245,7 +245,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   },
   error = function(e) NA)
   if (is.na(sum(is.na(jj)))) {
-    stop("FUN is not well defined by the basecase parameter values and ...")
+    stop("FUN is not well defined by the base case parameter values and ...")
   }
 
   userfun <- do.call(FUN, fun_input_ls)

@@ -16,13 +16,13 @@ run_psa(
 )
 }
 \arguments{
-\item{psa_samp}{A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)}
+\item{psa_samp}{A data frame with samples of parameters for a probabilistic sensitivity analysis (PSA)}
 
-\item{params_basecase}{a named list of basecase values for input parameters needed by \code{FUN},
+\item{params_basecase}{a named list of base case values for input parameters needed by \code{FUN},
 the user-defined function.}
 
 \item{FUN}{Function that takes the parameter values in \code{psa_samp} and \code{...} to
-produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
+produce the \code{outcome} of interest. The \code{FUN} must return a data frame
 where the first column are the strategy names and the rest of the columns must be outcomes.}
 
 \item{outcomes}{String vector with the outcomes of interest from \code{FUN}.}

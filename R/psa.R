@@ -176,6 +176,9 @@ plot.psa <- function(x,
                       "Cost" = df_cost$Cost,
                       "Effectiveness" = df_effect$Effectiveness)
 
+  # make strategies in psa object into ordered factors
+  ce_df$Strategy <- factor(ce_df$Strategy, levels = strategies, ordered = TRUE)
+
   psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
     geom_point(size = 0.7, alpha = alpha, shape = 21) +
     ylab(paste("Cost (", currency, ")", sep = ""))
@@ -186,6 +189,8 @@ plot.psa <- function(x,
       group_by(.data$Strategy) %>%
       summarize(Cost.mean = mean(.data$Cost),
                 Eff.mean = mean(.data$Effectiveness))
+    # make strategies in psa object into ordered factors
+    strat_means$Strategy <- factor(strat_means$Strategy, levels = strategies, ordered = TRUE)
     psa_plot <- psa_plot +
       geom_point(data = strat_means,
                  aes_string(x = "Eff.mean", y = "Cost.mean", fill = "Strategy"),

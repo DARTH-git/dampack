@@ -66,6 +66,8 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
       tw <- rbind(tw, new_df, stringsAsFactors = FALSE)
     }
     names(tw)[1:2] <- parnames
+    # make strategies in owsa object into ordered factors
+    tw$strategy <- factor(tw$strategy, levels = strategies, ordered = TRUE)
   } else {
     stop("either a psa or dsa_twoway object must be provided")
   }

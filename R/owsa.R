@@ -63,6 +63,8 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
                              "param_val" = param_val,
                              "outcome_val" = outcome_val)
         ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
+        # make strategies in owsa object into ordered factors
+        ow$strategy <- factor(ow$strategy, levels = strategies, ordered = TRUE)
       }
     }
 

@@ -136,7 +136,6 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #'
 #' @importFrom ellipse ellipse
 #' @import dplyr
-#' @import reshape2
 #' @import ggplot2
 #' @importFrom scales dollar_format
 #' @return A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy

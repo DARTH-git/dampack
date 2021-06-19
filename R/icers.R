@@ -194,7 +194,7 @@ calculate_icers <- function(cost, effect, strategies) {
 #' set to \code{TRUE}, four additional columns are provided for the 2.5th and 97.5th quantiles for
 #' each strategy's cost and effect.
 #' @seealso \code{\link{plot.icers}}
-#' @seealso \code{\link{calculate.icers}}
+#' @seealso \code{\link{calculate_icers}}
 #' @importFrom tidyr pivot_longer
 calculate_icers_psa <- function(psa, uncertainty = FALSE) {
 
@@ -218,13 +218,13 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
     # Calculate quantiles across costs and effects
     cost_bounds <- cost %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
-      group_by(Strategy) %>%
+      group_by(.data$Strategy) %>%
       summarize(LB_95_Cost = quantile(.data$value, probs = 0.025),
                 UB_95_Cost = quantile(.data$value, probs = 0.975))
 
     effect_bounds <- effect %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
-      group_by(Strategy) %>%
+      group_by(.data$Strategy) %>%
       summarize(LB_95_Effect = quantile(.data$value, probs = 0.025),
                 UB_95_Effect = quantile(.data$value, probs = 0.975))
 
@@ -232,9 +232,9 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
     icers <- icers %>%
       left_join(cost_bounds, by = "Strategy") %>%
       left_join(effect_bounds, by = "Strategy") %>%
-      select(Strategy, Cost, LB_95_Cost, UB_95_Cost,
-             Effect, LB_95_Effect, UB_95_Effect,
-             Inc_Cost, Inc_Effect, ICER, Status)
+      select(.data$Strategy, .data$Cost, .data$LB_95_Cost, .data$UB_95_Cost,
+             .data$Effect, .data$LB_95_Effect, .data$UB_95_Effect,
+             .data$Inc_Cost, .data$Inc_Effect, .data$ICER, .data$Status)
     }
 
   return(icers)
@@ -307,9 +307,9 @@ plot.icers <- function(x,
   if (ncol(x) > 7) {
     # reformat icers class object if uncertainty bounds are present
     x <- x %>%
-      select(Strategy, Cost, Effect,
-             Inc_Cost, Inc_Effect,
-             ICER, Status)
+      select(.data$Strategy, .data$Cost, .data$Effect,
+             .data$Inc_Cost, .data$Inc_Effect,
+             .data$ICER, .data$Status)
   }
 
   # type checking

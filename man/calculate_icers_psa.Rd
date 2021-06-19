@@ -36,5 +36,5 @@ even if present in the ICER table.
 \seealso{
 \code{\link{plot.icers}}
 
-\code{\link{calculate.icers}}
+\code{\link{calculate_icers}}
 }

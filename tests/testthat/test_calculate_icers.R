@@ -61,3 +61,66 @@ test_that("one strategy runs", {
                        stringsAsFactors = FALSE)
   expect_equal(cea, exp_df)
 })
+
+# import psa
+data("example_psa")
+psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
+                        example_psa$parameters, example_psa$strategies)
+
+# function runs w/o error (uncertainty = FALSE)
+test_that("calculate_icers_psa runs (no uncertainty)", {
+  expect_silent(calculate_icers_psa(psa_big))
+})
+
+# function runs w/o error (uncertainty = TRUE)
+test_that("calculate_icers_psa runs (w/ uncertainty)", {
+  expect_silent(calculate_icers_psa(psa_big, uncertainty = TRUE))
+})
+
+# mean costs and effect extracted as base case
+test_that("psa icers returns icers df corresponding to means", {
+  psa_icers <- calculate_icers_psa(psa_big)
+  psa_sum <- summary(psa_big)
+  exp_icers <- calculate_icers(cost = psa_sum$meanCost,
+                               effect = psa_sum$meanEffect,
+                               strategies = psa_sum$Strategy)
+  expect_equal(psa_icers, exp_icers)
+})
+
+# 95% quantiles are correct
+test_that("quantiles returned are correct", {
+  psa_icers_unc <- calculate_icers_psa(psa_big, uncertainty = TRUE)
+  quantiles <- as.data.frame(psa_icers_unc[, c("Lower_95_Cost", "Upper_95_Cost",
+                                               "Lower_95_Effect", "Upper_95_Effect")])
+  quantiles_exp <- data.frame(Lower_95_Cost = c(quantile(psa_big$cost$Radio, 0.025),
+                                                quantile(psa_big$cost$Chemo, 0.025),
+                                                quantile(psa_big$cost$Surg, 0.025)),
+                              Upper_95_Cost = c(quantile(psa_big$cost$Radio, 0.975),
+                                                quantile(psa_big$cost$Chemo, 0.975),
+                                                quantile(psa_big$cost$Surg, 0.975)),
+                              Lower_95_Effect = c(quantile(psa_big$effectiveness$Radio, 0.025),
+                                                  quantile(psa_big$effectiveness$Chemo, 0.025),
+                                                  quantile(psa_big$effectiveness$Surg, 0.025)),
+                              Upper_95_Effect = c(quantile(psa_big$effectiveness$Radio, 0.975),
+                                                  quantile(psa_big$effectiveness$Chemo, 0.975),
+                                                  quantile(psa_big$effectiveness$Surg, 0.975)))
+  expect_equal(quantiles, quantiles_exp)
+})
+
+test_that("plot.icers runs for PSA icers", {
+  psa_icers <- calculate_icers_psa(psa_big)
+  psa_icers_unc <- calculate_icers_psa(psa_big, uncertainty = TRUE)
+  expect_silent({
+    plot(psa_icers)
+    plot(psa_icers_unc)
+  })
+})
+
+test_that("plot.icers produces identical results for uncertainty and w/o", {
+  psa_icers <- calculate_icers_psa(psa_big)
+  psa_icers_unc <- calculate_icers_psa(psa_big, uncertainty = TRUE)
+  icers1 <- plot(psa_icers)
+  icers2 <- plot(psa_icers_unc)
+  expect_equal(icers1, icers2)
+})
+

@@ -196,6 +196,7 @@ calculate_icers <- function(cost, effect, strategies) {
 #' @seealso \code{\link{plot.icers}}
 #' @seealso \code{\link{calculate_icers}}
 #' @importFrom tidyr pivot_longer
+#' @export
 calculate_icers_psa <- function(psa, uncertainty = FALSE) {
 
   # check that psa has class 'psa'
@@ -219,21 +220,21 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
     cost_bounds <- cost %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
       group_by(.data$Strategy) %>%
-      summarize(LB_95_Cost = quantile(.data$value, probs = 0.025),
-                UB_95_Cost = quantile(.data$value, probs = 0.975))
+      summarize(Lower_95_Cost = quantile(.data$value, probs = 0.025, names = FALSE),
+                Upper_95_Cost = quantile(.data$value, probs = 0.975, names = FALSE))
 
     effect_bounds <- effect %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
       group_by(.data$Strategy) %>%
-      summarize(LB_95_Effect = quantile(.data$value, probs = 0.025),
-                UB_95_Effect = quantile(.data$value, probs = 0.975))
+      summarize(Lower_95_Effect = quantile(.data$value, probs = 0.025, names = FALSE),
+                Upper_95_Effect = quantile(.data$value, probs = 0.975, names = FALSE))
 
     # merge bound data.frames into icers data.frame
     icers <- icers %>%
       left_join(cost_bounds, by = "Strategy") %>%
       left_join(effect_bounds, by = "Strategy") %>%
-      select(.data$Strategy, .data$Cost, .data$LB_95_Cost, .data$UB_95_Cost,
-             .data$Effect, .data$LB_95_Effect, .data$UB_95_Effect,
+      select(.data$Strategy, .data$Cost, .data$Lower_95_Cost, .data$Upper_95_Cost,
+             .data$Effect, .data$Lower_95_Effect, .data$Upper_95_Effect,
              .data$Inc_Cost, .data$Inc_Effect, .data$ICER, .data$Status)
     }
 

@@ -29,6 +29,22 @@ test_that("plot.owsa returns a ggplot object", {
   expect_is(g, "ggplot")
 })
 
+# test basecase argument for plot.owsa
+test_that("plot.owsa basecase argument", {
+  o <- owsa(psa_big, outcome = "nhb", wtp = 100000)
+  # all params except 1
+  p <- plot(o,
+            basecase = list(cRadio = 10000, cSurg = 30000, muDieCancer = 0.2,
+                            pDieSurg = .1, pFailChemo = .45, pFailRadio = .5,
+                            pFailSurg = .050))
+  expect_is(p, "ggplot")
+
+  # test error when wrong parameter is supplied
+  expect_error(plot(o,
+                    basecase = list(cRadio = 10000, non_existent = .050)),
+               "Some parameter names in the basecase argument of plot.owsa are not present in owsa object.")
+})
+
 # test owsa tornado
 test_that("owsa_tornado", {
   o <- owsa(psa_big, outcome = "nmb", wtp = 100000)

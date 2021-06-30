@@ -123,4 +123,3 @@ test_that("plot.icers produces identical results for uncertainty and w/o", {
   icers2 <- plot(psa_icers_unc)
   expect_equal(icers1, icers2)
 })
-

@@ -50,8 +50,8 @@
 #' @seealso
 #' \code{\link{plot.ceac}}, \code{\link{summary.ceac}}
 #'
-#' @importFrom reshape2 melt
 #'
+#' @importFrom tidyr pivot_longer
 #' @export
 ceac <- function(wtp, psa) {
   # check that psa has class 'psa'
@@ -94,9 +94,13 @@ ceac <- function(wtp, psa) {
                        stringsAsFactors = FALSE)
   colnames(cea_df) <- c("WTP", strategies, "fstrat")
 
-  # make ceac df
-  ceac <- melt(cea_df, id.vars = c("WTP", "fstrat"),
-               variable.name = "Strategy", value.name = "Proportion")
+  # Reformat df to long format
+  ceac <- tidyr::pivot_longer(
+    data = cea_df,
+    cols = !c("WTP", "fstrat"),
+    names_to = "Strategy",
+    values_to = "Proportion"
+  )
 
   # boolean for on frontier or not
   ceac$On_Frontier <- (ceac$fstrat == ceac$Strategy)

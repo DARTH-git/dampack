@@ -21,13 +21,13 @@ run_twsa_det(
 determined by \code{nsamp}. "pars" are the 2 parameters of interest, which must be a subset of
 the parameters from \code{params_basecase}.}
 
-\item{params_basecase}{a named list of basecase values for input parameters needed by \code{FUN},
+\item{params_basecase}{a named list of base case values for input parameters needed by \code{FUN},
 the user-defined function.}
 
 \item{nsamp}{number of parameter values. If \code{NULL}, 40 parameter values are
 used}
 
-\item{FUN}{Function that takes the basecase in \code{params_all} and \code{...} to
+\item{FUN}{Function that takes the base case in \code{params_all} and \code{...} to
 produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
 where the first column are the strategy names and the rest of the columns must be outcomes.}
 

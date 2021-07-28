@@ -1,3 +1,9 @@
+## dampack 1.0.1.9000
+
+### New Features
+-Added calculate_icers_psa function
+-Added argument to plot.owsa and plot.twsa for the plotting of specific points (e.g. base case values) on top of default plot
+
 ## dampack 1.0.1
 
 ### Bug Fixes

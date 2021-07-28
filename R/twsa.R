@@ -66,6 +66,8 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
       tw <- rbind(tw, new_df, stringsAsFactors = FALSE)
     }
     names(tw)[1:2] <- parnames
+    # make strategies in twsa object into ordered factors
+    tw$strategy <- factor(tw$strategy, levels = strategies, ordered = TRUE)
   } else {
     stop("either a psa or dsa_twoway object must be provided")
   }
@@ -81,6 +83,9 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
 #' @inheritParams add_common_aes
 #' @param maximize If \code{TRUE}, plot of strategy with maximum expected outcome
 #' (default); if \code{FALSE}, plot of strategy with minimum expected outcome
+#' @param basecase named list of specific combination of param1 and param2 values to highlight
+#' on the returned plot. Each list element must have the same name as the corresponding
+#' parameter in the \code{owsa} object.
 #'
 #' @import ggplot2
 #' @import dplyr
@@ -90,7 +95,9 @@ plot.twsa <- function(x, maximize = TRUE,
                       col = c("full", "bw"),
                       n_x_ticks = 6,
                       n_y_ticks = 6,
-                      txtsize = 12, ...) {
+                      txtsize = 12,
+                      basecase = NULL,
+                      ...) {
 
   # parameter names
   params <- names(x)[c(1, 2)]
@@ -113,6 +120,20 @@ plot.twsa <- function(x, maximize = TRUE,
     theme_bw() +
     xlab(param1) +
     ylab(param2)
+
+  if (!is.null(basecase)) {
+    if (!all(names(basecase) %in% names(x)[1:2])) {
+      stop("Some parameter names in the basecase argument do not match param1 or param2 of twsa")
+    }
+    # create data.frame for "basecase" values
+    basecase_df <- as.data.frame(basecase)
+
+    g <- g +
+      geom_point(mapping = aes_(x = as.name(param1), y = as.name(param2)),
+                 data = basecase_df,
+                 shape = 8)
+  }
+
   col <- match.arg(col)
   add_common_aes(g, txtsize, col = col, col_aes = "fill",
                  scale_name = "Strategy",

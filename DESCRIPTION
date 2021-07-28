@@ -1,7 +1,7 @@
 Package: dampack
 Type: Package
 Title: Decision-Analytic Modeling Package
-Version: 1.0.1
+Version: 1.0.1.9000
 Authors@R: 
     c(person(given = "Fernando",
              family = "Alarid-Escudero",
@@ -33,7 +33,6 @@ Depends:
     R (>= 3.5),
     ggplot2 (>= 3.3.0)
 Imports:
-    reshape2,
     ellipse,
     dplyr,
     scales,
@@ -41,7 +40,8 @@ Imports:
     mgcv,
     truncnorm,
     triangle,
-    ggrepel
+    ggrepel,
+    tidyr
 Suggests:
     testthat,
     lintr,

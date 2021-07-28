@@ -3,11 +3,11 @@
 #' @description \code{run_psa} calculates outcomes using a user-defined function and creates PSA objects
 #' corresponding to the specified outcomes.
 #'
-#' @param psa_samp A dataframe with samples of parameters for a probabilistic sensitivity analysis (PSA)
-#' @param params_basecase a named list of basecase values for input parameters needed by \code{FUN},
+#' @param psa_samp A data frame with samples of parameters for a probabilistic sensitivity analysis (PSA)
+#' @param params_basecase a named list of base case values for input parameters needed by \code{FUN},
 #' the user-defined function.
 #' @param FUN Function that takes the parameter values in \code{psa_samp} and \code{...} to
-#' produce the \code{outcome} of interest. The \code{FUN} must return a dataframe
+#' produce the \code{outcome} of interest. The \code{FUN} must return a data frame
 #' where the first column are the strategy names and the rest of the columns must be outcomes.
 #' @param outcomes String vector with the outcomes of interest from \code{FUN}.
 #' @param strategies vector of strategy names. The default \code{NULL} will use

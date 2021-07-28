@@ -169,6 +169,77 @@ calculate_icers <- function(cost, effect, strategies) {
   return(results)
 }
 
+#' Calculate incremental cost-effectiveness ratios from a \code{psa} object.
+#'
+#' @description The mean costs and QALYs for each strategy in a PSA are used
+#' to conduct an incremental cost-effectiveness analysis. \code{\link{calculate_icers}} should be used
+#' if costs and QALYs for each strategy need to be specified manually, whereas \code{calculate_icers_psa}
+#' can be used if mean costs and mean QALYs from the PSA are assumed to represent a base case scenario for
+#' calculation of ICERS.
+#'
+#' Optionally, the \code{uncertainty} argument can be used to provide the 2.5th and 97.5th
+#' quantiles for each strategy's cost and QALY outcomes based on the variation present in the PSA.
+#' Because the dominated vs. non-dominated status and the ordering of strategies in the ICER table are
+#' liable to change across different samples of the PSA, confidence intervals are not provided for the
+#' incremental costs and QALYs along the cost-effectiveness acceptability frontier.
+#' \code{link{plot.psa}} does not show the confidence intervals in the resulting plot
+#' even if present in the ICER table.
+#'
+#' @param psa \code{psa} object from \code{link{make_psa_object}}
+#' @param uncertainty whether or not 95% quantiles for the cost and QALY outcomes should be included
+#' in the resulting ICER table. Defaults to \code{FALSE}.
+#'
+#' @return A data frame and \code{icers} object of strategies and their associated
+#' status, cost, effect, incremental cost, incremental effect, and ICER. If \code{uncertainty} is
+#' set to \code{TRUE}, four additional columns are provided for the 2.5th and 97.5th quantiles for
+#' each strategy's cost and effect.
+#' @seealso \code{\link{plot.icers}}
+#' @seealso \code{\link{calculate_icers}}
+#' @importFrom tidyr pivot_longer
+#' @export
+calculate_icers_psa <- function(psa, uncertainty = FALSE) {
+
+  # check that psa has class 'psa'
+  check_psa_object(psa)
+
+  # Calculate mean outcome values
+  psa_sum <- summary(psa)
+
+  # Supply mean outcome values to calculate_icers
+  icers <- calculate_icers(cost = psa_sum$meanCost,
+                           effect = psa_sum$meanEffect,
+                           strategies = psa_sum$Strategy)
+
+  if (uncertainty == TRUE) {
+
+    # extract cost and effect data.frames from psa object
+    cost <- psa$cost
+    effect <- psa$effectiveness
+
+    # Calculate quantiles across costs and effects
+    cost_bounds <- cost %>%
+      pivot_longer(cols = everything(), names_to = "Strategy") %>%
+      group_by(.data$Strategy) %>%
+      summarize(Lower_95_Cost = quantile(.data$value, probs = 0.025, names = FALSE),
+                Upper_95_Cost = quantile(.data$value, probs = 0.975, names = FALSE))
+
+    effect_bounds <- effect %>%
+      pivot_longer(cols = everything(), names_to = "Strategy") %>%
+      group_by(.data$Strategy) %>%
+      summarize(Lower_95_Effect = quantile(.data$value, probs = 0.025, names = FALSE),
+                Upper_95_Effect = quantile(.data$value, probs = 0.975, names = FALSE))
+
+    # merge bound data.frames into icers data.frame
+    icers <- icers %>%
+      left_join(cost_bounds, by = "Strategy") %>%
+      left_join(effect_bounds, by = "Strategy") %>%
+      select(.data$Strategy, .data$Cost, .data$Lower_95_Cost, .data$Upper_95_Cost,
+             .data$Effect, .data$Lower_95_Effect, .data$Upper_95_Effect,
+             .data$Inc_Cost, .data$Inc_Effect, .data$ICER, .data$Status)
+    }
+
+  return(icers)
+}
 
 #' compute icers for non-dominated strategies
 #'
@@ -234,6 +305,14 @@ plot.icers <- function(x,
                        yexpand = expansion(0.1),
                        max.iter = 20000,
                        ...) {
+  if (ncol(x) > 7) {
+    # reformat icers class object if uncertainty bounds are present
+    x <- x %>%
+      select(.data$Strategy, .data$Cost, .data$Effect,
+             .data$Inc_Cost, .data$Inc_Effect,
+             .data$ICER, .data$Status)
+  }
+
   # type checking
   label <- match.arg(label)
 

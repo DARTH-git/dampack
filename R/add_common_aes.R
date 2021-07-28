@@ -63,7 +63,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
         scale_color_discrete(name = scale_name, l = lval,
                              aesthetics = "color",
                              drop = FALSE)
-    } else if ("fill" %in% col_aes) {
+    }
+    if ("fill" %in% col_aes) {
       p <- p +
         scale_fill_discrete(name = scale_name, l = lval,
                             aesthetics = "fill",
@@ -76,7 +77,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
         scale_color_grey(name = scale_name, start = greystart, end = greyend,
                          aesthetics = "color",
                          drop = FALSE)
-    } else if ("fill" %in% col_aes) {
+    }
+    if ("fill" %in% col_aes) {
       p <- p +
         scale_fill_grey(name = scale_name, start = greystart, end = greyend,
                         aesthetics = "fill",
@@ -137,7 +139,7 @@ labfun <- function(x) {
 #' @section Details:
 #' Based on function \code{pretty}.
 #' @return a vector of axis-label breaks
-#' @keywords internal
+#' @export
 number_ticks <- function(n) {
   function(limits) {
     pretty(limits, n + 1)

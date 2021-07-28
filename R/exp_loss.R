@@ -37,7 +37,7 @@
 #'
 #' # the y axis is on a log scale by default
 #' plot(exp_loss, log_y = FALSE)
-#' @importFrom reshape2 melt
+#' @importFrom tidyr pivot_longer
 #' @export
 calc_exp_loss <- function(psa, wtp) {
   check_psa_object(psa)
@@ -60,10 +60,12 @@ calc_exp_loss <- function(psa, wtp) {
   colnames(exp_loss_df) <- c("WTP", strategies, "fstrat")
 
   # Reformat df to long format
-  exp_loss_df_melt <- melt(exp_loss_df,
-                           id.vars = c("WTP", "fstrat"),
-                           variable.name = "Strategy",
-                           value.name = "Expected_Loss")
+  exp_loss_df_melt <- tidyr::pivot_longer(
+    data = exp_loss_df,
+    cols = !c("WTP", "fstrat"),
+    names_to = "Strategy",
+    values_to = "Expected_Loss"
+  )
 
   # boolean for on frontier or not
   exp_loss_df_melt$On_Frontier <- (exp_loss_df_melt$fstrat == exp_loss_df_melt$Strategy)

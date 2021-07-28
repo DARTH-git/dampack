@@ -63,6 +63,8 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
                              "param_val" = param_val,
                              "outcome_val" = outcome_val)
         ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
+        # make strategies in owsa object into ordered factors
+        ow$strategy <- factor(ow$strategy, levels = strategies, ordered = TRUE)
       }
     }
 
@@ -88,12 +90,15 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 #' The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
 #' which determines the number of rows and columns automatically.
 #' @param facet_nrow number of rows in plot facet.
+#' @param basecase named list of specific values for each parameter to highlight
+#' on the returned plot. Each list element must have the same name as the corresponding
+#' parameter in the \code{owsa} object.
 #' @inheritParams add_common_aes
 #'
 #' @return A \code{ggplot2} plot of the \code{owsa} object.
 #'
-#' @importFrom reshape2 melt
 #' @import ggplot2
+#' @importFrom tidyr pivot_longer
 #' @export
 plot.owsa <- function(x, txtsize = 12,
                       col = c("full", "bw"),
@@ -103,6 +108,7 @@ plot.owsa <- function(x, txtsize = 12,
                       size = 1,
                       n_x_ticks = 6,
                       n_y_ticks = 6,
+                      basecase = NULL,
                       ...) {
   scales <- match.arg(facet_scales)
   owsa <- ggplot(data = x,
@@ -123,6 +129,23 @@ plot.owsa <- function(x, txtsize = 12,
                 size = size) +
       scale_linetype_discrete(name = "Strategy")
   }
+
+  if (!is.null(basecase)) {
+    # create data.frame for "basecase" values
+    basecase_df <- as.data.frame(basecase) %>%
+      pivot_longer(cols = everything(),
+                   names_to = "parameter",
+                   values_to = "param_val")
+
+    if (!all(basecase_df$parameter %in% unique(x$parameter))) {
+      stop("Some parameter names in the basecase argument of plot.owsa are not present in owsa object.")
+    }
+
+    owsa <- owsa +
+      geom_vline(mapping = aes_(xintercept = as.name("param_val")),
+                 data = basecase_df)
+  }
+
   add_common_aes(owsa, txtsize, col = col, col_aes = "color",
                  scale_name = "Strategy",
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,

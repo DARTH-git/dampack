@@ -46,8 +46,7 @@ test_that("default reference strategy", {
                          effect = c(6.48273, 6.52861, 6.52861),
                          strategies = c("No Treat",   "Treat all", "Test & treat"))
   expect_equal(cea$Strategy[1], "Test & treat")
-  }
-)
+})
 
 # one strategy
 test_that("one strategy runs", {

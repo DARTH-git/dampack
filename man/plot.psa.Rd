@@ -34,19 +34,19 @@
 
 \item{col}{either none, full color, or black and white}
 
-\item{n_x_ticks}{number of axis ticks}
+\item{n_x_ticks}{number of x-axis ticks}
 
-\item{n_y_ticks}{number of axis ticks}
+\item{n_y_ticks}{number of y-axis ticks}
 
-\item{xbreaks}{vector of axis breaks.
-will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+\item{xbreaks}{vector of x-axis breaks.
+will override \code{n_x_ticks} if provided.}
 
-\item{ybreaks}{vector of axis breaks.
-will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+\item{ybreaks}{vector of y-axis breaks.
+will override \code{n_y_ticks} if provided.}
 
-\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+\item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
 
-\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+\item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

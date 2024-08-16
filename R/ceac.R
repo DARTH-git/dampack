@@ -148,6 +148,8 @@ ceac <- function(wtp, psa) {
 #'
 #' @import ggplot2
 #' @import dplyr
+#' @importFrom rlang !!
+#' @importFrom rlang sym
 #'
 #' @export
 plot.ceac <- function(x,
@@ -169,13 +171,14 @@ plot.ceac <- function(x,
   strat_name <- "Strategy"
   x$WTP_thou <- x[, wtp_name] / 1000
 
+  Strategy <- Proportion <- maxpr <- On_Frontier <- WTP_thou <- NULL
   # removing strategies with probabilities always below `min_prob`
   # get group-wise max probability
   if (min_prob > 0) {
     max_prob <- x %>%
-      group_by(.data$Strategy) %>%
-      summarize(maxpr = max(.data$Proportion)) %>%
-      filter(.data$maxpr >= min_prob)
+      group_by(Strategy) %>%
+      summarize(maxpr = max(Proportion)) %>%
+      filter(maxpr >= min_prob)
     strat_to_keep <- max_prob$Strategy
     if (length(strat_to_keep) == 0) {
       stop(
@@ -193,7 +196,7 @@ plot.ceac <- function(x,
           paste(diff_strat, collapse = ","), "\n", sep = "")
 
       # report if any filtered strategies are on the frontier
-      df_filt <- filter(x, .data$Strategy %in% diff_strat & .data$On_Frontier)
+      df_filt <- filter(x, Strategy %in% diff_strat & On_Frontier)
       if (nrow(df_filt) > 0) {
         cat(paste0("WARNING - some strategies that were filtered out are on the frontier:\n",
                    paste(unique(df_filt$Strategy), collapse = ","), "\n"))
@@ -201,28 +204,28 @@ plot.ceac <- function(x,
     }
 
     # filter dataframe
-    x <- filter(x, .data$Strategy %in% strat_to_keep)
+    x <- filter(x, Strategy %in% strat_to_keep)
   }
 
   # Drop unused strategy names
   x$Strategy <- droplevels(x$Strategy)
 
-  p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
-                             y = as.name(prop_name),
-                             color = as.name(strat_name))) +
+  p <- ggplot(data = x, aes(x = WTP_thou,
+                            y = !!sym(prop_name),
+                            color = !!sym(strat_name))) +
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
     ylab("Pr Cost-Effective")
 
   if (points) {
-    p <- p + geom_point(aes_(color = as.name(strat_name)))
+    p <- p + geom_point(aes(color = !!sym(strat_name)))
   }
 
   if (frontier) {
     front <- x[x$On_Frontier, ]
-    p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),
-                                           y = as.name(prop_name),
-                                           shape = as.name("On_Frontier")),
+    p <- p + geom_point(data = front, aes(x = WTP_thou,
+                                          y = !!sym(prop_name),
+                                          shape = On_Frontier),
                         size = 3, stroke = 1, color = "black") +
       scale_shape_manual(name = NULL, values = 0, labels = "Frontier") +
       guides(color = guide_legend(order = 1),

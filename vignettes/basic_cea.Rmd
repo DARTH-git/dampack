@@ -68,9 +68,9 @@ v_hiv_qalys <- c(277.25, 277.57, 277.78, 277.83, 277.76) / 12
 
 Using these elements, we then use the `calculate_icers()` function in `dampack` to conduct the cost-effectiveness comparison of the five HIV testing strategies.
 ```{r}
-icer_hiv <- calculate_icers(cost=v_hiv_costs, 
-                            effect=v_hiv_qalys, 
-                            strategies=v_hiv_strat_names)
+icer_hiv <- calculate_icers(cost = v_hiv_costs,
+                            effect = v_hiv_qalys,
+                            strategies = v_hiv_strat_names)
 icer_hiv
 ```
 
@@ -98,14 +98,14 @@ In the plot, the points on the efficient frontier (consisting of all non-dominat
 
 Plot with all strategies labeled:
 ```{r}
-plot(icer_hiv, 
-     label="all")
+plot(icer_hiv,
+     label = "all")
 ```
 
 Plot with a different `ggplot` theme:
 ```{r}
-plot(icer_hiv, 
-     label="all") +
+plot(icer_hiv,
+     label = "all") +
   theme_classic() +
   ggtitle("Cost-effectiveness of HIV screening strategies")
 ```
@@ -154,7 +154,7 @@ icer_cdiff %>%
 In this example, 5 of the 11 strategies are dominated. Most are strongly dominated (denoted by "D"), while one is dominated through extended/weak dominance (denoted "ED"). When many dominated strategies are present in an analysis, it may be desirable to completely remove them from the CEA results table. This can be done by filtering by the `Status` column to include only non-dominated strategies.
 ```{r}
 icer_cdiff %>%
-  filter(Status == "ND")%>%
+  filter(Status == "ND") %>%
   kable() %>%
   kable_styling()
 ```

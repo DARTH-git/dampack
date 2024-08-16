@@ -37,9 +37,9 @@ which determines the number of rows and columns automatically.}
 
 \item{size}{either point size (ptype = "point") and/or line size (ptype = "line")}
 
-\item{n_x_ticks}{number of axis ticks}
+\item{n_x_ticks}{number of x-axis ticks}
 
-\item{n_y_ticks}{number of axis ticks}
+\item{n_y_ticks}{number of y-axis ticks}
 
 \item{basecase}{named list of specific values for each parameter to highlight
 on the returned plot. Each list element must have the same name as the corresponding

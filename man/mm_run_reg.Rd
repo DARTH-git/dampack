@@ -11,7 +11,7 @@ mm_run_reg(analysis, dep, params, dat, type, poly.order, k)
 
 \item{dep}{dependent variable in regression}
 
-\item{params}{string vector with the name(s) of the parameter of interest. Defaults to all.}
+\item{params}{all params in PSA}
 
 \item{dat}{data to use in regression}
 
@@ -26,8 +26,6 @@ Default: 2}
     null space of the penalty for the term (see
     \code{\link[mgcv]{null.space.dimension}}), but will be reset if
   it is. See \code{\link[mgcv]{choose.k}} for further information.}
-
-\item{all_params}{all params in PSA}
 }
 \value{
 a statistical metamodel

@@ -44,23 +44,21 @@ longer strategies are truncated to save space.}
 
 \item{alpha}{opacity of points}
 
-\item{n_x_ticks}{number of axis ticks}
+\item{n_x_ticks}{number of x-axis ticks}
 
-\item{n_y_ticks}{number of axis ticks}
+\item{n_y_ticks}{number of y-axis ticks}
 
-\item{xbreaks}{vector of axis breaks.
-will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+\item{xbreaks}{vector of x-axis breaks.
+will override \code{n_x_ticks} if provided.}
 
-\item{ybreaks}{vector of axis breaks.
-will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+\item{ybreaks}{vector of y-axis breaks.
+will override \code{n_y_ticks} if provided.}
 
-\item{xlim}{vector of axis limits, or NULL, which sets limits automatically}
+\item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
 
-\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+\item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
 
-\item{xexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
-The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
-for how to modify this.}
+\item{xexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.}
 
 \item{yexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
 The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}

@@ -59,7 +59,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
     wrong_p <- setdiff(p, pnames)
     stop(paste0("the following parameters are not valid: ",
                 paste(wrong_p, collapse = ",")))
-  } else if (length(params) != 2 & analysis == "twoway") {
+  } else if (length(params) != 2 && analysis == "twoway") {
     stop("If analysis == twoway, exactly 2 params must be provided.")
   }
 
@@ -108,7 +108,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
       }
     }
   }
-  if (analysis == "twoway" | analysis == "multiway") {
+  if (analysis == "twoway" || analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
       mod <- mm_run_reg(analysis, s, params, dat, type, poly.order, k)
@@ -131,7 +131,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 #' Build formula and run linear regression for metamodel
 #' @param dep dependent variable in regression
 #' @param dat data to use in regression
-#' @param all_params all params in PSA
+#' @param params all params in PSA
 #'
 #' @importFrom mgcv gam
 #' @keywords internal
@@ -321,7 +321,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 
     ## all elements of ranges must have length 2 or be NULL
     for (i in ranges) {
-      if (!is.null(i) & length(i) != 2) {
+      if (!is.null(i) && length(i) != 2) {
         stop("all entries in ranges must have length 2 or be NULL")
       }
     }
@@ -413,8 +413,8 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
       mod <- mods[[s]]
       outcome <- predict(mod, newdata = pdata)
       outcome_df <- data.frame("p1" = pdata[, p1], "p2" = pdata[, p2],
-                                           "strategy" = s, "outcome_val" = outcome,
-                                           stringsAsFactors = FALSE)
+                               "strategy" = s, "outcome_val" = outcome,
+                               stringsAsFactors = FALSE)
       names(outcome_df)[1:2] <- c(p1, p2)
       outcome_dfs[[counter]] <- outcome_df
       counter <- counter + 1
@@ -443,7 +443,7 @@ make_param_seq <- function(p, ranges, nsamp, psa_paramvals) {
   } else {
     # throw warning if outside of psa range
     psa_range <- range(p_psa_vals)
-    if (p_range[1] < psa_range[1] | p_range[2] > psa_range[2]) {
+    if (p_range[1] < psa_range[1] || p_range[2] > psa_range[2]) {
       warning(paste0("The requested range for ", p, " is outside of the PSA range.\n",
                      "requested range: [", paste(p_range, collapse = ","), "]\n",
                      "PSA range: [", paste(psa_range, collapse = ", "), "]\n.",

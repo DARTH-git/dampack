@@ -47,7 +47,7 @@ changes in optimal strategy as they vary.}
 
 \item{facet_lab_txtsize}{text size for plot facet labels}
 
-\item{n_x_ticks}{number of axis ticks}
+\item{n_x_ticks}{number of x-axis ticks}
 }
 \value{
 If \code{return == "plot"}, a \code{ggplot2} optimal strategy plot derived from the \code{owsa}

@@ -130,11 +130,11 @@
 #' @export
 gen_psa_samp <- function(params = NULL,
                          dists = c("normal", "log-normal", "truncated-normal", "beta", "gamma",
-                                  "dirichlet", "bootstrap", "constant", "triangle"),
+                                   "dirichlet", "bootstrap", "constant", "triangle"),
                          parameterization_types = c("mean, sd", "a, b", "shape, scale",
-                                                   "value, mean_prop, sd", "value, n",
-                                                   "value, alpha", "mean, sd, ll, ul", "val",
-                                                   "meanlog, sdlog", "ll, ul, mode"),
+                                                    "value, mean_prop, sd", "value, n",
+                                                    "value, alpha", "mean, sd, ll, ul", "val",
+                                                    "meanlog, sdlog", "ll, ul, mode"),
                          dists_params = NULL,
                          nsamp = 100) {
 
@@ -217,7 +217,7 @@ gen_psa_samp <- function(params = NULL,
         sd <- sqrt((p_mean * (1 - p_mean)) / total)
         alpha <- dirichlet_params(p_mean, sd)
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
-        } else if (parameterization_types[i] == "value, alpha") {
+      } else if (parameterization_types[i] == "value, alpha") {
         alpha <- dists_params[[i]][, 2]
         params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
       }
@@ -274,10 +274,10 @@ gen_psa_samp <- function(params = NULL,
 #'  @return A vector random values sampled from a dirichlet distribution
 #'  @export
 rdirichlet <- function(n, alpha) {
-    k <- length(alpha)
-    out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
-    out <- out / rowSums(out)
-    return(out)
+  k <- length(alpha)
+  out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
+  out <- out / rowSums(out)
+  return(out)
 }
 
 
@@ -459,10 +459,10 @@ lnorm_params <- function(m = 1, v = 1) {
   ### Sanity checkd
   if (m <= 0) {
     stop("'m' needs to be greater than 0")
-    }
+  }
   if (v <= 0) {
     stop("'v' needs to be greater than 0")
-    }
+  }
   mu <- log(m / sqrt(1 + v / m ^ 2))
   sigma <- sqrt(log(1 + v / m ^ 2))
   return(list(mu = mu,

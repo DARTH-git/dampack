@@ -30,12 +30,12 @@ no strategies are filtered.}
 
 \item{col}{either none, full color, or black and white}
 
-\item{n_y_ticks}{number of axis ticks}
+\item{n_y_ticks}{number of y-axis ticks}
 
-\item{ylim}{vector of axis limits, or NULL, which sets limits automatically}
+\item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
 
-\item{ybreaks}{vector of axis breaks.
-will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+\item{ybreaks}{vector of y-axis breaks.
+will override \code{n_y_ticks} if provided.}
 }
 \value{
 If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}

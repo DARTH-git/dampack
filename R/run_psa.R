@@ -31,11 +31,11 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   opt_arg_val <- list(...)
 
   if (!is.null(params_basecase)) {
-      replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
-      new_params <- params_basecase
-      # replace values in new_params
-      new_params[replace_var] <- psa_samp[1, replace_var]
-      fun_input_test <- c(list(new_params), opt_arg_val)
+    replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
+    new_params <- params_basecase
+    # replace values in new_params
+    new_params[replace_var] <- psa_samp[1, replace_var]
+    fun_input_test <- c(list(new_params), opt_arg_val)
   } else {
     fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
   }
@@ -82,7 +82,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
       sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
       # display progress every 10%
       if (progress == TRUE) {
-        if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) & progress == TRUE) {
+        if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) && progress == TRUE) {
           cat("\r", paste(i / nrow(psa_samp) * 100, "% done", sep = " "))
         }
       }
@@ -93,7 +93,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
       sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
       # display progress every 10%
       if (progress == TRUE) {
-        if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) & progress == TRUE) {
+        if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) && progress == TRUE) {
           cat("\r", paste(i / nrow(psa_samp) * 100, "% done", sep = " "))
         }
       }
@@ -114,16 +114,16 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
 
 
 
-    psa_out <- vector(mode = "list", length = n_outcomes)
-    for (j in 1:n_outcomes) {
-      psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
-                                   other_outcome = sim_out_df[[j]],
-                                   parameters = psa_samp[, -1], strategies = strategies,
-                                   currency = currency)
-    }
-
-
-    names(psa_out) <- outcomes
-
-    return(psa_out)
+  psa_out <- vector(mode = "list", length = n_outcomes)
+  for (j in 1:n_outcomes) {
+    psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
+                                 other_outcome = sim_out_df[[j]],
+                                 parameters = psa_samp[, -1], strategies = strategies,
+                                 currency = currency)
   }
+
+
+  names(psa_out) <- outcomes
+
+  return(psa_out)
+}

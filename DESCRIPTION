@@ -6,15 +6,17 @@ Authors@R:
     c(person(given = "Fernando",
              family = "Alarid-Escudero",
              role = "aut",
-             email = "falarid@stanford.edu"),
-             person(given = "Greg",
+             email = "falarid@stanford.edu",
+             comment = c(ORCID = "0000-0001-5076-1172")),
+      person(given = "Greg",
              family = "Knowlton",
              role = c("aut", "cre"),
              email = "knowl193@umn.edu"),
-      person(given = "Caleb",
+      person(given = "Caleb W.",
              family = "Easterly",
              role = "aut",
-             email = "easte080@umn.edu"),
+             email = "caleb_easterly@unc.edu",
+             comment = c(ORCID = "0000-0001-7853-377X")),
       person(given = "David",
              family = "Garibay",
              role = c("ctb", "cre"),
@@ -22,7 +24,8 @@ Authors@R:
       person(given = "Eva",
              family = "Enns",
              role = "aut",
-             email = "eenns@umn.edu"))
+             email = "eenns@umn.edu",
+             comment = c(ORCID = "0000-0003-0693-7358")))
 Description: A suite of functions for analyzing and visualizing the health economic outputs of mathematical models.
     This package was developed with funding from the National Institutes of Allergy and Infectious Diseases of the 
     National Institutes of Health under award no. R01AI138783. The content of this package is solely the 

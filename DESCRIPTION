@@ -10,7 +10,7 @@ Authors@R:
              comment = c(ORCID = "0000-0001-5076-1172")),
       person(given = "Greg",
              family = "Knowlton",
-             role = c("aut", "cre"),
+             role = "aut",
              email = "knowl193@umn.edu"),
       person(given = "Caleb W.",
              family = "Easterly",

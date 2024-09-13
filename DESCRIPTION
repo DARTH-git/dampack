@@ -1,7 +1,7 @@
 Package: dampack
 Type: Package
 Title: Decision-Analytic Modeling Package
-Version: 1.0.1.9000
+Version: 1.0.2.1000
 Authors@R: 
     c(person(given = "Fernando",
              family = "Alarid-Escudero",
@@ -41,7 +41,8 @@ Imports:
     truncnorm,
     triangle,
     ggrepel,
-    tidyr
+    tidyr,
+    rlang
 Suggests:
     testthat,
     lintr,
@@ -49,5 +50,5 @@ Suggests:
     rmarkdown,
     kableExtra
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr

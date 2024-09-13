@@ -95,7 +95,7 @@ plot(psa_obj)
 When you call `summary()` on a `psa` object, a data.frame is returned that displays the mean cost and mean effect across all of the PSA samples for each strategy. If `calc_sds` is set to `TRUE`, then the standard deviations for these outcomes are displayed as well.
 
 ```{r}
-psa_sum <- summary(psa_obj, 
+psa_sum <- summary(psa_obj,
                    calc_sds = TRUE)
 psa_sum
 ```
@@ -103,8 +103,8 @@ psa_sum
 For more information about how to use `dampack` to calculate, visualize, and analyze the ICERs for the different strategies compared in a PSA, please see the `basic_cea` vignette.
 
 ```{r, fig.width = 7, fig.height = 5, fig.align = "center"}
-icers <- calculate_icers(cost = psa_sum$meanCost, 
-                         effect = psa_sum$meanEffect, 
+icers <- calculate_icers(cost = psa_sum$meanCost,
+                         effect = psa_sum$meanEffect,
                          strategies = psa_sum$Strategy)
 plot(icers)
 ```
@@ -116,7 +116,7 @@ A strategy's cost-effectiveness is sometimes discussed in terms of either net he
 The `ceac()` function (`ceac` stands for cost-effectiveness acceptability curve) takes a `psa` object and a numeric vector of willingness to pay thresholds to create a `ceac` object, which is essentially a data.frame with special plotting functionality. The proportion column of the `ceac` object is the proportion of PSA samples in which that particular strategy had the maximum benefit at the corresponding WTP. The `On_Frontier` column indicates whether a strategy was on the cost-effectiveness acceptability frontier at the corresponding WTP. A strategy is on the cost-effectiveness acceptability frontier if it maximizes expected benefit *on average* across all samples of the PSA at the WTP being considered. Note that this designation is fundamentally different than identifying the strategy that has the highest probability of being cost-effective across all samples of the PSA.
 
 ```{r}
-ceac_obj <- ceac(wtp = example_psa$wtp, 
+ceac_obj <- ceac(wtp = example_psa$wtp,
                  psa = psa_obj)
 head(ceac_obj)
 ```
@@ -130,8 +130,8 @@ summary(ceac_obj)
 Plotting a `ceac` object yields a `ggplot2` graph showing the cost-effectiveness acceptability curves for all strategies where the y-axis indicates the probability that each strategy is cost-effective and the x-axis indicates the WTP threshold. By default, the strategies on the cost-effectiveness acceptability frontier are marked with black boxes, and the exact values calculated within the `ceac` object at each provided WTP threshold are marked with points. For more plotting details, see `?plot.ceac`.
 
 ```{r, fig.width = 7, fig.height = 5, fig.align = "center"}
-plot(ceac_obj, 
-     frontier = TRUE, 
+plot(ceac_obj,
+     frontier = TRUE,
      points = TRUE)
 ```
 
@@ -142,11 +142,11 @@ Alternatively, the degree to which cost-effectiveness varies with respect to the
 Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. "Time Traveling Is Just Too Dangerous" But Some Methods Are Worth Revisiting: The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability Curves and Frontier. Value Health. 2019;22(5):611-618.
 
 ```{r, fig.width = 7, fig.height = 5, fig.align = "center"}
-el <- calc_exp_loss(wtp = example_psa$wtp, 
+el <- calc_exp_loss(wtp = example_psa$wtp,
                     psa = psa_obj)
 head(el)
-plot(el, 
-     n_x_ticks = 8, 
+plot(el,
+     n_x_ticks = 8,
      n_y_ticks = 6)
 ```
 
@@ -180,13 +180,13 @@ owsa_tornado(o)
 For owsa objects that contain many parameters that have minimal effect on the parameter of interest, you may want to consider producing a plot that highlights only the most influential parameters. Using the `min_rel_diff` argument, you can instruct `owsa_tornado` to exclude all parameters that fail to produce a relative change in the outcome below a specific fraction. 
 
 ```{r, fig.width = 7, fig.height = 5, fig.align = "center"}
-owsa_tornado(o, 
+owsa_tornado(o,
              min_rel_diff = 0.05)
 ```
 In order to attain the data.frame used to produce the tornado plot, use the `return` argument to change the type of object returned by the `owsa_tornado` function.
 
 ```{r}
-owsa_tornado(o, 
+owsa_tornado(o,
              return = "data")
 ```
 
@@ -195,14 +195,14 @@ owsa_tornado(o,
 The second special plotting function designed for the visualization of the `owsa` object is `owsa_opt_strat`, which directly addresses the crucial information that is missing from the tornado plot. The output of `owsa_opt_strat` allows us to see how the strategy that maximizes the expectation of the outcome of interest changes as a function of each parameter of interest.
 
 ```{r, fig.width = 7, fig.height = 5, fig.align = "center"}
-owsa_opt_strat(o, 
+owsa_opt_strat(o,
                n_x_ticks = 5)
 ```
 
 Like `owsa_tornado()`, the `return` argument in `owsa_opt_strat()` allows the user to access a tidy data.frame that contains the exact values used to produce the plot.
 
 ```{r}
-owsa_opt_strat(o, 
+owsa_opt_strat(o,
                return = "data")
 ```
 
@@ -211,8 +211,8 @@ owsa_opt_strat(o,
 A two-way sensitivity analysis (TWSA) illustrates how the expected outcome of a decision-analytic model changes as function of two input parameters in the PSA. Just as a regression metamodel was used to isolate the effect of a single parameter in `dampack`'s `owsa` function, `twsa()` uses a polynomial regression metamodel that includes both of the specified parameters to predict the expected outcome as a function of the two parameters. This regression metamodel includes polynomial terms up to and including the degree of the `poly.order` argument for both parameters, as well as all interaction terms between these polynomial terms.
 
 ```{r}
-tw <- twsa(psa_obj, 
-           param1 = "pFailChemo", 
+tw <- twsa(psa_obj,
+           param1 = "pFailChemo",
            param2 = "muDieCancer")
 ```
 

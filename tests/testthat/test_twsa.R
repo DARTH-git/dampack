@@ -47,7 +47,7 @@ test_that("plot.twsa basecase argument", {
 
   t2 <- twsa(psa_big, "pFailChemo", "muDieCancer", outcome = "eff")
   g2 <- plot(t,
-            basecase = list(muDieCancer = 0.09, pFailChemo = 0.37))
+             basecase = list(muDieCancer = 0.09, pFailChemo = 0.37))
   expect_is(g2, "ggplot")
 
   # test error when wrong parameter is supplied

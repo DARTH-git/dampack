@@ -47,16 +47,27 @@ add_common_aes(
 
 \item{continuous}{which axes are continuous and should be modified by this function}
 
-\item{n_x_ticks, n_y_ticks}{number of axis ticks}
+\item{n_x_ticks}{number of x-axis ticks}
 
-\item{xbreaks, ybreaks}{vector of axis breaks.
-will override \code{n_x_ticks} and/or \code{n_y_ticks} if provided.}
+\item{n_y_ticks}{number of y-axis ticks}
 
-\item{xlim, ylim}{vector of axis limits, or NULL, which sets limits automatically}
+\item{xbreaks}{vector of x-axis breaks.
+will override \code{n_x_ticks} if provided.}
 
-\item{xtrans, ytrans}{transformations for the axes. See \code{\link[ggplot2]{scale_continuous}} for details.}
+\item{ybreaks}{vector of y-axis breaks.
+will override \code{n_y_ticks} if provided.}
 
-\item{xexpand, yexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
+\item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
+
+\item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
+
+\item{xtrans}{transformation for the x-axis. See \code{\link[ggplot2]{scale_continuous}} for details.}
+
+\item{ytrans}{transformation for the y-axis. See \code{\link[ggplot2]{scale_continuous}} for details.}
+
+\item{xexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.}
+
+\item{yexpand}{Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
 The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
 for how to modify this.}
 

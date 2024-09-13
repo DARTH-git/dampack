@@ -23,9 +23,9 @@
 
 \item{col}{either none, full color, or black and white}
 
-\item{n_x_ticks}{number of axis ticks}
+\item{n_x_ticks}{number of x-axis ticks}
 
-\item{n_y_ticks}{number of axis ticks}
+\item{n_y_ticks}{number of y-axis ticks}
 
 \item{txtsize}{base text size}
 

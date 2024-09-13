@@ -38,7 +38,7 @@ markov_model <- function(param, state_name, cycle,
   for (t in c(1:cycle)) {
     trace[t + 1, ] <- trace[t, ] %*% trans_mat
     expand_state <- matrix(rep(trace[t, ], length(state_name)),
-                           nrow = length(state_name), byrow = F)
+                           nrow = length(state_name), byrow = FALSE)
     tmp_trans <- expand_state * trans_mat
     diag(tmp_trans) <- 0
     incidence[t, ] <- colSums(tmp_trans) * popsize

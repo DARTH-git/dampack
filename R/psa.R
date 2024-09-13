@@ -152,6 +152,7 @@ plot.psa <- function(x,
                      ylim = NULL,
                      ...) {
 
+  Effectiveness <- Cost <- Strategy <- Eff.mean <- Cost.mean <- y <- group <- NULL
   effectiveness <- x$effectiveness
   cost <- x$cost
   strategies <- x$strategies
@@ -178,21 +179,21 @@ plot.psa <- function(x,
   # make strategies in psa object into ordered factors
   ce_df$Strategy <- factor(ce_df$Strategy, levels = strategies, ordered = TRUE)
 
-  psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
+  psa_plot <- ggplot(ce_df, aes(x = Effectiveness, y = Cost, color = Strategy)) +
     geom_point(size = 0.7, alpha = alpha, shape = 21) +
     ylab(paste("Cost (", currency, ")", sep = ""))
 
   # define strategy-specific means for the center of the ellipse
   if (center) {
     strat_means <- ce_df %>%
-      group_by(.data$Strategy) %>%
-      summarize(Cost.mean = mean(.data$Cost),
-                Eff.mean = mean(.data$Effectiveness))
+      group_by(Strategy) %>%
+      summarize(Cost.mean = mean(Cost),
+                Eff.mean = mean(Effectiveness))
     # make strategies in psa object into ordered factors
     strat_means$Strategy <- factor(strat_means$Strategy, levels = strategies, ordered = TRUE)
     psa_plot <- psa_plot +
       geom_point(data = strat_means,
-                 aes_string(x = "Eff.mean", y = "Cost.mean", fill = "Strategy"),
+                 aes(x = Eff.mean, y = Cost.mean, fill = Strategy),
                  size = 8, shape = 21, color = "black")
   }
 
@@ -209,8 +210,8 @@ plot.psa <- function(x,
     df_ell <- bind_rows(df_list_ell)
     # draw ellipse lines
     psa_plot <- psa_plot + geom_path(data = df_ell,
-                                     aes_string(x = "x", y = "y", colour = "group"),
-                                     size = 1, linetype = 2, alpha = 1)
+                                     aes(x = x, y = y, colour = group),
+                                     linewidth = 1, linetype = 2, alpha = 1)
   }
 
   # add common theme

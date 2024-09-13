@@ -82,9 +82,10 @@ plot.evpi <- function(x,
                       xlim = c(0, NA),
                       ylim = NULL,
                       ...) {
+  WTP_thou <- EVPI <- NULL
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
-         aes_(x = as.name("WTP_thou"), y = as.name("EVPI"))) +
+              aes(x = WTP_thou, y = EVPI)) +
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
     ylab(paste("EVPI (", currency, ")", sep = ""))

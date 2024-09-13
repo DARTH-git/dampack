@@ -12,9 +12,9 @@ test_that("psa has all methods we'd expect", {
 
 ## setup
 sm_costs <- data.frame(rbind(c(10e3, 20e3, 100e3),
-               c(20e3, 40e3, 200e3)))
+                             c(20e3, 40e3, 200e3)))
 sm_effectiveness <- data.frame(rbind(c(100, 50, 900),
-                       c(56, 89, 700)))
+                                     c(56, 89, 700)))
 sm_parameters <- data.frame(
   "p1" = c(1, 2),
   "p2" = c(2, 10)
@@ -44,7 +44,7 @@ sm_str_space <- c("test", "no test", "treat")
 test_that("fix strategy", {
   # should produce a warning
   psa_space <- expect_warning(make_psa_obj(sm_costs, sm_effectiveness,
-                              sm_parameters, sm_str_space), "no.test")
+                                           sm_parameters, sm_str_space), "no.test")
   # correct strategies
   expect_true("no.test" %in% psa_space$strategies)
   expect_false("no test" %in% psa_space$strategies)

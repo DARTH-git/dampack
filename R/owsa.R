@@ -110,9 +110,10 @@ plot.owsa <- function(x, txtsize = 12,
                       n_y_ticks = 6,
                       basecase = NULL,
                       ...) {
+  param_val <- outcome_val <- strategy <- NULL
   scales <- match.arg(facet_scales)
   owsa <- ggplot(data = x,
-                 aes_(x = as.name("param_val"), y = as.name("outcome_val"))) +
+                 aes(x = param_val, y = outcome_val)) +
     facet_wrap(facets = "parameter", scales = scales, nrow = facet_nrow, ncol = facet_ncol) +
     ylab("E[Outcome]") +
     xlab("Parameter Values")
@@ -120,12 +121,12 @@ plot.owsa <- function(x, txtsize = 12,
   col <- match.arg(col)
   if (col == "full") {
     owsa <- owsa +
-      geom_line(aes_(color = as.name("strategy")),
-                size = size)
+      geom_line(aes(color = strategy),
+                linewidth = size)
   }
   if (col == "bw") {
     owsa <- owsa +
-      geom_line(aes_(linetype = as.name("strategy")),
+      geom_line(aes_(linetype = strategy),
                 size = size) +
       scale_linetype_discrete(name = "Strategy")
   }
@@ -142,7 +143,7 @@ plot.owsa <- function(x, txtsize = 12,
     }
 
     owsa <- owsa +
-      geom_vline(mapping = aes_(xintercept = as.name("param_val")),
+      geom_vline(mapping = aes(xintercept = param_val),
                  data = basecase_df)
   }
 
@@ -172,48 +173,50 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
                          txtsize = 12, min_rel_diff = 0,
                          col = c("full", "bw"),
                          n_y_ticks = 8, ylim = NULL, ybreaks = NULL) {
+  parameter <- param_val <- outcome_val <- strategy <- outcome_val.low <-
+    outcome_val.high <- abs_diff <- rel_diff <- NULL
   # check that is owsa object
   if (!is_owsa(owsa)) {
     stop("must provide an owsa object created with owsa()")
   }
 
   # range of min_rel_diff
-  if (min_rel_diff < 0 | min_rel_diff > 1) {
+  if (min_rel_diff < 0 || min_rel_diff > 1) {
     stop("min_rel_diff must be between 0 and 1")
   }
 
   owsa_filt <- owsa %>%
-    group_by(.data$parameter, .data$param_val) %>%
-    arrange(.data$outcome_val) %>%
+    group_by(parameter, param_val) %>%
+    arrange(outcome_val) %>%
     slice(n()) %>%
-    select(-.data$strategy) %>%
+    select(-strategy) %>%
     ungroup()
 
   # group by parameter and strategy
   mins <- owsa_filt %>%
-    group_by(.data$parameter) %>%
-    filter(.data$param_val == min(.data$param_val))
+    group_by(parameter) %>%
+    filter(param_val == min(param_val))
 
   maxes <- owsa_filt %>%
-    group_by(.data$parameter) %>%
-    filter(.data$param_val == max(.data$param_val))
+    group_by(parameter) %>%
+    filter(param_val == max(param_val))
 
   avg <- median(owsa_filt$outcome_val)
 
   min_max <- inner_join(mins, maxes, by = c("parameter"),
                         suffix = c(".low", ".high")) %>%
-    mutate(abs_diff = abs(.data$outcome_val.high - .data$outcome_val.low),
-           rel_diff = .data$abs_diff / .data$outcome_val.low) %>%
-    filter(.data$rel_diff >= min_rel_diff) %>%
-    arrange(-.data$abs_diff)
+    mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
+           rel_diff = abs_diff / outcome_val.low) %>%
+    filter(rel_diff >= min_rel_diff) %>%
+    arrange(-abs_diff)
 
   # return either plot or data
   ret <- match.arg(return)
   if (ret == "plot") {
-    g <- ggplot(min_max, aes_(x = reorder(min_max$parameter, min_max$abs_diff))) +
-      geom_bar(aes_(y = as.name("outcome_val.low"), fill = "Low"),
+    g <- ggplot(min_max, aes(x = reorder(min_max$parameter, min_max$abs_diff))) +
+      geom_bar(aes(y = outcome_val.low, fill = "Low"),
                stat = "identity") +
-      geom_bar(aes_(y = as.name("outcome_val.high"), fill = "High"),
+      geom_bar(aes(y = outcome_val.high, fill = "High"),
                stat = "identity") +
       labs(x = "Parameter", y = "Outcome") +
       coord_flip()
@@ -279,6 +282,7 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
     stop("must provide an owsa object created with owsa()")
   }
 
+  parameter <- param_val <- outcome_val <- strategy <- NULL
   # get optimal strategy
   ## either minimum or maximum
   if (maximize) {
@@ -290,15 +294,15 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   ## filter to those parameter values
   ## that maximize the outcome for each strategy
   opt_strat <- owsa %>%
-    group_by(.data$parameter, .data$param_val) %>%
-    filter(.data$outcome_val == obj_fun(.data$outcome_val)) %>%
+    group_by(parameter, param_val) %>%
+    filter(outcome_val == obj_fun(outcome_val)) %>%
     ungroup() %>%
-    group_by(.data$parameter, .data$strategy) %>%
-    summarize(pmin = min(.data$param_val), pmax = max(.data$param_val)) %>%
+    group_by(parameter, strategy) %>%
+    summarize(pmin = min(param_val), pmax = max(param_val)) %>%
     ungroup()
   if (!plot_const) {
     opt_strat <- opt_strat %>%
-      group_by(.data$parameter) %>%
+      group_by(parameter) %>%
       filter(n() > 1) %>%
       ungroup()
   }
@@ -320,9 +324,9 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   g <- ggplot(opt_strat) +
     facet_wrap("parameter", scales = "free_x", ncol = facet_ncol, nrow = facet_nrow) +
     # a little bit hacky: rectangles with height 1
-    geom_rect(aes_(xmin = as.name("pmin"), xmax = as.name("pmax"),
-                   ymin = 0, ymax = 1,
-                   fill = as.name("strategy")),
+    geom_rect(aes(xmin = pmin, xmax = pmax,
+                  ymin = 0, ymax = 1,
+                  fill = strategy),
               position = "identity") +
     facet_wrap(facets = "parameter", scales = "free_x", nrow = facet_nrow, ncol = facet_ncol)
 

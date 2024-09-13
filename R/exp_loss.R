@@ -103,6 +103,8 @@ calc_exp_loss <- function(psa, wtp) {
 #'
 #' @return A \code{ggplot2} object with the expected loss
 #' @import ggplot2
+#' @importFrom rlang !!
+#' @importFrom rlang sym
 #' @importFrom scales comma
 #' @export
 plot.exp_loss <- function(x,
@@ -121,6 +123,7 @@ plot.exp_loss <- function(x,
                           ylim = NULL,
                           col = c("full", "bw"),
                           ...) {
+  On_Frontier <- NULL
   wtp_name <- "WTP_thou"
   loss_name <- "Expected_Loss"
   strat_name <- "Strategy"
@@ -140,8 +143,8 @@ plot.exp_loss <- function(x,
     tr <- "identity"
   }
 
-  p <- ggplot(data = nofront, aes_(x = as.name(wtp_name),
-                                   y = as.name(loss_name))) +
+  p <- ggplot(data = nofront, aes(x = !!sym(wtp_name),
+                                  y = !!sym(loss_name))) +
     xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
     ylab(paste0("Expected Loss (", currency, ")"))
 
@@ -150,10 +153,10 @@ plot.exp_loss <- function(x,
   ## change linetype too if color is black and white
   if (col == "full") {
     if (points) {
-      p <- p + geom_point(aes_(color = as.name(strat_name)))
+      p <- p + geom_point(aes(color = !!sym(strat_name)))
     }
     p <- p +
-      geom_line(size = lsize, aes_(color = as.name(strat_name)))
+      geom_line(linewidth = lsize, aes(color = !!sym(strat_name)))
 
   }
   if (col == "bw") {
@@ -161,7 +164,7 @@ plot.exp_loss <- function(x,
       p <- p + geom_point()
     }
     p <- p +
-      geom_line(aes_(linetype = as.name(strat_name)))
+      geom_line(aes(linetype = !!sym(strat_name)))
   }
 
   p <- add_common_aes(p, txtsize, col = col, col_aes = c("color", "line"),
@@ -171,9 +174,9 @@ plot.exp_loss <- function(x,
                       xlim = xlim, ylim = ylim,
                       ytrans = tr)
   if (frontier) {
-    p <- p + geom_point(data = front, aes_(x = as.name(wtp_name),
-                                           y = as.name(loss_name),
-                                           shape = as.name("On_Frontier")),
+    p <- p + geom_point(data = front, aes(x = !!sym(wtp_name),
+                                          y = !!sym(loss_name),
+                                          shape = On_Frontier),
                         size = 3, stroke = 1, color = "black") +
       scale_shape_manual(name = NULL, values = 0, labels = "Frontier & EVPI") +
       guides(color = guide_legend(order = 1),

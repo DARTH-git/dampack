@@ -60,9 +60,11 @@ calculate_icers <- function(cost, effect, strategies) {
   n_cost <- length(cost)
   n_eff <- length(effect)
   n_strat <- length(strategies)
-  if (n_cost != n_eff | n_eff != n_strat) {
+  if (n_cost != n_eff || n_eff != n_strat) {
     stop("cost, effect, and strategies must all be vectors of the same length", call. = FALSE)
   }
+
+  Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
 
   # coerce to character, in case they are provided as numeric
   char_strat <- as.character(strategies)
@@ -86,7 +88,7 @@ calculate_icers <- function(cost, effect, strategies) {
   # detect dominated strategies
   # dominated strategies have a higher cost and lower effect
   df <- df %>%
-    arrange(.data$Cost, desc(.data$Effect))
+    arrange(Cost, desc(Effect))
 
   # iterate over strategies and detect (strongly) dominated strategies
   # those with higher cost and equal or lower effect
@@ -157,12 +159,12 @@ calculate_icers <- function(cost, effect, strategies) {
 
   # when combining, sort so we have ref,ND,ED,D
   results <- bind_rows(d_df, ed_df, nd_df_icers) %>%
-    arrange(desc(.data$Status), .data$Cost, desc(.data$Effect))
+    arrange(desc(Status), Cost, desc(Effect))
 
   # re-arrange columns
   results <- results %>%
-    select(.data$Strategy, .data$Cost, .data$Effect,
-           .data$Inc_Cost, .data$Inc_Effect, .data$ICER, .data$Status)
+    select(Strategy, Cost, Effect,
+           Inc_Cost, Inc_Effect, ICER, Status)
 
   # declare class of results
   class(results) <- c("icers", "data.frame")
@@ -205,6 +207,9 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
   # Calculate mean outcome values
   psa_sum <- summary(psa)
 
+  Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- value <-
+    Lower_95_Cost <- Upper_95_Cost <- Lower_95_Effect <- Upper_95_Effect <- NULL
+
   # Supply mean outcome values to calculate_icers
   icers <- calculate_icers(cost = psa_sum$meanCost,
                            effect = psa_sum$meanEffect,
@@ -219,24 +224,24 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
     # Calculate quantiles across costs and effects
     cost_bounds <- cost %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
-      group_by(.data$Strategy) %>%
-      summarize(Lower_95_Cost = quantile(.data$value, probs = 0.025, names = FALSE),
-                Upper_95_Cost = quantile(.data$value, probs = 0.975, names = FALSE))
+      group_by(Strategy) %>%
+      summarize(Lower_95_Cost = quantile(value, probs = 0.025, names = FALSE),
+                Upper_95_Cost = quantile(value, probs = 0.975, names = FALSE))
 
     effect_bounds <- effect %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
-      group_by(.data$Strategy) %>%
-      summarize(Lower_95_Effect = quantile(.data$value, probs = 0.025, names = FALSE),
-                Upper_95_Effect = quantile(.data$value, probs = 0.975, names = FALSE))
+      group_by(Strategy) %>%
+      summarize(Lower_95_Effect = quantile(value, probs = 0.025, names = FALSE),
+                Upper_95_Effect = quantile(value, probs = 0.975, names = FALSE))
 
     # merge bound data.frames into icers data.frame
     icers <- icers %>%
       left_join(cost_bounds, by = "Strategy") %>%
       left_join(effect_bounds, by = "Strategy") %>%
-      select(.data$Strategy, .data$Cost, .data$Lower_95_Cost, .data$Upper_95_Cost,
-             .data$Effect, .data$Lower_95_Effect, .data$Upper_95_Effect,
-             .data$Inc_Cost, .data$Inc_Effect, .data$ICER, .data$Status)
-    }
+      select(Strategy, Cost, Lower_95_Cost, Upper_95_Cost,
+             Effect, Lower_95_Effect, Upper_95_Effect,
+             Inc_Cost, Inc_Effect, ICER, Status)
+  }
 
   return(icers)
 }
@@ -286,6 +291,8 @@ compute_icers <- function(non_d) {
 #'
 #' @importFrom stringr str_sub
 #' @importFrom ggrepel geom_label_repel
+#' @importFrom rlang !!
+#' @importFrom rlang sym
 #' @export
 plot.icers <- function(x,
                        txtsize = 12,
@@ -305,19 +312,21 @@ plot.icers <- function(x,
                        yexpand = expansion(0.1),
                        max.iter = 20000,
                        ...) {
+  Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
+
   if (ncol(x) > 7) {
     # reformat icers class object if uncertainty bounds are present
     x <- x %>%
-      select(.data$Strategy, .data$Cost, .data$Effect,
-             .data$Inc_Cost, .data$Inc_Effect,
-             .data$ICER, .data$Status)
+      select(Strategy, Cost, Effect,
+             Inc_Cost, Inc_Effect,
+             ICER, Status)
   }
 
   # type checking
   label <- match.arg(label)
 
   # this is so non-dominated strategies are plotted last (on top)
-  x <- arrange(x, .data$Status)
+  x <- arrange(x, Status)
 
   # change status text in data frame for plotting
   d_name <- "Dominated"
@@ -334,7 +343,7 @@ plot.icers <- function(x,
                   "Weakly Dominated" = "blank",
                   "Efficient Frontier" = "solid")
 
-  # names to refer to in aes_
+  # names to refer to in aes
   stat_name <- "Status"
   strat_name <- "Strategy"
   eff_name <- "Effect"
@@ -348,10 +357,10 @@ plot.icers <- function(x,
   }
 
   # make plot
-  icer_plot <- ggplot(plt_data, aes_(x = as.name(eff_name), y = as.name(cost_name),
-                                     shape = as.name(stat_name))) +
+  icer_plot <- ggplot(plt_data, aes(x = !!sym(eff_name), y = !!sym(cost_name),
+                                    shape = !!sym(stat_name))) +
     geom_point(alpha = alpha, size = 2) +
-    geom_line(aes_(linetype = as.name(stat_name), group = as.name(stat_name))) +
+    geom_line(aes(linetype = !!sym(stat_name), group = !!sym(stat_name))) +
     scale_linetype_manual(name = NULL, values = plot_lines) +
     scale_shape_discrete(name = NULL) +
     labs(x = paste0("Effect (", effect_units, ")"),
@@ -379,7 +388,7 @@ plot.icers <- function(x,
 
     icer_plot <- icer_plot +
       geom_label_repel(data = lab_data,
-                       aes_(label = as.name(strat_name)),
+                       aes(label = !!sym(strat_name)),
                        size = 3,
                        show.legend = FALSE,
                        max.iter = max.iter,

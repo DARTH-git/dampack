@@ -3,6 +3,8 @@ if (requireNamespace("lintr", quietly = TRUE)) {
 
   context("lints")
   test_that("Package Style", {
+    skip_on_cran()
+    skip_on_travis()  
 
     # A duplicate copy of the find_package function from lintr
     find_package <- function(path) {

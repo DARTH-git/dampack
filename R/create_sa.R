@@ -86,9 +86,8 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 
     # make sure strategies is the same length as the number of columns
     if (n_strategies != length(strategies)) {
-      stop(
-        paste0("The number of columns in the cost and effectiveness",
-               "matrices is different from the number of strategies provided"))
+      stop(paste0("The number of columns in the cost and effectiveness",
+                  "matrices is different from the number of strategies provided"))
     }
   }
 
@@ -102,14 +101,14 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 
   # define sa as a named list
   sa <- list("n_strategies" = n_strategies,
-              "strategies" = strategies,
-              "n_sim" = n_sim,
-              "cost" = cost,
-              "effectiveness" = effectiveness,
-              "other_outcome" = other_outcome,
-              "parameters" = parameters,
-              "parnames" = parnames,
-              "currency" = currency)
+             "strategies" = strategies,
+             "n_sim" = n_sim,
+             "cost" = cost,
+             "effectiveness" = effectiveness,
+             "other_outcome" = other_outcome,
+             "parameters" = parameters,
+             "parnames" = parnames,
+             "currency" = currency)
   class(sa) <- "sa"
   return(sa)
 }
@@ -143,7 +142,7 @@ print.sa <- function(x, all_strat = FALSE, ...) {
   # cost
   cat("number of strategies (n_strategies):", x$n_strategies, "\n")
   n_trunc <- 5
-  if (all_strat | (x$n_strategies <= n_trunc)) {
+  if (all_strat || (x$n_strategies <= n_trunc)) {
     s2print <- x$strategies
     msg <- ""
   } else {

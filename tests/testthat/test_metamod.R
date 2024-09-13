@@ -35,7 +35,7 @@ test_that("metamodel with one outcome", {
 
   ## poly
   mm_poly <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo",
-                  type = "poly")
+                       type = "poly")
   expect_is(mm_poly, "metamodel")
 
   # predictions
@@ -45,7 +45,7 @@ test_that("metamodel with one outcome", {
 
   ## GAM
   mm_gam <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo",
-                  type = "gam")
+                      type = "gam")
   expect_is(mm_gam, "metamodel")
 
   # predictions
@@ -123,6 +123,6 @@ test_that("out of range warning", {
 test_that("two-way metamodel", {
   # metamodel
   mm <- metamodel(analysis = "twoway", params = c("pFailChemo", "pFailRadio"),
-                psa = psa_big, outcome = "eff")
+                  psa = psa_big, outcome = "eff")
   expect_is(mm, "metamodel")
 })

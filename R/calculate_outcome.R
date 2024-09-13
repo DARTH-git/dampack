@@ -29,7 +29,7 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
     if (outcome == "nmb") {
       y <- effect * wtp - cost
     }
-    if (outcome == "nhb_loss" | outcome == "nmb_loss") {
+    if (outcome == "nhb_loss" || outcome == "nmb_loss") {
       if (outcome == "nhb_loss") {
         net_outcome <- "nhb"
       }
@@ -40,7 +40,7 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
       max_str_rowwise <- max.col(netben)
       y <-  netben[cbind(1:n_sim, max_str_rowwise)] - netben
     }
-    if (outcome == "nhb_loss_voi" | outcome == "nmb_loss_voi") {
+    if (outcome == "nhb_loss_voi" || outcome == "nmb_loss_voi") {
       if (outcome == "nhb_loss_voi") {
         net_outcome <- "nhb"
       }

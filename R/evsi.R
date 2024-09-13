@@ -137,11 +137,11 @@ predict_ga <- function(object, n, n0) {
   n_params <- ncol(param_vals)
 
   # Sanity checks
-  if (!(length(n) == 1 | length(n) == n_params)) {
+  if (!(length(n) == 1 || length(n) == n_params)) {
     stop("Variable 'n' should be either a scalar or a vector
          the same size as the number of parameters")
   }
-  if (!(length(n0) == 1 | length(n0) == n_params)) {
+  if (!(length(n0) == 1 || length(n0) == n_params)) {
     stop("Variable 'n0' should be either a scalar or a vector
          the same size as the number of parameters")
   }
@@ -187,7 +187,7 @@ predict_ga <- function(object, n, n0) {
   l_tilde <- x %*% beta
 
   return(l_tilde)
-  }
+}
 
 #' Function to compute the preposterior for each of the
 #' basis functions of a smooth for one parameter
@@ -292,18 +292,19 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #' @importFrom scales comma
 #' @export
 plot.evsi <- function(x,
-                       txtsize = 12,
-                       currency = "$",
-                       effect_units = "QALY",
-                       n_y_ticks = 8,
-                       n_x_ticks = 20,
-                       xbreaks = NULL,
-                       ybreaks = NULL,
-                       xlim = c(0, NA),
-                       ylim = NULL,
-                       col = c("full", "bw"),
-                       ...) {
+                      txtsize = 12,
+                      currency = "$",
+                      effect_units = "QALY",
+                      n_y_ticks = 8,
+                      n_x_ticks = 20,
+                      xbreaks = NULL,
+                      ybreaks = NULL,
+                      xlim = c(0, NA),
+                      ylim = NULL,
+                      col = c("full", "bw"),
+                      ...) {
   # Select EVSI data.frame, discarding metamodel list
+  EVSI <- WTP_thou <- NULL
   x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
@@ -312,18 +313,18 @@ plot.evsi <- function(x,
   }
   scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
 
-  if (length(unique(x$WTP)) == 1 & "n" %in% names(x)) {
+  if (length(unique(x$WTP)) == 1 && "n" %in% names(x)) {
     g <- ggplot(data = x,
-                aes_(x = as.name("n"), y = as.name("EVSI"))) +
+                aes(x = n, y = EVSI)) +
       xlab("Additional Sample Size")
-  } else if (!("n" %in% names(x)) | ("n" %in% names(x) & length(unique(x$n)) == 1)) {
+  } else if (!("n" %in% names(x)) || ("n" %in% names(x) && length(unique(x$n)) == 1)) {
     g <- ggplot(data = x,
-                aes_(x = as.name("WTP_thou"), y = as.name("EVSI"))) +
+                aes(x = WTP_thou, y = EVSI)) +
       xlab(scale_text)
-  } else if (length(unique(x$WTP > 1)) & length(unique(x$n)) > 1) {
+  } else if (length(unique(x$WTP > 1)) && length(unique(x$n)) > 1) {
     x$WTP_thou <- as.factor(x$WTP_thou)
     g <- ggplot(data = x,
-                aes_(x = as.name("n"), y = as.name("EVSI"), color = as.name("WTP_thou"))) +
+                aes(x = n, y = EVSI, color = WTP_thou)) +
       xlab("Additional Sample Size")
   } else {
     stop("Insufficient data to plot")

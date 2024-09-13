@@ -17,7 +17,7 @@ Authors@R:
              email = "easte080@umn.edu"),
       person(given = "David",
              family = "Garibay",
-             role = "ctb",
+             role = c("ctb", "cre"),
              email = "dgari039@uottawa.ca"),
       person(given = "Eva",
              family = "Enns",

@@ -169,20 +169,20 @@ plot.owsa <- function(x, txtsize = 12,
 #' @importFrom stats median reorder
 #' @import ggplot2
 #' @export
-owsa_tornado_new <- function (owsa,
-                              return = c("plot", "data"),
-                              txtsize = 12,
-                              min_rel_diff = 0,
-                              col = c("full", "bw"),
-                              n_y_ticks = 8,
-                              ylim = NULL,
-                              ybreaks = NULL,
-                              select_str = NULL,
-                              outcome_name = NULL,
-                              params_basecase  = NULL,
-                              FUN = calculate_ce_out,
-                              n_wtp = NULL,
-                              param_labels=NULL) ##new argument 'param_labels', a vector that has all the names for pars
+owsa_tornado <- function (owsa,
+                          return = c("plot", "data"),
+                          txtsize = 12,
+                          min_rel_diff = 0,
+                          col = c("full", "bw"),
+                          n_y_ticks = 8,
+                          ylim = NULL,
+                          ybreaks = NULL,
+                          select_str = NULL,
+                          outcome_name = NULL,
+                          params_basecase  = NULL,
+                          FUN = calculate_ce_out,
+                          n_wtp = NULL,
+                          param_labels=NULL) ##new argument 'param_labels', a vector that has all the names for pars
 {
 
   #browser()

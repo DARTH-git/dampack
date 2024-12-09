@@ -153,15 +153,32 @@ plot.owsa <- function(x, txtsize = 12,
                  continuous = c("x", "y"))
 }
 
+#' @param basecase named list of specific values for each parameter to highlight
+#' on the returned plot. Each list element must have the same name as the corresponding
+#' parameter in the \code{owsa} object.
+
 #' Tornado plot of a one-way sensitivity analysis
-#'
-#' @param owsa an owsa object
+#' @param owsa an `owsa` object
+#' @param return character input with two available options "plot" and "data", defining if the function should return a plot or a dataset, respectively.
+#' @param txtsize text size of the plot if `return` == "plot".
 #' @param min_rel_diff this function only plots
 #' parameters that lead to a relative change in the outcome greater than or equal
 #' to \code{min_rel_diff}, which must be between 0 and 1. The default (0) is that
 #' no strategies are filtered.
+#' @param col character input with two available options "full" or "bw", defining if the returned plot should be in color or in black and white, respectively.
+#' @param n_y_ticks number of ticks in the y-axis of the plot.
+#' @param ylim limit in the y-axis of the plot
+#' @param ybreaks numeric vector defining the breaks in the y-axis of the plot.
+#' @param select_str character input defining the strategy to be analyzed.
+#' @param outcome_name character input defining the name of the outcome.
+#' @param params_basecase parameters corresponding to the basecase.
+#' @param FUN function used to analyze different strategies.
+#' @param n_wtp numeric input defining the willingness-to-pay threshold.
+#' @param param_labels a character vector defining the labels of all the parameters in the analysis.
+#'
 #' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
+#'
 #' @return If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}
 #' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
 #' A tornado plot is a visual aid used to identify which parameters are driving most of the variation
@@ -262,7 +279,7 @@ owsa_tornado <- function (owsa,
            rel_diff = abs_diff/outcome_val.low) %>%
     arrange(-abs_diff)
 
-  ################################NEW OPERATION:parameter labels and ranges if param_labels is provided
+  # NEW OPERATION:parameter labels and ranges if param_labels is provided
   if (!is.null(param_labels)) {
     min_max$parameter <- paste0(
       param_labels[min_max$parameter],
@@ -270,7 +287,7 @@ owsa_tornado <- function (owsa,
       ",<span style='color:forestgreen;'>", format(min_max$param_val.high),"</span>]" #green for high
     )
   }
-  ################################
+
 
   ret <- match.arg(return)
   if (ret == "plot") {

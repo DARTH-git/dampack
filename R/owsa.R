@@ -169,67 +169,130 @@ plot.owsa <- function(x, txtsize = 12,
 #' @importFrom stats median reorder
 #' @import ggplot2
 #' @export
-owsa_tornado <- function(owsa, return = c("plot", "data"),
-                         txtsize = 12, min_rel_diff = 0,
-                         col = c("full", "bw"),
-                         n_y_ticks = 8, ylim = NULL, ybreaks = NULL) {
-  parameter <- param_val <- outcome_val <- strategy <- outcome_val.low <-
-    outcome_val.high <- abs_diff <- rel_diff <- NULL
-  # check that is owsa object
-  if (!is_owsa(owsa)) {
-    stop("must provide an owsa object created with owsa()")
+owsa_tornado_new <- function (owsa,
+                              return = c("plot", "data"),
+                              txtsize = 12,
+                              min_rel_diff = 0,
+                              col = c("full", "bw"),
+                              n_y_ticks = 8,
+                              ylim = NULL,
+                              ybreaks = NULL,
+                              select_str = NULL,
+                              outcome_name = NULL,
+                              params_basecase  = NULL,
+                              FUN = calculate_ce_out,
+                              n_wtp = NULL,
+                              param_labels=NULL) ##new argument 'param_labels', a vector that has all the names for pars
+{
+
+  #browser()
+
+  if(is.null(params_basecase)){
+    stop("Please provide base case parameters")
+  }
+  if(is.null(n_wtp)){
+    stop("Please specify a willingness to pay threshold")
+  }
+  if(is.null(select_str)){
+    stop("Please provide at least 1 strategy name")
   }
 
-  # range of min_rel_diff
+
+  if (length(select_str)>2){
+    stop("Please select a max of 2 strategies")
+
+  }
+
+
+  # run basecase analysis
+  res_out <- FUN(params_basecase, n_wtp = n_wtp)
+  res_out <- res_out %>%
+    mutate(Strategy = gsub(" ", ".", Strategy))
+
+  if(is.null(select_str)){
+    select_str <- owsa$strategy[1]
+    owsa <- owsa %>% filter(strategy ==select_str[1])
+    y_label <-  paste0(outcome_name, " (", select_str[1],")")
+    avg <- res_out[res_out$Strategy %in% select_str[1], outcome_name]
+
+  }else{
+    if (length(select_str)==2){
+      owsa_base <- owsa_nmb%>%filter(strategy == select_str[1])
+      owsa_comp <- owsa_nmb%>%filter(strategy == select_str[2])
+      owsa_join <- inner_join(owsa_base,owsa_comp,by = c("parameter", "param_val"))
+      owsa_join$outcome_val <- owsa_join$outcome_val.y - owsa_join$outcome_val.x
+      owsa_join$strategy    <- owsa_join$strategy.x
+      owsa                  <- owsa_join%>% select(parameter ,strategy,  param_val, outcome_val )
+      y_label               <- paste0(outcome_name, " (", select_str[1], " vs ", select_str[2],")")
+
+      avg <- res_out[res_out$Strategy %in% select_str[2], outcome_name] -
+        res_out[res_out$Strategy %in% select_str[1], outcome_name]
+
+    }else{
+
+      owsa       <- owsa %>% filter(strategy ==select_str)
+      y_label    <-  paste0(outcome_name, " (", select_str,")")
+      avg        <- res_out[res_out$Strategy %in% select_str, outcome_name]
+
+
+
+    }
+  }
+  parameter <- param_val <- outcome_val <- strategy <- outcome_val.low <- outcome_val.high <- abs_diff <- rel_diff <- NULL
+  if (!dampack:::is_owsa(owsa)) {
+    stop("must provide an owsa object created with owsa()")
+  }
   if (min_rel_diff < 0 || min_rel_diff > 1) {
     stop("min_rel_diff must be between 0 and 1")
   }
-
   owsa_filt <- owsa %>%
     group_by(parameter, param_val) %>%
     arrange(outcome_val) %>%
     slice(n()) %>%
     select(-strategy) %>%
     ungroup()
-
-  # group by parameter and strategy
-  mins <- owsa_filt %>%
-    group_by(parameter) %>%
-    filter(param_val == min(param_val))
-
-  maxes <- owsa_filt %>%
-    group_by(parameter) %>%
-    filter(param_val == max(param_val))
-
-  avg <- median(owsa_filt$outcome_val)
-
+  mins <- owsa_filt %>% group_by(parameter) %>% filter(param_val ==
+                                                         min(param_val))
+  maxes <- owsa_filt %>% group_by(parameter) %>% filter(param_val ==
+                                                          max(param_val))
+  #avg <- median(owsa_filt$outcome_val)
   min_max <- inner_join(mins, maxes, by = c("parameter"),
                         suffix = c(".low", ".high")) %>%
     mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
-           rel_diff = abs_diff / outcome_val.low) %>%
-    filter(rel_diff >= min_rel_diff) %>%
+           rel_diff = abs_diff/outcome_val.low) %>%
     arrange(-abs_diff)
 
-  # return either plot or data
+  ################################NEW OPERATION:parameter labels and ranges if param_labels is provided
+  if (!is.null(param_labels)) {
+    min_max$parameter <- paste0(
+      param_labels[min_max$parameter],
+      " [<span style='color:red2;'>",format(min_max$param_val.low),"</span>", #red for low
+      ",<span style='color:forestgreen;'>", format(min_max$param_val.high),"</span>]" #green for high
+    )
+  }
+  ################################
+
   ret <- match.arg(return)
   if (ret == "plot") {
-    g <- ggplot(min_max, aes(x = reorder(min_max$parameter, min_max$abs_diff))) +
-      geom_bar(aes(y = outcome_val.low, fill = "Low"),
-               stat = "identity") +
-      geom_bar(aes(y = outcome_val.high, fill = "High"),
-               stat = "identity") +
-      labs(x = "Parameter", y = "Outcome") +
-      coord_flip()
-
-    col <- match.arg(col)
-    g <- add_common_aes(g, txtsize, col = col, col_aes = "fill",
-                        scale_name = "Parameter\nLevel",
-                        continuous = "y",
-                        ytrans = offset_trans(offset = avg),
-                        n_y_ticks = n_y_ticks,
-                        ybreaks = ybreaks,
-                        ylim = ylim) +
-      geom_hline(yintercept = avg, linetype = 3)
+    if (is.null(outcome_name)){
+      outcome_name <-"Outcome"
+    }
+    g <- ggplot(min_max, aes(x = reorder(parameter, abs_diff))) +
+      geom_bar(aes(y = outcome_val.low - avg, fill = "Low"), stat = "identity") + # Bars relative to average
+      geom_bar(aes(y = outcome_val.high - avg, fill = "High"), stat = "identity") + # Bars relative to average
+      labs(x = "Parameter", y = y_label, title = "Tornado Diagram") +
+      coord_flip() +
+      scale_fill_manual(values = c("Low" = "red2", "High" = "forestgreen"), name = "Value Level") +
+      theme_minimal() +
+      theme(
+        axis.text.y = element_markdown(size = txtsize),
+        axis.text.x = element_text(size = txtsize),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"),
+        legend.position = "bottom"
+      ) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 0.8) # Dashed line at the average
 
     return(g)
   } else {

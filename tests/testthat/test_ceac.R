@@ -44,6 +44,20 @@ test_that("message is correct in summary.ceac", {
   expect_equal(sum_df$cost_eff_strat, c("Radio", "Chemo"))
 })
 
+test_that("summary.ceac is correct when the frontier switches twice", {
+  # frontier optimal on A -> B -> C, so two switches and three intervals
+  ceac_obj <- data.frame(WTP = c(10000, 30000, 50000, 70000, 90000),
+                         Strategy = c("A", "A", "B", "C", "C"),
+                         On_Frontier = TRUE,
+                         stringsAsFactors = FALSE)
+  class(ceac_obj) <- c("ceac", "data.frame")
+  sum_df <- summary(ceac_obj)
+  expect_equal(nrow(sum_df), 3)
+  expect_equal(sum_df$range_min, c(10000, 50000, 70000))
+  expect_equal(sum_df$range_max, c(50000, 70000, 90000))
+  expect_equal(sum_df$cost_eff_strat, c("A", "B", "C"))
+})
+
 ## plot
 test_that("plot.ceac produces ggplot object", {
   ceac_obj <- ceac(wtp, psa_obj)

@@ -276,30 +276,32 @@ summary.ceac <- function(object, ...) {
   } else {
     # build up summary data frame
     sum_df <- NULL
+    # each switch contributes the interval that ends at it, and the final
+    # switch additionally contributes the interval running to the highest wtp,
+    # giving n_switches + 1 rows. every index below is a single element -
+    # indexing with the whole `switches` vector recycles and duplicates rows.
     for (i in 1:n_switches) {
       if (i == 1) {
-        sum_df_row_first <- data.frame(wtp_range[1],
-                                       wtp[switches],
-                                       strat_on_front[switches - 1],
-                                       fix.empty.names = FALSE,
-                                       stringsAsFactors = FALSE)
-        sum_df <- rbind(sum_df, sum_df_row_first)
+        sum_df_row <- data.frame(wtp_range[1],
+                                 wtp[switches[1]],
+                                 strat_on_front[switches[1] - 1],
+                                 fix.empty.names = FALSE,
+                                 stringsAsFactors = FALSE)
+      } else {
+        sum_df_row <- data.frame(wtp[switches[i - 1]],
+                                 wtp[switches[i]],
+                                 strat_on_front[switches[i] - 1],
+                                 fix.empty.names = FALSE,
+                                 stringsAsFactors = FALSE)
       }
+      sum_df <- rbind(sum_df, sum_df_row)
       if (i == n_switches) {
-        sum_df_row_last <- data.frame(wtp[switches],
+        sum_df_row_last <- data.frame(wtp[switches[n_switches]],
                                       wtp_range[2],
-                                      strat_on_front[switches],
+                                      strat_on_front[switches[n_switches]],
                                       fix.empty.names = FALSE,
                                       stringsAsFactors = FALSE)
         sum_df <- rbind(sum_df, sum_df_row_last)
-      }
-      if (i > 1) {
-        sum_df_row_middle <- data.frame(wtp[switches[i]],
-                                        wtp[switches[i + 1]],
-                                        strat_on_front[switches[i]],
-                                        fix.empty.names = FALSE,
-                                        stringsAsFactors = FALSE)
-        sum_df <- rbind(sum_df, sum_df_row_middle)
       }
     }
   }

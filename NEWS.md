@@ -1,8 +1,12 @@
 ## dampack 1.0.1.9000
 
 ### New Features
+-Added df_example_psa_elc, a de-identified six-strategy PSA sample whose cost-effectiveness frontier switches optimal strategy three times. Useful for exercising CEAC and expected loss curve functions, which behave differently when the frontier switches more than once (#180)
 -Added calculate_icers_psa function
 -Added argument to plot.owsa and plot.twsa for the plotting of specific points (e.g. base case values) on top of default plot
+
+### Bug Fixes
+-summary.ceac no longer returns duplicated, mislabeled, and NA-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173)
 
 ## dampack 1.0.1
 

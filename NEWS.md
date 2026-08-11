@@ -5,6 +5,9 @@
 -Added calculate_icers_psa function
 -Added argument to plot.owsa and plot.twsa for the plotting of specific points (e.g. base case values) on top of default plot
 
+### Breaking Changes
+-summary.ceac renames its third output column from `cost_eff_strat` to `optimal_strategy`. Code that referred to the old column name by `$cost_eff_strat` must be updated (#173)
+
 ### Bug Fixes
 -summary.ceac no longer returns duplicated, mislabeled, and NA-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173)
 

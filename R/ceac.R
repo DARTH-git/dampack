@@ -246,9 +246,11 @@ plot.ceac <- function(x,
 #'
 #' @param object object returned from the \code{ceac} function
 #' @param ... further arguments (not used)
-#' @return data frame showing the interval of cost effectiveness for each
-#' interval. The intervals are open on the right endpoint -
-#' i.e., [\code{range_min}, \code{range_max})
+#' @return data frame with one row per interval of willingness to pay over which
+#' a single strategy is optimal, and three columns: \code{range_min} and
+#' \code{range_max} bounding the interval, and \code{optimal_strategy} naming the
+#' strategy on the cost-effectiveness frontier there. The intervals are open on
+#' the right endpoint - i.e., [\code{range_min}, \code{range_max})
 #'
 #' @keywords internal
 #'
@@ -305,6 +307,6 @@ summary.ceac <- function(object, ...) {
       }
     }
   }
-  names(sum_df) <- c("range_min", "range_max", "cost_eff_strat")
+  names(sum_df) <- c("range_min", "range_max", "optimal_strategy")
   sum_df
 }

@@ -12,9 +12,11 @@
 \item{...}{further arguments (not used)}
 }
 \value{
-data frame showing the interval of cost effectiveness for each
-interval. The intervals are open on the right endpoint -
-i.e., [\code{range_min}, \code{range_max})
+data frame with one row per interval of willingness to pay over which
+a single strategy is optimal, and three columns: \code{range_min} and
+\code{range_max} bounding the interval, and \code{optimal_strategy} naming the
+strategy on the cost-effectiveness frontier there. The intervals are open on
+the right endpoint - i.e., [\code{range_min}, \code{range_max})
 }
 \description{
 Describes cost-effective strategies and their

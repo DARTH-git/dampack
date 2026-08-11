@@ -41,7 +41,7 @@ test_that("handles missing strategy", {
 test_that("message is correct in summary.ceac", {
   c <- ceac(wtp, psa_obj)
   sum_df <- summary(c)
-  expect_equal(sum_df$cost_eff_strat, c("Radio", "Chemo"))
+  expect_equal(sum_df$optimal_strategy, c("Radio", "Chemo"))
 })
 
 test_that("summary.ceac is correct when the frontier switches twice", {
@@ -55,7 +55,31 @@ test_that("summary.ceac is correct when the frontier switches twice", {
   expect_equal(nrow(sum_df), 3)
   expect_equal(sum_df$range_min, c(10000, 50000, 70000))
   expect_equal(sum_df$range_max, c(50000, 70000, 90000))
-  expect_equal(sum_df$cost_eff_strat, c("A", "B", "C"))
+  expect_equal(sum_df$optimal_strategy, c("A", "B", "C"))
+})
+
+test_that("summary.ceac summarizes a real psa whose frontier switches many times", {
+  # df_example_psa_elc switches optimal strategy three times, so the summary must
+  # have four intervals. built through the public api - make_psa_obj() then
+  # ceac() - so the test also proves the bad shape was reachable from real data,
+  # which a hand-built ceac object cannot.
+  data("df_example_psa_elc")
+  l_psa <- make_psa_obj(cost = df_example_psa_elc[, 1:6],
+                        effectiveness = df_example_psa_elc[, 7:12])
+  df_ceac <- ceac(seq(1000, 150000, 1000), l_psa)
+  df_sum <- summary(df_ceac)
+
+  # expected intervals derived independently, by run-length encoding the frontier
+  df_front <- df_ceac[df_ceac$On_Frontier == TRUE, ]
+  l_runs <- rle(as.character(df_front$Strategy))
+  v_starts <- c(1, head(cumsum(l_runs$lengths), -1) + 1)
+
+  expect_equal(nrow(df_sum), length(l_runs$values))
+  expect_equal(df_sum$optimal_strategy, l_runs$values)
+  expect_equal(df_sum$range_min, df_front$WTP[v_starts])
+  expect_equal(df_sum$range_max, c(df_front$WTP[v_starts[-1]], max(df_front$WTP)))
+  expect_false(anyNA(df_sum))
+  expect_equal(anyDuplicated(df_sum), 0L)
 })
 
 ## plot

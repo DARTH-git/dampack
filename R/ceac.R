@@ -215,7 +215,7 @@ plot.ceac <- function(x,
                             color = !!sym(strat_name))) +
     geom_line() +
     xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
-    ylab("Pr Preferred")
+    ylab("Pr Most Cost-Effective")
 
   if (points) {
     p <- p + geom_point(aes(color = !!sym(strat_name)))

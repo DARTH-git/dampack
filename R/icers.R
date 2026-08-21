@@ -396,3 +396,43 @@ plot.icers <- function(x,
   }
   return(icer_plot)
 }
+
+
+#' Format CEA table
+#'
+#' \code{format_table_cea} formats the CEA table.
+#'
+#' @param x Object of class \code{icers}
+#' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
+#' @param dig_cost integer. number of digits to round costs to
+#' @param dig_eff integer. number of digits to round effects to
+#' @param dig_icer integer. number of digits to round ICER to
+#' @return a dataframe object - formatted CEA table
+#' @export
+format.icers <- function(x,
+                         currency = "$",
+                         dig_cost = 0,
+                         dig_eff  = 2,
+                         dig_icer = 0) {
+
+  table_cea            <- x
+  table_cea$Cost       <- scales::comma(round(table_cea$Cost, dig_cost))
+  table_cea$Inc_Cost   <- scales::comma(round(table_cea$Inc_Cost, dig_cost))
+  table_cea$Effect     <- round(table_cea$Effect, dig_eff)
+  table_cea$Inc_Effect <- round(table_cea$Inc_Effect, dig_eff)
+  table_cea$ICER       <- scales::comma(round(table_cea$ICER, dig_icer))
+
+  colnames(table_cea)[colnames(table_cea)
+                      %in% c("Cost",
+                             "Effect",
+                             "Inc_Cost",
+                             "Inc_Effect",
+                             "ICER")] <-
+    c(paste0("Costs (", currency, ")"),
+      "QALYs",
+      paste0("Incremental Costs (", currency, ")"),
+      "Incremental QALYs",
+      paste0("ICER (", currency, "/QALY)"))
+
+  return(table_cea)
+}

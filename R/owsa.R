@@ -156,10 +156,23 @@ plot.owsa <- function(x, txtsize = 12,
 #' Tornado plot of a one-way sensitivity analysis
 #'
 #' @param owsa an owsa object
+#' @param return choose whether to return the plot, underlying data, or both
+#' @param txtsize text size used for the plot; input for add_common_aes function
 #' @param min_rel_diff this function only plots
 #' parameters that lead to a relative change in the outcome greater than or equal
 #' to \code{min_rel_diff}, which must be between 0 and 1. The default (0) is that
 #' no strategies are filtered.
+#' @param col color used for the plot; input for add_common_aes function
+#' @param n_y_ticks number of y-axis ticks; input for add_common_aes function
+#' @param ylim vector of y-axis limits, or NULL, which sets limits
+#' automatically; input for add_common_aes function
+#' @param ybreaks vector of y-axis breaks, will override \code{n_y_ticks} if
+#' provided; input for add_common_aes function
+#' @param select_str vector of strategy names to examine (max of 2). If none are
+#' input, it will default to choose only the first of the strategies in the owsa
+#' object.
+#' @param outcome_name The name of the outcome to show by strategy, either IMB,
+#' NMB, or ICER
 #' @inheritParams add_common_aes
 #' @inheritParams owsa_opt_strat
 #' @return If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}
@@ -172,9 +185,53 @@ plot.owsa <- function(x, txtsize = 12,
 owsa_tornado <- function(owsa, return = c("plot", "data"),
                          txtsize = 12, min_rel_diff = 0,
                          col = c("full", "bw"),
-                         n_y_ticks = 8, ylim = NULL, ybreaks = NULL) {
+                         n_y_ticks = 8, ylim = NULL, ybreaks = NULL,
+                         select_str = NULL, outcome_name = NULL) {
+
+  if (length(select_str) > 2) {
+    stop("Please select a max of 2 strategies")
+  }
+
+  if (is.null(outcome_name)) {
+    outcome_name <- "Outcome"
+  }
+
+  if (is.null(select_str)) {
+    select_str <- owsa$strategy[1]
+    owsa       <- owsa %>%
+      dplyr::filter(strategy == select_str[1])
+    y_label    <- paste0(outcome_name, " (", select_str[1], ")")
+    avg        <- median(owsa$outcome_val)  # MK: Replacement for res_out
+
+  } else {
+    if (length(select_str) == 2) {
+      owsa_base <- owsa %>%
+        dplyr::filter(strategy == select_str[1])
+      owsa_comp <- owsa %>%
+        dplyr::filter(strategy == select_str[2])
+      owsa_join <- dplyr::inner_join(owsa_base, owsa_comp,
+                                     by = c("parameter", "param_val"))
+      owsa_join$outcome_val <- owsa_join$outcome_val.y - owsa_join$outcome_val.x
+      owsa_join$strategy    <- owsa_join$strategy.x
+      owsa                  <- owsa_join %>%
+        dplyr::select(parameter, strategy, param_val, outcome_val)
+      y_label <- paste0(outcome_name, " (", select_str[2],
+                        " - ", select_str[1], ")")
+      # MK: Replacement for res_out
+      avg <- median(owsa_comp$outcome_val) - median(owsa_base$outcome_val)
+
+    } else {
+      owsa       <- owsa %>%
+        dplyr::filter(strategy == select_str)
+      y_label    <- paste0(outcome_name, " (", select_str, ")")
+      avg        <- median(owsa$outcome_val)  # MK: Replacement for res_out
+    }
+  }
+
+  # MK: Removed rel_diff
   parameter <- param_val <- outcome_val <- strategy <- outcome_val.low <-
-    outcome_val.high <- abs_diff <- rel_diff <- NULL
+    outcome_val.high <- abs_diff <- NULL
+
   # check that is owsa object
   if (!is_owsa(owsa)) {
     stop("must provide an owsa object created with owsa()")
@@ -186,40 +243,38 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
   }
 
   owsa_filt <- owsa %>%
-    group_by(parameter, param_val) %>%
-    arrange(outcome_val) %>%
-    slice(n()) %>%
-    select(-strategy) %>%
-    ungroup()
+    dplyr::group_by(parameter, param_val) %>%
+    dplyr::arrange(outcome_val) %>%
+    dplyr::slice(n()) %>%
+    dplyr::select(-strategy) %>%
+    dplyr::ungroup()
 
   # group by parameter and strategy
   mins <- owsa_filt %>%
-    group_by(parameter) %>%
-    filter(param_val == min(param_val))
+    dplyr::group_by(parameter) %>%
+    dplyr::filter(param_val == min(param_val))
 
   maxes <- owsa_filt %>%
-    group_by(parameter) %>%
-    filter(param_val == max(param_val))
+    dplyr::group_by(parameter) %>%
+    dplyr::filter(param_val == max(param_val))
 
-  avg <- median(owsa_filt$outcome_val)
-
-  min_max <- inner_join(mins, maxes, by = c("parameter"),
-                        suffix = c(".low", ".high")) %>%
-    mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
-           rel_diff = abs_diff / outcome_val.low) %>%
-    filter(rel_diff >= min_rel_diff) %>%
-    arrange(-abs_diff)
+  min_max <- dplyr::inner_join(mins, maxes, by = c("parameter"),
+                               suffix = c(".low", ".high")) %>%
+    dplyr::mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
+                  rel_diff = abs_diff / outcome_val.low) %>%
+    dplyr::arrange(-abs_diff)
 
   # return either plot or data
   ret <- match.arg(return)
   if (ret == "plot") {
-    g <- ggplot(min_max, aes(x = reorder(min_max$parameter, min_max$abs_diff))) +
-      geom_bar(aes(y = outcome_val.low, fill = "Low"),
-               stat = "identity") +
-      geom_bar(aes(y = outcome_val.high, fill = "High"),
-               stat = "identity") +
-      labs(x = "Parameter", y = "Outcome") +
-      coord_flip()
+    g <- ggplot2::ggplot(min_max, aes(x = reorder(min_max$parameter,
+                                                  min_max$abs_diff))) +
+      ggplot2::geom_bar(aes(y = outcome_val.low, fill = "Low"),
+                        stat = "identity") +
+      ggplot2::geom_bar(aes(y = outcome_val.high, fill = "High"),
+                        stat = "identity") +
+      ggplot2::labs(x = "Parameter", y = y_label) +
+      ggplot2::coord_flip()
 
     col <- match.arg(col)
     g <- add_common_aes(g, txtsize, col = col, col_aes = "fill",
@@ -229,7 +284,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
                         n_y_ticks = n_y_ticks,
                         ybreaks = ybreaks,
                         ylim = ylim) +
-      geom_hline(yintercept = avg, linetype = 3)
+      ggplot2::geom_hline(yintercept = avg, linetype = 3)
 
     return(g)
   } else {

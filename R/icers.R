@@ -396,3 +396,59 @@ plot.icers <- function(x,
   }
   return(icer_plot)
 }
+
+
+#' Print the formatted CEA table
+#'
+#' @param x Object of class \code{icers}
+#' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
+#' @param dig_cost integer. number of digits to round costs to
+#' @param dig_eff integer. number of digits to round effects to
+#' @param dig_icer integer. number of digits to round ICER to
+#' @return a dataframe object - formatted CEA table
+#' @export
+print.icers <- function(x,
+                        currency = "$",
+                        dig_cost = 0,
+                        dig_eff  = 2,
+                        dig_icer = 0) {
+  # check if icers object
+  if (!inherits(x, "icers")) {
+    stop("x must be an object of class icers")
+  }
+
+  format_numbers <- function(col, n_digits) {
+    new_col <- rep("-", length(col))
+    non_na <- !is.na(col)
+    if(n_digits > 0) {
+      new_col[non_na] <- format(col[non_na], big.mark = ",", nsmall = n_digits, digits = n_digits, scientific = FALSE)
+    } else{
+      new_col[non_na] <- format(round(col[non_na], n_digits), big.mark = ",", nsmall = n_digits, scientific = FALSE)
+    }
+
+    return(new_col)
+  }
+
+  table_cea            <- x
+  table_cea$Cost       <- format_numbers(table_cea$Cost, n_digits = dig_cost)
+  table_cea$Inc_Cost   <- format_numbers(table_cea$Inc_Cost, n_digits = dig_cost)
+  table_cea$Effect     <- format_numbers(table_cea$Effect, n_digits = dig_eff)
+  table_cea$Inc_Effect <- format_numbers(table_cea$Inc_Effect, n_digits = dig_eff)
+  table_cea$ICER       <- format_numbers(table_cea$ICER, n_digits = dig_icer)
+
+  colnames(table_cea)[colnames(table_cea)
+                      %in% c("Cost",
+                             "Effect",
+                             "Inc_Cost",
+                             "Inc_Effect",
+                             "ICER")] <-
+    c(paste0("Costs (", currency, ")"),
+      "QALYs",
+      paste0("Incremental Costs (", currency, ")"),
+      "Incremental QALYs",
+      paste0("ICER (", currency, "/QALY)"))
+
+  class(table_cea) <- "data.frame"
+  print(table_cea)
+  invisible(table_cea)
+}

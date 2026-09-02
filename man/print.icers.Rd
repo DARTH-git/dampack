@@ -4,7 +4,7 @@
 \alias{print.icers}
 \title{Print the formatted CEA table}
 \usage{
-\method{print}{icers}(x, currency = "$", dig_cost = 0, dig_eff = 2, dig_icer = 0)
+\method{print}{icers}(x, currency = "$", dig_cost = 0, dig_eff = 2, dig_icer = 0, ...)
 }
 \arguments{
 \item{x}{Object of class \code{icers}}

@@ -411,7 +411,8 @@ print.icers <- function(x,
                         currency = "$",
                         dig_cost = 0,
                         dig_eff  = 2,
-                        dig_icer = 0) {
+                        dig_icer = 0,
+                        ...) {
   # check if icers object
   if (!inherits(x, "icers")) {
     stop("x must be an object of class icers")

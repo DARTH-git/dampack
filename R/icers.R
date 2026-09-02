@@ -405,6 +405,7 @@ plot.icers <- function(x,
 #' @param dig_cost integer. number of digits to round costs to
 #' @param dig_eff integer. number of digits to round effects to
 #' @param dig_icer integer. number of digits to round ICER to
+#' @param ... Additional arguments passed to other methods.
 #' @return a dataframe object - formatted CEA table
 #' @export
 print.icers <- function(x,

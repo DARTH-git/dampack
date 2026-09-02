@@ -16,6 +16,8 @@
 \item{dig_eff}{integer. number of digits to round effects to}
 
 \item{dig_icer}{integer. number of digits to round ICER to}
+
+\item{...}{Additional arguments passed to other methods.}
 }
 \value{
 a dataframe object - formatted CEA table

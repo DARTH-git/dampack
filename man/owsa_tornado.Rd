@@ -12,30 +12,39 @@ owsa_tornado(
   col = c("full", "bw"),
   n_y_ticks = 8,
   ylim = NULL,
-  ybreaks = NULL
+  ybreaks = NULL,
+  select_str = NULL,
+  outcome_name = NULL
 )
 }
 \arguments{
 \item{owsa}{an owsa object}
 
-\item{return}{either return a ggplot object \code{plot} or a data frame with
-ranges of parameters for which each strategy is optimal.}
+\item{return}{choose whether to return the plot, underlying data, or both}
 
-\item{txtsize}{base text size}
+\item{txtsize}{text size used for the plot; input for add_common_aes function}
 
 \item{min_rel_diff}{this function only plots
 parameters that lead to a relative change in the outcome greater than or equal
 to \code{min_rel_diff}, which must be between 0 and 1. The default (0) is that
 no strategies are filtered.}
 
-\item{col}{either none, full color, or black and white}
+\item{col}{color used for the plot; input for add_common_aes function}
 
-\item{n_y_ticks}{number of y-axis ticks}
+\item{n_y_ticks}{number of y-axis ticks; input for add_common_aes function}
 
-\item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
+\item{ylim}{vector of y-axis limits, or NULL, which sets limits
+automatically; input for add_common_aes function}
 
-\item{ybreaks}{vector of y-axis breaks.
-will override \code{n_y_ticks} if provided.}
+\item{ybreaks}{vector of y-axis breaks, will override \code{n_y_ticks} if
+provided; input for add_common_aes function}
+
+\item{select_str}{vector of strategy names to examine (max of 2). If none are
+input, it will default to choose only the first of the strategies in the owsa
+object.}
+
+\item{outcome_name}{The name of the outcome to show by strategy, either IMB,
+NMB, or ICER}
 }
 \value{
 If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}

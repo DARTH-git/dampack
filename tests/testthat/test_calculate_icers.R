@@ -6,7 +6,7 @@ data("hund_strat")
 # test the class
 test_that("icers has all methods we'd expect", {
   current_methods <- as.vector(methods(class = "icers"))
-  expected_methods <- c("plot.icers")
+  expected_methods <- c("plot.icers", "print.icers")
   expect_equal(current_methods, expected_methods)
 })
 

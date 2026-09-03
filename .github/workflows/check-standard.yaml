@@ -68,9 +68,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
+            install.packages("pak")
+            pak::pak(c("rcmdcheck", "deps"))
         shell: Rscript {0}
+          # remotes::install_deps(dependencies = TRUE)
+          # remotes::install_cran("rcmdcheck")
 
       - name: Check
         env:

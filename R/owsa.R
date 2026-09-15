@@ -173,8 +173,6 @@ plot.owsa <- function(x, txtsize = 12,
 #' object.
 #' @param outcome_name The name of the outcome to show by strategy, either IMB,
 #' NMB, or ICER
-#' @inheritParams add_common_aes
-#' @inheritParams owsa_opt_strat
 #' @return If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}
 #' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
 #' A tornado plot is a visual aid used to identify which parameters are driving most of the variation

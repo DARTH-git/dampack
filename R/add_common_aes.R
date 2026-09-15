@@ -3,7 +3,7 @@
 #' @param gplot a ggplot object
 #' @param txtsize base text size
 #' @param scale_name how to name scale. Default inherits from variable name.
-#' @param col either none, full color, or black and white
+#' @param col either none, full color, accessible colors, or black and white
 #' @param col_aes which aesthetics to modify with \code{col}
 #' @param lval color lightness - 0 to 100
 #' @param greystart between 0 and 1. used in greyscale only. smaller numbers are lighter
@@ -24,14 +24,18 @@
 #' @param yexpand Padding around data. See \code{\link[ggplot2]{scale_continuous}} for details.
 #' The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplot2]{expansion}}
 #' for how to modify this.
+#' @param v_str vector of strategies. Used to control for color palette when a
+#' reference strategy is excluded from the plot.
 #' @param ... further arguments to plot.
 #' This is not used by \code{dampack} but required for generic consistency.
 #' @return a \code{ggplot2} plot updated with a common aesthetic
 #'
 #' @import ggplot2
+#' @importFrom stats setNames
+#' @importFrom grDevices grey.colors
 #' @keywords internal
 add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
-                           col = c("none", "full", "bw"),
+                           col = c("none", "full", "access", "bw"),
                            col_aes = c("fill", "color"),
                            lval = 50,
                            greystart = 0.2,
@@ -48,6 +52,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                            xexpand = waiver(),
                            yexpand = waiver(),
                            facet_lab_txtsize = NULL,
+                           v_str = NULL,
                            ...) {
   p <- gplot +
     theme_bw() +
@@ -64,31 +69,110 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   col <- match.arg(col)
   col_aes <- match.arg(col_aes, several.ok = TRUE)
   if (col == "full") {
-    if ("color" %in% col_aes) {
-      p <- p +
-        scale_color_discrete(name = scale_name, l = lval,
+    if (!is.null(v_str)) {
+      man_cols <- setNames(
+        scales::hue_pal(l = lval)(length(v_str)),
+        v_str
+      )
+      if ("color" %in% col_aes) {
+        p <- p +
+          scale_color_manual(name = scale_name,
                              aesthetics = "color",
-                             drop = FALSE)
-    }
-    if ("fill" %in% col_aes) {
-      p <- p +
-        scale_fill_discrete(name = scale_name, l = lval,
+                             values = man_cols,
+                             drop = TRUE)
+      }
+      if ("fill" %in% col_aes) {
+        p <- p +
+          scale_fill_manual(name = scale_name,
                             aesthetics = "fill",
-                            drop = FALSE)
+                            values = man_cols,
+                            drop = TRUE)
+      }
+    } else {
+      if ("color" %in% col_aes) {
+        p <- p +
+          scale_color_discrete(name = scale_name, l = lval,
+                               aesthetics = "color",
+                               drop = FALSE)
+      }
+      if ("fill" %in% col_aes) {
+        p <- p +
+          scale_fill_discrete(name = scale_name, l = lval,
+                              aesthetics = "fill",
+                              drop = FALSE)
+      }
+    }
+  }
+  if (col == "access") {
+    if (!is.null(v_str)) {
+      man_cols <- setNames(
+        viridis::viridis(length(v_str)),
+        v_str
+      )
+      if ("color" %in% col_aes) {
+        p <- p +
+          scale_color_manual(name = scale_name,
+                             aesthetics = "color",
+                             values = man_cols,
+                             drop = TRUE)
+      }
+      if ("fill" %in% col_aes) {
+        p <- p +
+          scale_fill_manual(name = scale_name,
+                            aesthetics = "fill",
+                            values = man_cols,
+                            drop = TRUE)
+      }
+    } else {
+      if ("color" %in% col_aes) {
+        p <- p +
+          scale_color_viridis_d(name = scale_name,
+                                aesthetics = "color",
+                                drop = FALSE,
+                                option = "D")
+      }
+      if ("fill" %in% col_aes) {
+        p <- p +
+          scale_fill_viridis_d(name = scale_name,
+                               aesthetics = "fill",
+                               drop = FALSE,
+                               option = "D")
+      }
     }
   }
   if (col == "bw") {
-    if ("color" %in% col_aes) {
-      p <- p +
-        scale_color_grey(name = scale_name, start = greystart, end = greyend,
-                         aesthetics = "color",
-                         drop = FALSE)
-    }
-    if ("fill" %in% col_aes) {
-      p <- p +
-        scale_fill_grey(name = scale_name, start = greystart, end = greyend,
-                        aesthetics = "fill",
-                        drop = FALSE)
+    if (!is.null(v_str)) {
+      col_palette <- setNames(
+        grey.colors(length(v_str), start = greystart, end = greyend),
+        v_str
+      )
+      if ("color" %in% col_aes) {
+        p <- p +
+          scale_color_manual(name = scale_name,
+                             aesthetics = "color",
+                             values = man_cols,
+                             drop = TRUE)
+      }
+      if ("fill" %in% col_aes) {
+        p <- p +
+          scale_fill_manual(name = scale_name,
+                            aesthetics = "fill",
+                            values = man_cols,
+                            drop = TRUE)
+      }
+    } else {
+      if ("color" %in% col_aes) {
+        p <- p +
+          scale_color_grey(name = scale_name, start = greystart, end = greyend,
+                           aesthetics = "color",
+                           drop = FALSE)
+      }
+      if ("fill" %in% col_aes) {
+        p <- p +
+          scale_fill_grey(name = scale_name, start = greystart, end = greyend,
+                          aesthetics = "fill",
+                          drop = FALSE)
+      }
     }
   }
 

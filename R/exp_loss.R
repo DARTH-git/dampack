@@ -121,7 +121,7 @@ plot.exp_loss <- function(x,
                           ybreaks = NULL,
                           xlim = c(0, NA),
                           ylim = NULL,
-                          col = c("full", "bw"),
+                          col = c("access", "full", "bw"),
                           ...) {
   On_Frontier <- NULL
   wtp_name <- "WTP_thou"
@@ -151,7 +151,7 @@ plot.exp_loss <- function(x,
   # color
   col <- match.arg(col)
   ## change linetype too if color is black and white
-  if (col == "full") {
+  if (col == "full" | col == "access") {
     if (points) {
       p <- p + geom_point(aes(color = !!sym(strat_name)))
     }

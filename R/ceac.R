@@ -164,7 +164,7 @@ plot.ceac <- function(x,
                       ybreaks = NULL,
                       ylim = NULL,
                       xlim = c(0, NA),
-                      col = c("full", "bw"),
+                      col = c("access", "full", "bw"),
                       ...) {
   wtp_name <- "WTP"
   prop_name <- "Proportion"

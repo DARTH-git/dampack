@@ -94,7 +94,7 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
 #' @return A \code{ggplot2} plot of the two-way sensitivity analysis.
 #' @export
 plot.twsa <- function(x, maximize = TRUE,
-                      col = c("full", "bw"),
+                      col = c("access", "full", "bw"),
                       n_x_ticks = 6,
                       n_y_ticks = 6,
                       txtsize = 12,

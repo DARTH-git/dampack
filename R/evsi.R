@@ -301,7 +301,7 @@ plot.evsi <- function(x,
                       ybreaks = NULL,
                       xlim = c(0, NA),
                       ylim = NULL,
-                      col = c("full", "bw"),
+                      col = c("access", "full", "bw"),
                       ...) {
   # Select EVSI data.frame, discarding metamodel list
   EVSI <- WTP_thou <- NULL

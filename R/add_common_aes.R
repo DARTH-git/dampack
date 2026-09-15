@@ -105,10 +105,18 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   }
   if (col == "access") {
     if (!is.null(v_str)) {
-      man_cols <- setNames(
-        viridis::viridis(length(v_str)),
-        v_str
-      )
+      if (length(v_str) > 8) {
+        man_cols <- setNames(
+          viridis::viridis(length(v_str), option = "D"),
+          v_str
+        )
+      } else {
+        man_cols <- setNames(
+          RColorBrewer::brewer.pal(max(length(v_str), 3), name = "Dark2"),
+          v_str
+        )
+      }
+
       if ("color" %in% col_aes) {
         p <- p +
           scale_color_manual(name = scale_name,
@@ -124,19 +132,27 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                             drop = TRUE)
       }
     } else {
+      p_data   <- ggplot_build(p)
+      n_groups <- max(length(unique(p_data@data[[1]]$colour)),
+                      length(unique(p_data@data[[1]]$fill)))
+      if (n_groups > 8) {
+        man_cols <- viridis::viridis(n_groups, option = "D")
+      } else {
+        man_cols <- RColorBrewer::brewer.pal(max(n_groups, 3), name = "Dark2")
+      }
       if ("color" %in% col_aes) {
         p <- p +
-          scale_color_viridis_d(name = scale_name,
-                                aesthetics = "color",
-                                drop = FALSE,
-                                option = "D")
+          scale_color_manual(name = scale_name,
+                             aesthetics = "color",
+                             values = man_cols,
+                             drop = FALSE)
       }
       if ("fill" %in% col_aes) {
         p <- p +
-          scale_fill_viridis_d(name = scale_name,
-                               aesthetics = "fill",
-                               drop = FALSE,
-                               option = "D")
+          scale_fill_manual(name = scale_name,
+                            aesthetics = "fill",
+                            values = man_cols,
+                            drop = FALSE)
       }
     }
   }

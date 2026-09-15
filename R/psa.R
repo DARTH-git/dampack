@@ -128,10 +128,14 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' Plot the psa object
 #'
 #' @param x the psa object
+#' @param ref_str select a reference strategy. If the user selects a reference
+#' strategy, the cost-effectiveness plane becomes an incremental cost-effectiveness plane
 #' @param center plot the mean cost and effectiveness for each strategy. defaults to TRUE
 #' @param ellipse plot an ellipse around each strategy. defaults to TRUE
 #' @param alpha opacity of the scatterplot points.
 #' 0 is completely transparent, 1 is completely opaque
+#' @param ref_axis Add dotted axes lines at (0,0). Defaults to TRUE
+#' @param ref_caption Add the reference strategy as a caption. Defaults to TRUE
 #' @inheritParams add_common_aes
 #'
 #' @importFrom ellipse ellipse
@@ -143,13 +147,16 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @importFrom tidyr pivot_longer
 #' @export
 plot.psa <- function(x,
+                     ref_str = NULL,
                      center = TRUE, ellipse = TRUE,
-                     alpha = 0.2, txtsize = 12, col = c("full", "bw"),
+                     alpha = 0.2, txtsize = 12, col = c("access", "full", "bw"),
                      n_x_ticks = 6, n_y_ticks = 6,
                      xbreaks = NULL,
                      ybreaks = NULL,
                      xlim = NULL,
                      ylim = NULL,
+                     ref_axis = TRUE,
+                     ref_caption = TRUE,
                      ...) {
 
   Effectiveness <- Cost <- Strategy <- Eff.mean <- Cost.mean <- y <- group <- NULL
@@ -158,67 +165,161 @@ plot.psa <- function(x,
   strategies <- x$strategies
   currency <- x$currency
 
-  # expect that effectiveness and costs have strategy column names
-  # removes confusing 'No id variables; using all as measure variables'
-  df_cost <- suppressMessages(
-    pivot_longer(cost,
-                 everything(),
-                 names_to = "Strategy",
-                 values_to = "Cost")
-  )
-  df_effect <- suppressMessages(
-    pivot_longer(effectiveness,
-                 cols = everything(),
-                 names_to = "Strategy",
-                 values_to = "Effectiveness")
-  )
-  ce_df <- data.frame("Strategy" = df_cost$Strategy,
-                      "Cost" = df_cost$Cost,
-                      "Effectiveness" = df_effect$Effectiveness)
+  if (is.null(ref_str)) {
+    # expect that effectiveness and costs have strategy column names
+    # removes confusing 'No id variables; using all as measure variables'
+    df_cost <- suppressMessages(
+      pivot_longer(cost,
+                   everything(),
+                   names_to = "Strategy",
+                   values_to = "Cost")
+    )
+    df_effect <- suppressMessages(
+      pivot_longer(effectiveness,
+                   cols = everything(),
+                   names_to = "Strategy",
+                   values_to = "Effectiveness")
+    )
+    ce_df <- data.frame("Strategy" = df_cost$Strategy,
+                        "Cost" = df_cost$Cost,
+                        "Effectiveness" = df_effect$Effectiveness)
 
-  # make strategies in psa object into ordered factors
-  ce_df$Strategy <- factor(ce_df$Strategy, levels = strategies, ordered = TRUE)
-
-  psa_plot <- ggplot(ce_df, aes(x = Effectiveness, y = Cost, color = Strategy)) +
-    geom_point(size = 0.7, alpha = alpha, shape = 21) +
-    ylab(paste("Cost (", currency, ")", sep = ""))
-
-  # define strategy-specific means for the center of the ellipse
-  if (center) {
-    strat_means <- ce_df %>%
-      group_by(Strategy) %>%
-      summarize(Cost.mean = mean(Cost),
-                Eff.mean = mean(Effectiveness))
     # make strategies in psa object into ordered factors
-    strat_means$Strategy <- factor(strat_means$Strategy, levels = strategies, ordered = TRUE)
-    psa_plot <- psa_plot +
-      geom_point(data = strat_means,
-                 aes(x = Eff.mean, y = Cost.mean, fill = Strategy),
-                 size = 8, shape = 21, color = "black")
-  }
+    ce_df$Strategy <- factor(ce_df$Strategy, levels = strategies, ordered = TRUE)
 
-  if (ellipse) {
-    # make points for ellipse plotting
-    df_list_ell <- lapply(strategies, function(s) {
-      strat_specific_df <- ce_df[ce_df$Strategy == s, ]
-      els <-  with(strat_specific_df,
-                   ellipse(cor(Effectiveness, Cost),
-                           scale = c(sd(Effectiveness), sd(Cost)),
-                           centre = c(mean(Effectiveness), mean(Cost))))
-      data.frame(els, group = s, stringsAsFactors = FALSE)
-    })
-    df_ell <- bind_rows(df_list_ell)
-    # draw ellipse lines
-    psa_plot <- psa_plot + geom_path(data = df_ell,
-                                     aes(x = x, y = y, colour = group),
-                                     linewidth = 1, linetype = 2, alpha = 1)
-  }
+    psa_plot <- ggplot(ce_df, aes(x = Effectiveness, y = Cost, color = Strategy)) +
+      geom_point(size = 0.7, alpha = alpha, shape = 21) +
+      ylab(paste("Cost (", currency, ")", sep = ""))
 
-  # add common theme
-  col <- match.arg(col)
-  add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
-                 continuous = c("x", "y"),
-                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
-                 xbreaks = xbreaks, ybreaks = ybreaks,
-                 xlim = xlim, ylim = ylim)
+    # define strategy-specific means for the center of the ellipse
+    if (center) {
+      strat_means <- ce_df %>%
+        group_by(Strategy) %>%
+        summarize(Cost.mean = mean(Cost),
+                  Eff.mean = mean(Effectiveness))
+      # make strategies in psa object into ordered factors
+      strat_means$Strategy <- factor(strat_means$Strategy, levels = strategies, ordered = TRUE)
+      psa_plot <- psa_plot +
+        geom_point(data = strat_means,
+                   aes(x = Eff.mean, y = Cost.mean, fill = Strategy),
+                   size = 8, shape = 21, color = "black")
+    }
+
+    if (ellipse) {
+      # make points for ellipse plotting
+      df_list_ell <- lapply(strategies, function(s) {
+        strat_specific_df <- ce_df[ce_df$Strategy == s, ]
+        els <-  with(strat_specific_df,
+                     ellipse(cor(Effectiveness, Cost),
+                             scale = c(sd(Effectiveness), sd(Cost)),
+                             centre = c(mean(Effectiveness), mean(Cost))))
+        data.frame(els, group = s, stringsAsFactors = FALSE)
+      })
+      df_ell <- bind_rows(df_list_ell)
+      # draw ellipse lines
+      psa_plot <- psa_plot + geom_path(data = df_ell,
+                                       aes(x = x, y = y, colour = group),
+                                       linewidth = 1, linetype = 2, alpha = 1)
+    }
+
+    # add common theme
+    col <- match.arg(col)
+    add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
+                   continuous = c("x", "y"),
+                   n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                   xbreaks = xbreaks, ybreaks = ybreaks,
+                   xlim = xlim, ylim = ylim)
+
+  } else {
+    ### Check that the reference strategy is in the list of strategies
+    if (!(ref_str %in% strategies)) {
+      stop("ref_str must be in the list of strategies")
+    }
+    ## Function to convert the raw outcomes to incremental outcomes
+    make_df_inc <- function(df) {
+      v_ref    <- df[, ref_str]
+      df_inc   <- df[, !(names(df) %in% ref_str)]
+      df_inc   <- sweep(df_inc, 1, v_ref, "-")
+      return(df_inc)
+    }
+
+    ## Long data frames
+    df_inc_cost <- suppressMessages(
+      make_df_inc(cost) %>%
+        pivot_longer(cols = everything(),
+                     names_to = "Strategy",
+                     values_to = "Cost")
+    )
+    df_inc_effect <- suppressMessages(
+      make_df_inc(effectiveness) %>%
+        pivot_longer(cols = everything(),
+                     names_to = "Strategy",
+                     values_to = "Effectiveness")
+    )
+    ice_df <- data.frame("Strategy" = df_inc_cost$Strategy,
+                         "Cost" = df_inc_cost$Cost,
+                         "Effectiveness" = df_inc_effect$Effectiveness)
+
+    # make strategies in psa object into ordered factors
+    v_comp_strategies <- strategies[strategies != ref_str]
+
+    ice_df$Strategy <- factor(ice_df$Strategy, levels = v_comp_strategies, ordered = TRUE)
+
+    psa_plot <- ggplot(ice_df, aes(x = Effectiveness, y = Cost, color = Strategy)) +
+      geom_point(size = 0.7, alpha = alpha, shape = 21) +
+      ylab(paste("Incremental Cost (", currency, ")", sep = "")) +
+      xlab("Incremental Effectiveness")
+
+    if (ref_axis == TRUE) {
+      psa_plot <- psa_plot +
+        geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+        geom_vline(xintercept = 0, linetype = "dashed", color = "black")
+    }
+
+    if (ref_caption == TRUE) {
+      psa_plot <- psa_plot +
+        labs(caption = paste("Reference Strategy: ", ref_str))
+    }
+
+    # define strategy-specific means for the center of the ellipse
+    if (center) {
+      strat_means <- ice_df %>%
+        group_by(Strategy) %>%
+        summarize(Cost.mean = mean(Cost),
+                  Eff.mean = mean(Effectiveness))
+      # make strategies in psa object into ordered factors
+      strat_means$Strategy <- factor(strat_means$Strategy, levels = v_comp_strategies, ordered = TRUE)
+      psa_plot <- psa_plot +
+        geom_point(data = strat_means,
+                   aes(x = Eff.mean, y = Cost.mean, fill = Strategy),
+                   size = 8, shape = 21, color = "black")
+    }
+
+    if (ellipse) {
+      # make points for ellipse plotting
+      df_list_ell <- lapply(v_comp_strategies, function(s) {
+        strat_specific_df <- ice_df[ice_df$Strategy == s, ]
+        els <-  with(strat_specific_df,
+                     ellipse(cor(Effectiveness, Cost),
+                             scale = c(sd(Effectiveness), sd(Cost)),
+                             centre = c(mean(Effectiveness), mean(Cost))))
+        data.frame(els, group = s, stringsAsFactors = FALSE)
+      })
+      df_ell <- bind_rows(df_list_ell)
+      # draw ellipse lines
+      psa_plot <- psa_plot + geom_path(data = df_ell,
+                                       aes(x = x, y = y, colour = group),
+                                       linewidth = 1, linetype = 2, alpha = 1)
+    }
+
+    # add common theme
+    col <- match.arg(col)
+    add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
+                   continuous = c("x", "y"),
+                   n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                   xbreaks = xbreaks, ybreaks = ybreaks,
+                   xlim = xlim, ylim = ylim,
+                   v_str = strategies)
+
+  }
 }

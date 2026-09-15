@@ -6,22 +6,28 @@
 \usage{
 \method{plot}{psa}(
   x,
+  ref_str = NULL,
   center = TRUE,
   ellipse = TRUE,
   alpha = 0.2,
   txtsize = 12,
-  col = c("full", "bw"),
+  col = c("access", "full", "bw"),
   n_x_ticks = 6,
   n_y_ticks = 6,
   xbreaks = NULL,
   ybreaks = NULL,
   xlim = NULL,
   ylim = NULL,
+  ref_axis = TRUE,
+  ref_caption = TRUE,
   ...
 )
 }
 \arguments{
 \item{x}{the psa object}
+
+\item{ref_str}{select a reference strategy. If the user selects a reference
+strategy, the cost-effectiveness plane becomes an incremental cost-effectiveness plane}
 
 \item{center}{plot the mean cost and effectiveness for each strategy. defaults to TRUE}
 
@@ -32,7 +38,7 @@
 
 \item{txtsize}{base text size}
 
-\item{col}{either none, full color, or black and white}
+\item{col}{either none, full color, accessible colors, or black and white}
 
 \item{n_x_ticks}{number of x-axis ticks}
 
@@ -47,6 +53,10 @@ will override \code{n_y_ticks} if provided.}
 \item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
 
 \item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
+
+\item{ref_axis}{Add dotted axes lines at (0,0). Defaults to TRUE}
+
+\item{ref_caption}{Add the reference strategy as a caption. Defaults to TRUE}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

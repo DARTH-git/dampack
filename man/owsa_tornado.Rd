@@ -9,7 +9,7 @@ owsa_tornado(
   return = c("plot", "data"),
   txtsize = 12,
   min_rel_diff = 0,
-  col = c("full", "bw"),
+  col = c("access", "full", "bw"),
   n_y_ticks = 8,
   ylim = NULL,
   ybreaks = NULL,

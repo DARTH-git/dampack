@@ -101,7 +101,7 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 #' @importFrom tidyr pivot_longer
 #' @export
 plot.owsa <- function(x, txtsize = 12,
-                      col = c("full", "bw"),
+                      col = c("access", "full", "bw"),
                       facet_scales = c("free_x", "free_y", "free", "fixed"),
                       facet_nrow = NULL,
                       facet_ncol = NULL,
@@ -119,7 +119,7 @@ plot.owsa <- function(x, txtsize = 12,
     xlab("Parameter Values")
 
   col <- match.arg(col)
-  if (col == "full") {
+  if (col == "full" | col == "access") {
     owsa <- owsa +
       geom_line(aes(color = strategy),
                 linewidth = size)
@@ -184,7 +184,7 @@ plot.owsa <- function(x, txtsize = 12,
 #' @export
 owsa_tornado <- function(owsa, return = c("plot", "data"),
                          txtsize = 12, min_rel_diff = 0,
-                         col = c("full", "bw"),
+                         col = c("access", "full", "bw"),
                          n_y_ticks = 8, ylim = NULL, ybreaks = NULL,
                          select_str = NULL, outcome_name = NULL) {
 
@@ -262,6 +262,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
                                suffix = c(".low", ".high")) %>%
     dplyr::mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
                   rel_diff = abs_diff / outcome_val.low) %>%
+    dplyr::filter(abs(rel_diff) >= min_rel_diff) %>%
     dplyr::arrange(-abs_diff)
 
   # return either plot or data
@@ -324,7 +325,7 @@ offset_trans <- function(offset = 0) {
 owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
                            return = c("plot", "data"),
                            plot_const = TRUE,
-                           col = c("full", "bw"),
+                           col = c("access", "full", "bw"),
                            greystart = 0.2,
                            greyend = 0.8,
                            txtsize = 12,
@@ -349,15 +350,15 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   ## filter to those parameter values
   ## that maximize the outcome for each strategy
   opt_strat <- owsa %>%
-    group_by(parameter, param_val) %>%
+    group_by(parameter, param_val, .groups = "drop_last") %>%
     filter(outcome_val == obj_fun(outcome_val)) %>%
     ungroup() %>%
-    group_by(parameter, strategy) %>%
+    group_by(parameter, strategy, .groups = "drop_last") %>%
     summarize(pmin = min(param_val), pmax = max(param_val)) %>%
     ungroup()
   if (!plot_const) {
     opt_strat <- opt_strat %>%
-      group_by(parameter) %>%
+      group_by(parameter, .groups = "drop_last") %>%
       filter(n() > 1) %>%
       ungroup()
   }

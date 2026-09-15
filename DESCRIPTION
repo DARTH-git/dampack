@@ -53,7 +53,8 @@ Imports:
     triangle,
     ggrepel,
     tidyr,
-    rlang
+    rlang,
+    viridis
 Suggests:
     testthat,
     lintr,

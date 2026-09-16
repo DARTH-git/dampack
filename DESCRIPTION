@@ -59,7 +59,8 @@ Imports:
     ggrepel,
     tidyr,
     rlang,
-    viridis
+    viridis,
+    RColorBrewer
 Suggests:
     testthat,
     lintr,

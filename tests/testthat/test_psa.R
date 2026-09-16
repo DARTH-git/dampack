@@ -68,6 +68,11 @@ test_that("plot.psa runs", {
   })
 })
 
+test_that("Plot returns ggplot object", {
+  p <- plot(psa_big)
+  expect_is(p, "ggplot")
+})
+
 # print
 # use small example from above
 test_that("print.psa returns correct output", {

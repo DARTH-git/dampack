@@ -151,7 +151,7 @@ plot.exp_loss <- function(x,
   # color
   col <- match.arg(col)
   ## change linetype too if color is black and white
-  if (col == "full" | col == "access") {
+  if (col == "full" || col == "access") {
     if (points) {
       p <- p + geom_point(aes(color = !!sym(strat_name)))
     }

@@ -158,7 +158,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   }
   if (col == "bw") {
     if (!is.null(v_str)) {
-      col_palette <- setNames(
+      man_cols <- setNames(
         grey.colors(length(v_str), start = greystart, end = greyend),
         v_str
       )

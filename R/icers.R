@@ -422,9 +422,9 @@ print.icers <- function(x,
   format_numbers <- function(col, n_digits) {
     new_col <- rep("-", length(col))
     non_na <- !is.na(col)
-    if(n_digits > 0) {
+    if (n_digits > 0) {
       new_col[non_na] <- format(col[non_na], big.mark = ",", nsmall = n_digits, digits = n_digits, scientific = FALSE)
-    } else{
+    } else {
       new_col[non_na] <- format(round(col[non_na], n_digits), big.mark = ",", nsmall = n_digits, scientific = FALSE)
     }
 

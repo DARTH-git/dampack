@@ -119,7 +119,7 @@ plot.owsa <- function(x, txtsize = 12,
     xlab("Parameter Values")
 
   col <- match.arg(col)
-  if (col == "full" | col == "access") {
+  if (col == "full" || col == "access") {
     owsa <- owsa +
       geom_line(aes(color = strategy),
                 linewidth = size)
@@ -260,7 +260,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
                                suffix = c(".low", ".high")) %>%
     dplyr::mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
                   rel_diff = abs_diff / outcome_val.low) %>%
-    dplyr::filter(abs(rel_diff) >= min_rel_diff) %>%
+    dplyr::filter(abs(.data$rel_diff) >= min_rel_diff) %>%
     dplyr::arrange(-abs_diff)
 
   # return either plot or data

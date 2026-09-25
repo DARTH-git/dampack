@@ -78,10 +78,10 @@ calc_evsi <- function(psa,
       predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
       # bind the columns to get a dataframe
-      predicted_loss_df <- bind_cols(predicted_loss_list)
+      df_predicted_loss <- bind_cols(predicted_loss_list)
 
       # calculate the evsi as the average of the row maxima
-      row_maxes <- apply(predicted_loss_df, 1, max)
+      row_maxes <- apply(df_predicted_loss, 1, max)
       evsi[l] <- mean(row_maxes) * pop
     } else {
       for (i in seq_len(n_n)) {
@@ -89,10 +89,10 @@ calc_evsi <- function(psa,
         predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
 
         # bind the columns to get a dataframe
-        predicted_loss_df <- bind_cols(predicted_loss_list)
+        df_predicted_loss <- bind_cols(predicted_loss_list)
 
         # calculate the evsi as the average of the row maxima
-        row_maxes <- apply(predicted_loss_df, 1, max)
+        row_maxes <- apply(df_predicted_loss, 1, max)
         evsi[l, i] <- mean(row_maxes) * pop
       }
     }

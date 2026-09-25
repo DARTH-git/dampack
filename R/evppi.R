@@ -109,10 +109,10 @@ calc_evppi <- function(psa,
     fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
 
     # bind the columns to get a dataframe
-    fitted_loss_df <- bind_cols(fitted_loss_list)
+    df_fitted_loss <- bind_cols(fitted_loss_list)
 
     # calculate the evppi as the average of the row maxima
-    row_maxes <- apply(fitted_loss_df, 1, max)
+    row_maxes <- apply(df_fitted_loss, 1, max)
     evppi[l] <- mean(row_maxes) * pop
 
     if (progress == TRUE) {

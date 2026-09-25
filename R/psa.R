@@ -180,20 +180,20 @@ plot.psa <- function(x,
                    names_to = "Strategy",
                    values_to = "Effectiveness")
     )
-    ce_df <- data.frame("Strategy" = df_cost$Strategy,
+    df_ce <- data.frame("Strategy" = df_cost$Strategy,
                         "Cost" = df_cost$Cost,
                         "Effectiveness" = df_effect$Effectiveness)
 
     # make strategies in psa object into ordered factors
-    ce_df$Strategy <- factor(ce_df$Strategy, levels = strategies, ordered = TRUE)
+    df_ce$Strategy <- factor(df_ce$Strategy, levels = strategies, ordered = TRUE)
 
-    psa_plot <- ggplot(ce_df, aes(x = Effectiveness, y = Cost, color = Strategy)) +
+    psa_plot <- ggplot(df_ce, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
       ylab(paste("Cost (", currency, ")", sep = ""))
 
     # define strategy-specific means for the center of the ellipse
     if (center) {
-      strat_means <- ce_df %>%
+      strat_means <- df_ce %>%
         group_by(Strategy) %>%
         summarize(Cost.mean = mean(Cost),
                   Eff.mean = mean(Effectiveness))
@@ -208,8 +208,8 @@ plot.psa <- function(x,
     if (ellipse) {
       # make points for ellipse plotting
       df_list_ell <- lapply(strategies, function(s) {
-        strat_specific_df <- ce_df[ce_df$Strategy == s, ]
-        els <-  with(strat_specific_df,
+        df_strat_specific <- df_ce[df_ce$Strategy == s, ]
+        els <-  with(df_strat_specific,
                      ellipse(cor(Effectiveness, Cost),
                              scale = c(sd(Effectiveness), sd(Cost)),
                              centre = c(mean(Effectiveness), mean(Cost))))
@@ -256,16 +256,16 @@ plot.psa <- function(x,
                      names_to = "Strategy",
                      values_to = "Effectiveness")
     )
-    ice_df <- data.frame("Strategy" = df_inc_cost$Strategy,
+    df_ice <- data.frame("Strategy" = df_inc_cost$Strategy,
                          "Cost" = df_inc_cost$Cost,
                          "Effectiveness" = df_inc_effect$Effectiveness)
 
     # make strategies in psa object into ordered factors
     v_comp_strategies <- strategies[strategies != ref_str]
 
-    ice_df$Strategy <- factor(ice_df$Strategy, levels = v_comp_strategies, ordered = TRUE)
+    df_ice$Strategy <- factor(df_ice$Strategy, levels = v_comp_strategies, ordered = TRUE)
 
-    psa_plot <- ggplot(ice_df, aes(x = Effectiveness, y = Cost, color = Strategy)) +
+    psa_plot <- ggplot(df_ice, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
       ylab(paste("Incremental Cost (", currency, ")", sep = "")) +
       xlab("Incremental Effectiveness")
@@ -283,7 +283,7 @@ plot.psa <- function(x,
 
     # define strategy-specific means for the center of the ellipse
     if (center) {
-      strat_means <- ice_df %>%
+      strat_means <- df_ice %>%
         group_by(Strategy) %>%
         summarize(Cost.mean = mean(Cost),
                   Eff.mean = mean(Effectiveness))
@@ -298,8 +298,8 @@ plot.psa <- function(x,
     if (ellipse) {
       # make points for ellipse plotting
       df_list_ell <- lapply(v_comp_strategies, function(s) {
-        strat_specific_df <- ice_df[ice_df$Strategy == s, ]
-        els <-  with(strat_specific_df,
+        df_strat_specific <- df_ice[df_ice$Strategy == s, ]
+        els <-  with(df_strat_specific,
                      ellipse(cor(Effectiveness, Cost),
                              scale = c(sd(Effectiveness), sd(Cost)),
                              centre = c(mean(Effectiveness), mean(Cost))))

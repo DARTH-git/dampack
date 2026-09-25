@@ -58,11 +58,11 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
         param_val <- params[param_rows, "paramval"]
         outcome_val <- y[param_rows, s]
 
-        new_df <- data.frame("parameter" = p,
+        df_new <- data.frame("parameter" = p,
                              "strategy" = s,
                              "param_val" = param_val,
                              "outcome_val" = outcome_val)
-        ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
+        ow <- rbind(ow, df_new, stringsAsFactors = FALSE)
         # make strategies in owsa object into ordered factors
         ow$strategy <- factor(ow$strategy, levels = strategies, ordered = TRUE)
       }
@@ -133,18 +133,18 @@ plot.owsa <- function(x, txtsize = 12,
 
   if (!is.null(basecase)) {
     # create data.frame for "basecase" values
-    basecase_df <- as.data.frame(basecase) %>%
+    df_basecase <- as.data.frame(basecase) %>%
       pivot_longer(cols = everything(),
                    names_to = "parameter",
                    values_to = "param_val")
 
-    if (!all(basecase_df$parameter %in% unique(x$parameter))) {
+    if (!all(df_basecase$parameter %in% unique(x$parameter))) {
       stop("Some parameter names in the basecase argument of plot.owsa are not present in owsa object.")
     }
 
     owsa <- owsa +
       geom_vline(mapping = aes(xintercept = param_val),
-                 data = basecase_df)
+                 data = df_basecase)
   }
 
   add_common_aes(owsa, txtsize, col = col, col_aes = "color",

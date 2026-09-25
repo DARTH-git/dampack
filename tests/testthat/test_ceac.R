@@ -40,8 +40,8 @@ test_that("handles missing strategy", {
 ## summary
 test_that("message is correct in summary.ceac", {
   c <- ceac(wtp, psa_obj)
-  sum_df <- summary(c)
-  expect_equal(sum_df$cost_eff_strat, c("Radio", "Chemo"))
+  df_sum <- summary(c)
+  expect_equal(df_sum$cost_eff_strat, c("Radio", "Chemo"))
 })
 
 ## plot

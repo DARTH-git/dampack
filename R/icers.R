@@ -115,11 +115,11 @@ calculate_icers <- function(cost, effect, strategies) {
     nd <- setdiff(strategies, dom)
 
     # compute icers for nd strategies
-    nd_df <- df[df$Strategy %in% nd, ] %>%
+    df_nd <- df[df$Strategy %in% nd, ] %>%
       compute_icers()
 
     # number non-d
-    n_non_d <- nrow(nd_df)
+    n_non_d <- nrow(df_nd)
 
     # if only two strategies left, we're done
     if (n_non_d <= 2) {
@@ -127,7 +127,7 @@ calculate_icers <- function(cost, effect, strategies) {
     }
 
     # strategy identifiers for non-d
-    nd_strat <- nd_df$Strategy
+    nd_strat <- df_nd$Strategy
 
     # now, go through non-d strategies and detect any
     # with higher ICER than following strategy
@@ -135,7 +135,7 @@ calculate_icers <- function(cost, effect, strategies) {
     # if not, we're done - exit the loop
     new_ed <- 0
     for (i in 2:(n_non_d - 1)) {
-      if (nd_df[i, "ICER"] > nd_df[i + 1, "ICER"]) {
+      if (df_nd[i, "ICER"] > df_nd[i + 1, "ICER"]) {
         ed <- c(ed, nd_strat[i])
         new_ed <- new_ed + 1
       }
@@ -146,19 +146,19 @@ calculate_icers <- function(cost, effect, strategies) {
   }
 
   # recompute icers without weakly dominated strategies
-  nd_df_icers <- nd_df[!(nd_df$Strategy %in% dom), ] %>%
+  df_nd_icers <- df_nd[!(df_nd$Strategy %in% dom), ] %>%
     mutate(Status = "ND") %>%
     compute_icers()
 
   # dominated and weakly dominated
-  d_df <- df[df$Strategy %in% d, ] %>%
+  df_d <- df[df$Strategy %in% d, ] %>%
     mutate(ICER = NA, Status = "D")
 
-  ed_df <- df[df$Strategy %in% ed, ] %>%
+  df_ed <- df[df$Strategy %in% ed, ] %>%
     mutate(ICER = NA, Status = "ED")
 
   # when combining, sort so we have ref,ND,ED,D
-  results <- bind_rows(d_df, ed_df, nd_df_icers) %>%
+  results <- bind_rows(df_d, df_ed, df_nd_icers) %>%
     arrange(desc(Status), Cost, desc(Effect))
 
   # re-arrange columns

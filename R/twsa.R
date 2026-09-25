@@ -61,9 +61,9 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
     tw <- NULL
     for (s in strategies) {
       # maybe extract this out later - shared with predict.metamodel
-      new_df <- data.frame("p1" = params[, parnames[1]], "p2" = params[, parnames[2]],
+      df_new <- data.frame("p1" = params[, parnames[1]], "p2" = params[, parnames[2]],
                            "strategy" = s, "outcome_val" = y[, s])
-      tw <- rbind(tw, new_df, stringsAsFactors = FALSE)
+      tw <- rbind(tw, df_new, stringsAsFactors = FALSE)
     }
     names(tw)[1:2] <- parnames
     # make strategies in twsa object into ordered factors
@@ -115,10 +115,10 @@ plot.twsa <- function(x, maximize = TRUE,
   } else {
     obj_fn <- which.min
   }
-  opt_df <- x %>%
+  df_opt <- x %>%
     group_by(.data[[param1]], .data[[param2]]) %>%
     slice(obj_fn(outcome_val))
-  g <- ggplot(opt_df, aes(x = !!sym(param1), y = !!sym(param2))) +
+  g <- ggplot(df_opt, aes(x = !!sym(param1), y = !!sym(param2))) +
     geom_tile(aes(fill = strategy)) +
     theme_bw() +
     xlab(param1) +
@@ -129,11 +129,11 @@ plot.twsa <- function(x, maximize = TRUE,
       stop("Some parameter names in the basecase argument do not match param1 or param2 of twsa")
     }
     # create data.frame for "basecase" values
-    basecase_df <- as.data.frame(basecase)
+    df_basecase <- as.data.frame(basecase)
 
     g <- g +
       geom_point(mapping = aes(x = !!sym(param1), y = !!sym(param2)),
-                 data = basecase_df,
+                 data = df_basecase,
                  shape = 8)
   }
 

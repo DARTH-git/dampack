@@ -101,15 +101,15 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   }
 
   n_outcomes <- length(outcomes)
-  sim_out_df <- vector(mode = "list", length = n_outcomes)
-  names(sim_out_df) <- outcomes
+  df_sim_out <- vector(mode = "list", length = n_outcomes)
+  names(df_sim_out) <- outcomes
   for (j in 1:n_outcomes) {
-    sim_out_df[[j]] <- lapply(sim_out_ls,
+    df_sim_out[[j]] <- lapply(sim_out_ls,
                               function(x, tmp_out = outcomes[j]) {
                                 t(x[[outcomes[j]]])
                               })
-    sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
-    colnames(sim_out_df[[j]]) <- strategies
+    df_sim_out[[j]] <- as.data.frame(do.call(rbind, df_sim_out[[j]]))
+    colnames(df_sim_out[[j]]) <- strategies
   }
 
 
@@ -117,7 +117,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   psa_out <- vector(mode = "list", length = n_outcomes)
   for (j in 1:n_outcomes) {
     psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
-                                 other_outcome = sim_out_df[[j]],
+                                 other_outcome = df_sim_out[[j]],
                                  parameters = psa_samp[, -1], strategies = strategies,
                                  currency = currency)
   }

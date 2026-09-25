@@ -254,7 +254,7 @@ print.metamodel <- function(x, ...) {
 summary.metamodel <- function(object, ...) {
   analysis <- object$analysis
   type <- object$type
-  summary_df <- NULL
+  df_summary <- NULL
   if (analysis == "multiway") {
     stop("metamodel summary not available for multiway analyses")
   }
@@ -268,7 +268,7 @@ summary.metamodel <- function(object, ...) {
           r2 <- lm_summary$r.squared
         }
         df_new_row <- data.frame("param" = p, "strat" = s, "rsquared" = r2)
-        summary_df <- rbind(summary_df, df_new_row)
+        df_summary <- rbind(df_summary, df_new_row)
       }
     }
   }
@@ -283,10 +283,10 @@ summary.metamodel <- function(object, ...) {
       }
       df_new_row <- data.frame("param1" = params[1], "param2" = params[2],
                                "strat" = s, "rsquared" = r2)
-      summary_df <- rbind(summary_df, df_new_row)
+      df_summary <- rbind(df_summary, df_new_row)
     }
   }
-  return(summary_df)
+  return(df_summary)
 }
 
 #' Predict from a one-way or two-way metamodel
@@ -372,7 +372,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   # predict outcomes from linear metamodels
   if (analysis == "oneway") {
     ## make list to hold outcome dfs
-    outcome_dfs <- vector(mode = "list",
+    dfs_outcome <- vector(mode = "list",
                           length = length(strats) * length(q_params))
     counter <- 1
     for (p in q_params) {
@@ -390,7 +390,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
       # for each strategy
       for (s in strats) {
         mod <- mods[[p]][[s]]
-        outcome_dfs[[counter]] <- data.frame("parameter" = p, "strategy" = s,
+        dfs_outcome[[counter]] <- data.frame("parameter" = p, "strategy" = s,
                                              "param_val" = newdata,
                                              "outcome_val" = predict(mod, newdata = this_p_data, type = "response"),
                                              stringsAsFactors = FALSE)
@@ -399,7 +399,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
     }
   }
   if (analysis == "twoway") {
-    outcome_dfs <- vector(mode = "list",
+    dfs_outcome <- vector(mode = "list",
                           length = length(strats))
     counter <- 1
     p1 <- psa_params[1]
@@ -412,16 +412,16 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
     for (s in strats) {
       mod <- mods[[s]]
       outcome <- predict(mod, newdata = pdata)
-      outcome_df <- data.frame("p1" = pdata[, p1], "p2" = pdata[, p2],
+      df_outcome <- data.frame("p1" = pdata[, p1], "p2" = pdata[, p2],
                                "strategy" = s, "outcome_val" = outcome,
                                stringsAsFactors = FALSE)
-      names(outcome_df)[1:2] <- c(p1, p2)
-      outcome_dfs[[counter]] <- outcome_df
+      names(df_outcome)[1:2] <- c(p1, p2)
+      dfs_outcome[[counter]] <- df_outcome
       counter <- counter + 1
     }
   }
-  combined_df <- bind_rows(outcome_dfs)
-  return(combined_df)
+  df_combined <- bind_rows(dfs_outcome)
+  return(df_combined)
 }
 
 #' make a parameter sequence

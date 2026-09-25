@@ -94,11 +94,11 @@ test_that("print.psa returns correct output", {
 # summary
 test_that("summary.psa returns correct output", {
   # no sds
-  expected_df <- data.frame("Strategy" = sm_strategies,
+  df_expected <- data.frame("Strategy" = sm_strategies,
                             "meanCost" = colMeans(sm_costs),
                             "meanEffect" = colMeans(sm_effectiveness),
                             stringsAsFactors = FALSE,
                             row.names = NULL)
-  calc_df <- summary(psa_small)
-  expect_equal(expected = expected_df, calc_df)
+  df_calc <- summary(psa_small)
+  expect_equal(expected = df_expected, df_calc)
 })

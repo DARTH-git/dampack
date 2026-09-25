@@ -100,10 +100,10 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
   if (is.null(outcomes)) outcomes <- v_outcomes
 
   param_table_all <- NULL
-  sim_out_df <- NULL
+  df_sim_out <- NULL
   n_params <- nrow(params_range)
   n_outcomes <- length(outcomes)
-  sim_out_df_all <- vector(mode = "list", length = n_outcomes)
+  df_sim_out_all <- vector(mode = "list", length = n_outcomes)
 
   for (i in 1:n_params) {
     # Generate matrix of inputs
@@ -133,13 +133,13 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                       nsamp = nsamp)
 
     for (j in 1:n_outcomes) {
-      sim_out_df[[j]] <- lapply(sim_out,
+      df_sim_out[[j]] <- lapply(sim_out,
                                 function(x, tmp_out = outcomes[j]) {
                                   t(x[outcomes[j]])
                                 })
-      sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
-      colnames(sim_out_df[[j]]) <- strategies
-      sim_out_df_all[[j]] <- rbind(sim_out_df_all[[j]], sim_out_df[[j]])
+      df_sim_out[[j]] <- as.data.frame(do.call(rbind, df_sim_out[[j]]))
+      colnames(df_sim_out[[j]]) <- strategies
+      df_sim_out_all[[j]] <- rbind(df_sim_out_all[[j]], df_sim_out[[j]])
     }
 
     param_table <- data.frame(parameter = rep(pars_i, nsamp),
@@ -154,7 +154,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
   owsa_out <- vector(mode = "list", length = n_outcomes)
   for (k in 1:n_outcomes) {
     df_owsa[[k]] <- create_dsa_oneway(parameters = param_table_all,
-                                      other_outcome = sim_out_df_all[[k]],
+                                      other_outcome = df_sim_out_all[[k]],
                                       strategies = strategies)
     owsa_out[[k]] <- owsa(df_owsa[[k]], outcome = "eff")
   }
@@ -269,15 +269,15 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   if (is.null(outcomes)) outcomes <- v_outcomes
 
   n_outcomes <- length(outcomes)
-  sim_out_df <- NULL
+  df_sim_out <- NULL
 
   ### Generate matrix of inputs
-  range_df <- params_range[, c("min", "max")]
-  param_table <- expand.grid(param1 = seq(range_df[1, "min"],
-                                          range_df[1, "max"],
+  df_range <- params_range[, c("min", "max")]
+  param_table <- expand.grid(param1 = seq(df_range[1, "min"],
+                                          df_range[1, "max"],
                                           length.out = nsamp),
-                             param2 = seq(range_df[2, "min"],
-                                          range_df[2, "max"],
+                             param2 = seq(df_range[2, "min"],
+                                          df_range[2, "max"],
                                           length.out = nsamp))
   colnames(param_table) <- poi
 
@@ -303,12 +303,12 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
                     nsamp = n_run)
 
   for (j in 1:n_outcomes) {
-    sim_out_df[[j]] <- lapply(sim_out,
+    df_sim_out[[j]] <- lapply(sim_out,
                               function(x, tmp_out = outcomes[j]) {
                                 t(x[outcomes[j]])
                               })
-    sim_out_df[[j]] <- as.data.frame(do.call(rbind, sim_out_df[[j]]))
-    colnames(sim_out_df[[j]]) <- strategies
+    df_sim_out[[j]] <- as.data.frame(do.call(rbind, df_sim_out[[j]]))
+    colnames(df_sim_out[[j]]) <- strategies
   }
 
 
@@ -317,7 +317,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 
   for (k in 1:n_outcomes) {
     df_twsa[[k]] <- create_dsa_twoway(parameters = param_table,
-                                      other_outcome = sim_out_df[[k]],
+                                      other_outcome = df_sim_out[[k]],
                                       strategies = strategies)
     twsa_out[[k]] <- twsa(df_twsa[[k]], outcome = "eff")
   }

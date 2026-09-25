@@ -133,8 +133,8 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
       }
     } else {
       p_data   <- ggplot_build(p)
-      n_groups <- max(length(unique(p_data@data[[1]]$colour)),
-                      length(unique(p_data@data[[1]]$fill)))
+      n_groups <- max(length(unique(p_data[[data]][[1]]$colour)),
+                      length(unique(p_data[[data]][[1]]$fill)))
       if (n_groups > 8) {
         man_cols <- viridis::viridis(n_groups, option = "D")
       } else {

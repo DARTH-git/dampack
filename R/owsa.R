@@ -111,6 +111,7 @@ plot.owsa <- function(x, txtsize = 12,
                       basecase = NULL,
                       ...) {
   param_val <- outcome_val <- strategy <- NULL
+  strategies <- unique(x$strategy)
   scales <- match.arg(facet_scales)
   owsa <- ggplot(data = x,
                  aes(x = param_val, y = outcome_val)) +
@@ -150,7 +151,8 @@ plot.owsa <- function(x, txtsize = 12,
   add_common_aes(owsa, txtsize, col = col, col_aes = "color",
                  scale_name = "Strategy",
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
-                 continuous = c("x", "y"))
+                 continuous = c("x", "y"),
+                 v_str = strategies)
 }
 
 #' Tornado plot of a one-way sensitivity analysis

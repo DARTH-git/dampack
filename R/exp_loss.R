@@ -128,6 +128,7 @@ plot.exp_loss <- function(x,
   loss_name <- "Expected_Loss"
   strat_name <- "Strategy"
   x[, wtp_name] <- x$WTP / 1000
+  strategies <- unique(x$Strategy)
 
   # split into on frontier and not on frontier
   nofront <- x
@@ -171,7 +172,7 @@ plot.exp_loss <- function(x,
                       continuous = c("x", "y"),
                       n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                       xbreaks = xbreaks, ybreaks = ybreaks,
-                      xlim = xlim, ylim = ylim,
+                      xlim = xlim, ylim = ylim, v_str = strategies,
                       ytrans = tr)
   if (frontier) {
     p <- p + geom_point(data = front, aes(x = !!sym(wtp_name),

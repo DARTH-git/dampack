@@ -170,6 +170,7 @@ plot.ceac <- function(x,
   prop_name <- "Proportion"
   strat_name <- "Strategy"
   x$WTP_thou <- x[, wtp_name] / 1000
+  strategies <- unique(x$Strategy)
 
   Strategy <- Proportion <- maxpr <- On_Frontier <- WTP_thou <- NULL
   # removing strategies with probabilities always below `min_prob`
@@ -235,7 +236,8 @@ plot.ceac <- function(x,
   add_common_aes(p, txtsize, col = col, col_aes = "color",
                  continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,
-                 ylim = ylim, xlim = xlim)
+                 ylim = ylim, xlim = xlim,
+                 v_str = strategies)
 }
 
 

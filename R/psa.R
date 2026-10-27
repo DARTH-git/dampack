@@ -228,7 +228,8 @@ plot.psa <- function(x,
                    continuous = c("x", "y"),
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
-                   xlim = xlim, ylim = ylim)
+                   xlim = xlim, ylim = ylim,
+                   v_str = strategies)
 
   } else {
     ### Check that the reference strategy is in the list of strategies

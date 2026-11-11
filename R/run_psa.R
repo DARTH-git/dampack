@@ -125,5 +125,5 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
 
   names(psa_out) <- outcomes
 
-  return(psa_out)
+  psa_out
 }

@@ -127,7 +127,7 @@ calc_evppi <- function(psa,
 
   evppi_ls <- list(df_evppi = df_evppi, metamodel_ls = mms_ls)
   class(evppi_ls) <- c("evppi")
-  return(evppi_ls)
+  evppi_ls
 }
 
 #' Plot of Expected Value of Partial Perfect Information (EVPPI)

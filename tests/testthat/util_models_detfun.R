@@ -49,7 +49,7 @@ markov_model <- function(param, state_name, cycle,
 
   output <- data.frame("prev" = prev,
                        "tot_incidence" = tot_incidence)
-  return(output)
+  output
 }
 
 strategy_func <- function(param, state_name, cycle,
@@ -78,5 +78,5 @@ strategy_func <- function(param, state_name, cycle,
   }
 
   output <- cbind(output, tmp_output)
-  return(output)
+  output
 }

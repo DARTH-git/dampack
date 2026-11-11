@@ -168,7 +168,7 @@ calculate_icers <- function(cost, effect, strategies) {
 
   # declare class of results
   class(results) <- c("icers", "data.frame")
-  return(results)
+  results
 }
 
 #' Calculate incremental cost-effectiveness ratios from a \code{psa} object.
@@ -243,7 +243,7 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
              Inc_Cost, Inc_Effect, ICER, Status)
   }
 
-  return(icers)
+  icers
 }
 
 #' compute icers for non-dominated strategies
@@ -269,7 +269,7 @@ compute_icers <- function(non_d) {
     # don't calculate ICER if only one strategy
     non_d[1, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
   }
-  return(non_d)
+  non_d
 }
 
 #' Plot of ICERs
@@ -394,7 +394,7 @@ plot.icers <- function(x,
                        max.iter = max.iter,
                        direction = "both")
   }
-  return(icer_plot)
+  icer_plot
 }
 
 
@@ -428,7 +428,7 @@ print.icers <- function(x,
       new_col[non_na] <- format(round(col[non_na], n_digits), big.mark = ",", nsmall = n_digits, scientific = FALSE)
     }
 
-    return(new_col)
+    new_col
   }
 
   table_cea            <- x

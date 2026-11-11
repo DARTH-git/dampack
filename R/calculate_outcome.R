@@ -52,5 +52,5 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
       y <- netben - netben[cbind(1:n_sim), max_str]
     }
   }
-  return(y)
+  y
 }

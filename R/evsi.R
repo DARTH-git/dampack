@@ -108,7 +108,7 @@ calc_evsi <- function(psa,
   }
   evsi_ls <- list(df_evsi = df_evsi, metamodel_ls = mms_ls)
   class(evsi_ls) <- c("evsi")
-  return(evsi_ls)
+  evsi_ls
 }
 
 
@@ -186,7 +186,7 @@ predict_ga <- function(object, n, n0) {
   # Compute conditional Loss
   l_tilde <- x %*% beta
 
-  return(l_tilde)
+  l_tilde
 }
 
 #' Function to compute the preposterior for each of the
@@ -210,7 +210,7 @@ predict_smooth_ga <- function(object, param_vals, vrf = 1) {
   # Compute phi on each of the basis function
   x <- vrf * x + (1 - vrf) * (ones %*% colMeans(x))
 
-  return(x)
+  x
 }
 
 #' Predict matrix tensor smooth (GA)
@@ -234,7 +234,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
   for (i in seq_len(m)) {
     term <- object$margin[[i]]$term
     dat <- list()
-    for (j in seq_len(length(term))) {
+    for (j in seq_along(term)) {
       dat[[term[j]]] <- param_vals[[term[j]]]
     }
     x[[i]] <- if (!is.null(object$mc[i])) {
@@ -266,7 +266,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
   # Compute tensor product
   t_ga <- tensor.prod.model.matrix(x_ga)
 
-  return(t_ga)
+  t_ga
 }
 
 #' Plot of Expected Value of Sample Information (EVSI)

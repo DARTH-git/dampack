@@ -221,7 +221,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
                          trans = ytrans,
                          expand = yexpand)
   }
-  return(p)
+  p
 }
 
 #' used to automatically label continuous scales

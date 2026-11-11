@@ -165,7 +165,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     owsa_out <- owsa_out[[1]]
   }
 
-  return(owsa_out)
+  owsa_out
 }
 
 #' Run deterministic two-way sensitivity analysis (TWSA)
@@ -328,7 +328,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
     twsa_out <- twsa_out[[1]]
   }
 
-  return(twsa_out)
+  twsa_out
 }
 
 

@@ -248,9 +248,11 @@ plot.ceac <- function(x,
 #'
 #' @param object object returned from the \code{ceac} function
 #' @param ... further arguments (not used)
-#' @return data frame showing the interval of cost effectiveness for each
-#' interval. The intervals are open on the right endpoint -
-#' i.e., [\code{range_min}, \code{range_max})
+#' @return data frame with one row per interval of willingness to pay over which
+#' a single strategy is optimal, and three columns: \code{range_min} and
+#' \code{range_max} bounding the interval, and \code{optimal_strategy} naming the
+#' strategy on the cost-effectiveness frontier there. The intervals are open on
+#' the right endpoint - i.e., [\code{range_min}, \code{range_max})
 #'
 #' @keywords internal
 #'
@@ -278,33 +280,35 @@ summary.ceac <- function(object, ...) {
   } else {
     # build up summary data frame
     df_sum <- NULL
+    # each switch contributes the interval that ends at it, and the final
+    # switch additionally contributes the interval running to the highest wtp,
+    # giving n_switches + 1 rows. every index below is a single element -
+    # indexing with the whole `switches` vector recycles and duplicates rows.
     for (i in 1:n_switches) {
       if (i == 1) {
-        df_sum_row_first <- data.frame(wtp_range[1],
-                                       wtp[switches],
-                                       strat_on_front[switches - 1],
-                                       fix.empty.names = FALSE,
-                                       stringsAsFactors = FALSE)
-        df_sum <- rbind(df_sum, df_sum_row_first)
+        df_sum_row <- data.frame(wtp_range[1],
+                                 wtp[switches[1]],
+                                 strat_on_front[switches[1] - 1],
+                                 fix.empty.names = FALSE,
+                                 stringsAsFactors = FALSE)
+      } else {
+        df_sum_row <- data.frame(wtp[switches[i - 1]],
+                                 wtp[switches[i]],
+                                 strat_on_front[switches[i] - 1],
+                                 fix.empty.names = FALSE,
+                                 stringsAsFactors = FALSE)
       }
+      df_sum <- rbind(df_sum, df_sum_row)
       if (i == n_switches) {
-        df_sum_row_last <- data.frame(wtp[switches],
+        df_sum_row_last <- data.frame(wtp[switches[n_switches]],
                                       wtp_range[2],
-                                      strat_on_front[switches],
+                                      strat_on_front[switches[n_switches]],
                                       fix.empty.names = FALSE,
                                       stringsAsFactors = FALSE)
         df_sum <- rbind(df_sum, df_sum_row_last)
       }
-      if (i > 1) {
-        df_sum_row_middle <- data.frame(wtp[switches[i]],
-                                        wtp[switches[i + 1]],
-                                        strat_on_front[switches[i]],
-                                        fix.empty.names = FALSE,
-                                        stringsAsFactors = FALSE)
-        df_sum <- rbind(df_sum, df_sum_row_middle)
-      }
     }
   }
-  names(df_sum) <- c("range_min", "range_max", "cost_eff_strat")
+  names(df_sum) <- c("range_min", "range_max", "optimal_strategy")
   df_sum
 }

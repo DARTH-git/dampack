@@ -66,9 +66,11 @@ on the PSA object. The output of \code{summary} can be used in \code{\link{calcu
 }
 \examples{
 # psa input provided with package
-data("example_psa")
-psa <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                    example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                    effectiveness = cancer_psa_data$effectiveness,
+                    parameters = cancer_psa_data$parameters,
+                    strategies = cancer_psa_data$strategies)
 
 # custom print and summary methods
 print(psa)

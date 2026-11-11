@@ -11,11 +11,12 @@ test_that("exp_loss has all methods we'd expect", {
 
 # test return object
 ## setup
-data("example_psa")
-psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                        example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+v_wtp <- seq(1000, 141000, by = 10000)
+psa_obj <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters, cancer_psa_data$strategies)
 elc_obj <- calc_exp_loss(psa = psa_obj,
-                         wtp = example_psa$wtp)
+                         wtp = v_wtp)
 
 # classes
 test_that("return object has classes evpi and data.frame", {
@@ -32,7 +33,7 @@ test_that("return object has correct column names", {
 
 # calculation
 test_that("expected loss is what we'd expect", {
-  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$cost
+  nmb <-  v_wtp[1] * cancer_psa_data$effectiveness - cancer_psa_data$cost
   max_str <- max.col(nmb)
   loss <- nmb[cbind(1:(psa_obj$n_sim), max_str)] - nmb
   exp_loss <- colMeans(loss)

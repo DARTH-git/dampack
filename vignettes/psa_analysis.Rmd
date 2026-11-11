@@ -50,35 +50,35 @@ Within `dampack` there is an example PSA dataset from a model evaluating differe
 
 ```{r}
 library(dampack)
-data("example_psa")
+data("cancer_psa_data")
 ```
 
 
 We can see the structure of the data with `str()`:
 ```{r}
-str(example_psa)
+str(cancer_psa_data)
 ```
 
-We see that the `example_psa` dataset is a list that contains the elements below. It also contains a `wtp` vector of willingness-to-pay thresholds, which we can ignore for now.
+We see that the `cancer_psa_data` dataset is a list that contains:
 
 - `strategies`: a vector of strategy names. In this example, we see that there are three strategies, corresponding to three different cancer treatments.
 ```{r}
-example_psa$strategies
+cancer_psa_data$strategies
 ```
 
 - `cost`: a data frame of the cost of each strategy for each PSA sample. We see that there are three columns, one for each strategy. There are no requirements on the column names of this data frame, but it is *critical* these columns be in the same order as the `strategies` vector. There are 10,000 rows (the number of PSA samples).
 ```{r}
-head(example_psa$cost)
+head(cancer_psa_data$cost)
 ```
 
 - `effectiveness`: a data frame of the effectiveness outcome (such as quality-adjusted life-years). This data frame has the same structure as the `costs` data frame, with three columns (one for each strategy) and 10,000 rows (the number of PSA samples)
 ```{r}
-head(example_psa$effectiveness)
+head(cancer_psa_data$effectiveness)
 ```
 
 - `parameters`: a data frame of the parameter values used in each PSA sample. Each column represents an input parameter varied in the PSA and is named after that parameter. There are 8 columns, meaning that in this PSA, 8 parameters were varied probabilistically. The data frame has 10,000 rows, again reflecting the number of PSA samples.
 ```{r}
-head(example_psa$parameters)
+head(cancer_psa_data$parameters)
 ```
 
 ### Construct PSA object
@@ -86,10 +86,10 @@ head(example_psa$parameters)
 We will now construct a `psa` object from this example data. We do so using the `make_psa_obj` function.
 
 ```{r}
-psa_cancer <- make_psa_obj(cost = example_psa$cost,
-                        effectiveness = example_psa$effectiveness,
-                        parameters = example_psa$parameters,
-                        strategies = example_psa$strategies,
+psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+                        effectiveness = cancer_psa_data$effectiveness,
+                        parameters = cancer_psa_data$parameters,
+                        strategies = cancer_psa_data$strategies,
                         currency = "$")
 str(psa_cancer)
 ```

@@ -25,9 +25,13 @@
 #' cost- disutility plane. Med Decis Making. 2008;28(2):172–181.
 #' }
 #' @examples
-#' data("example_psa_obj")
+#' data("cancer_psa_data")
+#' psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                            effectiveness = cancer_psa_data$effectiveness,
+#'                            parameters = cancer_psa_data$parameters,
+#'                            strategies = cancer_psa_data$strategies)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' exp_loss <- calc_exp_loss(example_psa_obj, wtp)
+#' exp_loss <- calc_exp_loss(psa_cancer, wtp)
 #'
 #' # can use head(), summary(), print(), etc.
 #' head(exp_loss)

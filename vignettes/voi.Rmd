@@ -33,16 +33,16 @@ In 'dampack', EVPI is calculated using the function `calc_evpi()`, which require
 
 ```{r}
 library(dampack)
-data("example_psa")
-psa_big <- make_psa_obj(example_psa$cost,
-                        example_psa$effectiveness,
-                        example_psa$parameters,
-                        example_psa$strategies)
+data("cancer_psa_data")
+psa_big <- make_psa_obj(cancer_psa_data$cost,
+                        cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters,
+                        cancer_psa_data$strategies)
 ```
 
 ```{r}
 evpi_obj <- calc_evpi(psa = psa_big,
-                      wtp = example_psa$wtp,
+                      wtp = seq(1000, 141000, by = 10000),
                       pop = 1)
 head(evpi_obj)
 ```

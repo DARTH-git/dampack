@@ -11,12 +11,12 @@ test_that("ceac has all methods we'd expect", {
 # test class creation
 
 ## setup
-data("example_psa")
-wtp <- example_psa$wtp
-psa_obj <- make_psa_obj(example_psa$cost,
-                        example_psa$effectiveness,
-                        example_psa$parameters,
-                        example_psa$strategies)
+data("cancer_psa_data")
+wtp <- seq(1000, 141000, by = 10000)
+psa_obj <- make_psa_obj(cancer_psa_data$cost,
+                        cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters,
+                        cancer_psa_data$strategies)
 
 test_that("result has class 'ceac'", {
   c <- ceac(wtp, psa_obj)
@@ -25,9 +25,9 @@ test_that("result has class 'ceac'", {
 })
 
 test_that("handles missing strategy", {
-  psa_missing <- make_psa_obj(example_psa$cost,
-                              example_psa$effectiveness,
-                              example_psa$parameters)
+  psa_missing <- make_psa_obj(cancer_psa_data$cost,
+                              cancer_psa_data$effectiveness,
+                              cancer_psa_data$parameters)
   c_missing <- ceac(wtp, psa_missing)
   expected_generic_strat <- factor(c("Strategy_1", "Strategy_2", "Strategy_3"), ordered = TRUE)
   obtained_generic_strat <- sort(unique(c_missing$Strategy))

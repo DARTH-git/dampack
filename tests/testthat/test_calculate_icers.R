@@ -62,9 +62,9 @@ test_that("one strategy runs", {
 })
 
 # import psa
-data("example_psa")
-psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                        example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters, cancer_psa_data$strategies)
 
 # function runs w/o error (uncertainty = FALSE)
 test_that("calculate_icers_psa runs (no uncertainty)", {

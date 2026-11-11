@@ -68,6 +68,7 @@ summary(df_ceac)
 plot(df_ceac, frontier = TRUE)
 }
 \seealso{
-\code{\link{example_psa}} for a smaller two-strategy sample.
+\code{\link{cancer_psa_data}} for a three-strategy sample that
+also includes the parameter draws.
 }
 \keyword{datasets}

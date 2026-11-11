@@ -42,7 +42,8 @@
 #' names, which were inconsistent, were regularized to \code{Cost_1} to
 #' \code{Cost_6} and \code{QALY_1} to \code{QALY_6}.
 #'
-#' @seealso \code{\link{example_psa}} for a smaller two-strategy sample.
+#' @seealso \code{\link{cancer_psa_data}} for a three-strategy sample that
+#' also includes the parameter draws.
 #'
 #' @examples
 #' data(df_example_psa_elc)

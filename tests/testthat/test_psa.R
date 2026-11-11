@@ -53,9 +53,9 @@ test_that("fix strategy", {
 ## methods
 
 # plot
-data("example_psa")
-psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                        example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters, cancer_psa_data$strategies)
 test_that("plot.psa runs", {
   expect_silent({
     plot(psa_big)

@@ -1,7 +1,7 @@
 Package: dampack
 Type: Package
 Title: Decision-Analytic Modeling Package
-Version: 1.0.2.1000
+Version: 1.1.0.9000
 Authors@R: 
     c(person(given = "Fernando",
              family = "Alarid-Escudero",
@@ -42,11 +42,11 @@ Description: A suite of functions for analyzing and visualizing the health econo
     of Health. The theoretical underpinnings of 'dampack''s functionality are detailed in Hunink et al. (2014) 
     <doi:10.1017/CBO9781139506779>.
 License: GPL-3
-URL: https://github.com/DARTH-git/dampack
+URL: https://github.com/DARTH-git/dampack, https://darth-git.github.io/dampack/
 BugReports: https://github.com/DARTH-git/dampack/issues
 Encoding: UTF-8
 Depends:
-    R (>= 3.5),
+    R (>= 4.1.0),
     ggplot2 (>= 3.3.0)
 Imports:
     ellipse,
@@ -70,3 +70,4 @@ LazyData: true
 BuildResaveData: no
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
+Config/Needs/website: pkgdown

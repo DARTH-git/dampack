@@ -74,7 +74,7 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 
   # define classes
   class(ow) <- c("owsa", "data.frame")
-  return(ow)
+  ow
 }
 
 #' Plot a sensitivity analysis
@@ -287,9 +287,9 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
                         ylim = ylim) +
       ggplot2::geom_hline(yintercept = avg, linetype = 3)
 
-    return(g)
+    g
   } else {
-    return(min_max)
+    min_max
   }
 }
 
@@ -400,9 +400,9 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   # return either plot or data
   ret <- match.arg(return)
   if (ret == "plot") {
-    return(g)
+    g
   } else {
-    return(opt_strat)
+    opt_strat
   }
 }
 
@@ -413,8 +413,8 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
 #' @keywords internal
 is_owsa <- function(obj) {
   if (inherits(obj, "owsa")) {
-    return(TRUE)
+    TRUE
   } else {
-    return(FALSE)
+    FALSE
   }
 }

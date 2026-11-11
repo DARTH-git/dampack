@@ -125,7 +125,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
                     type = type, poly.order = poly.order, k = k)
   # define class
   class(metamodel) <- "metamodel"
-  return(metamodel)
+  metamodel
 }
 
 #' Build formula and run linear regression for metamodel
@@ -217,7 +217,7 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
 
     metamod <- gam(f, data = dat)
   }
-  return(metamod)
+  metamod
 }
 
 
@@ -286,7 +286,7 @@ summary.metamodel <- function(object, ...) {
       df_summary <- rbind(df_summary, df_new_row)
     }
   }
-  return(df_summary)
+  df_summary
 }
 
 #' Predict from a one-way or two-way metamodel
@@ -421,7 +421,7 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
     }
   }
   df_combined <- bind_rows(dfs_outcome)
-  return(df_combined)
+  df_combined
 }
 
 #' make a parameter sequence

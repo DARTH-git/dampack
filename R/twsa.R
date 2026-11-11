@@ -74,7 +74,7 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
 
   # define classes
   class(tw) <- c("twsa", "data.frame")
-  return(tw)
+  tw
 }
 
 #' Two-way sensitivity analysis plot

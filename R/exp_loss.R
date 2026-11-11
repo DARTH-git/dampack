@@ -50,7 +50,7 @@ calc_exp_loss <- function(psa, wtp) {
   strategies <- psa$strategies
   n_str  <- psa$n_strategies
   exp_loss <- matrix(0, nrow = length(wtp), ncol = n_str)
-  for (i in seq_len(length(wtp))) {
+  for (i in seq_along(wtp)) {
     ith_wtp <- wtp[i]
     loss <- calculate_outcome("nmb_loss", cost, effectiveness, ith_wtp)
     exp_loss[i, ] <- colMeans(loss)
@@ -87,7 +87,7 @@ calc_exp_loss <- function(psa, wtp) {
   df_exp_loss_melt$Strategy <- factor(df_exp_loss_melt$Strategy, levels = strategies, ordered = TRUE)
 
   class(df_exp_loss_melt) <- c("exp_loss", "data.frame")
-  return(df_exp_loss_melt)
+  df_exp_loss_melt
 }
 
 
@@ -188,5 +188,5 @@ plot.exp_loss <- function(x,
              linetype = guide_legend(order = 1),
              shape = guide_legend(order = 2))
   }
-  return(p)
+  p
 }

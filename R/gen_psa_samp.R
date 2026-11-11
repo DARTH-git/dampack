@@ -260,7 +260,7 @@ gen_psa_samp <- function(params = NULL,
   df_params <- do.call(cbind, df_params)
   nsamp <- 1:nsamp
   df_params <- cbind(nsamp, df_params)
-  return(df_params)
+  df_params
 }
 
 
@@ -277,7 +277,7 @@ rdirichlet <- function(n, alpha) {
   k <- length(alpha)
   out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
   out <- out / rowSums(out)
-  return(out)
+  out
 }
 
 
@@ -307,7 +307,7 @@ beta_params <- function(mean, sigma) {
   alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
   beta  <- alpha * (1 / mean - 1)
   params <- list(alpha = alpha, beta = beta)
-  return(params)
+  params
 }
 
 
@@ -359,7 +359,7 @@ dirichlet_params <- function(p.mean, sigma) {
     alpha[i] <- (p.mean[1] - p.2[1]) * p.mean[i] / (p.2[1] - p.mean[1] ^ 2)
   }
   alpha[n.params] <- (p.mean[1] - p.2[1]) * (1 - sum(p.mean[- n.params])) / (p.2[1] - p.mean[1] ^ 2)
-  return(alpha)
+  alpha
 }
 
 
@@ -415,7 +415,7 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
     params <- list(shape = shape,
                    rate  = rate)
   }
-  return(params)
+  params
 }
 
 
@@ -465,6 +465,6 @@ lnorm_params <- function(m = 1, v = 1) {
   }
   mu <- log(m / sqrt(1 + v / m ^ 2))
   sigma <- sqrt(log(1 + v / m ^ 2))
-  return(list(mu = mu,
-              sigma = sigma))
+  list(mu = mu,
+       sigma = sigma)
 }

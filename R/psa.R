@@ -77,7 +77,7 @@ make_psa_obj <- function(cost, effectiveness, parameters = NULL,
 
   # give classes "psa" and "sa"
   class(psa_obj) <- c("psa", class(psa_obj))
-  return(psa_obj)
+  psa_obj
 }
 
 check_psa_object <- function(psa) {
@@ -95,7 +95,7 @@ check_df_and_coerce <- function(obj) {
   } else {
     df <- as.data.frame(obj)
   }
-  return(df)
+  df
 }
 
 #' summarize a psa object across all simulations
@@ -243,7 +243,7 @@ plot.psa <- function(x,
       v_ref    <- df[, ref_str]
       df_inc   <- df[, !(names(df) %in% ref_str)]
       df_inc   <- sweep(df_inc, 1, v_ref, "-")
-      return(df_inc)
+      df_inc
     }
 
     ## Long data frames

@@ -159,7 +159,7 @@ test_that("accurately producing warnings and errors in run_owsa_det", {
                              init_state = c(1, 0, 0, 0)) {
     input_ls <- as.list(environment())
     output <- do.call(strategy_func, input_ls)
-    return(as.matrix(output))
+    as.matrix(output)
   }
   expect_error(run_owsa_det(params_range, params_basecase, nsamp = 10,
                             strategy_func2, outcomes,
@@ -246,7 +246,7 @@ test_that("checking warning error message from run_twsa_det", {
                              init_state = c(1, 0, 0, 0)) {
     input_ls <- as.list(environment())
     output <- do.call(strategy_func, input_ls)
-    return(as.matrix(output))
+    as.matrix(output)
   }
   expect_error(run_twsa_det(params_range, params_basecase, nsamp = 30,
                             strategy_func2, outcomes,

@@ -123,7 +123,7 @@ ceac <- function(wtp, psa) {
   # defining data.frame as well allows the object to use print.data.frame, for example
   class(ceac) <- c("ceac", "data.frame")
 
-  return(ceac)
+  ceac
 }
 
 #' Plot of Cost-Effectiveness Acceptability Curves (CEAC)

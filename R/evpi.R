@@ -55,7 +55,7 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 
   # declare class as both evpi (plotting) and data.frame (printing)
   class(df_evpi) <- c("evpi", "data.frame")
-  return(df_evpi)
+  df_evpi
 }
 
 #' Plot of Expected Value of Perfect Information (EVPI)

@@ -110,7 +110,7 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
              "parnames" = parnames,
              "currency" = currency)
   class(sa) <- "sa"
-  return(sa)
+  sa
 }
 
 #' print a psa object

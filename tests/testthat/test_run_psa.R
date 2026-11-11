@@ -23,7 +23,7 @@ test_func <- function(params, extra_param) {
                        effect = c(effect1, effect2),
                        cost = c(cost1, cost2))
 
-  return(output)
+  output
 }
 
 test <- gen_psa_samp(params = c("normal_param", "lognorm_param", "beta_param",

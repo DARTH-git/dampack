@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Package documentation and vignettes
+    url: https://darth-git.github.io/dampack/
+    about: Check the function reference and vignettes for usage questions.

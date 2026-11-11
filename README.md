@@ -2,12 +2,12 @@
 <!-- [![Build Status](https://www.travis-ci.com/DARTH-git/dampack.svg?branch=master)](https://www.travis-ci.com/DARTH-git/dampack) -->
 
 <!-- badges: start -->
-  [![R-CMD-check](https://github.com/DARTH-git/dampack/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DARTH-git/dampack/actions/workflows/R-CMD-check.yaml)
+  [![R-CMD-check](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml)
   <!-- badges: end -->
   
 The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and visualizing the health economic outputs of mathematical models. 
 
-Created and maintained by Fernando Alarid-Escudero ([@feralaes](https://github.com/feralaes)), Greg Knowlton ([@gknowlt](https://github.com/gknowlt)), and Eva Enns ([@evaenns](https://github.com/evaenns)), and important contributions from David Garibay ([@dugartre](https://github.com/dugartre)), and Mark Clements ([@mclements](https://github.com/mclements)).
+Created and maintained by Fernando Alarid-Escudero ([@feralaes](https://github.com/feralaes)), Greg Knowlton ([@gknowlt](https://github.com/gknowlt)), and Eva Enns ([@evaenns](https://github.com/evaenns)), and important contributions from David Garibay ([@du-gartre](https://github.com/du-gartre)), and Mark Clements ([@mclements](https://github.com/mclements)).
 
 This package was developed with funding from the National Institutes of Allergy and Infectious Diseases of the National Institutes of Health under award no. R01AI138783. The content of this package is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 

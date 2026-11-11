@@ -20,13 +20,15 @@
 #'
 #' @examples
 #' # psa input provided with package
-#' data("example_psa")
-#' example_psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-#'                     example_psa$parameters, example_psa$strategies)
+#' data("cancer_psa_data")
+#' psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                            effectiveness = cancer_psa_data$effectiveness,
+#'                            parameters = cancer_psa_data$parameters,
+#'                            strategies = cancer_psa_data$strategies)
 #'
 #' # define wtp threshold vector (can also use a single wtp)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' ceac_obj <- ceac(wtp, example_psa_obj)
+#' ceac_obj <- ceac(wtp, psa_cancer)
 #' plot(ceac_obj) # see ?plot.ceac for options
 #'
 #' # this is most useful when there are many strategies
@@ -90,13 +92,13 @@ ceac <- function(wtp, psa) {
   }
 
   # make cea df
-  cea_df <- data.frame(wtp, cea, strategies[frontv],
+  df_cea <- data.frame(wtp, cea, strategies[frontv],
                        stringsAsFactors = FALSE)
-  colnames(cea_df) <- c("WTP", strategies, "fstrat")
+  colnames(df_cea) <- c("WTP", strategies, "fstrat")
 
   # Reformat df to long format
   ceac <- tidyr::pivot_longer(
-    data = cea_df,
+    data = df_cea,
     cols = !c("WTP", "fstrat"),
     names_to = "Strategy",
     values_to = "Proportion"
@@ -164,12 +166,13 @@ plot.ceac <- function(x,
                       ybreaks = NULL,
                       ylim = NULL,
                       xlim = c(0, NA),
-                      col = c("full", "bw"),
+                      col = c("access", "full", "bw"),
                       ...) {
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"
   x$WTP_thou <- x[, wtp_name] / 1000
+  strategies <- unique(x$Strategy)
 
   Strategy <- Proportion <- maxpr <- On_Frontier <- WTP_thou <- NULL
   # removing strategies with probabilities always below `min_prob`
@@ -235,7 +238,8 @@ plot.ceac <- function(x,
   add_common_aes(p, txtsize, col = col, col_aes = "color",
                  continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,
-                 ylim = ylim, xlim = xlim)
+                 ylim = ylim, xlim = xlim,
+                 v_str = strategies)
 }
 
 
@@ -246,9 +250,11 @@ plot.ceac <- function(x,
 #'
 #' @param object object returned from the \code{ceac} function
 #' @param ... further arguments (not used)
-#' @return data frame showing the interval of cost effectiveness for each
-#' interval. The intervals are open on the right endpoint -
-#' i.e., [\code{range_min}, \code{range_max})
+#' @return data frame with one row per interval of willingness to pay over which
+#' a single strategy is optimal, and three columns: \code{range_min} and
+#' \code{range_max} bounding the interval, and \code{optimal_strategy} naming the
+#' strategy on the cost-effectiveness frontier there. The intervals are open on
+#' the right endpoint - i.e., [\code{range_min}, \code{range_max})
 #'
 #' @keywords internal
 #'
@@ -270,39 +276,41 @@ summary.ceac <- function(object, ...) {
     wtp_min <- wtp_range[1]
     wtp_max <- wtp_range[2]
     one_strat <- unique(front$Strategy)
-    sum_df <- data.frame(wtp_min,
+    df_sum <- data.frame(wtp_min,
                          wtp_max,
                          one_strat)
   } else {
     # build up summary data frame
-    sum_df <- NULL
+    df_sum <- NULL
+    # each switch contributes the interval that ends at it, and the final
+    # switch additionally contributes the interval running to the highest wtp,
+    # giving n_switches + 1 rows. every index below is a single element -
+    # indexing with the whole `switches` vector recycles and duplicates rows.
     for (i in 1:n_switches) {
       if (i == 1) {
-        sum_df_row_first <- data.frame(wtp_range[1],
-                                       wtp[switches],
-                                       strat_on_front[switches - 1],
-                                       fix.empty.names = FALSE,
-                                       stringsAsFactors = FALSE)
-        sum_df <- rbind(sum_df, sum_df_row_first)
+        df_sum_row <- data.frame(wtp_range[1],
+                                 wtp[switches[1]],
+                                 strat_on_front[switches[1] - 1],
+                                 fix.empty.names = FALSE,
+                                 stringsAsFactors = FALSE)
+      } else {
+        df_sum_row <- data.frame(wtp[switches[i - 1]],
+                                 wtp[switches[i]],
+                                 strat_on_front[switches[i] - 1],
+                                 fix.empty.names = FALSE,
+                                 stringsAsFactors = FALSE)
       }
+      df_sum <- rbind(df_sum, df_sum_row)
       if (i == n_switches) {
-        sum_df_row_last <- data.frame(wtp[switches],
+        df_sum_row_last <- data.frame(wtp[switches[n_switches]],
                                       wtp_range[2],
-                                      strat_on_front[switches],
+                                      strat_on_front[switches[n_switches]],
                                       fix.empty.names = FALSE,
                                       stringsAsFactors = FALSE)
-        sum_df <- rbind(sum_df, sum_df_row_last)
-      }
-      if (i > 1) {
-        sum_df_row_middle <- data.frame(wtp[switches[i]],
-                                        wtp[switches[i + 1]],
-                                        strat_on_front[switches[i]],
-                                        fix.empty.names = FALSE,
-                                        stringsAsFactors = FALSE)
-        sum_df <- rbind(sum_df, sum_df_row_middle)
+        df_sum <- rbind(df_sum, df_sum_row_last)
       }
     }
   }
-  names(sum_df) <- c("range_min", "range_max", "cost_eff_strat")
-  sum_df
+  names(df_sum) <- c("range_min", "range_max", "optimal_strategy")
+  df_sum
 }

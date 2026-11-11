@@ -7,7 +7,7 @@
 \method{plot}{twsa}(
   x,
   maximize = TRUE,
-  col = c("full", "bw"),
+  col = c("access", "full", "bw"),
   n_x_ticks = 6,
   n_y_ticks = 6,
   txtsize = 12,
@@ -21,7 +21,7 @@
 \item{maximize}{If \code{TRUE}, plot of strategy with maximum expected outcome
 (default); if \code{FALSE}, plot of strategy with minimum expected outcome}
 
-\item{col}{either none, full color, or black and white}
+\item{col}{either none, full color, accessible colors, or black and white}
 
 \item{n_x_ticks}{number of x-axis ticks}
 

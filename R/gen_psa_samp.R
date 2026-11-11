@@ -142,14 +142,14 @@ gen_psa_samp <- function(params = NULL,
   parameterization_types <- match.arg(parameterization_types, several.ok = TRUE)
 
   n_params <- length(params)
-  params_df <- vector(mode = "list", length = n_params)
+  df_params <- vector(mode = "list", length = n_params)
 
   for (i in 1:n_params) {
     #normal
     if (dists[i] == "normal") {
-      params_df[[i]] <- data.frame(param_val = rnorm(nsamp, mean = dists_params[[i]][1],
+      df_params[[i]] <- data.frame(param_val = rnorm(nsamp, mean = dists_params[[i]][1],
                                                      sd = dists_params[[i]][2]))
-      names(params_df[[i]]) <- paste0(params[i])
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
     #log normal
@@ -162,8 +162,8 @@ gen_psa_samp <- function(params = NULL,
         sd <- dists_params[[i]][2]
       }
 
-      params_df[[i]] <- data.frame(param_val = rlnorm(nsamp, meanlog = mu, sdlog = sd))
-      names(params_df[[i]]) <- paste0(params[i])
+      df_params[[i]] <- data.frame(param_val = rlnorm(nsamp, meanlog = mu, sdlog = sd))
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
     #truncated normal
@@ -172,23 +172,23 @@ gen_psa_samp <- function(params = NULL,
       sample_sd <- dists_params[[i]][2]
       lowerbound <- ifelse(!is.na(dists_params[[i]][3]), dists_params[[i]][3], -Inf)
       upperbound <- ifelse(!is.na(dists_params[[i]][4]), dists_params[[i]][4], Inf)
-      params_df[[i]] <- data.frame(param_val = rtruncnorm(nsamp, a = lowerbound,
+      df_params[[i]] <- data.frame(param_val = rtruncnorm(nsamp, a = lowerbound,
                                                           b = upperbound, mean = sample_mean,
                                                           sd = sample_sd))
-      names(params_df[[i]]) <- paste0(params[i])
+      names(df_params[[i]]) <- paste0(params[i])
     }
     #beta
     if (dists[i] == "beta") {
       if (parameterization_types[i] == "mean, sd") {
         a <- beta_params(dists_params[[i]][1], dists_params[[i]][2])[[1]]
         b <- beta_params(dists_params[[i]][1], dists_params[[i]][2])[[2]]
-        params_df[[i]] <- as.data.frame(rbeta(nsamp, a, b))
+        df_params[[i]] <- as.data.frame(rbeta(nsamp, a, b))
       } else if (parameterization_types[i] == "a, b") {
         a <- dists_params[[i]][1]
         b <- dists_params[[i]][2]
-        params_df[[i]] <- as.data.frame(rbeta(nsamp, a, b))
+        df_params[[i]] <- as.data.frame(rbeta(nsamp, a, b))
       }
-      names(params_df[[i]]) <- paste0(params[i])
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
     #gamma
@@ -196,32 +196,32 @@ gen_psa_samp <- function(params = NULL,
       if (parameterization_types[i] == "mean, sd") {
         shape <- gamma_params(dists_params[[i]][1], dists_params[[i]][2], scale = TRUE)[[1]]
         scale <- gamma_params(dists_params[[i]][1], dists_params[[i]][2], scale = TRUE)[[2]]
-        params_df[[i]] <- as.data.frame(rgamma(nsamp, shape = shape, scale = scale))
+        df_params[[i]] <- as.data.frame(rgamma(nsamp, shape = shape, scale = scale))
       } else if (parameterization_types[i] == "shape, scale") {
         shape <- dists_params[[i]][1]
         scale <- dists_params[[i]][2]
-        params_df[[i]] <- as.data.frame(rgamma(nsamp, shape = shape, scale = scale))
+        df_params[[i]] <- as.data.frame(rgamma(nsamp, shape = shape, scale = scale))
       }
-      names(params_df[[i]]) <- paste0(params[i])
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
     #dirichlet
     if (dists[i] == "dirichlet") {
       if (parameterization_types[i] == "value, mean_prop, sd") {
         alpha <- dirichlet_params(dists_params[[i]][, 2], dists_params[[i]][, 3])
-        params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
+        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
       } else if (parameterization_types[i] == "value, n") {
         val_n <- as.data.frame(dists_params[[i]])
         total <- sum(val_n[, 2])
         p_mean <- val_n[, 2] / total
         sd <- sqrt((p_mean * (1 - p_mean)) / total)
         alpha <- dirichlet_params(p_mean, sd)
-        params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
+        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
       } else if (parameterization_types[i] == "value, alpha") {
         alpha <- dists_params[[i]][, 2]
-        params_df[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
+        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
       }
-      names(params_df[[i]]) <- paste0(dists_params[[i]][, 1])
+      names(df_params[[i]]) <- paste0(dists_params[[i]][, 1])
     }
 
     #bootstrap
@@ -233,8 +233,8 @@ gen_psa_samp <- function(params = NULL,
                                    replace = TRUE,
                                    prob = dists_params[[i]][, 2]))
       }
-      params_df[[i]] <- as.data.frame(samp_vec)
-      names(params_df[[i]]) <- paste0(params[i])
+      df_params[[i]] <- as.data.frame(samp_vec)
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
     #triangle
@@ -243,24 +243,24 @@ gen_psa_samp <- function(params = NULL,
         a <- dists_params[[i]][1]
         b <- dists_params[[i]][2]
         c <- dists_params[[i]][3]
-        params_df[[i]] <- as.data.frame(rtriangle(n = nsamp, a = a, b = b, c = c))
+        df_params[[i]] <- as.data.frame(rtriangle(n = nsamp, a = a, b = b, c = c))
       }
-      names(params_df[[i]]) <- paste0(params[i])
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
     #constant
     if (dists[i] == "constant") {
       val <- dists_params[[i]]
-      params_df[[i]] <- data.frame(param_val = rep(val, nsamp))
-      names(params_df[[i]]) <- paste0(params[i])
+      df_params[[i]] <- data.frame(param_val = rep(val, nsamp))
+      names(df_params[[i]]) <- paste0(params[i])
     }
 
   }
 
-  params_df <- do.call(cbind, params_df)
+  df_params <- do.call(cbind, df_params)
   nsamp <- 1:nsamp
-  params_df <- cbind(nsamp, params_df)
-  return(params_df)
+  df_params <- cbind(nsamp, df_params)
+  return(df_params)
 }
 
 

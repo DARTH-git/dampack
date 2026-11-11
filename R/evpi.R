@@ -12,12 +12,16 @@
 #' @return A data frame and \code{evpi} object with the EVPI at each WTP threshold.
 #' @seealso \code{\link{plot.evpi}}, \code{\link{make_psa_obj}}
 #' @examples
-#' # load psa object provided with package
-#' data("example_psa_obj")
+#' # build a psa object from the data provided with the package
+#' data("cancer_psa_data")
+#' psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                            effectiveness = cancer_psa_data$effectiveness,
+#'                            parameters = cancer_psa_data$parameters,
+#'                            strategies = cancer_psa_data$strategies)
 #'
 #' # define wtp threshold vector (can also use a single wtp)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' evpi <- calc_evpi(example_psa_obj, wtp)
+#' evpi <- calc_evpi(psa_cancer, wtp)
 #' plot(evpi) # see ?plot.evpi for options
 #'
 #' # can use plot options (# see ?plot.evpi for details)

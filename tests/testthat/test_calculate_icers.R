@@ -20,7 +20,7 @@ strat <- c("E", "D", "C", "B", "A", "UC")
 icer <- calculate_icers(cost = cost, effect = effect, strategies = strat)
 
 test_that("calculate_icers returns correct object", {
-  expected_df <- data.frame("Strategy" = c("UC", "B", "D", "E", "C", "A"),
+  df_expected <- data.frame("Strategy" = c("UC", "B", "D", "E", "C", "A"),
                             "Cost" = c(5000, 10000, 35000, 55000, 25000, 12000),
                             "Effect" = c(1, 2, 4, 5, 3, 1.5),
                             "Inc_Cost" = c(NA, 5000, 25000, 20000, NA, NA),
@@ -28,8 +28,8 @@ test_that("calculate_icers returns correct object", {
                             "ICER" = c(NA, 5000, 12500, 20000, NA, NA),
                             "Status" = c("ND", "ND", "ND", "ND", "ED", "D"),
                             stringsAsFactors = FALSE)
-  class(expected_df) <- c("icers", "data.frame")
-  expect_equal(expected_df, icer)
+  class(df_expected) <- c("icers", "data.frame")
+  expect_equal(df_expected, icer)
 })
 
 ## methods
@@ -51,20 +51,20 @@ test_that("default reference strategy", {
 # one strategy
 test_that("one strategy runs", {
   cea <- calculate_icers(1, 2, "s")
-  exp_df <- data.frame("Strategy" = "s",
+  df_exp <- data.frame("Strategy" = "s",
                        "Cost" = 1,
                        "Effect" = 2,
                        "ICER" = NA,
                        "Inc_Cost" = NA,
                        "Inc_Effect" = NA,
                        stringsAsFactors = FALSE)
-  expect_equal(cea, exp_df)
+  expect_equal(cea, df_exp)
 })
 
 # import psa
-data("example_psa")
-psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                        example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters, cancer_psa_data$strategies)
 
 # function runs w/o error (uncertainty = FALSE)
 test_that("calculate_icers_psa runs (no uncertainty)", {

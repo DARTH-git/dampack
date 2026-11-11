@@ -53,9 +53,9 @@ test_that("fix strategy", {
 ## methods
 
 # plot
-data("example_psa")
-psa_big <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                        example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters, cancer_psa_data$strategies)
 test_that("plot.psa runs", {
   expect_silent({
     plot(psa_big)
@@ -66,6 +66,11 @@ test_that("plot.psa runs", {
     plot(psa_big, col = "bw", xbreaks = seq(0, 15), xlim = c(0, 15),
          ylim = NULL, alpha = 1)
   })
+})
+
+test_that("Plot returns ggplot object", {
+  p <- plot(psa_big)
+  expect_is(p, "ggplot")
 })
 
 # print
@@ -89,11 +94,11 @@ test_that("print.psa returns correct output", {
 # summary
 test_that("summary.psa returns correct output", {
   # no sds
-  expected_df <- data.frame("Strategy" = sm_strategies,
+  df_expected <- data.frame("Strategy" = sm_strategies,
                             "meanCost" = colMeans(sm_costs),
                             "meanEffect" = colMeans(sm_effectiveness),
                             stringsAsFactors = FALSE,
                             row.names = NULL)
-  calc_df <- summary(psa_small)
-  expect_equal(expected = expected_df, calc_df)
+  df_calc <- summary(psa_small)
+  expect_equal(expected = df_expected, df_calc)
 })

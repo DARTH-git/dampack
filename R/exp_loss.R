@@ -25,9 +25,13 @@
 #' cost- disutility plane. Med Decis Making. 2008;28(2):172–181.
 #' }
 #' @examples
-#' data("example_psa_obj")
+#' data("cancer_psa_data")
+#' psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                            effectiveness = cancer_psa_data$effectiveness,
+#'                            parameters = cancer_psa_data$parameters,
+#'                            strategies = cancer_psa_data$strategies)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' exp_loss <- calc_exp_loss(example_psa_obj, wtp)
+#' exp_loss <- calc_exp_loss(psa_cancer, wtp)
 #'
 #' # can use head(), summary(), print(), etc.
 #' head(exp_loss)
@@ -56,34 +60,34 @@ calc_exp_loss <- function(psa, wtp) {
   optimal_str <- max.col(-exp_loss)
 
   # Format expected loss for plotting
-  exp_loss_df <- data.frame(wtp, exp_loss, strategies[optimal_str])
-  colnames(exp_loss_df) <- c("WTP", strategies, "fstrat")
+  df_exp_loss <- data.frame(wtp, exp_loss, strategies[optimal_str])
+  colnames(df_exp_loss) <- c("WTP", strategies, "fstrat")
 
   # Reformat df to long format
-  exp_loss_df_melt <- tidyr::pivot_longer(
-    data = exp_loss_df,
+  df_exp_loss_melt <- tidyr::pivot_longer(
+    data = df_exp_loss,
     cols = !c("WTP", "fstrat"),
     names_to = "Strategy",
     values_to = "Expected_Loss"
   )
 
   # boolean for on frontier or not
-  exp_loss_df_melt$On_Frontier <- (exp_loss_df_melt$fstrat == exp_loss_df_melt$Strategy)
+  df_exp_loss_melt$On_Frontier <- (df_exp_loss_melt$fstrat == df_exp_loss_melt$Strategy)
 
   # drop fstrat column
-  exp_loss_df_melt$fstrat <- NULL
+  df_exp_loss_melt$fstrat <- NULL
 
   # order by WTP
-  exp_loss_df_melt <- exp_loss_df_melt[order(exp_loss_df_melt$WTP), ]
+  df_exp_loss_melt <- df_exp_loss_melt[order(df_exp_loss_melt$WTP), ]
 
   # remove rownames
-  rownames(exp_loss_df_melt) <- NULL
+  rownames(df_exp_loss_melt) <- NULL
 
   # make strategies in exp_loss object into ordered factors
-  exp_loss_df_melt$Strategy <- factor(exp_loss_df_melt$Strategy, levels = strategies, ordered = TRUE)
+  df_exp_loss_melt$Strategy <- factor(df_exp_loss_melt$Strategy, levels = strategies, ordered = TRUE)
 
-  class(exp_loss_df_melt) <- c("exp_loss", "data.frame")
-  return(exp_loss_df_melt)
+  class(df_exp_loss_melt) <- c("exp_loss", "data.frame")
+  return(df_exp_loss_melt)
 }
 
 
@@ -121,13 +125,14 @@ plot.exp_loss <- function(x,
                           ybreaks = NULL,
                           xlim = c(0, NA),
                           ylim = NULL,
-                          col = c("full", "bw"),
+                          col = c("access", "full", "bw"),
                           ...) {
   On_Frontier <- NULL
   wtp_name <- "WTP_thou"
   loss_name <- "Expected_Loss"
   strat_name <- "Strategy"
   x[, wtp_name] <- x$WTP / 1000
+  strategies <- unique(x$Strategy)
 
   # split into on frontier and not on frontier
   nofront <- x
@@ -151,7 +156,7 @@ plot.exp_loss <- function(x,
   # color
   col <- match.arg(col)
   ## change linetype too if color is black and white
-  if (col == "full") {
+  if (col == "full" || col == "access") {
     if (points) {
       p <- p + geom_point(aes(color = !!sym(strat_name)))
     }
@@ -171,7 +176,7 @@ plot.exp_loss <- function(x,
                       continuous = c("x", "y"),
                       n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                       xbreaks = xbreaks, ybreaks = ybreaks,
-                      xlim = xlim, ylim = ylim,
+                      xlim = xlim, ylim = ylim, v_str = strategies,
                       ytrans = tr)
   if (frontier) {
     p <- p + geom_point(data = front, aes(x = !!sym(wtp_name),

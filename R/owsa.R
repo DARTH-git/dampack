@@ -58,11 +58,11 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
         param_val <- params[param_rows, "paramval"]
         outcome_val <- y[param_rows, s]
 
-        new_df <- data.frame("parameter" = p,
+        df_new <- data.frame("parameter" = p,
                              "strategy" = s,
                              "param_val" = param_val,
                              "outcome_val" = outcome_val)
-        ow <- rbind(ow, new_df, stringsAsFactors = FALSE)
+        ow <- rbind(ow, df_new, stringsAsFactors = FALSE)
         # make strategies in owsa object into ordered factors
         ow$strategy <- factor(ow$strategy, levels = strategies, ordered = TRUE)
       }
@@ -101,7 +101,7 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 #' @importFrom tidyr pivot_longer
 #' @export
 plot.owsa <- function(x, txtsize = 12,
-                      col = c("full", "bw"),
+                      col = c("access", "full", "bw"),
                       facet_scales = c("free_x", "free_y", "free", "fixed"),
                       facet_nrow = NULL,
                       facet_ncol = NULL,
@@ -111,6 +111,7 @@ plot.owsa <- function(x, txtsize = 12,
                       basecase = NULL,
                       ...) {
   param_val <- outcome_val <- strategy <- NULL
+  strategies <- unique(x$strategy)
   scales <- match.arg(facet_scales)
   owsa <- ggplot(data = x,
                  aes(x = param_val, y = outcome_val)) +
@@ -119,7 +120,7 @@ plot.owsa <- function(x, txtsize = 12,
     xlab("Parameter Values")
 
   col <- match.arg(col)
-  if (col == "full") {
+  if (col == "full" || col == "access") {
     owsa <- owsa +
       geom_line(aes(color = strategy),
                 linewidth = size)
@@ -133,24 +134,25 @@ plot.owsa <- function(x, txtsize = 12,
 
   if (!is.null(basecase)) {
     # create data.frame for "basecase" values
-    basecase_df <- as.data.frame(basecase) %>%
+    df_basecase <- as.data.frame(basecase) %>%
       pivot_longer(cols = everything(),
                    names_to = "parameter",
                    values_to = "param_val")
 
-    if (!all(basecase_df$parameter %in% unique(x$parameter))) {
+    if (!all(df_basecase$parameter %in% unique(x$parameter))) {
       stop("Some parameter names in the basecase argument of plot.owsa are not present in owsa object.")
     }
 
     owsa <- owsa +
       geom_vline(mapping = aes(xintercept = param_val),
-                 data = basecase_df)
+                 data = df_basecase)
   }
 
   add_common_aes(owsa, txtsize, col = col, col_aes = "color",
                  scale_name = "Strategy",
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
-                 continuous = c("x", "y"))
+                 continuous = c("x", "y"),
+                 v_str = strategies)
 }
 
 #' Tornado plot of a one-way sensitivity analysis
@@ -173,8 +175,6 @@ plot.owsa <- function(x, txtsize = 12,
 #' object.
 #' @param outcome_name The name of the outcome to show by strategy, either IMB,
 #' NMB, or ICER
-#' @inheritParams add_common_aes
-#' @inheritParams owsa_opt_strat
 #' @return If \code{return == "plot"}, a \code{ggplot2} tornado plot derived from the \code{owsa}
 #' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
 #' A tornado plot is a visual aid used to identify which parameters are driving most of the variation
@@ -184,7 +184,7 @@ plot.owsa <- function(x, txtsize = 12,
 #' @export
 owsa_tornado <- function(owsa, return = c("plot", "data"),
                          txtsize = 12, min_rel_diff = 0,
-                         col = c("full", "bw"),
+                         col = c("access", "full", "bw"),
                          n_y_ticks = 8, ylim = NULL, ybreaks = NULL,
                          select_str = NULL, outcome_name = NULL) {
 
@@ -262,6 +262,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
                                suffix = c(".low", ".high")) %>%
     dplyr::mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
                   rel_diff = abs_diff / outcome_val.low) %>%
+    dplyr::filter(abs(.data$rel_diff) >= min_rel_diff) %>%
     dplyr::arrange(-abs_diff)
 
   # return either plot or data
@@ -324,7 +325,7 @@ offset_trans <- function(offset = 0) {
 owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
                            return = c("plot", "data"),
                            plot_const = TRUE,
-                           col = c("full", "bw"),
+                           col = c("access", "full", "bw"),
                            greystart = 0.2,
                            greyend = 0.8,
                            txtsize = 12,
@@ -349,15 +350,15 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   ## filter to those parameter values
   ## that maximize the outcome for each strategy
   opt_strat <- owsa %>%
-    group_by(parameter, param_val) %>%
+    group_by(parameter, param_val, .groups = "drop_last") %>%
     filter(outcome_val == obj_fun(outcome_val)) %>%
     ungroup() %>%
-    group_by(parameter, strategy) %>%
+    group_by(parameter, strategy, .groups = "drop_last") %>%
     summarize(pmin = min(param_val), pmax = max(param_val)) %>%
     ungroup()
   if (!plot_const) {
     opt_strat <- opt_strat %>%
-      group_by(parameter) %>%
+      group_by(parameter, .groups = "drop_last") %>%
       filter(n() > 1) %>%
       ungroup()
   }

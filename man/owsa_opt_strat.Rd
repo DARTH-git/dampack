@@ -10,7 +10,7 @@ owsa_opt_strat(
   maximize = TRUE,
   return = c("plot", "data"),
   plot_const = TRUE,
-  col = c("full", "bw"),
+  col = c("access", "full", "bw"),
   greystart = 0.2,
   greyend = 0.8,
   txtsize = 12,
@@ -33,7 +33,7 @@ ranges of parameters for which each strategy is optimal.}
 \item{plot_const}{whether to plot parameters that don't lead to
 changes in optimal strategy as they vary.}
 
-\item{col}{either none, full color, or black and white}
+\item{col}{either none, full color, accessible colors, or black and white}
 
 \item{greystart}{between 0 and 1. used in greyscale only. smaller numbers are lighter}
 

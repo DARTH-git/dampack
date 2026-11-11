@@ -21,6 +21,11 @@ Authors@R:
              family = "Garibay",
              role = c("ctb", "cre"),
              email = "dgari039@uottawa.ca"),
+      person(given = "Matthew B.",
+             family = "Kaufmann",
+             role = "aut",
+             email = "kaufm458@umn.edu",
+             comment = c(ORCID = "0000-0002-9947-936X")),
       person(given = "Mark",
              family = "Clements",
              role = c("ctb"),
@@ -53,7 +58,9 @@ Imports:
     triangle,
     ggrepel,
     tidyr,
-    rlang
+    rlang,
+    viridis,
+    RColorBrewer
 Suggests:
     testthat,
     lintr,
@@ -61,5 +68,6 @@ Suggests:
     rmarkdown,
     kableExtra
 LazyData: true
+BuildResaveData: no
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

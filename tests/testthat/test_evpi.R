@@ -11,12 +11,13 @@ test_that("evpi has all methods we'd expect", {
 
 # test return object
 ## setup
-data("example_psa")
-psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                        example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+v_wtp <- seq(1000, 141000, by = 10000)
+psa_obj <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                        cancer_psa_data$parameters, cancer_psa_data$strategies)
 
 evpi_obj <- calc_evpi(psa = psa_obj,
-                      wtp = example_psa$wtp)
+                      wtp = v_wtp)
 
 # classes
 test_that("return object has classes evpi and data.frame", {
@@ -31,8 +32,8 @@ test_that("return object has column names WTP and EVPI", {
 
 # calculation
 test_that("evpi is what we'd expect", {
-  nmb <-  example_psa$wtp[1] * example_psa$effectiveness - example_psa$cost
-  n_sim <- nrow(example_psa$cost)
+  nmb <-  v_wtp[1] * cancer_psa_data$effectiveness - cancer_psa_data$cost
+  n_sim <- nrow(cancer_psa_data$cost)
   max_str <- max.col(nmb)
   loss <-  nmb[cbind(1:n_sim, max_str)] - nmb
   evpi <- min(apply(loss, 2, mean))

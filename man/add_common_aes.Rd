@@ -8,7 +8,7 @@ add_common_aes(
   gplot,
   txtsize,
   scale_name = waiver(),
-  col = c("none", "full", "bw"),
+  col = c("none", "full", "access", "bw"),
   col_aes = c("fill", "color"),
   lval = 50,
   greystart = 0.2,
@@ -25,6 +25,7 @@ add_common_aes(
   xexpand = waiver(),
   yexpand = waiver(),
   facet_lab_txtsize = NULL,
+  v_str = NULL,
   ...
 )
 }
@@ -35,7 +36,7 @@ add_common_aes(
 
 \item{scale_name}{how to name scale. Default inherits from variable name.}
 
-\item{col}{either none, full color, or black and white}
+\item{col}{either none, full color, accessible colors, or black and white}
 
 \item{col_aes}{which aesthetics to modify with \code{col}}
 
@@ -72,6 +73,9 @@ The default behavior in ggplot2 is \code{expansion(0.05)}. See \code{\link[ggplo
 for how to modify this.}
 
 \item{facet_lab_txtsize}{text size for plot facet labels}
+
+\item{v_str}{vector of strategies. Used to control for color palette when a
+reference strategy is excluded from the plot.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

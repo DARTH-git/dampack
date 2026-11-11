@@ -7,7 +7,7 @@
 \method{plot}{owsa}(
   x,
   txtsize = 12,
-  col = c("full", "bw"),
+  col = c("access", "full", "bw"),
   facet_scales = c("free_x", "free_y", "free", "fixed"),
   facet_nrow = NULL,
   facet_ncol = NULL,

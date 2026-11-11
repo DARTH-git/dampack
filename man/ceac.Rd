@@ -28,13 +28,15 @@ cost-effective at each \code{wtp} threshold. The returned object has classes
 }
 \examples{
 # psa input provided with package
-data("example_psa")
-example_psa_obj <- make_psa_obj(example_psa$cost, example_psa$effectiveness,
-                    example_psa$parameters, example_psa$strategies)
+data("cancer_psa_data")
+psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+                           effectiveness = cancer_psa_data$effectiveness,
+                           parameters = cancer_psa_data$parameters,
+                           strategies = cancer_psa_data$strategies)
 
 # define wtp threshold vector (can also use a single wtp)
 wtp <- seq(1e4, 1e5, by = 1e4)
-ceac_obj <- ceac(wtp, example_psa_obj)
+ceac_obj <- ceac(wtp, psa_cancer)
 plot(ceac_obj) # see ?plot.ceac for options
 
 # this is most useful when there are many strategies

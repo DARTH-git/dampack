@@ -7,3 +7,4 @@ cran-comments.md
 ^\.github$
 Makefile
 ^dampack.*\.tar\.gz$
+^Manuscript$

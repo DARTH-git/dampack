@@ -3,14 +3,24 @@
 \docType{data}
 \name{example_psa_obj}
 \alias{example_psa_obj}
-\title{Sample PSA data for testing}
+\title{Sample psa object (superseded)}
 \format{
-An object of class \code{psa} of length 8.
+A \code{psa} object (in the \code{dampack} 1.0.x layout) built from
+the PSA samples in \code{\link{cancer_psa_data}}.
 }
 \usage{
 example_psa_obj
 }
 \description{
-A psa object created from the data in example_psa
+\code{example_psa_obj} is superseded. Build the same \code{psa} object from
+\code{\link{cancer_psa_data}} with \code{\link{make_psa_obj}}:
+
+\preformatted{psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
+                           effectiveness = cancer_psa_data$effectiveness,
+                           parameters = cancer_psa_data$parameters,
+                           strategies = cancer_psa_data$strategies)}
+
+It is kept for backward compatibility and will be removed in
+\code{dampack} 2.0.
 }
-\keyword{datasets}
+\keyword{internal}

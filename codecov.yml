@@ -1,0 +1,16 @@
+comment:
+  layout: "condensed_header, diff, files"
+  require_changes: true
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true

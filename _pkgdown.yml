@@ -1,0 +1,125 @@
+url: https://darth-git.github.io/dampack/
+
+template:
+  bootstrap: 5
+
+home:
+  title: "dampack: Decision-Analytic Modeling Package"
+
+authors:
+  footer:
+    roles: [aut, cre]
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+
+articles:
+  - title: Cost-effectiveness analysis
+    navbar: Cost-effectiveness analysis
+    contents:
+      - basic_cea
+  - title: Probabilistic sensitivity analysis
+    navbar: Probabilistic sensitivity analysis
+    contents:
+      - psa_analysis
+      - psa_generation
+  - title: Value of information
+    navbar: Value of information
+    contents:
+      - voi
+  - title: Deterministic sensitivity analysis
+    navbar: Deterministic sensitivity analysis
+    contents:
+      - dsa_generation
+
+reference:
+  - title: Package overview
+    contents:
+      - dampack-package
+
+  - title: Cost-effectiveness analysis and ICERs
+    desc: >
+      Identify dominated and extendedly dominated strategies, compute
+      incremental cost-effectiveness ratios (ICERs), and plot the
+      cost-effectiveness frontier.
+    contents:
+      - calculate_icers
+      - calculate_icers_psa
+      - print.icers
+      - plot.icers
+
+  - title: Probabilistic sensitivity analysis (PSA) objects
+    desc: >
+      Build a `psa` object from the costs, effects, and parameter draws of any
+      decision model, summarize it, and plot it on the cost-effectiveness plane.
+    contents:
+      - make_psa_obj
+      - summary.psa
+      - plot.psa
+      - print.sa
+
+  - title: Cost-effectiveness acceptability curves and expected loss
+    contents:
+      - ceac
+      - plot.ceac
+      - summary.ceac
+      - calc_exp_loss
+      - plot.exp_loss
+
+  - title: Value of information
+    desc: >
+      Expected value of perfect information (EVPI), of partial perfect
+      information (EVPPI), and of sample information (EVSI).
+    contents:
+      - calc_evpi
+      - plot.evpi
+      - calc_evppi
+      - plot.evppi
+      - calc_evsi
+      - plot.evsi
+
+  - title: Metamodeling
+    contents:
+      - metamodel
+      - predict.metamodel
+      - print.metamodel
+      - summary.metamodel
+
+  - title: Deterministic sensitivity analysis
+    desc: >
+      One-way and two-way sensitivity analyses, either run directly on a
+      decision model or derived from a PSA through metamodeling.
+    contents:
+      - run_owsa_det
+      - run_twsa_det
+      - create_dsa_oneway
+      - create_dsa_twoway
+      - owsa
+      - plot.owsa
+      - owsa_tornado
+      - owsa_opt_strat
+      - twsa
+      - plot.twsa
+
+  - title: Generating PSA samples and running a model
+    contents:
+      - gen_psa_samp
+      - run_psa
+      - beta_params
+      - gamma_params
+      - lnorm_params
+      - dirichlet_params
+      - rdirichlet
+
+  - title: Plotting helpers
+    contents:
+      - number_ticks
+
+  - title: Example datasets
+    contents:
+      - cancer_psa_data
+      - df_example_psa_elc
+      - psa_cdiff
+      - hund_strat

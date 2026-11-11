@@ -29,3 +29,6 @@ vignettes/*.pdf
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
 .Rproj.user
+
+# pkgdown site (built and deployed by CI)
+docs/

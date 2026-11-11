@@ -68,5 +68,6 @@ Suggests:
     rmarkdown,
     kableExtra
 LazyData: true
+BuildResaveData: no
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

@@ -149,6 +149,7 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @return A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy
 #' on the cost-effectiveness plane.
 #' @importFrom tidyr pivot_longer
+#' @importFrom stats cor
 #' @export
 plot.psa <- function(x,
                      ref_str = NULL,

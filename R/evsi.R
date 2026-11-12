@@ -170,7 +170,7 @@ predict_ga <- function(object, n, n0) {
   m_x <- matrix(NA, n_row_x, n_col_x)
   m_x[, 1] <- 1
 
-  for (k in 1:n_smooth) {
+  for (k in seq_len(n_smooth)) {
     klab <- substr(object$smooth[[k]]$label, 1, 1)
     if (klab == "s") {
       m_x_frag <- predict_smooth_ga(object$smooth[[k]], df_param_vals, v_vrf[k])

@@ -23,8 +23,8 @@ create_dsa_twoway <- function(parameters, effectiveness = NULL, strategies,
                               cost = NULL, currency = "$", other_outcome  = NULL) {
   # parameter names and dataframe structure
   parameters <- check_df_and_coerce(parameters)
-  parnames <- colnames(parameters)
-  if (is.null(parnames)) {
+  v_parnames <- colnames(parameters)
+  if (is.null(v_parnames)) {
     stop("parameter dataframe must have column names")
   }
 
@@ -34,7 +34,7 @@ create_dsa_twoway <- function(parameters, effectiveness = NULL, strategies,
   }
 
   # create dsa object
-  dsa <- create_sa(parameters, parnames, effectiveness, strategies,
+  dsa <- create_sa(parameters, v_parnames, effectiveness, strategies,
                    cost, currency, other_outcome)
   class(dsa) <- c("dsa_twoway", class(dsa))
   dsa

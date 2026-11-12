@@ -69,10 +69,10 @@ make_psa_obj <- function(cost, effectiveness, parameters = NULL,
                          strategies = NULL, currency = "$", other_outcome = NULL) {
 
   # parameter names
-  parnames <- names(parameters)
+  v_parnames <- names(parameters)
 
   # define psa as a named list
-  psa_obj <- create_sa(parameters, parnames, effectiveness, strategies,
+  psa_obj <- create_sa(parameters, v_parnames, effectiveness, strategies,
                        cost, currency, other_outcome)
 
   # give classes "psa" and "sa"
@@ -91,11 +91,11 @@ check_df_and_coerce <- function(obj) {
   obj_name <- deparse(substitute(obj))
   if (!inherits(obj, "data.frame")) {
     warning(paste0("\'", obj_name, "\'", " is not a data frame. coercing to data frame"))
-    df <- as.data.frame(obj)
+    df_obj <- as.data.frame(obj)
   } else {
-    df <- as.data.frame(obj)
+    df_obj <- as.data.frame(obj)
   }
-  df
+  df_obj
 }
 
 #' summarize a psa object across all simulations
@@ -110,21 +110,21 @@ check_df_and_coerce <- function(obj) {
 #' @export
 summary.psa <- function(object, calc_sds = FALSE, ...) {
 
-  mean_cost <- colMeans(object$cost)
-  mean_effect <- colMeans(object$effectiveness)
-  strat <- object$strategies
-  sum_psa <- data.frame("Strategy" = strat,
-                        "meanCost" = mean_cost,
-                        "meanEffect" = mean_effect,
-                        stringsAsFactors = FALSE)
+  v_mean_cost <- colMeans(object$cost)
+  v_mean_effect <- colMeans(object$effectiveness)
+  v_strat <- object$strategies
+  df_sum_psa <- data.frame("Strategy" = v_strat,
+                           "meanCost" = v_mean_cost,
+                           "meanEffect" = v_mean_effect,
+                           stringsAsFactors = FALSE)
   if (calc_sds) {
-    sd_cost <- apply(object$cost, 2, sd)
-    sd_effect <- apply(object$effectiveness, 2, sd)
-    sum_psa[, "sdCost"] <- sd_cost
-    sum_psa[, "sdEffect"] <- sd_effect
+    v_sd_cost <- apply(object$cost, 2, sd)
+    v_sd_effect <- apply(object$effectiveness, 2, sd)
+    df_sum_psa[, "sdCost"] <- v_sd_cost
+    df_sum_psa[, "sdEffect"] <- v_sd_effect
   }
-  rownames(sum_psa) <- seq_len(nrow(sum_psa))
-  sum_psa
+  rownames(df_sum_psa) <- seq_len(nrow(df_sum_psa))
+  df_sum_psa
 }
 
 #' Plot the psa object
@@ -162,22 +162,22 @@ plot.psa <- function(x,
                      ...) {
 
   Effectiveness <- Cost <- Strategy <- Eff.mean <- Cost.mean <- y <- group <- NULL
-  effectiveness <- x$effectiveness
-  cost <- x$cost
-  strategies <- x$strategies
+  df_effectiveness_wide <- x$effectiveness
+  df_cost_wide <- x$cost
+  v_strategies <- x$strategies
   currency <- x$currency
 
   if (is.null(ref_str)) {
     # expect that effectiveness and costs have strategy column names
     # removes confusing 'No id variables; using all as measure variables'
     df_cost <- suppressMessages(
-      pivot_longer(cost,
+      pivot_longer(df_cost_wide,
                    everything(),
                    names_to = "Strategy",
                    values_to = "Cost")
     )
     df_effect <- suppressMessages(
-      pivot_longer(effectiveness,
+      pivot_longer(df_effectiveness_wide,
                    cols = everything(),
                    names_to = "Strategy",
                    values_to = "Effectiveness")
@@ -187,7 +187,7 @@ plot.psa <- function(x,
                         "Effectiveness" = df_effect$Effectiveness)
 
     # make strategies in psa object into ordered factors
-    df_ce$Strategy <- factor(df_ce$Strategy, levels = strategies, ordered = TRUE)
+    df_ce$Strategy <- factor(df_ce$Strategy, levels = v_strategies, ordered = TRUE)
 
     psa_plot <- ggplot(df_ce, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
@@ -195,21 +195,21 @@ plot.psa <- function(x,
 
     # define strategy-specific means for the center of the ellipse
     if (center) {
-      strat_means <- df_ce %>%
+      df_strat_means <- df_ce %>%
         group_by(Strategy) %>%
         summarize(Cost.mean = mean(Cost),
                   Eff.mean = mean(Effectiveness))
       # make strategies in psa object into ordered factors
-      strat_means$Strategy <- factor(strat_means$Strategy, levels = strategies, ordered = TRUE)
+      df_strat_means$Strategy <- factor(df_strat_means$Strategy, levels = v_strategies, ordered = TRUE)
       psa_plot <- psa_plot +
-        geom_point(data = strat_means,
+        geom_point(data = df_strat_means,
                    aes(x = Eff.mean, y = Cost.mean, fill = Strategy),
                    size = 8, shape = 21, color = "black")
     }
 
     if (ellipse) {
       # make points for ellipse plotting
-      df_list_ell <- lapply(strategies, function(s) {
+      l_df_ell <- lapply(v_strategies, function(s) {
         df_strat_specific <- df_ce[df_ce$Strategy == s, ]
         els <-  with(df_strat_specific,
                      ellipse(cor(Effectiveness, Cost),
@@ -217,7 +217,7 @@ plot.psa <- function(x,
                              centre = c(mean(Effectiveness), mean(Cost))))
         data.frame(els, group = s, stringsAsFactors = FALSE)
       })
-      df_ell <- bind_rows(df_list_ell)
+      df_ell <- bind_rows(l_df_ell)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
@@ -231,11 +231,11 @@ plot.psa <- function(x,
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
                    xlim = xlim, ylim = ylim,
-                   v_str = strategies)
+                   v_str = v_strategies)
 
   } else {
     ### Check that the reference strategy is in the list of strategies
-    if (!(ref_str %in% strategies)) {
+    if (!(ref_str %in% v_strategies)) {
       stop("ref_str must be in the list of strategies")
     }
     ## Function to convert the raw outcomes to incremental outcomes
@@ -248,13 +248,13 @@ plot.psa <- function(x,
 
     ## Long data frames
     df_inc_cost <- suppressMessages(
-      make_df_inc(cost) %>%
+      make_df_inc(df_cost_wide) %>%
         pivot_longer(cols = everything(),
                      names_to = "Strategy",
                      values_to = "Cost")
     )
     df_inc_effect <- suppressMessages(
-      make_df_inc(effectiveness) %>%
+      make_df_inc(df_effectiveness_wide) %>%
         pivot_longer(cols = everything(),
                      names_to = "Strategy",
                      values_to = "Effectiveness")
@@ -264,7 +264,7 @@ plot.psa <- function(x,
                          "Effectiveness" = df_inc_effect$Effectiveness)
 
     # make strategies in psa object into ordered factors
-    v_comp_strategies <- strategies[strategies != ref_str]
+    v_comp_strategies <- v_strategies[v_strategies != ref_str]
 
     df_ice$Strategy <- factor(df_ice$Strategy, levels = v_comp_strategies, ordered = TRUE)
 
@@ -286,21 +286,21 @@ plot.psa <- function(x,
 
     # define strategy-specific means for the center of the ellipse
     if (center) {
-      strat_means <- df_ice %>%
+      df_strat_means <- df_ice %>%
         group_by(Strategy) %>%
         summarize(Cost.mean = mean(Cost),
                   Eff.mean = mean(Effectiveness))
       # make strategies in psa object into ordered factors
-      strat_means$Strategy <- factor(strat_means$Strategy, levels = v_comp_strategies, ordered = TRUE)
+      df_strat_means$Strategy <- factor(df_strat_means$Strategy, levels = v_comp_strategies, ordered = TRUE)
       psa_plot <- psa_plot +
-        geom_point(data = strat_means,
+        geom_point(data = df_strat_means,
                    aes(x = Eff.mean, y = Cost.mean, fill = Strategy),
                    size = 8, shape = 21, color = "black")
     }
 
     if (ellipse) {
       # make points for ellipse plotting
-      df_list_ell <- lapply(v_comp_strategies, function(s) {
+      l_df_ell <- lapply(v_comp_strategies, function(s) {
         df_strat_specific <- df_ice[df_ice$Strategy == s, ]
         els <-  with(df_strat_specific,
                      ellipse(cor(Effectiveness, Cost),
@@ -308,7 +308,7 @@ plot.psa <- function(x,
                              centre = c(mean(Effectiveness), mean(Cost))))
         data.frame(els, group = s, stringsAsFactors = FALSE)
       })
-      df_ell <- bind_rows(df_list_ell)
+      df_ell <- bind_rows(l_df_ell)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
@@ -322,7 +322,7 @@ plot.psa <- function(x,
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
                    xlim = xlim, ylim = ylim,
-                   v_str = strategies)
+                   v_str = v_strategies)
 
   }
 }

@@ -37,31 +37,31 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
   } else if (inherits(sa_obj, "dsa_oneway")) {
     params <- sa_obj$parameters
     if (!is.null(sa_obj$other_outcome)) {
-      eff <- sa_obj$other_outcome
+      df_eff <- sa_obj$other_outcome
     } else {
-      eff <- sa_obj$effectiveness
+      df_eff <- sa_obj$effectiveness
     }
-    cost <- sa_obj$cost
+    df_cost <- sa_obj$cost
     strategies <- sa_obj$strategies
-    param_names <- sa_obj$parnames
+    v_param_names <- sa_obj$parnames
 
     # calculate outcome of interest
-    y <- calculate_outcome(outcome, cost, eff, wtp)
-    names(y) <- strategies
+    df_y <- calculate_outcome(outcome, df_cost, df_eff, wtp)
+    names(df_y) <- strategies
 
     # loop over dsa's and create ow
     ow <- NULL
-    for (p in param_names) {
+    for (p in v_param_names) {
       for (s in strategies) {
         # maybe extract this out later - shared with predict.metamodel
-        param_rows <- params$parameter == p
-        param_val <- params[param_rows, "paramval"]
-        outcome_val <- y[param_rows, s]
+        v_param_rows <- params$parameter == p
+        v_param_val <- params[v_param_rows, "paramval"]
+        v_outcome_val <- df_y[v_param_rows, s]
 
         df_new <- data.frame("parameter" = p,
                              "strategy" = s,
-                             "param_val" = param_val,
-                             "outcome_val" = outcome_val)
+                             "param_val" = v_param_val,
+                             "outcome_val" = v_outcome_val)
         ow <- rbind(ow, df_new, stringsAsFactors = FALSE)
         # make strategies in owsa object into ordered factors
         ow$strategy <- factor(ow$strategy, levels = strategies, ordered = TRUE)
@@ -111,7 +111,7 @@ plot.owsa <- function(x, txtsize = 12,
                       basecase = NULL,
                       ...) {
   param_val <- outcome_val <- strategy <- NULL
-  strategies <- unique(x$strategy)
+  v_strategies <- unique(x$strategy)
   scales <- match.arg(facet_scales)
   owsa <- ggplot(data = x,
                  aes(x = param_val, y = outcome_val)) +
@@ -152,7 +152,7 @@ plot.owsa <- function(x, txtsize = 12,
                  scale_name = "Strategy",
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  continuous = c("x", "y"),
-                 v_str = strategies)
+                 v_str = v_strategies)
 }
 
 #' Tornado plot of a one-way sensitivity analysis
@@ -205,20 +205,20 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
 
   } else {
     if (length(select_str) == 2) {
-      owsa_base <- owsa %>%
+      df_owsa_base <- owsa %>%
         dplyr::filter(strategy == select_str[1])
-      owsa_comp <- owsa %>%
+      df_owsa_comp <- owsa %>%
         dplyr::filter(strategy == select_str[2])
-      owsa_join <- dplyr::inner_join(owsa_base, owsa_comp,
-                                     by = c("parameter", "param_val"))
-      owsa_join$outcome_val <- owsa_join$outcome_val.y - owsa_join$outcome_val.x
-      owsa_join$strategy    <- owsa_join$strategy.x
-      owsa                  <- owsa_join %>%
+      df_owsa_join <- dplyr::inner_join(df_owsa_base, df_owsa_comp,
+                                        by = c("parameter", "param_val"))
+      df_owsa_join$outcome_val <- df_owsa_join$outcome_val.y - df_owsa_join$outcome_val.x
+      df_owsa_join$strategy    <- df_owsa_join$strategy.x
+      owsa                  <- df_owsa_join %>%
         dplyr::select(parameter, strategy, param_val, outcome_val)
       y_label <- paste0(outcome_name, " (", select_str[2],
                         " - ", select_str[1], ")")
       # MK: Replacement for res_out
-      avg <- median(owsa_comp$outcome_val) - median(owsa_base$outcome_val)
+      avg <- median(df_owsa_comp$outcome_val) - median(df_owsa_base$outcome_val)
 
     } else {
       owsa       <- owsa %>%
@@ -242,7 +242,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
     stop("min_rel_diff must be between 0 and 1")
   }
 
-  owsa_filt <- owsa %>%
+  df_owsa_filt <- owsa %>%
     dplyr::group_by(parameter, param_val) %>%
     dplyr::arrange(outcome_val) %>%
     dplyr::slice(n()) %>%
@@ -250,16 +250,16 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
     dplyr::ungroup()
 
   # group by parameter and strategy
-  mins <- owsa_filt %>%
+  df_mins <- df_owsa_filt %>%
     dplyr::group_by(parameter) %>%
     dplyr::filter(param_val == min(param_val))
 
-  maxes <- owsa_filt %>%
+  df_maxes <- df_owsa_filt %>%
     dplyr::group_by(parameter) %>%
     dplyr::filter(param_val == max(param_val))
 
-  min_max <- dplyr::inner_join(mins, maxes, by = c("parameter"),
-                               suffix = c(".low", ".high")) %>%
+  df_min_max <- dplyr::inner_join(df_mins, df_maxes, by = c("parameter"),
+                                  suffix = c(".low", ".high")) %>%
     dplyr::mutate(abs_diff = abs(outcome_val.high - outcome_val.low),
                   rel_diff = abs_diff / outcome_val.low) %>%
     dplyr::filter(abs(.data$rel_diff) >= min_rel_diff) %>%
@@ -268,8 +268,8 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
   # return either plot or data
   ret <- match.arg(return)
   if (ret == "plot") {
-    g <- ggplot2::ggplot(min_max, aes(x = reorder(min_max$parameter,
-                                                  min_max$abs_diff))) +
+    g <- ggplot2::ggplot(df_min_max, aes(x = reorder(df_min_max$parameter,
+                                                     df_min_max$abs_diff))) +
       ggplot2::geom_bar(aes(y = outcome_val.low, fill = "Low"),
                         stat = "identity") +
       ggplot2::geom_bar(aes(y = outcome_val.high, fill = "High"),
@@ -289,7 +289,7 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
 
     g
   } else {
-    min_max
+    df_min_max
   }
 }
 
@@ -349,7 +349,7 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
 
   ## filter to those parameter values
   ## that maximize the outcome for each strategy
-  opt_strat <- owsa %>%
+  df_opt_strat <- owsa %>%
     group_by(parameter, param_val, .groups = "drop_last") %>%
     filter(outcome_val == obj_fun(outcome_val)) %>%
     ungroup() %>%
@@ -357,27 +357,27 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
     summarize(pmin = min(param_val), pmax = max(param_val)) %>%
     ungroup()
   if (!plot_const) {
-    opt_strat <- opt_strat %>%
+    df_opt_strat <- df_opt_strat %>%
       group_by(parameter, .groups = "drop_last") %>%
       filter(n() > 1) %>%
       ungroup()
   }
-  opt_strat$strategy <- as.factor(opt_strat$strategy)
+  df_opt_strat$strategy <- as.factor(df_opt_strat$strategy)
 
   # filter to parameters input by user and maintain their ordering
   # if no parameters are supplied, initial ordering from owsa will be used
   if (!is.null(params)) {
     #check that params supplied are a subset of parameters from owsa
-    if (!all(params %in% opt_strat$parameter)) {
+    if (!all(params %in% df_opt_strat$parameter)) {
       stop("must provide valid parameters")
     }
-    opt_strat <- opt_strat[opt_strat$parameter %in% params, ]
-    opt_strat$parameter <- factor(opt_strat$parameter, levels = params)
+    df_opt_strat <- df_opt_strat[df_opt_strat$parameter %in% params, ]
+    df_opt_strat$parameter <- factor(df_opt_strat$parameter, levels = params)
   } else {
-    opt_strat$parameter <- factor(opt_strat$parameter, levels = unique(owsa$parameter))
+    df_opt_strat$parameter <- factor(df_opt_strat$parameter, levels = unique(owsa$parameter))
   }
 
-  g <- ggplot(opt_strat) +
+  g <- ggplot(df_opt_strat) +
     facet_wrap("parameter", scales = "free_x", ncol = facet_ncol, nrow = facet_nrow) +
     # a little bit hacky: rectangles with height 1
     geom_rect(aes(xmin = pmin, xmax = pmax,
@@ -402,7 +402,7 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   if (ret == "plot") {
     g
   } else {
-    opt_strat
+    df_opt_strat
   }
 }
 

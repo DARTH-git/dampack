@@ -70,7 +70,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   col_aes <- match.arg(col_aes, several.ok = TRUE)
   if (col == "full") {
     if (!is.null(v_str)) {
-      man_cols <- setNames(
+      v_man_cols <- setNames(
         scales::hue_pal(l = lval)(length(v_str)),
         v_str
       )
@@ -78,14 +78,14 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
         p <- p +
           scale_color_manual(name = scale_name,
                              aesthetics = "color",
-                             values = man_cols,
+                             values = v_man_cols,
                              drop = TRUE)
       }
       if ("fill" %in% col_aes) {
         p <- p +
           scale_fill_manual(name = scale_name,
                             aesthetics = "fill",
-                            values = man_cols,
+                            values = v_man_cols,
                             drop = TRUE)
       }
     } else {
@@ -106,12 +106,12 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   if (col == "access") {
     if (!is.null(v_str)) {
       if (length(v_str) > 8) {
-        man_cols <- setNames(
+        v_man_cols <- setNames(
           viridis::viridis(length(v_str), option = "D"),
           v_str
         )
       } else {
-        man_cols <- setNames(
+        v_man_cols <- setNames(
           RColorBrewer::brewer.pal(max(length(v_str), 3), name = "Dark2"),
           v_str
         )
@@ -121,14 +121,14 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
         p <- p +
           scale_color_manual(name = scale_name,
                              aesthetics = "color",
-                             values = man_cols,
+                             values = v_man_cols,
                              drop = TRUE)
       }
       if ("fill" %in% col_aes) {
         p <- p +
           scale_fill_manual(name = scale_name,
                             aesthetics = "fill",
-                            values = man_cols,
+                            values = v_man_cols,
                             drop = TRUE)
       }
     } else {
@@ -136,29 +136,29 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
       n_groups <- max(length(unique(p_data@data[[1]]$colour)),
                       length(unique(p_data@data[[1]]$fill)))
       if (n_groups > 8) {
-        man_cols <- viridis::viridis(n_groups, option = "D")
+        v_man_cols <- viridis::viridis(n_groups, option = "D")
       } else {
-        man_cols <- RColorBrewer::brewer.pal(max(n_groups, 3), name = "Dark2")
+        v_man_cols <- RColorBrewer::brewer.pal(max(n_groups, 3), name = "Dark2")
       }
       if ("color" %in% col_aes) {
         p <- p +
           scale_color_manual(name = scale_name,
                              aesthetics = "color",
-                             values = man_cols,
+                             values = v_man_cols,
                              drop = FALSE)
       }
       if ("fill" %in% col_aes) {
         p <- p +
           scale_fill_manual(name = scale_name,
                             aesthetics = "fill",
-                            values = man_cols,
+                            values = v_man_cols,
                             drop = FALSE)
       }
     }
   }
   if (col == "bw") {
     if (!is.null(v_str)) {
-      man_cols <- setNames(
+      v_man_cols <- setNames(
         grey.colors(length(v_str), start = greystart, end = greyend),
         v_str
       )
@@ -166,14 +166,14 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
         p <- p +
           scale_color_manual(name = scale_name,
                              aesthetics = "color",
-                             values = man_cols,
+                             values = v_man_cols,
                              drop = TRUE)
       }
       if ("fill" %in% col_aes) {
         p <- p +
           scale_fill_manual(name = scale_name,
                             aesthetics = "fill",
-                            values = man_cols,
+                            values = v_man_cols,
                             drop = TRUE)
       }
     } else {

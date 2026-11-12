@@ -44,24 +44,24 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   ### argument checks and definitions of other variables ###
 
   # costs, effectiveness, and parameters have same number of rows
-  n_sim_ls <- list(effectiveness, cost, parameters, other_outcome)
-  if (length(unique(unlist(lapply(n_sim_ls[!unlist(lapply(n_sim_ls, is.null))], nrow)))) != 1) {
+  l_n_sim <- list(effectiveness, cost, parameters, other_outcome)
+  if (length(unique(unlist(lapply(l_n_sim[!unlist(lapply(l_n_sim, is.null))], nrow)))) != 1) {
     stop("Among those provided, the cost, effectiveness, parameter,
          and other_outcome dataframes must all have the same number of rows.")
   }
 
   # define n_sim
-  n_sim <- unique(unlist(lapply(n_sim_ls[!unlist(lapply(n_sim_ls, is.null))], nrow)))
+  n_sim <- unique(unlist(lapply(l_n_sim[!unlist(lapply(l_n_sim, is.null))], nrow)))
 
   # costs and effectiveness have same number of columns (strategies)
-  n_strategies_ls <- list(effectiveness, cost, other_outcome)
-  if (length(unique(unlist(lapply(n_strategies_ls[!unlist(lapply(n_strategies_ls, is.null))], ncol)))) != 1) {
+  l_n_strategies <- list(effectiveness, cost, other_outcome)
+  if (length(unique(unlist(lapply(l_n_strategies[!unlist(lapply(l_n_strategies, is.null))], ncol)))) != 1) {
     stop("Among those provided, the cost, effectiveness,
          and other_outcome dataframes must all have the same number of columns.")
   }
 
   # define n_strategies
-  n_strategies <- unique(unlist(lapply(n_strategies_ls[!unlist(lapply(n_strategies_ls, is.null))], ncol)))
+  n_strategies <- unique(unlist(lapply(l_n_strategies[!unlist(lapply(l_n_strategies, is.null))], ncol)))
 
   # If the strategy names are not provided, generate a generic vector
   # with strategy names
@@ -70,19 +70,19 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   } else {
     # correct strategy names. they are used as data.frame column names and in lm()
     # so they need to be syntactically valid
-    new_strategies <- make.names(strategies, unique = TRUE)
+    v_new_strategies <- make.names(strategies, unique = TRUE)
 
     # write warning to console, so user knows that strategy name was changed
     for (i in 1:n_strategies) {
       old_strat <- strategies[i]
-      new_strat <- new_strategies[i]
+      new_strat <- v_new_strategies[i]
       if (new_strat != old_strat) {
         warning(paste0("strategy name '", old_strat, "' was converted to '", new_strat,
                        "' for compatibility. See ?make.names"), call. = FALSE)
       }
     }
     # update strategies
-    strategies <- new_strategies
+    strategies <- v_new_strategies
 
     # make sure strategies is the same length as the number of columns
     if (n_strategies != length(strategies)) {
@@ -123,10 +123,10 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 #' @return None (invisible NULL).
 #' @export
 print.sa <- function(x, all_strat = FALSE, ...) {
-  xclass <- class(x)
-  is_ow_dsa <- "dsa_oneway" %in% xclass
-  is_tw_dsa <- "dsa_twoway" %in% xclass
-  is_psa <- "psa" %in% xclass
+  v_xclass <- class(x)
+  is_ow_dsa <- "dsa_oneway" %in% v_xclass
+  is_tw_dsa <- "dsa_twoway" %in% v_xclass
+  is_psa <- "psa" %in% v_xclass
   cat("\n")
   if (is_ow_dsa) {
     cat("One-way Deterministic SA Object", "\n")
@@ -143,13 +143,13 @@ print.sa <- function(x, all_strat = FALSE, ...) {
   cat("number of strategies (n_strategies):", x$n_strategies, "\n")
   n_trunc <- 5
   if (all_strat || (x$n_strategies <= n_trunc)) {
-    s2print <- x$strategies
+    v_s2print <- x$strategies
     msg <- ""
   } else {
-    s2print <- c(x$strategies[1:n_trunc], "...")
+    v_s2print <- c(x$strategies[1:n_trunc], "...")
     msg <- paste("(truncated at", n_trunc, ")")
   }
-  s_collapsed <- paste(s2print, collapse = ", ")
+  s_collapsed <- paste(v_s2print, collapse = ", ")
   cat("strategies:", s_collapsed, msg, "\n")
   if (is_psa) {
     cat("number of simulations (n_sim):", x$n_sim, "\n")

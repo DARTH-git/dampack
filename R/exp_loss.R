@@ -45,23 +45,23 @@
 #' @export
 calc_exp_loss <- function(psa, wtp) {
   check_psa_object(psa)
-  cost <- psa$cost
-  effectiveness <- psa$effectiveness
-  strategies <- psa$strategies
+  df_cost <- psa$cost
+  df_effectiveness <- psa$effectiveness
+  v_strategies <- psa$strategies
   n_str  <- psa$n_strategies
-  exp_loss <- matrix(0, nrow = length(wtp), ncol = n_str)
+  m_exp_loss <- matrix(0, nrow = length(wtp), ncol = n_str)
   for (i in seq_along(wtp)) {
     ith_wtp <- wtp[i]
-    loss <- calculate_outcome("nmb_loss", cost, effectiveness, ith_wtp)
-    exp_loss[i, ] <- colMeans(loss)
+    df_loss <- calculate_outcome("nmb_loss", df_cost, df_effectiveness, ith_wtp)
+    m_exp_loss[i, ] <- colMeans(df_loss)
   }
   # optimal strategy based on lowest expected loss (max of negative expected loss)
   # this was done because min.col isn't a function
-  optimal_str <- max.col(-exp_loss)
+  v_optimal_str <- max.col(-m_exp_loss)
 
   # Format expected loss for plotting
-  df_exp_loss <- data.frame(wtp, exp_loss, strategies[optimal_str])
-  colnames(df_exp_loss) <- c("WTP", strategies, "fstrat")
+  df_exp_loss <- data.frame(wtp, m_exp_loss, v_strategies[v_optimal_str])
+  colnames(df_exp_loss) <- c("WTP", v_strategies, "fstrat")
 
   # Reformat df to long format
   df_exp_loss_melt <- tidyr::pivot_longer(
@@ -84,7 +84,7 @@ calc_exp_loss <- function(psa, wtp) {
   rownames(df_exp_loss_melt) <- NULL
 
   # make strategies in exp_loss object into ordered factors
-  df_exp_loss_melt$Strategy <- factor(df_exp_loss_melt$Strategy, levels = strategies, ordered = TRUE)
+  df_exp_loss_melt$Strategy <- factor(df_exp_loss_melt$Strategy, levels = v_strategies, ordered = TRUE)
 
   class(df_exp_loss_melt) <- c("exp_loss", "data.frame")
   df_exp_loss_melt
@@ -132,15 +132,15 @@ plot.exp_loss <- function(x,
   loss_name <- "Expected_Loss"
   strat_name <- "Strategy"
   x[, wtp_name] <- x$WTP / 1000
-  strategies <- unique(x$Strategy)
+  v_strategies <- unique(x$Strategy)
 
   # split into on frontier and not on frontier
-  nofront <- x
-  front <- x[x$On_Frontier, ]
+  df_nofront <- x
+  df_front <- x[x$On_Frontier, ]
 
   # Drop unused levels from strategy names
-  nofront$Strategy <- droplevels(nofront$Strategy)
-  front$Strategy <- droplevels(front$Strategy)
+  df_nofront$Strategy <- droplevels(df_nofront$Strategy)
+  df_front$Strategy <- droplevels(df_front$Strategy)
   # formatting if logging the y axis
   if (log_y) {
     tr <- "log10"
@@ -148,8 +148,8 @@ plot.exp_loss <- function(x,
     tr <- "identity"
   }
 
-  p <- ggplot(data = nofront, aes(x = !!sym(wtp_name),
-                                  y = !!sym(loss_name))) +
+  p <- ggplot(data = df_nofront, aes(x = !!sym(wtp_name),
+                                     y = !!sym(loss_name))) +
     xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
     ylab(paste0("Expected Loss (", currency, ")"))
 
@@ -176,12 +176,12 @@ plot.exp_loss <- function(x,
                       continuous = c("x", "y"),
                       n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                       xbreaks = xbreaks, ybreaks = ybreaks,
-                      xlim = xlim, ylim = ylim, v_str = strategies,
+                      xlim = xlim, ylim = ylim, v_str = v_strategies,
                       ytrans = tr)
   if (frontier) {
-    p <- p + geom_point(data = front, aes(x = !!sym(wtp_name),
-                                          y = !!sym(loss_name),
-                                          shape = On_Frontier),
+    p <- p + geom_point(data = df_front, aes(x = !!sym(wtp_name),
+                                             y = !!sym(loss_name),
+                                             shape = On_Frontier),
                         size = 3, stroke = 1, color = "black") +
       scale_shape_manual(name = NULL, values = 0, labels = "Frontier & EVPI") +
       guides(color = guide_legend(order = 1),

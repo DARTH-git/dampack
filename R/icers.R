@@ -67,55 +67,55 @@ calculate_icers <- function(cost, effect, strategies) {
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
 
   # coerce to character, in case they are provided as numeric
-  char_strat <- as.character(strategies)
+  v_char_strat <- as.character(strategies)
 
   # create data frame to hold data
-  df <- data.frame("Strategy" = char_strat,
-                   "Cost" = cost,
-                   "Effect" = effect,
-                   stringsAsFactors = FALSE)
-  nstrat <- nrow(df)
+  df_cea <- data.frame("Strategy" = v_char_strat,
+                       "Cost" = cost,
+                       "Effect" = effect,
+                       stringsAsFactors = FALSE)
+  nstrat <- nrow(df_cea)
 
   # if only one strategy was provided, return df with NAs for incremental
   if (nstrat == 1) {
-    df[, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
-    return(df)
+    df_cea[, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
+    return(df_cea)
   }
 
   # three statuses: dominated, extended dominated, and non-dominated
-  d <- NULL
+  v_d <- NULL
 
   # detect dominated strategies
   # dominated strategies have a higher cost and lower effect
-  df <- df %>%
+  df_cea <- df_cea %>%
     arrange(Cost, desc(Effect))
 
   # iterate over strategies and detect (strongly) dominated strategies
   # those with higher cost and equal or lower effect
   for (i in 1:(nstrat - 1)) {
-    ith_effect <- df[i, "Effect"]
+    ith_effect <- df_cea[i, "Effect"]
     for (j in (i + 1):nstrat) {
-      jth_effect <- df[j, "Effect"]
+      jth_effect <- df_cea[j, "Effect"]
       if (jth_effect <= ith_effect) {
         # append dominated strategies to vector
-        d <- c(d, df[j, "Strategy"])
+        v_d <- c(v_d, df_cea[j, "Strategy"])
       }
     }
   }
 
   # detect weakly dominated strategies (extended dominance)
   # this needs to be repeated until there are no more ED strategies
-  ed <- vector()
+  v_ed <- vector()
   continue <- TRUE  # ensure that the loop is run at least once
   while (continue) {
     # vector of all dominated strategies (strong or weak)
-    dom <- union(d, ed)
+    v_dom <- union(v_d, v_ed)
 
     # strategies declared to be non-dominated at this point
-    nd <- setdiff(strategies, dom)
+    v_nd <- setdiff(strategies, v_dom)
 
     # compute icers for nd strategies
-    df_nd <- df[df$Strategy %in% nd, ] %>%
+    df_nd <- df_cea[df_cea$Strategy %in% v_nd, ] %>%
       compute_icers()
 
     # number non-d
@@ -127,7 +127,7 @@ calculate_icers <- function(cost, effect, strategies) {
     }
 
     # strategy identifiers for non-d
-    nd_strat <- df_nd$Strategy
+    v_nd_strat <- df_nd$Strategy
 
     # now, go through non-d strategies and detect any
     # with higher ICER than following strategy
@@ -136,7 +136,7 @@ calculate_icers <- function(cost, effect, strategies) {
     new_ed <- 0
     for (i in 2:(n_non_d - 1)) {
       if (df_nd[i, "ICER"] > df_nd[i + 1, "ICER"]) {
-        ed <- c(ed, nd_strat[i])
+        v_ed <- c(v_ed, v_nd_strat[i])
         new_ed <- new_ed + 1
       }
     }
@@ -146,29 +146,29 @@ calculate_icers <- function(cost, effect, strategies) {
   }
 
   # recompute icers without weakly dominated strategies
-  df_nd_icers <- df_nd[!(df_nd$Strategy %in% dom), ] %>%
+  df_nd_icers <- df_nd[!(df_nd$Strategy %in% v_dom), ] %>%
     mutate(Status = "ND") %>%
     compute_icers()
 
   # dominated and weakly dominated
-  df_d <- df[df$Strategy %in% d, ] %>%
+  df_d <- df_cea[df_cea$Strategy %in% v_d, ] %>%
     mutate(ICER = NA, Status = "D")
 
-  df_ed <- df[df$Strategy %in% ed, ] %>%
+  df_ed <- df_cea[df_cea$Strategy %in% v_ed, ] %>%
     mutate(ICER = NA, Status = "ED")
 
   # when combining, sort so we have ref,ND,ED,D
-  results <- bind_rows(df_d, df_ed, df_nd_icers) %>%
+  df_results <- bind_rows(df_d, df_ed, df_nd_icers) %>%
     arrange(desc(Status), Cost, desc(Effect))
 
   # re-arrange columns
-  results <- results %>%
+  df_results <- df_results %>%
     select(Strategy, Cost, Effect,
            Inc_Cost, Inc_Effect, ICER, Status)
 
   # declare class of results
-  class(results) <- c("icers", "data.frame")
-  results
+  class(df_results) <- c("icers", "data.frame")
+  df_results
 }
 
 #' Calculate incremental cost-effectiveness ratios from a \code{psa} object.
@@ -205,45 +205,45 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
   check_psa_object(psa)
 
   # Calculate mean outcome values
-  psa_sum <- summary(psa)
+  df_psa_sum <- summary(psa)
 
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- value <-
     Lower_95_Cost <- Upper_95_Cost <- Lower_95_Effect <- Upper_95_Effect <- NULL
 
   # Supply mean outcome values to calculate_icers
-  icers <- calculate_icers(cost = psa_sum$meanCost,
-                           effect = psa_sum$meanEffect,
-                           strategies = psa_sum$Strategy)
+  df_icers <- calculate_icers(cost = df_psa_sum$meanCost,
+                              effect = df_psa_sum$meanEffect,
+                              strategies = df_psa_sum$Strategy)
 
   if (uncertainty == TRUE) {
 
     # extract cost and effect data.frames from psa object
-    cost <- psa$cost
-    effect <- psa$effectiveness
+    df_cost <- psa$cost
+    df_effect <- psa$effectiveness
 
     # Calculate quantiles across costs and effects
-    cost_bounds <- cost %>%
+    df_cost_bounds <- df_cost %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
       group_by(Strategy) %>%
       summarize(Lower_95_Cost = quantile(value, probs = 0.025, names = FALSE),
                 Upper_95_Cost = quantile(value, probs = 0.975, names = FALSE))
 
-    effect_bounds <- effect %>%
+    df_effect_bounds <- df_effect %>%
       pivot_longer(cols = everything(), names_to = "Strategy") %>%
       group_by(Strategy) %>%
       summarize(Lower_95_Effect = quantile(value, probs = 0.025, names = FALSE),
                 Upper_95_Effect = quantile(value, probs = 0.975, names = FALSE))
 
     # merge bound data.frames into icers data.frame
-    icers <- icers %>%
-      left_join(cost_bounds, by = "Strategy") %>%
-      left_join(effect_bounds, by = "Strategy") %>%
+    df_icers <- df_icers %>%
+      left_join(df_cost_bounds, by = "Strategy") %>%
+      left_join(df_effect_bounds, by = "Strategy") %>%
       select(Strategy, Cost, Lower_95_Cost, Upper_95_Cost,
              Effect, Lower_95_Effect, Upper_95_Effect,
              Inc_Cost, Inc_Effect, ICER, Status)
   }
 
-  icers
+  df_icers
 }
 
 #' compute icers for non-dominated strategies
@@ -333,15 +333,15 @@ plot.icers <- function(x,
   ed_name <- "Weakly Dominated"
   nd_name <- "Efficient Frontier"
 
-  status_expand <- c("D" = d_name, "ED" = ed_name,
-                     "ND" = nd_name, "ref" = nd_name)
-  x$Status <- factor(status_expand[x$Status], ordered = FALSE,
+  v_status_expand <- c("D" = d_name, "ED" = ed_name,
+                       "ND" = nd_name, "ref" = nd_name)
+  x$Status <- factor(v_status_expand[x$Status], ordered = FALSE,
                      levels = c(d_name, ed_name, nd_name))
 
   # linetype
-  plot_lines <- c("Dominated" = "blank",
-                  "Weakly Dominated" = "blank",
-                  "Efficient Frontier" = "solid")
+  v_plot_lines <- c("Dominated" = "blank",
+                    "Weakly Dominated" = "blank",
+                    "Efficient Frontier" = "solid")
 
   # names to refer to in aes
   stat_name <- "Status"
@@ -351,17 +351,17 @@ plot.icers <- function(x,
 
   # frontier only
   if (plot_frontier_only) {
-    plt_data <- x[x$Status == nd_name, ]
+    df_plt_data <- x[x$Status == nd_name, ]
   } else {
-    plt_data <- x
+    df_plt_data <- x
   }
 
   # make plot
-  icer_plot <- ggplot(plt_data, aes(x = !!sym(eff_name), y = !!sym(cost_name),
-                                    shape = !!sym(stat_name))) +
+  icer_plot <- ggplot(df_plt_data, aes(x = !!sym(eff_name), y = !!sym(cost_name),
+                                       shape = !!sym(stat_name))) +
     geom_point(alpha = alpha, size = 2) +
     geom_line(aes(linetype = !!sym(stat_name), group = !!sym(stat_name))) +
-    scale_linetype_manual(name = NULL, values = plot_lines) +
+    scale_linetype_manual(name = NULL, values = v_plot_lines) +
     scale_shape_discrete(name = NULL) +
     labs(x = paste0("Effect (", effect_units, ")"),
          y = paste0("Cost (", currency, ")"))
@@ -376,18 +376,18 @@ plot.icers <- function(x,
   # labeling
   if (label != "none") {
     if (!is.null(label_max_char)) {
-      plt_data[, strat_name] <- str_sub(plt_data[, strat_name],
-                                        start = 1L, end = label_max_char)
+      df_plt_data[, strat_name] <- str_sub(df_plt_data[, strat_name],
+                                           start = 1L, end = label_max_char)
     }
     if (label == "all") {
-      lab_data <- plt_data
+      df_lab_data <- df_plt_data
     }
     if (label == "frontier") {
-      lab_data <- plt_data[plt_data$Status == nd_name, ]
+      df_lab_data <- df_plt_data[df_plt_data$Status == nd_name, ]
     }
 
     icer_plot <- icer_plot +
-      geom_label_repel(data = lab_data,
+      geom_label_repel(data = df_lab_data,
                        aes(label = !!sym(strat_name)),
                        size = 3,
                        show.legend = FALSE,
@@ -420,37 +420,39 @@ print.icers <- function(x,
   }
 
   format_numbers <- function(col, n_digits) {
-    new_col <- rep("-", length(col))
-    non_na <- !is.na(col)
+    v_new_col <- rep("-", length(col))
+    v_non_na <- !is.na(col)
     if (n_digits > 0) {
-      new_col[non_na] <- format(col[non_na], big.mark = ",", nsmall = n_digits, digits = n_digits, scientific = FALSE)
+      v_new_col[v_non_na] <- format(col[v_non_na], big.mark = ",", nsmall = n_digits,
+                                    digits = n_digits, scientific = FALSE)
     } else {
-      new_col[non_na] <- format(round(col[non_na], n_digits), big.mark = ",", nsmall = n_digits, scientific = FALSE)
+      v_new_col[v_non_na] <- format(round(col[v_non_na], n_digits), big.mark = ",",
+                                    nsmall = n_digits, scientific = FALSE)
     }
 
-    new_col
+    v_new_col
   }
 
-  table_cea            <- x
-  table_cea$Cost       <- format_numbers(table_cea$Cost, n_digits = dig_cost)
-  table_cea$Inc_Cost   <- format_numbers(table_cea$Inc_Cost, n_digits = dig_cost)
-  table_cea$Effect     <- format_numbers(table_cea$Effect, n_digits = dig_eff)
-  table_cea$Inc_Effect <- format_numbers(table_cea$Inc_Effect, n_digits = dig_eff)
-  table_cea$ICER       <- format_numbers(table_cea$ICER, n_digits = dig_icer)
+  df_table_cea            <- x
+  df_table_cea$Cost       <- format_numbers(df_table_cea$Cost, n_digits = dig_cost)
+  df_table_cea$Inc_Cost   <- format_numbers(df_table_cea$Inc_Cost, n_digits = dig_cost)
+  df_table_cea$Effect     <- format_numbers(df_table_cea$Effect, n_digits = dig_eff)
+  df_table_cea$Inc_Effect <- format_numbers(df_table_cea$Inc_Effect, n_digits = dig_eff)
+  df_table_cea$ICER       <- format_numbers(df_table_cea$ICER, n_digits = dig_icer)
 
-  colnames(table_cea)[colnames(table_cea)
-                      %in% c("Cost",
-                             "Effect",
-                             "Inc_Cost",
-                             "Inc_Effect",
-                             "ICER")] <-
+  colnames(df_table_cea)[colnames(df_table_cea)
+                         %in% c("Cost",
+                                "Effect",
+                                "Inc_Cost",
+                                "Inc_Effect",
+                                "ICER")] <-
     c(paste0("Costs (", currency, ")"),
       "QALYs",
       paste0("Incremental Costs (", currency, ")"),
       "Incremental QALYs",
       paste0("ICER (", currency, "/QALY)"))
 
-  class(table_cea) <- "data.frame"
-  print(table_cea)
-  invisible(table_cea)
+  class(df_table_cea) <- "data.frame"
+  print(df_table_cea)
+  invisible(df_table_cea)
 }

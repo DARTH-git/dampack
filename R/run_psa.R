@@ -28,26 +28,26 @@
 #' @export
 run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
                     strategies = NULL, currency = "$", progress = TRUE, ...) {
-  opt_arg_val <- list(...)
+  l_opt_arg_val <- list(...)
 
   if (!is.null(params_basecase)) {
-    replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
-    new_params <- params_basecase
+    v_replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
+    l_new_params <- params_basecase
     # replace values in new_params
-    new_params[replace_var] <- psa_samp[1, replace_var]
-    fun_input_test <- c(list(new_params), opt_arg_val)
+    l_new_params[v_replace_var] <- psa_samp[1, v_replace_var]
+    l_fun_input_test <- c(list(l_new_params), l_opt_arg_val)
   } else {
-    fun_input_test <- c(list(psa_samp[1, ]), opt_arg_val)
+    l_fun_input_test <- c(list(psa_samp[1, ]), l_opt_arg_val)
   }
 
   jj <- tryCatch({
-    userfun <- do.call(FUN, fun_input_test)
+    userfun <- do.call(FUN, l_fun_input_test)
   },
   error = function(e) NA)
   if (is.na(sum(is.na(jj)))) {
     stop("FUN is not well defined by the parameter values and ...")
   }
-  userfun <- do.call(FUN, fun_input_test)
+  userfun <- do.call(FUN, l_fun_input_test)
 
   if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
@@ -68,18 +68,18 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   }
   if (is.null(outcomes)) outcomes <- v_outcomes
 
-  sim_out_ls <- vector(mode = "list", length = nrow(psa_samp))
+  l_sim_out <- vector(mode = "list", length = nrow(psa_samp))
 
 
 
   if (!is.null(params_basecase)) {
-    replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
-    new_params <- params_basecase
+    v_replace_var <- names(psa_samp)[names(psa_samp) %in% names(params_basecase)]
+    l_new_params <- params_basecase
     for (i in seq_len(nrow(psa_samp))) {
       # replace values in new_params
-      new_params[replace_var] <- psa_samp[i, replace_var]
-      fun_input_ls <- c(list(new_params), opt_arg_val)
-      sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+      l_new_params[v_replace_var] <- psa_samp[i, v_replace_var]
+      l_fun_input <- c(list(l_new_params), l_opt_arg_val)
+      l_sim_out[[i]] <- do.call(FUN, l_fun_input)
       # display progress every 10%
       if (progress == TRUE) {
         if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) && progress == TRUE) {
@@ -89,8 +89,8 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
     }
   } else {
     for (i in seq_len(nrow(psa_samp))) {
-      fun_input_ls <- c(list(psa_samp[i, ]), opt_arg_val)
-      sim_out_ls[[i]] <- do.call(FUN, fun_input_ls)
+      l_fun_input <- c(list(psa_samp[i, ]), l_opt_arg_val)
+      l_sim_out[[i]] <- do.call(FUN, l_fun_input)
       # display progress every 10%
       if (progress == TRUE) {
         if (i / (nrow(psa_samp) / 10) == round(i / (nrow(psa_samp) / 10), 0) && progress == TRUE) {
@@ -101,29 +101,29 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   }
 
   n_outcomes <- length(outcomes)
-  df_sim_out <- vector(mode = "list", length = n_outcomes)
-  names(df_sim_out) <- outcomes
+  l_df_outcomes <- vector(mode = "list", length = n_outcomes)
+  names(l_df_outcomes) <- outcomes
   for (j in 1:n_outcomes) {
-    df_sim_out[[j]] <- lapply(sim_out_ls,
-                              function(x, tmp_out = outcomes[j]) {
-                                t(x[[outcomes[j]]])
-                              })
-    df_sim_out[[j]] <- as.data.frame(do.call(rbind, df_sim_out[[j]]))
-    colnames(df_sim_out[[j]]) <- strategies
+    l_df_outcomes[[j]] <- lapply(l_sim_out,
+                                 function(x, tmp_out = outcomes[j]) {
+                                   t(x[[outcomes[j]]])
+                                 })
+    l_df_outcomes[[j]] <- as.data.frame(do.call(rbind, l_df_outcomes[[j]]))
+    colnames(l_df_outcomes[[j]]) <- strategies
   }
 
 
 
-  psa_out <- vector(mode = "list", length = n_outcomes)
+  l_psa_out <- vector(mode = "list", length = n_outcomes)
   for (j in 1:n_outcomes) {
-    psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
-                                 other_outcome = df_sim_out[[j]],
-                                 parameters = psa_samp[, -1], strategies = strategies,
-                                 currency = currency)
+    l_psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
+                                   other_outcome = l_df_outcomes[[j]],
+                                   parameters = psa_samp[, -1], strategies = strategies,
+                                   currency = currency)
   }
 
 
-  names(psa_out) <- outcomes
+  names(l_psa_out) <- outcomes
 
-  psa_out
+  l_psa_out
 }

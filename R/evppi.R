@@ -85,9 +85,9 @@ calc_evppi <- function(psa,
   # number of wtp thresholds
   n_wtps <- length(wtp)
   # vector to store evppi
-  evppi <- rep(0, n_wtps)
+  v_evppi <- rep(0, n_wtps)
 
-  mms_ls <- vector(mode = "list", length = n_wtps)
+  l_mms <- vector(mode = "list", length = n_wtps)
 
   # calculate evppi at each wtp
   for (l in 1:n_wtps) {
@@ -102,18 +102,18 @@ calc_evppi <- function(psa,
                      poly.order = poly.order,
                      k = k)
 
-    mms_ls[[l]] <- mms
+    l_mms[[l]] <- mms
 
     # get the fitted loss values from the regression models
     # there is one for each strategy
-    fitted_loss_list <- lapply(mms$mods, function(m) m$fitted.values)
+    l_fitted_loss <- lapply(mms$mods, function(m) m$fitted.values)
 
     # bind the columns to get a dataframe
-    df_fitted_loss <- bind_cols(fitted_loss_list)
+    df_fitted_loss <- bind_cols(l_fitted_loss)
 
     # calculate the evppi as the average of the row maxima
-    row_maxes <- apply(df_fitted_loss, 1, max)
-    evppi[l] <- mean(row_maxes) * pop
+    v_row_maxes <- apply(df_fitted_loss, 1, max)
+    v_evppi[l] <- mean(v_row_maxes) * pop
 
     if (progress == TRUE) {
       if (l / (n_wtps / 10) == round(l / (n_wtps / 10), 0)) { # display progress every 10%
@@ -123,9 +123,9 @@ calc_evppi <- function(psa,
   }
 
   # data.frame to store EVPPI for each WTP threshold
-  df_evppi <- data.frame("WTP" = wtp, "EVPPI" = evppi)
+  df_evppi <- data.frame("WTP" = wtp, "EVPPI" = v_evppi)
 
-  evppi_ls <- list(df_evppi = df_evppi, metamodel_ls = mms_ls)
+  evppi_ls <- list(df_evppi = df_evppi, metamodel_ls = l_mms)
   class(evppi_ls) <- c("evppi")
   evppi_ls
 }

@@ -44,7 +44,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
                       type = c("linear", "gam", "poly"), poly.order = 2, k = -1) {
 
   # get parameter names
-  pnames <- psa$parnames
+  v_pnames <- psa$parnames
 
   # analysis
   analysis <- match.arg(analysis)
@@ -54,11 +54,11 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 
   # make sure all of params is in parameter names
   if (is.null(params)) {
-    params <- pnames
-  } else if (!all(params %in% pnames)) {
-    wrong_p <- setdiff(p, pnames)
+    params <- v_pnames
+  } else if (!all(params %in% v_pnames)) {
+    v_wrong_p <- setdiff(p, v_pnames)
     stop(paste0("the following parameters are not valid: ",
-                paste(wrong_p, collapse = ",")))
+                paste(v_wrong_p, collapse = ",")))
   } else if (length(params) != 2 && analysis == "twoway") {
     stop("If analysis == twoway, exactly 2 params must be provided.")
   }
@@ -67,26 +67,26 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   outcome <- match.arg(outcome)
 
   # define y, the outcome matrix
-  y <- calculate_outcome(outcome, psa$cost, psa$effectiveness, wtp)
+  df_y <- calculate_outcome(outcome, psa$cost, psa$effectiveness, wtp)
 
   # define strategies
-  strat <- psa$strategies
+  v_strat <- psa$strategies
 
   ## make sure all subset strats are in strat
   if (is.null(strategies)) {
-    strategies <- strat
-  } else if (!all(strategies %in% strat)) {
-    wrong_strats <- setdiff(strategies, strat)
+    strategies <- v_strat
+  } else if (!all(strategies %in% v_strat)) {
+    v_wrong_strats <- setdiff(strategies, v_strat)
     errmsg <- paste0("the following are not in psa$strategies: ",
-                     paste(wrong_strats, collapse = ","))
+                     paste(v_wrong_strats, collapse = ","))
     stop(errmsg)
   }
 
   # define data for linear model
-  dat <- data.frame(y, psa$parameters)
+  df_dat <- data.frame(df_y, psa$parameters)
 
   # make sure there are not more parameters to estimate than there are psa samples
-  if (nrow(dat) < length(params)) {
+  if (nrow(df_dat) < length(params)) {
     errmsg <- paste0("The number of parameters to be estimated by the metamodel
                      cannot be greater than the number of PSA samples")
     stop(errmsg)
@@ -101,7 +101,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
     for (p in params) {
       # loop over strategies
       for (s in strategies) {
-        mod <- mm_run_reg(analysis, s, p, dat, type, poly.order, k)
+        mod <- mm_run_reg(analysis, s, p, df_dat, type, poly.order, k)
         mod$param_of_int <- p
         mod$strat <- s
         lms[[p]][[s]] <- mod
@@ -111,7 +111,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   if (analysis == "twoway" || analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
-      mod <- mm_run_reg(analysis, s, params, dat, type, poly.order, k)
+      mod <- mm_run_reg(analysis, s, params, df_dat, type, poly.order, k)
       # for accessing later in predict
       mod$param_of_int <- params
       mod$strat <- s
@@ -181,15 +181,15 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
 
     ## parameters of interest
     fparam <- ""
-    list_of_ps <- lapply(params, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
+    l_ps <- lapply(params, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
 
     if (analysis == "twoway") {
-      list_of_ps <- append(list_of_ps,
-                           paste0("poly(", params[1], ",", poly.order, ", raw=TRUE):",
-                                  "poly(", params[2], ",", poly.order, ", raw=TRUE)"))
+      l_ps <- append(l_ps,
+                     paste0("poly(", params[1], ",", poly.order, ", raw=TRUE):",
+                            "poly(", params[2], ",", poly.order, ", raw=TRUE)"))
     }
 
-    fparam <- paste(list_of_ps, collapse = " + ")
+    fparam <- paste(l_ps, collapse = " + ")
     ## combine
     f <- as.formula(paste0(fbeg, fparam))
 
@@ -207,8 +207,8 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
     if (n_params == 1) {
       fparam <- paste0(fparam, "s(", params, ", k=", k, ")")
     } else {
-      params_k <- paste0("s(", params,  ", k=", k, ")")
-      f_s <- paste(params_k, collapse = " + ")
+      v_params_k <- paste0("s(", params,  ", k=", k, ")")
+      f_s <- paste(v_params_k, collapse = " + ")
       k_ti <- ifelse(k == -1, NA, k)
       fparam <- paste0(f_s, " + ti(", paste(params, collapse = ", "), ", k = ", k_ti, ")")
     }
@@ -273,7 +273,7 @@ summary.metamodel <- function(object, ...) {
     }
   }
   if (analysis == "twoway") {
-    params <- object$params
+    v_params <- object$params
     for (s in object$strategies) {
       lm_summary <- summary(object$mods[[s]])
       if (type == "gam") {
@@ -281,7 +281,7 @@ summary.metamodel <- function(object, ...) {
       } else {
         r2 <- lm_summary$r.squared
       }
-      df_new_row <- data.frame("param1" = params[1], "param2" = params[2],
+      df_new_row <- data.frame("param1" = v_params[1], "param2" = v_params[2],
                                "strat" = s, "rsquared" = r2)
       df_summary <- rbind(df_summary, df_new_row)
     }
@@ -328,16 +328,16 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   }
 
   # all parameters in the metamodel
-  psa_params <- object$params
+  v_psa_params <- object$params
 
   # get original psa parameter df
-  psa_paramvals <- object$psa$parameters
+  df_psa_paramvals <- object$psa$parameters
 
   # set of linear models
-  mods <- object$mods
+  l_mods <- object$mods
 
   # strategies
-  strats <- object$strategies
+  v_strats <- object$strategies
 
   # data frame to be used in predict - mean values repeated
   # the values for the parameter of interest are replaced
@@ -348,79 +348,79 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   if (analysis == "twoway") {
     pred_data_nrow <- nsamp ^ 2
   }
-  pdata <- data.frame(matrix(colMeans(psa_paramvals),
-                             nrow = pred_data_nrow,
-                             ncol = ncol(psa_paramvals),
-                             byrow = TRUE))
+  df_pdata <- data.frame(matrix(colMeans(df_psa_paramvals),
+                                nrow = pred_data_nrow,
+                                ncol = ncol(df_psa_paramvals),
+                                byrow = TRUE))
 
   # Name data frame's columns with parameters' names
-  colnames(pdata) <- colnames(psa_paramvals)
+  colnames(df_pdata) <- colnames(df_psa_paramvals)
 
   # these are parameters that are included in ranges
   if (is.null(ranges)) {
-    q_params <- psa_params
+    v_q_params <- v_psa_params
   } else {
     # get parameters associated with ranges
-    q_params <- names(ranges)
-    if (!all(q_params %in% psa_params)) {
-      wrong_params <- setdiff(q_params, psa_params)
+    v_q_params <- names(ranges)
+    if (!all(v_q_params %in% v_psa_params)) {
+      v_wrong_params <- setdiff(v_q_params, v_psa_params)
       stop(paste0("The following range names were not found in psa$parameters:\n",
-                  paste(wrong_params, collapse = ", ")))
+                  paste(v_wrong_params, collapse = ", ")))
     }
   }
 
   # predict outcomes from linear metamodels
   if (analysis == "oneway") {
     ## make list to hold outcome dfs
-    dfs_outcome <- vector(mode = "list",
-                          length = length(strats) * length(q_params))
+    l_df_outcome <- vector(mode = "list",
+                           length = length(v_strats) * length(v_q_params))
     counter <- 1
-    for (p in q_params) {
+    for (p in v_q_params) {
       # define evenly spaced samples from parameter range
-      param_val <- make_param_seq(p, ranges, nsamp, psa_paramvals)
+      v_param_val <- make_param_seq(p, ranges, nsamp, df_psa_paramvals)
 
       # create new data from param_val
-      newdata <- data.frame(param_val)
+      df_newdata <- data.frame(param_val = v_param_val)
 
       # replace values for parameter of interest
-      this_p_data <- pdata
-      this_p_data[, p] <- newdata
+      df_this_p_data <- df_pdata
+      df_this_p_data[, p] <- df_newdata
 
       # predict values from linear model
       # for each strategy
-      for (s in strats) {
-        mod <- mods[[p]][[s]]
-        dfs_outcome[[counter]] <- data.frame("parameter" = p, "strategy" = s,
-                                             "param_val" = newdata,
-                                             "outcome_val" = predict(mod, newdata = this_p_data, type = "response"),
-                                             stringsAsFactors = FALSE)
+      for (s in v_strats) {
+        mod <- l_mods[[p]][[s]]
+        l_df_outcome[[counter]] <- data.frame("parameter" = p, "strategy" = s,
+                                              "param_val" = df_newdata,
+                                              "outcome_val" = predict(mod, newdata = df_this_p_data, type = "response"),
+                                              stringsAsFactors = FALSE)
         counter <- counter + 1
       }
     }
   }
   if (analysis == "twoway") {
-    dfs_outcome <- vector(mode = "list",
-                          length = length(strats))
+    l_df_outcome <- vector(mode = "list",
+                           length = length(v_strats))
     counter <- 1
-    p1 <- psa_params[1]
-    p2 <- psa_params[2]
-    p1_samp <- make_param_seq(p1, ranges, nsamp, psa_paramvals)
-    p2_samp <- make_param_seq(p2, ranges, nsamp, psa_paramvals)
-    p1p2_data <- data.frame(expand.grid(p1_samp, p2_samp))
-    pdata[, c(p1, p2)] <- p1p2_data
+    p1 <- v_psa_params[1]
+    p2 <- v_psa_params[2]
+    v_p1_samp <- make_param_seq(p1, ranges, nsamp, df_psa_paramvals)
+    v_p2_samp <- make_param_seq(p2, ranges, nsamp, df_psa_paramvals)
+    df_p1p2 <- data.frame(expand.grid(v_p1_samp, v_p2_samp))
+    df_pdata[, c(p1, p2)] <- df_p1p2
 
-    for (s in strats) {
-      mod <- mods[[s]]
-      outcome <- predict(mod, newdata = pdata)
-      df_outcome <- data.frame("p1" = pdata[, p1], "p2" = pdata[, p2],
+    for (s in v_strats) {
+      mod <- l_mods[[s]]
+      outcome <- predict(mod, newdata = df_pdata)
+      df_outcome <- data.frame("p1" = df_pdata[, p1], "p2" = df_pdata[, p2],
                                "strategy" = s, "outcome_val" = outcome,
                                stringsAsFactors = FALSE)
       names(df_outcome)[1:2] <- c(p1, p2)
-      dfs_outcome[[counter]] <- df_outcome
+      l_df_outcome[[counter]] <- df_outcome
       counter <- counter + 1
     }
   }
-  df_combined <- bind_rows(dfs_outcome)
+  df_combined <- bind_rows(l_df_outcome)
   df_combined
 }
 
@@ -434,22 +434,22 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 #' @return a vector of parameter values spanning the range specified
 #' @keywords internal
 make_param_seq <- function(p, ranges, nsamp, psa_paramvals) {
-  p_range <- ranges[[p]]
+  v_p_range <- ranges[[p]]
 
   # define default range if necesary
-  p_psa_vals <- psa_paramvals[, p]
-  if (is.null(p_range)) {
-    p_range <- quantile(p_psa_vals, c(0.025, 0.975))
+  v_p_psa_vals <- psa_paramvals[, p]
+  if (is.null(v_p_range)) {
+    v_p_range <- quantile(v_p_psa_vals, c(0.025, 0.975))
   } else {
     # throw warning if outside of psa range
-    psa_range <- range(p_psa_vals)
-    if (p_range[1] < psa_range[1] || p_range[2] > psa_range[2]) {
+    v_psa_range <- range(v_p_psa_vals)
+    if (v_p_range[1] < v_psa_range[1] || v_p_range[2] > v_psa_range[2]) {
       warning(paste0("The requested range for ", p, " is outside of the PSA range.\n",
-                     "requested range: [", paste(p_range, collapse = ","), "]\n",
-                     "PSA range: [", paste(psa_range, collapse = ", "), "]\n.",
+                     "requested range: [", paste(v_p_range, collapse = ","), "]\n",
+                     "PSA range: [", paste(v_psa_range, collapse = ", "), "]\n.",
                      "Please interpret results with caution."))
     }
   }
   # define evenly spaced samples from parameter range
-  seq(p_range[1], p_range[2], length.out = nsamp)
+  seq(v_p_range[1], v_p_range[2], length.out = nsamp)
 }

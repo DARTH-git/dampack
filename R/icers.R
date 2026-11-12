@@ -340,18 +340,25 @@ add_reference_and_nmb <- function(df_icers, ref_str, wtp, nhb, currency) {
 #' even if present in the ICER table.
 #'
 #' @param psa \code{psa} object from \code{link{make_psa_object}}
-#' @param uncertainty whether or not 95% quantiles for the cost and QALY outcomes should be included
+#' @param uncertainty whether or not 95\% quantiles for the cost and QALY outcomes should be included
 #' in the resulting ICER table. Defaults to \code{FALSE}.
+#' @inheritParams calculate_icers
 #'
 #' @return A data frame and \code{icers} object of strategies and their associated
 #' status, cost, effect, incremental cost, incremental effect, and ICER. If \code{uncertainty} is
 #' set to \code{TRUE}, four additional columns are provided for the 2.5th and 97.5th quantiles for
 #' each strategy's cost and effect.
+#'
+#' With \code{ref_str}, \code{wtp}, or \code{nhb}, the reference-strategy and net-benefit columns
+#' described in \code{\link{calculate_icers}} are added. With \code{uncertainty = TRUE} and
+#' \code{ref_str}, the 2.5th and 97.5th quantiles of the sample-by-sample differences from the reference
+#' are also given for \code{Inc_Cost_ref}, \code{Inc_Effect_ref}, and (with \code{wtp})
+#' \code{iNMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
 #' @seealso \code{\link{plot.icers}}
 #' @seealso \code{\link{calculate_icers}}
 #' @importFrom tidyr pivot_longer
 #' @export
-calculate_icers_psa <- function(psa, uncertainty = FALSE) {
+calculate_icers_psa <- function(psa, uncertainty = FALSE, ref_str = NULL, wtp = NULL, nhb = FALSE) {
 
   # check that psa has class 'psa'
   check_psa_object(psa)
@@ -365,9 +372,13 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
   # Supply mean outcome values to calculate_icers
   df_icers <- calculate_icers(cost = df_psa_sum$meanCost,
                               effect = df_psa_sum$meanEffect,
-                              strategies = df_psa_sum$Strategy)
+                              strategies = df_psa_sum$Strategy,
+                              ref_str = ref_str, wtp = wtp, nhb = nhb)
 
   if (uncertainty == TRUE) {
+    # the joins and column selection below drop the icers class and attributes; keep them
+    l_attr <- attributes(df_icers)[c("class", "ref_str", "wtp", "currency")]
+    l_attr <- l_attr[!vapply(l_attr, is.null, logical(1))]
 
     # extract cost and effect data.frames from psa object
     df_cost <- psa$cost
@@ -392,10 +403,51 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE) {
       left_join(df_effect_bounds, by = "Strategy") %>%
       select(Strategy, Cost, Lower_95_Cost, Upper_95_Cost,
              Effect, Lower_95_Effect, Upper_95_Effect,
-             Inc_Cost, Inc_Effect, ICER, Status)
+             Inc_Cost, Inc_Effect, ICER, Status, everything())
+
+    if (!is.null(ref_str)) {
+      df_icers <- add_reference_intervals(df_icers, psa, ref_str, wtp)
+    }
+    df_icers <- as.data.frame(df_icers)
+    for (a in names(l_attr)) {
+      attr(df_icers, a) <- l_attr[[a]]
+    }
   }
 
   df_icers
+}
+
+#' Add 95\% intervals for the differences from a reference strategy
+#'
+#' Quantiles of the sample-by-sample differences between each strategy and the reference, placed
+#' after the corresponding point estimate. \code{NA} for the reference itself.
+#'
+#' @param df_icers an \code{icers} object with reference columns.
+#' @param psa the \code{psa} object it was computed from.
+#' @inheritParams calculate_icers
+#' @return \code{df_icers} with the interval columns added.
+#' @keywords internal
+add_reference_intervals <- function(df_icers, psa, ref_str, wtp) {
+  m_inc_cost <- as.matrix(psa$cost) - psa$cost[[ref_str]]
+  m_inc_effect <- as.matrix(psa$effectiveness) - psa$effectiveness[[ref_str]]
+  l_inc <- list(Inc_Cost_ref = m_inc_cost, Inc_Effect_ref = m_inc_effect)
+  if (!is.null(wtp)) {
+    l_inc$iNMB_ref <- wtp * m_inc_effect - m_inc_cost
+  }
+  v_strat <- df_icers$Strategy
+  v_cols <- names(df_icers)
+  for (col in names(l_inc)) {
+    m_inc <- l_inc[[col]][, v_strat, drop = FALSE]
+    v_lower <- unname(apply(m_inc, 2, quantile, probs = 0.025, names = FALSE))
+    v_upper <- unname(apply(m_inc, 2, quantile, probs = 0.975, names = FALSE))
+    v_lower[v_strat == ref_str] <- NA_real_
+    v_upper[v_strat == ref_str] <- NA_real_
+    df_icers[[paste0("Lower_95_", col)]] <- v_lower
+    df_icers[[paste0("Upper_95_", col)]] <- v_upper
+    i <- match(col, v_cols)
+    v_cols <- append(v_cols, paste0(c("Lower_95_", "Upper_95_"), col), after = i)
+  }
+  df_icers[, v_cols]
 }
 
 #' compute icers for non-dominated strategies
@@ -656,7 +708,7 @@ print.icers <- function(x,
 
   # columns that belong to each view
   v_seq_cols <- c("Inc_Cost", "Inc_Effect", "ICER", "Status")
-  v_ref_cols <- c("Inc_Cost_ref", "Inc_Effect_ref", "ICER_ref", "Status_ref", "iNMB_ref", "iNHB_ref")
+  v_ref_cols <- grep("_ref$", names(x), value = TRUE)
   v_drop <- switch(ref, sequential = v_ref_cols, reference = v_seq_cols, both = character(0))
   df_table_cea <- x
   class(df_table_cea) <- "data.frame"

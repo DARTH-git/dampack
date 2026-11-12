@@ -14,8 +14,6 @@
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
 #' @param strategies string vector of strategy names
-#' With the default (NULL), there is no reference strategy, and the strategies
-#' are ranked in ascending order of cost.
 #'
 #' @return A data frame and \code{icers} object of strategies and their associated
 #' status, incremental cost, incremental effect, and ICER.
@@ -63,6 +61,9 @@ calculate_icers <- function(cost, effect, strategies) {
   if (n_cost != n_eff || n_eff != n_strat) {
     stop("cost, effect, and strategies must all be vectors of the same length", call. = FALSE)
   }
+  if (n_strat == 0) {
+    stop("cost, effect, and strategies must contain at least one strategy", call. = FALSE)
+  }
 
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
 
@@ -76,9 +77,14 @@ calculate_icers <- function(cost, effect, strategies) {
                        stringsAsFactors = FALSE)
   nstrat <- nrow(df_cea)
 
-  # if only one strategy was provided, return df with NAs for incremental
+  # if only one strategy was provided, it is on the frontier by definition and
+  # has no incremental values; return the same layout and class as below
   if (nstrat == 1) {
-    df_cea[, c("ICER", "Inc_Cost", "Inc_Effect")] <- NA
+    df_cea$Inc_Cost <- NA_real_
+    df_cea$Inc_Effect <- NA_real_
+    df_cea$ICER <- NA_real_
+    df_cea$Status <- "ND"
+    class(df_cea) <- c("icers", "data.frame")
     return(df_cea)
   }
 

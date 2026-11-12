@@ -11,9 +11,7 @@ calculate_icers(cost, effect, strategies)
 
 \item{effect}{vector of effect for each strategy}
 
-\item{strategies}{string vector of strategy names
-With the default (NULL), there is no reference strategy, and the strategies
-are ranked in ascending order of cost.}
+\item{strategies}{string vector of strategy names}
 }
 \value{
 A data frame and \code{icers} object of strategies and their associated

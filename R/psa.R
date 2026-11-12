@@ -209,7 +209,7 @@ plot.psa <- function(x,
 
     if (ellipse) {
       # make points for ellipse plotting
-      l_df_ell <- lapply(v_strategies, function(s) {
+      l_ell <- lapply(v_strategies, function(s) {
         df_strat_specific <- df_ce[df_ce$Strategy == s, ]
         els <-  with(df_strat_specific,
                      ellipse(cor(Effectiveness, Cost),
@@ -217,7 +217,7 @@ plot.psa <- function(x,
                              centre = c(mean(Effectiveness), mean(Cost))))
         data.frame(els, group = s, stringsAsFactors = FALSE)
       })
-      df_ell <- bind_rows(l_df_ell)
+      df_ell <- bind_rows(l_ell)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
@@ -300,7 +300,7 @@ plot.psa <- function(x,
 
     if (ellipse) {
       # make points for ellipse plotting
-      l_df_ell <- lapply(v_comp_strategies, function(s) {
+      l_ell <- lapply(v_comp_strategies, function(s) {
         df_strat_specific <- df_ice[df_ice$Strategy == s, ]
         els <-  with(df_strat_specific,
                      ellipse(cor(Effectiveness, Cost),
@@ -308,7 +308,7 @@ plot.psa <- function(x,
                              centre = c(mean(Effectiveness), mean(Cost))))
         data.frame(els, group = s, stringsAsFactors = FALSE)
       })
-      df_ell <- bind_rows(l_df_ell)
+      df_ell <- bind_rows(l_ell)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),

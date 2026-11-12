@@ -100,10 +100,10 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
   if (is.null(outcomes)) outcomes <- v_outcomes
 
   param_table_all <- NULL
-  l_df_outcomes <- NULL
+  l_outcomes <- NULL
   n_params <- nrow(params_range)
   n_outcomes <- length(outcomes)
-  l_df_outcomes_all <- vector(mode = "list", length = n_outcomes)
+  l_outcomes_all <- vector(mode = "list", length = n_outcomes)
 
   for (i in 1:n_params) {
     # Generate matrix of inputs
@@ -133,13 +133,13 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                         nsamp = nsamp)
 
     for (j in 1:n_outcomes) {
-      l_df_outcomes[[j]] <- lapply(l_sim_out,
-                                   function(x, tmp_out = outcomes[j]) {
-                                     t(x[outcomes[j]])
-                                   })
-      l_df_outcomes[[j]] <- as.data.frame(do.call(rbind, l_df_outcomes[[j]]))
-      colnames(l_df_outcomes[[j]]) <- strategies
-      l_df_outcomes_all[[j]] <- rbind(l_df_outcomes_all[[j]], l_df_outcomes[[j]])
+      l_outcomes[[j]] <- lapply(l_sim_out,
+                                function(x, tmp_out = outcomes[j]) {
+                                  t(x[outcomes[j]])
+                                })
+      l_outcomes[[j]] <- as.data.frame(do.call(rbind, l_outcomes[[j]]))
+      colnames(l_outcomes[[j]]) <- strategies
+      l_outcomes_all[[j]] <- rbind(l_outcomes_all[[j]], l_outcomes[[j]])
     }
 
     df_param_table <- data.frame(parameter = rep(pars_i, nsamp),
@@ -154,7 +154,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
   owsa_out <- vector(mode = "list", length = n_outcomes)
   for (k in 1:n_outcomes) {
     l_dsa_oneway[[k]] <- create_dsa_oneway(parameters = param_table_all,
-                                           other_outcome = l_df_outcomes_all[[k]],
+                                           other_outcome = l_outcomes_all[[k]],
                                            strategies = strategies)
     owsa_out[[k]] <- owsa(l_dsa_oneway[[k]], outcome = "eff")
   }

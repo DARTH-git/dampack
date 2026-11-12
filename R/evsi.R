@@ -184,9 +184,9 @@ predict_ga <- function(object, n, n0) {
   v_beta <- coef(object)
 
   # Compute conditional Loss
-  m_l_tilde <- m_x %*% v_beta
+  m_tilde <- m_x %*% v_beta
 
-  m_l_tilde
+  m_tilde
 }
 
 #' Function to compute the preposterior for each of the

@@ -381,8 +381,8 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
   # predict outcomes from linear metamodels
   if (analysis == "oneway") {
     ## make list to hold outcome dfs
-    l_df_outcome <- vector(mode = "list",
-                           length = length(v_strats) * length(v_q_params))
+    l_outcome <- vector(mode = "list",
+                        length = length(v_strats) * length(v_q_params))
     counter <- 1
     for (p in v_q_params) {
       # define evenly spaced samples from parameter range
@@ -399,17 +399,17 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
       # for each strategy
       for (s in v_strats) {
         mod <- l_mods[[p]][[s]]
-        l_df_outcome[[counter]] <- data.frame("parameter" = p, "strategy" = s,
-                                              "param_val" = df_newdata,
-                                              "outcome_val" = predict(mod, newdata = df_this_p_data, type = "response"),
-                                              stringsAsFactors = FALSE)
+        l_outcome[[counter]] <- data.frame("parameter" = p, "strategy" = s,
+                                           "param_val" = df_newdata,
+                                           "outcome_val" = predict(mod, newdata = df_this_p_data, type = "response"),
+                                           stringsAsFactors = FALSE)
         counter <- counter + 1
       }
     }
   }
   if (analysis == "twoway") {
-    l_df_outcome <- vector(mode = "list",
-                           length = length(v_strats))
+    l_outcome <- vector(mode = "list",
+                        length = length(v_strats))
     counter <- 1
     p1 <- v_psa_params[1]
     p2 <- v_psa_params[2]
@@ -425,11 +425,11 @@ predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
                                "strategy" = s, "outcome_val" = outcome,
                                stringsAsFactors = FALSE)
       names(df_outcome)[1:2] <- c(p1, p2)
-      l_df_outcome[[counter]] <- df_outcome
+      l_outcome[[counter]] <- df_outcome
       counter <- counter + 1
     }
   }
-  df_combined <- bind_rows(l_df_outcome)
+  df_combined <- bind_rows(l_outcome)
   df_combined
 }
 

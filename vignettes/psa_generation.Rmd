@@ -311,6 +311,8 @@ my_dists_params <- list(#Transition Probabilities
                         c(0.5, 0.03, NA, 1),
                         c(0.95, 0.02, NA, 1))
 
+# fix the random number seed so the PSA sample (and every result below) is reproducible
+set.seed(20261112)
 my_psa_params <- gen_psa_samp(params = my_params,
                               dists = my_dists,
                               parameterization_types = my_parameterization_types,

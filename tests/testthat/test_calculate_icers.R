@@ -48,17 +48,26 @@ test_that("default reference strategy", {
   expect_equal(cea$Strategy[1], "Test & treat")
 })
 
-# one strategy
-test_that("one strategy runs", {
+# one strategy (#183): a valid icers object with the same layout as for several strategies
+test_that("one strategy returns a valid icers object", {
   cea <- calculate_icers(1, 2, "s")
-  df_exp <- data.frame("Strategy" = "s",
-                       "Cost" = 1,
-                       "Effect" = 2,
-                       "ICER" = NA,
-                       "Inc_Cost" = NA,
-                       "Inc_Effect" = NA,
-                       stringsAsFactors = FALSE)
-  expect_equal(cea, df_exp)
+  cea_multi <- calculate_icers(c(1, 3), c(2, 4), c("s", "t"))
+  expect_s3_class(cea, "icers")
+  expect_identical(names(cea), names(cea_multi))
+  expect_identical(class(cea), class(cea_multi))
+  expect_equal(cea$Strategy, "s")
+  expect_equal(cea$Cost, 1)
+  expect_equal(cea$Effect, 2)
+  expect_equal(cea$Status, "ND")
+  expect_true(all(is.na(c(cea$Inc_Cost, cea$Inc_Effect, cea$ICER))))
+  expect_s3_class(plot(cea), "ggplot")
+  expect_output(print(cea), "s")
+})
+
+# no strategies (#178): an informative error instead of a failure inside the loop
+test_that("zero strategies give an informative error", {
+  expect_error(calculate_icers(numeric(0), numeric(0), character(0)),
+               "at least one strategy")
 })
 
 # import psa

@@ -4,12 +4,21 @@
 \alias{print.icers}
 \title{Print the formatted CEA table}
 \usage{
-\method{print}{icers}(x, currency = "$", dig_cost = 0, dig_eff = 2, dig_icer = 0, ...)
+\method{print}{icers}(
+  x,
+  currency = NULL,
+  dig_cost = 0,
+  dig_eff = 2,
+  dig_icer = 0,
+  ref = c("sequential", "reference", "both"),
+  ...
+)
 }
 \arguments{
 \item{x}{Object of class \code{icers}}
 
-\item{currency}{string. with currency used in the cost-effectiveness analysis (CEA).}
+\item{currency}{string. with currency used in the cost-effectiveness analysis (CEA).
+Defaults to the currency stored in \code{x}, or \code{"$"}.}
 
 \item{dig_cost}{integer. number of digits to round costs to}
 
@@ -17,11 +26,17 @@
 
 \item{dig_icer}{integer. number of digits to round ICER to}
 
+\item{ref}{which comparison to show: \code{"sequential"} (the default), \code{"reference"},
+or \code{"both"}.}
+
 \item{...}{Additional arguments passed to other methods.}
 }
 \value{
 a dataframe object - formatted CEA table
 }
 \description{
-Print the formatted CEA table
+By default, prints the sequential cost-effectiveness table: each strategy on the frontier is
+compared with the previous one. If the \code{icers} object was created with a reference
+strategy (\code{ref_str} in \code{\link{calculate_icers}}), \code{ref = "reference"} shows the
+comparison of every strategy with the reference instead, and \code{ref = "both"} shows both.
 }

@@ -14,9 +14,33 @@
 #' @param cost vector of cost for each strategy
 #' @param effect vector of effect for each strategy
 #' @param strategies string vector of strategy names
+#' @param ref_str name of a reference strategy (one of \code{strategies}) to compare every
+#' strategy against, for example \code{"Standard of care"}. The default (\code{NULL}) adds no
+#' reference columns. The frontier-based results (\code{Status}, \code{Inc_Cost},
+#' \code{Inc_Effect}, \code{ICER}) never depend on the reference.
+#' @param wtp a single willingness-to-pay threshold (currency per unit of effect). If given,
+#' the net monetary benefit (\code{NMB}) of each strategy is added. The default (\code{NULL})
+#' adds no net-benefit columns.
+#' @param nhb if \code{TRUE}, also add the net health benefit (\code{NHB}). Requires \code{wtp}.
+#' @param currency currency symbol used when printing and plotting the results, for example
+#' \code{"€"}. The default (\code{NULL}) uses \code{"$"}.
 #'
 #' @return A data frame and \code{icers} object of strategies and their associated
-#' status, incremental cost, incremental effect, and ICER.
+#' status, incremental cost, incremental effect, and ICER, computed sequentially along the
+#' cost-effectiveness frontier.
+#'
+#' If \code{ref_str} is given, four columns compare each strategy with the reference:
+#' \code{Inc_Cost_ref} and \code{Inc_Effect_ref} (cost and effect minus those of the
+#' reference), \code{ICER_ref}, and \code{Status_ref}, one of \code{"Reference"},
+#' \code{"Dominant"} (less costly and at least as effective), \code{"Dominated"} (more costly
+#' and no more effective), \code{"More costly, more effective"},
+#' \code{"Less costly, less effective"}, or \code{"Equivalent"} (same cost and effect).
+#' \code{ICER_ref} is \code{NA} where a ratio is not meaningful: for the reference itself and
+#' for dominant, dominated, and equivalent strategies.
+#'
+#' If \code{wtp} is given, \code{NMB} (\code{wtp * Effect - Cost}) is added, and with
+#' \code{ref_str} also \code{iNMB_ref}, the NMB minus that of the reference. With
+#' \code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) and \code{iNHB_ref} are added too.
 #'
 #' @seealso \code{\link{plot.icers}}
 #'
@@ -52,8 +76,17 @@
 #' # if using a small number of strategies, you can label all the points
 #' # note that longer strategy names will get truncated
 #' plot(icers, label = "all")
+#'
+#' ## Comparing every strategy with a reference strategy
+#' hund_ref <- calculate_icers(hund_strat$Cost,
+#'                             hund_strat$QALYs,
+#'                             hund_strat$Strategy,
+#'                             ref_str = hund_strat$Strategy[1],
+#'                             wtp = 50000)
+#' print(hund_ref, ref = "reference")
 #' @export
-calculate_icers <- function(cost, effect, strategies) {
+calculate_icers <- function(cost, effect, strategies, ref_str = NULL, wtp = NULL,
+                            nhb = FALSE, currency = NULL) {
   # checks on input
   n_cost <- length(cost)
   n_eff <- length(effect)
@@ -64,6 +97,8 @@ calculate_icers <- function(cost, effect, strategies) {
   if (n_strat == 0) {
     stop("cost, effect, and strategies must contain at least one strategy", call. = FALSE)
   }
+  ref_str <- check_ref_str(ref_str, as.character(strategies))
+  check_wtp_nhb(wtp, nhb)
 
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
 
@@ -85,7 +120,7 @@ calculate_icers <- function(cost, effect, strategies) {
     df_cea$ICER <- NA_real_
     df_cea$Status <- "ND"
     class(df_cea) <- c("icers", "data.frame")
-    return(df_cea)
+    return(add_reference_and_nmb(df_cea, ref_str, wtp, nhb, currency))
   }
 
   # three statuses: dominated, extended dominated, and non-dominated
@@ -174,7 +209,105 @@ calculate_icers <- function(cost, effect, strategies) {
 
   # declare class of results
   class(df_results) <- c("icers", "data.frame")
-  df_results
+  add_reference_and_nmb(df_results, ref_str, wtp, nhb, currency)
+}
+
+#' Check a reference strategy name
+#'
+#' @param ref_str reference strategy name, or \code{NULL}.
+#' @param strategies names of the strategies in the analysis.
+#' @return \code{ref_str} as a character string, or \code{NULL}.
+#' @keywords internal
+check_ref_str <- function(ref_str, strategies) {
+  if (is.null(ref_str)) {
+    return(NULL)
+  }
+  if (length(ref_str) != 1 || is.na(ref_str)) {
+    stop("`ref_str` must be a single strategy name.", call. = FALSE)
+  }
+  ref_str <- as.character(ref_str)
+  if (!ref_str %in% strategies) {
+    stop("`ref_str` must be one of the strategies: ",
+         paste0("\"", strategies, "\"", collapse = ", "), ".", call. = FALSE)
+  }
+  ref_str
+}
+
+#' Check the willingness-to-pay and NHB arguments of calculate_icers()
+#'
+#' @inheritParams calculate_icers
+#' @return \code{NULL}, invisibly; called for its errors.
+#' @keywords internal
+check_wtp_nhb <- function(wtp, nhb) {
+  if (!is.null(wtp) && (!is.numeric(wtp) || length(wtp) != 1 || !is.finite(wtp) || wtp < 0)) {
+    stop("`wtp` must be a single non-negative number.", call. = FALSE)
+  }
+  if (!isTRUE(nhb) && !isFALSE(nhb)) {
+    stop("`nhb` must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (nhb && (is.null(wtp) || wtp == 0)) {
+    stop("`nhb = TRUE` requires `wtp` greater than zero.", call. = FALSE)
+  }
+  invisible(NULL)
+}
+
+#' Status of each strategy relative to a reference strategy
+#'
+#' @param v_inc_cost,v_inc_effect cost and effect of each strategy minus those of the reference.
+#' @return character vector of statuses (the reference itself is labeled by the caller).
+#' @keywords internal
+status_vs_reference <- function(v_inc_cost, v_inc_effect) {
+  ifelse(v_inc_cost == 0 & v_inc_effect == 0, "Equivalent",
+         ifelse(v_inc_cost <= 0 & v_inc_effect >= 0, "Dominant",
+                ifelse(v_inc_cost >= 0 & v_inc_effect <= 0, "Dominated",
+                       ifelse(v_inc_cost > 0, "More costly, more effective",
+                              "Less costly, less effective"))))
+}
+
+#' Add reference-strategy and net-benefit columns to an icers object
+#'
+#' The frontier-based columns are not modified. Columns and attributes are only added
+#' for the arguments that are given, so with all of them \code{NULL} the object is unchanged.
+#'
+#' @param df_icers an \code{icers} object.
+#' @inheritParams calculate_icers
+#' @return \code{df_icers} with the requested columns and attributes added.
+#' @keywords internal
+add_reference_and_nmb <- function(df_icers, ref_str, wtp, nhb, currency) {
+  if (!is.null(ref_str)) {
+    i_ref <- match(ref_str, df_icers$Strategy)
+    v_inc_cost <- df_icers$Cost - df_icers$Cost[i_ref]
+    v_inc_effect <- df_icers$Effect - df_icers$Effect[i_ref]
+    v_status <- status_vs_reference(v_inc_cost, v_inc_effect)
+    v_status[i_ref] <- "Reference"
+    v_inc_cost[i_ref] <- NA_real_
+    v_inc_effect[i_ref] <- NA_real_
+    v_has_ratio <- v_status %in% c("More costly, more effective", "Less costly, less effective")
+    df_icers$Inc_Cost_ref <- v_inc_cost
+    df_icers$Inc_Effect_ref <- v_inc_effect
+    df_icers$ICER_ref <- ifelse(v_has_ratio, v_inc_cost / v_inc_effect, NA_real_)
+    df_icers$Status_ref <- v_status
+    attr(df_icers, "ref_str") <- ref_str
+  }
+  if (!is.null(wtp)) {
+    df_icers$NMB <- wtp * df_icers$Effect - df_icers$Cost
+    if (!is.null(ref_str)) {
+      df_icers$iNMB_ref <- df_icers$NMB - df_icers$NMB[i_ref]
+      df_icers$iNMB_ref[i_ref] <- NA_real_
+    }
+    if (nhb) {
+      df_icers$NHB <- df_icers$Effect - df_icers$Cost / wtp
+      if (!is.null(ref_str)) {
+        df_icers$iNHB_ref <- df_icers$NHB - df_icers$NHB[i_ref]
+        df_icers$iNHB_ref[i_ref] <- NA_real_
+      }
+    }
+    attr(df_icers, "wtp") <- wtp
+  }
+  if (!is.null(currency)) {
+    attr(df_icers, "currency") <- currency
+  }
+  df_icers
 }
 
 #' Calculate incremental cost-effectiveness ratios from a \code{psa} object.
@@ -406,23 +539,41 @@ plot.icers <- function(x,
 
 #' Print the formatted CEA table
 #'
+#' By default, prints the sequential cost-effectiveness table: each strategy on the frontier is
+#' compared with the previous one. If the \code{icers} object was created with a reference
+#' strategy (\code{ref_str} in \code{\link{calculate_icers}}), \code{ref = "reference"} shows the
+#' comparison of every strategy with the reference instead, and \code{ref = "both"} shows both.
+#'
 #' @param x Object of class \code{icers}
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
+#' Defaults to the currency stored in \code{x}, or \code{"$"}.
 #' @param dig_cost integer. number of digits to round costs to
 #' @param dig_eff integer. number of digits to round effects to
 #' @param dig_icer integer. number of digits to round ICER to
+#' @param ref which comparison to show: \code{"sequential"} (the default), \code{"reference"},
+#' or \code{"both"}.
 #' @param ... Additional arguments passed to other methods.
 #' @return a dataframe object - formatted CEA table
 #' @export
 print.icers <- function(x,
-                        currency = "$",
+                        currency = NULL,
                         dig_cost = 0,
                         dig_eff  = 2,
                         dig_icer = 0,
+                        ref = c("sequential", "reference", "both"),
                         ...) {
   # check if icers object
   if (!inherits(x, "icers")) {
     stop("x must be an object of class icers")
+  }
+  ref <- match.arg(ref)
+  if (is.null(currency)) {
+    currency <- if (is.null(attr(x, "currency"))) "$" else attr(x, "currency")
+  }
+  ref_str <- attr(x, "ref_str")
+  if (ref != "sequential" && is.null(ref_str)) {
+    stop("x has no reference strategy; create it with calculate_icers(..., ref_str = ) ",
+         "to use ref = \"", ref, "\".", call. = FALSE)
   }
 
   format_numbers <- function(col, n_digits) {
@@ -439,26 +590,38 @@ print.icers <- function(x,
     v_new_col
   }
 
-  df_table_cea            <- x
-  df_table_cea$Cost       <- format_numbers(df_table_cea$Cost, n_digits = dig_cost)
-  df_table_cea$Inc_Cost   <- format_numbers(df_table_cea$Inc_Cost, n_digits = dig_cost)
-  df_table_cea$Effect     <- format_numbers(df_table_cea$Effect, n_digits = dig_eff)
-  df_table_cea$Inc_Effect <- format_numbers(df_table_cea$Inc_Effect, n_digits = dig_eff)
-  df_table_cea$ICER       <- format_numbers(df_table_cea$ICER, n_digits = dig_icer)
-
-  colnames(df_table_cea)[colnames(df_table_cea)
-                         %in% c("Cost",
-                                "Effect",
-                                "Inc_Cost",
-                                "Inc_Effect",
-                                "ICER")] <-
-    c(paste0("Costs (", currency, ")"),
-      "QALYs",
-      paste0("Incremental Costs (", currency, ")"),
-      "Incremental QALYs",
-      paste0("ICER (", currency, "/QALY)"))
-
+  # columns that belong to each view
+  v_seq_cols <- c("Inc_Cost", "Inc_Effect", "ICER", "Status")
+  v_ref_cols <- c("Inc_Cost_ref", "Inc_Effect_ref", "ICER_ref", "Status_ref", "iNMB_ref", "iNHB_ref")
+  v_drop <- switch(ref, sequential = v_ref_cols, reference = v_seq_cols, both = character(0))
+  df_table_cea <- x
   class(df_table_cea) <- "data.frame"
+  df_table_cea <- df_table_cea[, setdiff(names(df_table_cea), v_drop), drop = FALSE]
+
+  # display digits and header for each known column
+  vs <- paste0(" vs ", ref_str)
+  l_format <- list(
+    Cost           = list(dig_cost, paste0("Costs (", currency, ")")),
+    Effect         = list(dig_eff, "QALYs"),
+    Inc_Cost       = list(dig_cost, paste0("Incremental Costs (", currency, ")")),
+    Inc_Effect     = list(dig_eff, "Incremental QALYs"),
+    ICER           = list(dig_icer, paste0("ICER (", currency, "/QALY)")),
+    Inc_Cost_ref   = list(dig_cost, paste0("Incremental Costs", vs, " (", currency, ")")),
+    Inc_Effect_ref = list(dig_eff, paste0("Incremental QALYs", vs)),
+    ICER_ref       = list(dig_icer, paste0("ICER", vs, " (", currency, "/QALY)")),
+    Status_ref     = list(NA, paste0("Status", vs)),
+    NMB            = list(dig_cost, paste0("NMB (", currency, ")")),
+    iNMB_ref       = list(dig_cost, paste0("iNMB", vs, " (", currency, ")")),
+    NHB            = list(dig_eff, "NHB (QALYs)"),
+    iNHB_ref       = list(dig_eff, paste0("iNHB", vs, " (QALYs)"))
+  )
+  for (col in intersect(names(l_format), names(df_table_cea))) {
+    if (!is.na(l_format[[col]][[1]])) {
+      df_table_cea[[col]] <- format_numbers(df_table_cea[[col]], n_digits = l_format[[col]][[1]])
+    }
+    names(df_table_cea)[names(df_table_cea) == col] <- l_format[[col]][[2]]
+  }
+
   print(df_table_cea)
   invisible(df_table_cea)
 }

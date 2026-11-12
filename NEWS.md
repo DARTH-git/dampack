@@ -2,6 +2,9 @@
 
 ## New features
 
+- `calculate_icers()` can compare every strategy with a user-selected reference strategy: with `ref_str = "Standard of care"`, it adds `Inc_Cost_ref`, `Inc_Effect_ref`, `ICER_ref`, and `Status_ref` ("Reference", "Dominant", "Dominated", "More costly, more effective", "Less costly, less effective", or "Equivalent"). The frontier-based results are unchanged, and without `ref_str` no columns are added (#209).
+- `calculate_icers()` gains `wtp`, which adds the net monetary benefit (`NMB`, and `iNMB_ref` with a reference strategy), and `nhb = TRUE`, which also adds the net health benefit (`NHB`, `iNHB_ref`) (#200).
+- `calculate_icers()` gains `currency`, used by `print.icers()`. `print.icers()` gains `ref`: `"sequential"` (the default) prints the usual table, and `"reference"` or `"both"` print the comparison with the reference strategy (#209).
 - `print.icers()` prints a formatted ICER table, with options for the currency symbol and the number of digits (#184, #171).
 - `plot.psa()` gains a `ref_str` argument that plots the PSA on the incremental cost-effectiveness plane relative to a chosen reference strategy (#188).
 - Plotting functions now default to an accessible, colorblind-friendly palette (`col = "access"`, based on viridis). The previous palettes remain available as `col = "full"` and `col = "bw"`.

@@ -12,9 +12,9 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
   outcome <- match.arg(outcome)
   n_sim <- nrow(cost)
   if (outcome == "eff") {
-    y <- effect
+    df_outcome <- effect
   } else if (outcome == "cost") {
-    y <- cost
+    df_outcome <- cost
   } else {
     if (is.null(wtp)) {
       # the call. = FALSE makes the error message more clear
@@ -24,10 +24,10 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
       stop("must provide cost for NHB and NMB.",  call. = FALSE)
     }
     if (outcome == "nhb") {
-      y <- effect - cost / wtp
+      df_outcome <- effect - cost / wtp
     }
     if (outcome == "nmb") {
-      y <- effect * wtp - cost
+      df_outcome <- effect * wtp - cost
     }
     if (outcome == "nhb_loss" || outcome == "nmb_loss") {
       if (outcome == "nhb_loss") {
@@ -36,9 +36,9 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
       if (outcome == "nmb_loss") {
         net_outcome <- "nmb"
       }
-      netben <- calculate_outcome(net_outcome, cost, effect, wtp)
-      max_str_rowwise <- max.col(netben)
-      y <-  netben[cbind(1:n_sim, max_str_rowwise)] - netben
+      df_netben <- calculate_outcome(net_outcome, cost, effect, wtp)
+      v_max_str_rowwise <- max.col(df_netben)
+      df_outcome <-  df_netben[cbind(1:n_sim, v_max_str_rowwise)] - df_netben
     }
     if (outcome == "nhb_loss_voi" || outcome == "nmb_loss_voi") {
       if (outcome == "nhb_loss_voi") {
@@ -47,10 +47,10 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
       if (outcome == "nmb_loss_voi") {
         net_outcome <- "nmb"
       }
-      netben <- calculate_outcome(net_outcome, cost, effect, wtp)
-      max_str <- which.max(colMeans(netben))
-      y <- netben - netben[cbind(1:n_sim), max_str]
+      df_netben <- calculate_outcome(net_outcome, cost, effect, wtp)
+      max_str <- which.max(colMeans(df_netben))
+      df_outcome <- df_netben - df_netben[cbind(1:n_sim), max_str]
     }
   }
-  y
+  df_outcome
 }

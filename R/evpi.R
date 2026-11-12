@@ -32,26 +32,26 @@
 #' @export
 calc_evpi <- function(psa, wtp, pop = 1) {
   check_psa_object(psa)
-  cost <- psa$cost
-  effectiveness <- psa$effectiveness
-  if (ncol(effectiveness) < 2) {
+  df_cost <- psa$cost
+  df_effectiveness <- psa$effectiveness
+  if (ncol(df_effectiveness) < 2) {
     stop("You need at least two different strategies to compute EVPI.")
   }
   # number of wtp thresholds
   n_wtps <- length(wtp)
   # vector to store evpi
-  evpi <- rep(0, n_wtps)
+  v_evpi <- rep(0, n_wtps)
   # Estimate the Loss matrix and EVPI at each WTP threshold
   for (l in 1:n_wtps) {
     ## Calculate the opportunity loss from choosing d.star for each strategy
-    loss <- calculate_outcome("nmb_loss", cost, effectiveness, wtp[l])
+    df_loss <- calculate_outcome("nmb_loss", df_cost, df_effectiveness, wtp[l])
 
     ## Compute EVPI
-    evpi[l] <- min(apply(loss, 2, mean)) * pop
+    v_evpi[l] <- min(apply(df_loss, 2, mean)) * pop
   }
 
   # Data frame to store EVPI for each WTP threshold
-  df_evpi <- data.frame("WTP" = wtp, "EVPI" = evpi)
+  df_evpi <- data.frame("WTP" = wtp, "EVPI" = v_evpi)
 
   # declare class as both evpi (plotting) and data.frame (printing)
   class(df_evpi) <- c("evpi", "data.frame")

@@ -44,13 +44,13 @@ calc_evsi <- function(psa,
 
   if (n_by_param == TRUE) {
     # vector to store evsi
-    evsi <- rep(0, n_wtps)
+    m_evsi <- rep(0, n_wtps)
   } else {
     # matrix to store evsi
-    evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
+    m_evsi <- matrix(rep(0, n_wtps * n_n), ncol = n_n)
   }
 
-  mms_ls <- vector(mode = "list", length = n_wtps)
+  l_mms <- vector(mode = "list", length = n_wtps)
 
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
@@ -65,7 +65,7 @@ calc_evsi <- function(psa,
                      poly.order = 2,
                      k = k)
 
-    mms_ls[[l]] <- mms
+    l_mms[[l]] <- mms
 
     if (progress == TRUE) {
       if (l / (n_wtps / 10) == round(l / (n_wtps / 10), 0)) { # display progress every 10%
@@ -75,38 +75,38 @@ calc_evsi <- function(psa,
 
     if (n_by_param == TRUE) {
       # predict from the regression models
-      predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
+      l_predicted_loss <- lapply(mms$mods, function(m) predict_ga(m, n, n0))
 
       # bind the columns to get a dataframe
-      df_predicted_loss <- bind_cols(predicted_loss_list)
+      df_predicted_loss <- bind_cols(l_predicted_loss)
 
       # calculate the evsi as the average of the row maxima
-      row_maxes <- apply(df_predicted_loss, 1, max)
-      evsi[l] <- mean(row_maxes) * pop
+      v_row_maxes <- apply(df_predicted_loss, 1, max)
+      m_evsi[l] <- mean(v_row_maxes) * pop
     } else {
       for (i in seq_len(n_n)) {
         # predict from the regression models
-        predicted_loss_list <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
+        l_predicted_loss <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
 
         # bind the columns to get a dataframe
-        df_predicted_loss <- bind_cols(predicted_loss_list)
+        df_predicted_loss <- bind_cols(l_predicted_loss)
 
         # calculate the evsi as the average of the row maxima
-        row_maxes <- apply(df_predicted_loss, 1, max)
-        evsi[l, i] <- mean(row_maxes) * pop
+        v_row_maxes <- apply(df_predicted_loss, 1, max)
+        m_evsi[l, i] <- mean(v_row_maxes) * pop
       }
     }
   }
 
   if (n_by_param == TRUE) {
-    df_evsi <- data.frame("WTP" = wtp, "EVSI" = evsi)
+    df_evsi <- data.frame("WTP" = wtp, "EVSI" = m_evsi)
   } else {
     # data.frame to store EVPPI for each WTP threshold
     df_evsi <- data.frame("WTP" = rep(wtp, n_n),
                           "n" = rep(n, each = n_wtps),
-                          "EVSI" = c(evsi))
+                          "EVSI" = c(m_evsi))
   }
-  evsi_ls <- list(df_evsi = df_evsi, metamodel_ls = mms_ls)
+  evsi_ls <- list(df_evsi = df_evsi, metamodel_ls = l_mms)
   class(evsi_ls) <- c("evsi")
   evsi_ls
 }
@@ -125,16 +125,16 @@ calc_evsi <- function(psa,
 #' @importFrom stats coef
 predict_ga <- function(object, n, n0) {
   # Name of parameters
-  param_names <- colnames(object$model)
+  v_param_names <- colnames(object$model)
 
   # Create dataframe with parameter values
-  param_vals <- data.frame(object$model[, -1])
+  df_param_vals <- data.frame(object$model[, -1])
 
   # Name columns of dataframe
-  colnames(param_vals) <- param_names[-1]
+  colnames(df_param_vals) <- v_param_names[-1]
 
   # Number of parameters
-  n_params <- ncol(param_vals)
+  n_params <- ncol(df_param_vals)
 
   # Sanity checks
   if (!(length(n) == 1 || length(n) == n_params)) {
@@ -155,7 +155,7 @@ predict_ga <- function(object, n, n0) {
   }
 
   # Compute variance reduction factor
-  vrf <- sqrt(n / (n + n0))
+  v_vrf <- sqrt(n / (n + n0))
 
   # Number of smoothers
   n_smooth <- length(object$smooth)
@@ -167,26 +167,26 @@ predict_ga <- function(object, n, n0) {
   n_row_x <- nrow(object$model)
 
   # Initialize matrix for preposterior of total basis functions
-  x <- matrix(NA, n_row_x, n_col_x)
-  x[, 1] <- 1
+  m_x <- matrix(NA, n_row_x, n_col_x)
+  m_x[, 1] <- 1
 
   for (k in 1:n_smooth) {
     klab <- substr(object$smooth[[k]]$label, 1, 1)
     if (klab == "s") {
-      x_frag <- predict_smooth_ga(object$smooth[[k]], param_vals, vrf[k])
+      m_x_frag <- predict_smooth_ga(object$smooth[[k]], df_param_vals, v_vrf[k])
     } else {
-      x_frag <- predict_matrix_tensor_smooth_ga(object$smooth[[k]], param_vals, vrf)
+      m_x_frag <- predict_matrix_tensor_smooth_ga(object$smooth[[k]], df_param_vals, v_vrf)
     }
-    x[, object$smooth[[k]]$first.para:object$smooth[[k]]$last.para] <- x_frag
+    m_x[, object$smooth[[k]]$first.para:object$smooth[[k]]$last.para] <- m_x_frag
   }
 
   # Coefficients of GAM model
-  beta <- coef(object)
+  v_beta <- coef(object)
 
   # Compute conditional Loss
-  l_tilde <- x %*% beta
+  m_tilde <- m_x %*% v_beta
 
-  l_tilde
+  m_tilde
 }
 
 #' Function to compute the preposterior for each of the
@@ -197,20 +197,20 @@ predict_ga <- function(object, n, n0) {
 #' @importFrom mgcv PredictMat
 predict_smooth_ga <- function(object, param_vals, vrf = 1) {
   # Produce basis functions for one parameter
-  x <- PredictMat(object, param_vals)
+  m_x <- PredictMat(object, param_vals)
 
   # Number of observations
-  n_obs <- nrow(x)
+  n_obs <- nrow(m_x)
 
   # Apply variance reduction to compute the preposterior
   # for each of the basis functions
   # Vector of ones
-  ones <- matrix(1, n_obs, 1)
+  m_ones <- matrix(1, n_obs, 1)
 
   # Compute phi on each of the basis function
-  x <- vrf * x + (1 - vrf) * (ones %*% colMeans(x))
+  m_x <- vrf * m_x + (1 - vrf) * (m_ones %*% colMeans(m_x))
 
-  x
+  m_x
 }
 
 #' Predict matrix tensor smooth (GA)

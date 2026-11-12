@@ -208,32 +208,32 @@ gen_psa_samp <- function(params = NULL,
     #dirichlet
     if (dists[i] == "dirichlet") {
       if (parameterization_types[i] == "value, mean_prop, sd") {
-        alpha <- dirichlet_params(dists_params[[i]][, 2], dists_params[[i]][, 3])
-        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
+        v_alpha <- dirichlet_params(dists_params[[i]][, 2], dists_params[[i]][, 3])
+        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, v_alpha))
       } else if (parameterization_types[i] == "value, n") {
-        val_n <- as.data.frame(dists_params[[i]])
-        total <- sum(val_n[, 2])
-        p_mean <- val_n[, 2] / total
-        sd <- sqrt((p_mean * (1 - p_mean)) / total)
-        alpha <- dirichlet_params(p_mean, sd)
-        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
+        df_val_n <- as.data.frame(dists_params[[i]])
+        total <- sum(df_val_n[, 2])
+        v_p_mean <- df_val_n[, 2] / total
+        sd <- sqrt((v_p_mean * (1 - v_p_mean)) / total)
+        v_alpha <- dirichlet_params(v_p_mean, sd)
+        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, v_alpha))
       } else if (parameterization_types[i] == "value, alpha") {
-        alpha <- dists_params[[i]][, 2]
-        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, alpha))
+        v_alpha <- dists_params[[i]][, 2]
+        df_params[[i]] <- as.data.frame(rdirichlet(nsamp, v_alpha))
       }
       names(df_params[[i]]) <- paste0(dists_params[[i]][, 1])
     }
 
     #bootstrap
     if (dists[i] == "bootstrap") {
-      samp_vec <- vector(mode = "numeric", length = nsamp)
+      v_samp <- vector(mode = "numeric", length = nsamp)
       for (k in 1:nsamp) {
-        samp_vec[k] <- mean(sample(x = dists_params[[i]][, 1],
-                                   size = sum(dists_params[[i]][, 2]),
-                                   replace = TRUE,
-                                   prob = dists_params[[i]][, 2]))
+        v_samp[k] <- mean(sample(x = dists_params[[i]][, 1],
+                                 size = sum(dists_params[[i]][, 2]),
+                                 replace = TRUE,
+                                 prob = dists_params[[i]][, 2]))
       }
-      df_params[[i]] <- as.data.frame(samp_vec)
+      df_params[[i]] <- as.data.frame(v_samp)
       names(df_params[[i]]) <- paste0(params[i])
     }
 
@@ -275,9 +275,9 @@ gen_psa_samp <- function(params = NULL,
 #'  @export
 rdirichlet <- function(n, alpha) {
   k <- length(alpha)
-  out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
-  out <- out / rowSums(out)
-  out
+  m_out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
+  m_out <- m_out / rowSums(m_out)
+  m_out
 }
 
 
@@ -306,8 +306,8 @@ rdirichlet <- function(n, alpha) {
 beta_params <- function(mean, sigma) {
   alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
   beta  <- alpha * (1 / mean - 1)
-  params <- list(alpha = alpha, beta = beta)
-  params
+  l_params <- list(alpha = alpha, beta = beta)
+  l_params
 }
 
 
@@ -352,14 +352,14 @@ dirichlet_params <- function(p.mean, sigma) {
   }
 
   # Compute second moment
-  p.2 <- sigma ^ 2 + p.mean ^ 2
+  v_p_2 <- sigma ^ 2 + p.mean ^ 2
   # Initialize alpha vector
-  alpha <- numeric(n.params)
+  v_alpha <- numeric(n.params)
   for (i in 1:(n.params - 1)) {
-    alpha[i] <- (p.mean[1] - p.2[1]) * p.mean[i] / (p.2[1] - p.mean[1] ^ 2)
+    v_alpha[i] <- (p.mean[1] - v_p_2[1]) * p.mean[i] / (v_p_2[1] - p.mean[1] ^ 2)
   }
-  alpha[n.params] <- (p.mean[1] - p.2[1]) * (1 - sum(p.mean[- n.params])) / (p.2[1] - p.mean[1] ^ 2)
-  alpha
+  v_alpha[n.params] <- (p.mean[1] - v_p_2[1]) * (1 - sum(p.mean[- n.params])) / (v_p_2[1] - p.mean[1] ^ 2)
+  v_alpha
 }
 
 
@@ -407,15 +407,15 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
   if (scale) {
     shape <- (mu ^ 2) / (sigma ^ 2)
     scale <- (sigma ^ 2) / mu
-    params <- list(shape = shape,
-                   scale = scale)
+    l_params <- list(shape = shape,
+                     scale = scale)
   } else {
     shape <- (mu ^ 2) / (sigma ^ 2)
     rate  <- mu / (sigma ^ 2)
-    params <- list(shape = shape,
-                   rate  = rate)
+    l_params <- list(shape = shape,
+                     rate  = rate)
   }
-  params
+  l_params
 }
 
 

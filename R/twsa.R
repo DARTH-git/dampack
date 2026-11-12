@@ -44,28 +44,28 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
   } else if (inherits(sa_obj, "dsa_twoway")) {
     params <- sa_obj$parameters
     if (!is.null(sa_obj$other_outcome)) {
-      eff <- sa_obj$other_outcome
+      df_eff <- sa_obj$other_outcome
     } else {
-      eff <- sa_obj$effectiveness
+      df_eff <- sa_obj$effectiveness
     }
     cost <- sa_obj$cost
     strategies <- sa_obj$strategies
-    parnames <- sa_obj$parnames
+    v_parnames <- sa_obj$parnames
 
     # calculate outcomes
     # calculate outcome of interest
-    y <- calculate_outcome(outcome, cost, eff, wtp)
-    names(y) <- strategies
+    df_y <- calculate_outcome(outcome, cost, df_eff, wtp)
+    names(df_y) <- strategies
 
     # loop over dsa's and create ow
     tw <- NULL
     for (s in strategies) {
       # maybe extract this out later - shared with predict.metamodel
-      df_new <- data.frame("p1" = params[, parnames[1]], "p2" = params[, parnames[2]],
-                           "strategy" = s, "outcome_val" = y[, s])
+      df_new <- data.frame("p1" = params[, v_parnames[1]], "p2" = params[, v_parnames[2]],
+                           "strategy" = s, "outcome_val" = df_y[, s])
       tw <- rbind(tw, df_new, stringsAsFactors = FALSE)
     }
-    names(tw)[1:2] <- parnames
+    names(tw)[1:2] <- v_parnames
     # make strategies in twsa object into ordered factors
     tw$strategy <- factor(tw$strategy, levels = strategies, ordered = TRUE)
   } else {
@@ -103,9 +103,9 @@ plot.twsa <- function(x, maximize = TRUE,
 
   outcome_val <- strategy <- NULL
   # parameter names
-  params <- names(x)[c(1, 2)]
-  param1 <- params[1]
-  param2 <- params[2]
+  v_params <- names(x)[c(1, 2)]
+  param1 <- v_params[1]
+  param2 <- v_params[2]
 
   # get optimal strategy
   # thanks to

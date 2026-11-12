@@ -2,6 +2,7 @@
 
 ## New features
 
+- `plot.icers()` gains `ref_str`, which plots the incremental cost-effectiveness plane with the reference strategy at the origin, and `wtp`, which draws a willingness-to-pay line. `plot.psa()` gains `wtp` for the same line on its incremental plane. `plot.icers()` uses the currency stored by `calculate_icers()` (#209, #202).
 - `calculate_icers()` can compare every strategy with a user-selected reference strategy: with `ref_str = "Standard of care"`, it adds `Inc_Cost_ref`, `Inc_Effect_ref`, `ICER_ref`, and `Status_ref` ("Reference", "Dominant", "Dominated", "More costly, more effective", "Less costly, less effective", or "Equivalent"). The frontier-based results are unchanged, and without `ref_str` no columns are added (#209).
 - `calculate_icers()` gains `wtp`, which adds the net monetary benefit (`NMB`, and `iNMB_ref` with a reference strategy), and `nhb = TRUE`, which also adds the net health benefit (`NHB`, `iNHB_ref`) (#200).
 - `calculate_icers()` gains `currency`, used by `print.icers()`. `print.icers()` gains `ref`: `"sequential"` (the default) prints the usual table, and `"reference"` or `"both"` print the comparison with the reference strategy (#209).
@@ -24,6 +25,7 @@
 
 ## Bug fixes
 
+- `plot.psa(ref_str = )` now works when there are only two strategies; it used to fail with "'dims' cannot be of length 0" (#209).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).
 - `metamodel()`, and the functions that use it (`owsa()` and `twsa()` on a PSA, `calc_evppi()`, `calc_evsi()`), now work with strategy names that are not syntactically valid R names (#208).

@@ -212,6 +212,19 @@ calculate_icers <- function(cost, effect, strategies, ref_str = NULL, wtp = NULL
   add_reference_and_nmb(df_results, ref_str, wtp, nhb, currency)
 }
 
+#' Caption text for a willingness-to-pay line
+#'
+#' @param wtp willingness-to-pay threshold.
+#' @param currency currency symbol.
+#' @param effect_units units of effectiveness, e.g. \code{"QALYs"}.
+#' @return a string such as \code{"Dotted line: WTP = $50,000/QALY"}.
+#' @keywords internal
+wtp_caption <- function(wtp, currency, effect_units = "QALYs") {
+  unit <- sub("s$", "", effect_units)
+  paste0("Dotted line: WTP = ", currency, format(wtp, big.mark = ",", scientific = FALSE, trim = TRUE),
+         "/", unit)
+}
+
 #' Check a reference strategy name
 #'
 #' @param ref_str reference strategy name, or \code{NULL}.
@@ -424,6 +437,16 @@ compute_icers <- function(non_d) {
 #' longer strategies are truncated to save space.
 #' @param plot_frontier_only only plot the efficient frontier
 #' @param alpha opacity of points
+#' @param ref_str name of a reference strategy. If given, the plot shows the incremental
+#' cost-effectiveness plane, with the reference strategy at the origin. The frontier and the
+#' status of each strategy do not change. Defaults to \code{NULL} (the cost-effectiveness plane).
+#' @param wtp a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
+#' drawn through the reference strategy (or, without \code{ref_str}, through the least costly
+#' strategy on the frontier). Strategies below the line are cost-effective compared with that
+#' strategy at this threshold.
+#' @param ref_axis with \code{ref_str}, draw dashed axes through the origin. Defaults to \code{TRUE}.
+#' @param ref_caption add a caption naming the reference strategy and the WTP threshold.
+#' Defaults to \code{TRUE}.
 #' @inheritParams ggrepel::geom_label_repel
 #'
 #' @return a ggplot2 object which can be modified by adding additional geoms
@@ -435,7 +458,7 @@ compute_icers <- function(non_d) {
 #' @export
 plot.icers <- function(x,
                        txtsize = 12,
-                       currency = "$",
+                       currency = NULL,
                        effect_units = "QALYs",
                        label = c("frontier", "all", "none"),
                        label_max_char = NULL,
@@ -450,8 +473,17 @@ plot.icers <- function(x,
                        xexpand = expansion(0.1),
                        yexpand = expansion(0.1),
                        max.iter = 20000,
+                       ref_str = NULL,
+                       wtp = NULL,
+                       ref_axis = TRUE,
+                       ref_caption = TRUE,
                        ...) {
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
+  if (is.null(currency)) {
+    currency <- if (is.null(attr(x, "currency"))) "$" else attr(x, "currency")
+  }
+  ref_str <- check_ref_str(ref_str, x$Strategy)
+  check_wtp_nhb(wtp, nhb = FALSE)
 
   if (ncol(x) > 7) {
     # reformat icers class object if uncertainty bounds are present
@@ -488,6 +520,23 @@ plot.icers <- function(x,
   eff_name <- "Effect"
   cost_name <- "Cost"
 
+  # point the WTP line goes through: the reference, or the least costly frontier strategy
+  if (!is.null(wtp)) {
+    df_front <- x[x$Status == nd_name, ]
+    df_anchor <- if (is.null(ref_str)) df_front[which.min(df_front$Cost), ] else x[x$Strategy == ref_str, ]
+  }
+
+  # incremental plane: put the reference strategy at the origin
+  x_lab <- paste0("Effect (", effect_units, ")")
+  y_lab <- paste0("Cost (", currency, ")")
+  if (!is.null(ref_str)) {
+    i_ref <- which(x$Strategy == ref_str)
+    x$Cost <- x$Cost - x$Cost[i_ref]
+    x$Effect <- x$Effect - x$Effect[i_ref]
+    x_lab <- paste0("Incremental Effect (", effect_units, ")")
+    y_lab <- paste0("Incremental Cost (", currency, ")")
+  }
+
   # frontier only
   if (plot_frontier_only) {
     df_plt_data <- x[x$Status == nd_name, ]
@@ -502,8 +551,23 @@ plot.icers <- function(x,
     geom_line(aes(linetype = !!sym(stat_name), group = !!sym(stat_name))) +
     scale_linetype_manual(name = NULL, values = v_plot_lines) +
     scale_shape_discrete(name = NULL) +
-    labs(x = paste0("Effect (", effect_units, ")"),
-         y = paste0("Cost (", currency, ")"))
+    labs(x = x_lab, y = y_lab)
+
+  if (!is.null(ref_str) && ref_axis) {
+    icer_plot <- icer_plot +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+      geom_vline(xintercept = 0, linetype = "dashed", color = "grey50")
+  }
+  if (!is.null(wtp)) {
+    intercept <- if (is.null(ref_str)) df_anchor$Cost - wtp * df_anchor$Effect else 0
+    icer_plot <- icer_plot +
+      geom_abline(intercept = intercept, slope = wtp, linetype = "dotted", color = "grey30")
+  }
+  v_caption <- c(if (!is.null(ref_str)) paste0("Reference Strategy: ", ref_str),
+                 if (!is.null(wtp)) wtp_caption(wtp, currency, effect_units))
+  if (ref_caption && length(v_caption)) {
+    icer_plot <- icer_plot + labs(caption = paste(v_caption, collapse = "; "))
+  }
 
   icer_plot <- add_common_aes(icer_plot, txtsize, col = "none",
                               continuous = c("x", "y"),

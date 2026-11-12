@@ -32,3 +32,6 @@ rsconnect/
 
 # pkgdown site (built and deployed by CI)
 docs/
+
+# graphics device output from non-interactive R sessions
+Rplots.pdf

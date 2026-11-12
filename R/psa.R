@@ -139,7 +139,11 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @param alpha opacity of the scatterplot points.
 #' 0 is completely transparent, 1 is completely opaque
 #' @param ref_axis Add dotted axes lines at (0,0). Defaults to TRUE
-#' @param ref_caption Add the reference strategy as a caption. Defaults to TRUE
+#' @param ref_caption Add the reference strategy (and the WTP threshold, if given) as a caption.
+#' Defaults to TRUE
+#' @param wtp a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
+#' drawn through the origin of the incremental cost-effectiveness plane; samples below the line are
+#' cost-effective compared with the reference strategy at this threshold. Requires \code{ref_str}.
 #' @inheritParams add_common_aes
 #'
 #' @importFrom ellipse ellipse
@@ -161,6 +165,7 @@ plot.psa <- function(x,
                      ylim = NULL,
                      ref_axis = TRUE,
                      ref_caption = TRUE,
+                     wtp = NULL,
                      ...) {
 
   Effectiveness <- Cost <- Strategy <- Eff.mean <- Cost.mean <- y <- group <- NULL
@@ -168,6 +173,12 @@ plot.psa <- function(x,
   df_cost_wide <- x$cost
   v_strategies <- x$strategies
   currency <- x$currency
+  ref_str <- check_ref_str(ref_str, v_strategies)
+  if (!is.null(wtp) && is.null(ref_str)) {
+    stop("`wtp` draws a willingness-to-pay line on the incremental cost-effectiveness plane, ",
+         "so it needs `ref_str`.", call. = FALSE)
+  }
+  check_wtp_nhb(wtp, nhb = FALSE)
 
   if (is.null(ref_str)) {
     # expect that effectiveness and costs have strategy column names
@@ -236,14 +247,11 @@ plot.psa <- function(x,
                    v_str = v_strategies)
 
   } else {
-    ### Check that the reference strategy is in the list of strategies
-    if (!(ref_str %in% v_strategies)) {
-      stop("ref_str must be in the list of strategies")
-    }
     ## Function to convert the raw outcomes to incremental outcomes
     make_df_inc <- function(df) {
       v_ref    <- df[, ref_str]
-      df_inc   <- df[, !(names(df) %in% ref_str)]
+      # drop = FALSE keeps a data frame when there is a single comparator
+      df_inc   <- df[, !(names(df) %in% ref_str), drop = FALSE]
       df_inc   <- sweep(df_inc, 1, v_ref, "-")
       df_inc
     }
@@ -281,9 +289,16 @@ plot.psa <- function(x,
         geom_vline(xintercept = 0, linetype = "dashed", color = "black")
     }
 
-    if (ref_caption == TRUE) {
+    if (!is.null(wtp)) {
       psa_plot <- psa_plot +
-        labs(caption = paste("Reference Strategy: ", ref_str))
+        geom_abline(intercept = 0, slope = wtp, linetype = "dotted", color = "grey30")
+    }
+
+    if (ref_caption == TRUE) {
+      v_caption <- c(paste0("Reference Strategy: ", ref_str),
+                     if (!is.null(wtp)) wtp_caption(wtp, currency))
+      psa_plot <- psa_plot +
+        labs(caption = paste(v_caption, collapse = "; "))
     }
 
     # define strategy-specific means for the center of the ellipse

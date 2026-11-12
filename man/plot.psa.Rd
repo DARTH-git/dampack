@@ -20,6 +20,7 @@
   ylim = NULL,
   ref_axis = TRUE,
   ref_caption = TRUE,
+  wtp = NULL,
   ...
 )
 }
@@ -56,7 +57,12 @@ will override \code{n_y_ticks} if provided.}
 
 \item{ref_axis}{Add dotted axes lines at (0,0). Defaults to TRUE}
 
-\item{ref_caption}{Add the reference strategy as a caption. Defaults to TRUE}
+\item{ref_caption}{Add the reference strategy (and the WTP threshold, if given) as a caption.
+Defaults to TRUE}
+
+\item{wtp}{a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
+drawn through the origin of the incremental cost-effectiveness plane; samples below the line are
+cost-effective compared with the reference strategy at this threshold. Requires \code{ref_str}.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

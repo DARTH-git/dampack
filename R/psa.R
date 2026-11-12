@@ -104,13 +104,31 @@ check_df_and_coerce <- function(obj) {
 #'
 #' @param object the psa object
 #' @param calc_sds whether or not to calculate the standard deviations. Defaults to FALSE
+#' @param ref_str name of a reference strategy. If given, each strategy is compared with it
+#' sample by sample (see Value). Defaults to \code{NULL}.
+#' @param wtp a single willingness-to-pay threshold. If given, the mean net monetary benefit is
+#' added (see Value). Defaults to \code{NULL}.
 #' @param ... further arguments to summary (not used)
 #'
 #' @importFrom stats sd
 #' @return a \code{data.frame} containing the mean cost and effectiveness for each strategy and, if requested,
 #' the standard deviations of the cost and effectiveness for each strategy.
+#'
+#' With \code{ref_str}, the differences between each strategy and the reference are computed in
+#' every PSA sample, and these columns are added (\code{NA} for the reference itself):
+#' \code{meanIncCost} and \code{meanIncEffect}, the mean differences in cost and effect; and
+#' \code{propNE}, \code{propSE}, \code{propSW}, and \code{propNW}, the proportion of samples in each
+#' quadrant of the incremental cost-effectiveness plane: NE more effective and more costly, SE more
+#' effective and not more costly (dominant), SW not more effective and not more costly, and NW not more
+#' effective and more costly (dominated). The four proportions sum to 1.
+#'
+#' With \code{wtp}, \code{meanNMB} (\code{wtp * effect - cost}, averaged over samples) is added; with
+#' \code{ref_str} too, also \code{meanIncNMB} and \code{propCostEffective}, the proportion of samples in
+#' which the strategy has a higher NMB than the reference (it lies below the willingness-to-pay line).
 #' @export
-summary.psa <- function(object, calc_sds = FALSE, ...) {
+summary.psa <- function(object, calc_sds = FALSE, ref_str = NULL, wtp = NULL, ...) {
+  ref_str <- check_ref_str(ref_str, object$strategies)
+  check_wtp_nhb(wtp, nhb = FALSE)
 
   v_mean_cost <- colMeans(object$cost)
   v_mean_effect <- colMeans(object$effectiveness)
@@ -124,6 +142,30 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
     v_sd_effect <- apply(object$effectiveness, 2, sd)
     df_sum_psa[, "sdCost"] <- v_sd_cost
     df_sum_psa[, "sdEffect"] <- v_sd_effect
+  }
+  if (!is.null(wtp)) {
+    df_sum_psa[, "meanNMB"] <- unname(colMeans(wtp * object$effectiveness - object$cost))
+  }
+  if (!is.null(ref_str)) {
+    # sample-by-sample differences from the reference strategy
+    m_inc_cost <- as.matrix(object$cost) - object$cost[[ref_str]]
+    m_inc_effect <- as.matrix(object$effectiveness) - object$effectiveness[[ref_str]]
+    v_is_ref <- v_strat == ref_str
+    na_ref <- function(v) {
+      v[v_is_ref] <- NA_real_
+      unname(v)
+    }
+    df_sum_psa[, "meanIncCost"] <- na_ref(colMeans(m_inc_cost))
+    df_sum_psa[, "meanIncEffect"] <- na_ref(colMeans(m_inc_effect))
+    df_sum_psa[, "propNE"] <- na_ref(colMeans(m_inc_effect > 0 & m_inc_cost > 0))
+    df_sum_psa[, "propSE"] <- na_ref(colMeans(m_inc_effect > 0 & m_inc_cost <= 0))
+    df_sum_psa[, "propSW"] <- na_ref(colMeans(m_inc_effect <= 0 & m_inc_cost <= 0))
+    df_sum_psa[, "propNW"] <- na_ref(colMeans(m_inc_effect <= 0 & m_inc_cost > 0))
+    if (!is.null(wtp)) {
+      m_inc_nmb <- wtp * m_inc_effect - m_inc_cost
+      df_sum_psa[, "meanIncNMB"] <- na_ref(colMeans(m_inc_nmb))
+      df_sum_psa[, "propCostEffective"] <- na_ref(colMeans(m_inc_nmb > 0))
+    }
   }
   rownames(df_sum_psa) <- seq_len(nrow(df_sum_psa))
   df_sum_psa

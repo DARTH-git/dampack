@@ -4,18 +4,36 @@
 \alias{summary.psa}
 \title{summarize a psa object across all simulations}
 \usage{
-\method{summary}{psa}(object, calc_sds = FALSE, ...)
+\method{summary}{psa}(object, calc_sds = FALSE, ref_str = NULL, wtp = NULL, ...)
 }
 \arguments{
 \item{object}{the psa object}
 
 \item{calc_sds}{whether or not to calculate the standard deviations. Defaults to FALSE}
 
+\item{ref_str}{name of a reference strategy. If given, each strategy is compared with it
+sample by sample (see Value). Defaults to \code{NULL}.}
+
+\item{wtp}{a single willingness-to-pay threshold. If given, the mean net monetary benefit is
+added (see Value). Defaults to \code{NULL}.}
+
 \item{...}{further arguments to summary (not used)}
 }
 \value{
 a \code{data.frame} containing the mean cost and effectiveness for each strategy and, if requested,
 the standard deviations of the cost and effectiveness for each strategy.
+
+With \code{ref_str}, the differences between each strategy and the reference are computed in
+every PSA sample, and these columns are added (\code{NA} for the reference itself):
+\code{meanIncCost} and \code{meanIncEffect}, the mean differences in cost and effect; and
+\code{propNE}, \code{propSE}, \code{propSW}, and \code{propNW}, the proportion of samples in each
+quadrant of the incremental cost-effectiveness plane: NE more effective and more costly, SE more
+effective and not more costly (dominant), SW not more effective and not more costly, and NW not more
+effective and more costly (dominated). The four proportions sum to 1.
+
+With \code{wtp}, \code{meanNMB} (\code{wtp * effect - cost}, averaged over samples) is added; with
+\code{ref_str} too, also \code{meanIncNMB} and \code{propCostEffective}, the proportion of samples in
+which the strategy has a higher NMB than the reference (it lies below the willingness-to-pay line).
 }
 \description{
 summarize a psa object across all simulations

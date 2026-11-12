@@ -2,6 +2,8 @@
 
 ## New features
 
+- `summary.psa()` gains `ref_str` and `wtp`. With a reference strategy it adds the mean incremental cost and effect and the proportion of PSA samples in each quadrant of the incremental cost-effectiveness plane (`propNE`, `propSE`, `propSW`, `propNW`); with `wtp` it adds the mean NMB and, with a reference, `meanIncNMB` and the proportion of samples that are cost-effective compared with the reference (`propCostEffective`) (#209, #202).
+- `calculate_icers_psa()` gains `ref_str`, `wtp`, and `nhb`. With `uncertainty = TRUE` and a reference strategy, it adds 95% intervals for the differences from the reference, computed sample by sample (#209).
 - `plot.icers()` gains `ref_str`, which plots the incremental cost-effectiveness plane with the reference strategy at the origin, and `wtp`, which draws a willingness-to-pay line. `plot.psa()` gains `wtp` for the same line on its incremental plane. `plot.icers()` uses the currency stored by `calculate_icers()` (#209, #202).
 - `calculate_icers()` can compare every strategy with a user-selected reference strategy: with `ref_str = "Standard of care"`, it adds `Inc_Cost_ref`, `Inc_Effect_ref`, `ICER_ref`, and `Status_ref` ("Reference", "Dominant", "Dominated", "More costly, more effective", "Less costly, less effective", or "Equivalent"). The frontier-based results are unchanged, and without `ref_str` no columns are added (#209).
 - `calculate_icers()` gains `wtp`, which adds the net monetary benefit (`NMB`, and `iNMB_ref` with a reference strategy), and `nhb = TRUE`, which also adds the net health benefit (`NHB`, `iNHB_ref`) (#200).

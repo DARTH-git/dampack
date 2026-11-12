@@ -15,11 +15,13 @@
 
 ## Breaking changes
 
+- Strategy names are now kept exactly as provided in `make_psa_obj()`, `create_dsa_oneway()`, `create_dsa_twoway()`, and the objects built from them, so names such as "Standard of care" appear unchanged in tables and plot legends. Previously they were converted with `make.names()` (to `Standard.of.care`) with a warning. Code that refers to the converted names must use the original ones, for example `psa$cost[["Standard of care"]]` instead of `psa$cost$Standard.of.care`. Strategy names must be unique and not missing or empty, and a wrong number of names now gives an informative error (#208).
 - `summary.ceac()` renames its third output column from `cost_eff_strat` to `optimal_strategy`. Code that refers to the old column name with `$cost_eff_strat` must be updated (#173).
 - dampack now requires R 4.1.0 or later, the minimum required by current versions of ggplot2.
 
 ## Bug fixes
 
+- `metamodel()`, and the functions that use it (`owsa()` and `twsa()` on a PSA, `calc_evppi()`, `calc_evsi()`), now work with strategy names that are not syntactically valid R names (#208).
 - `summary.ceac()` no longer returns duplicated, mislabeled, and `NA`-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173).
 - The y-axis label of the CEAC plot now correctly describes what is plotted (#165).
 - `owsa_tornado()` no longer omits parameters whose minimum value is negative (#166).

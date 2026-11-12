@@ -83,7 +83,8 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   }
 
   # define data for linear model
-  df_dat <- data.frame(df_y, psa$parameters)
+  # check.names = FALSE keeps strategy names (the response columns) as typed
+  df_dat <- data.frame(df_y, psa$parameters, check.names = FALSE)
 
   # make sure there are not more parameters to estimate than there are psa samples
   if (nrow(df_dat) < length(params)) {
@@ -156,7 +157,7 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
   if (type == "linear") {
     # build formula
     ## dependent variable
-    fbeg <- paste0(dep, " ~ ")
+    fbeg <- paste0(backtick_name(dep), " ~ ")
 
     if (n_params > 1) {
       ## parameters of interest
@@ -177,7 +178,7 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
   if (type == "poly") {
     # build formula
     ## dependent variable
-    fbeg <- paste0(dep, " ~ ")
+    fbeg <- paste0(backtick_name(dep), " ~ ")
 
     ## parameters of interest
     fparam <- ""
@@ -199,8 +200,16 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
   }
 
   if (type == "gam") {
+    # mgcv::gam() rebuilds the formula from text and drops backticks, so it cannot
+    # fit a response with a non-syntactic name (e.g., a strategy named
+    # "Standard of care"). Fit on a copy of the data whose response column has
+    # a syntactic internal name; predictions and fit statistics do not depend on it.
+    response <- ".dampack_response"
+    names(dat)[names(dat) == dep] <- response
+    dep <- response
+
     # build formula
-    fbeg <- paste0(dep, " ~ ")
+    fbeg <- paste0(backtick_name(dep), " ~ ")
 
     ## parameters of interest
     fparam <- ""
@@ -452,4 +461,16 @@ make_param_seq <- function(p, ranges, nsamp, psa_paramvals) {
   }
   # define evenly spaced samples from parameter range
   seq(v_p_range[1], v_p_range[2], length.out = nsamp)
+}
+
+#' Quote a name for use in a model formula
+#'
+#' Wraps a name in backticks so that strategy names with spaces or other
+#' characters can be used as the response of a regression metamodel.
+#'
+#' @param x character name.
+#' @return \code{x} wrapped in backticks, with any backtick inside it escaped.
+#' @keywords internal
+backtick_name <- function(x) {
+  paste0("`", gsub("`", "\\\\`", x), "`")
 }

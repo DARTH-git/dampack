@@ -14,10 +14,12 @@
 #' Each simulation should be a row of the data frame, and each strategy should be a column.
 #' Naming the columns of the data frames is not necessary, as they will be renamed with
 #' the \code{strategies} vector.
-#' @param strategies vector with the names of the strategies. Due to requirements in
-#' certain uses of this vector, this function uses \code{\link{make.names}} to modify
-#' strategy names as necessary. It is strongly suggested that you follow the rules
-#' in the \code{\link{make.names}} help page, to avoid unexpected errors.
+#' @param strategies vector with the names of the strategies, in the same order as
+#' the columns of the outcome data frames. Names are kept exactly as provided, so
+#' they can contain spaces and other characters (for example "Standard of care"),
+#' and are used as labels in tables and plots. They must be unique and not missing
+#' or empty. If \code{NULL}, strategies are named \code{Strategy_1},
+#' \code{Strategy_2}, and so on.
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #' @return returns "sa" sensitivity analysis object.
@@ -68,27 +70,9 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   if (is.null(strategies)) {
     strategies <- paste(rep("Strategy_", n_strategies), seq(1, n_strategies), sep = "")
   } else {
-    # correct strategy names. they are used as data.frame column names and in lm()
-    # so they need to be syntactically valid
-    v_new_strategies <- make.names(strategies, unique = TRUE)
-
-    # write warning to console, so user knows that strategy name was changed
-    for (i in 1:n_strategies) {
-      old_strat <- strategies[i]
-      new_strat <- v_new_strategies[i]
-      if (new_strat != old_strat) {
-        warning(paste0("strategy name '", old_strat, "' was converted to '", new_strat,
-                       "' for compatibility. See ?make.names"), call. = FALSE)
-      }
-    }
-    # update strategies
-    strategies <- v_new_strategies
-
-    # make sure strategies is the same length as the number of columns
-    if (n_strategies != length(strategies)) {
-      stop(paste0("The number of columns in the cost and effectiveness",
-                  "matrices is different from the number of strategies provided"))
-    }
+    # strategy names are kept exactly as provided (they may contain spaces and
+    # other characters); they only need to be complete and unique
+    strategies <- check_strategy_names(strategies, n_strategies)
   }
 
   # define cost and effectiveness column names using strategies
@@ -163,4 +147,30 @@ print.sa <- function(x, all_strat = FALSE, ...) {
       ncol(x$parameters), "columns", "\n")
   cat("parameter names (parnames): ", paste(x$parnames, collapse = ", "), "\n")
   cat("currency:", x$currency, "\n")
+}
+
+#' Check strategy names
+#'
+#' Strategy names are used as labels in tables and plots, so they are kept
+#' exactly as provided. They must be complete and unique, with one name per
+#' strategy.
+#'
+#' @param strategies vector of strategy names.
+#' @param n_strategies number of strategies (columns) in the outcome data.
+#' @return \code{strategies} as a character vector.
+#' @keywords internal
+check_strategy_names <- function(strategies, n_strategies) {
+  strategies <- as.character(strategies)
+  if (length(strategies) != n_strategies) {
+    stop(n_strategies, " strategy names are needed (one per column of the outcome data), but ",
+         length(strategies), " were provided.", call. = FALSE)
+  }
+  if (anyNA(strategies) || any(!nzchar(trimws(strategies)))) {
+    stop("Strategy names cannot be missing or empty.", call. = FALSE)
+  }
+  if (anyDuplicated(strategies)) {
+    stop("Strategy names must be unique. Duplicated: ",
+         paste(unique(strategies[duplicated(strategies)]), collapse = ", "), call. = FALSE)
+  }
+  strategies
 }

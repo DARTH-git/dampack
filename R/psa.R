@@ -17,10 +17,12 @@
 #' Each simulation should be a row of the data frame, and each strategy should be a column.
 #' Naming the columns of the data frames is not necessary, as they will be renamed with
 #' the \code{strategies} vector.
-#' @param strategies vector with the names of the strategies. Due to requirements in
-#' certain uses of this vector, this function uses \code{\link{make.names}} to modify
-#' strategy names as necessary. It is strongly suggested that you follow the rules
-#' in the \code{\link{make.names}} help page, to avoid unexpected errors.
+#' @param strategies vector with the names of the strategies, in the same order as
+#' the columns of the outcome data frames. Names are kept exactly as provided, so
+#' they can contain spaces and other characters (for example "Standard of care"),
+#' and are used as labels in tables and plots. They must be unique and not missing
+#' or empty. If \code{NULL}, strategies are named \code{Strategy_1},
+#' \code{Strategy_2}, and so on.
 #'
 #' @param currency symbol for the currency being used (ex. "$", "£")
 #'

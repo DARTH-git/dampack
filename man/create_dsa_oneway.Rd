@@ -26,10 +26,12 @@ param2 name     \tab  param2 val1 \cr
 ...            \tab ... \cr
 }}
 
-\item{strategies}{vector with the names of the strategies. Due to requirements in
-certain uses of this vector, this function uses \code{\link{make.names}} to modify
-strategy names as necessary. It is strongly suggested that you follow the rules
-in the \code{\link{make.names}} help page, to avoid unexpected errors.}
+\item{strategies}{vector with the names of the strategies, in the same order as
+the columns of the outcome data frames. Names are kept exactly as provided, so
+they can contain spaces and other characters (for example "Standard of care"),
+and are used as labels in tables and plots. They must be unique and not missing
+or empty. If \code{NULL}, strategies are named \code{Strategy_1},
+\code{Strategy_2}, and so on.}
 
 \item{cost, effectiveness, other_outcome}{data frames containing data for costs,
 effectiveness or another outcome (user-defined), respectively.

@@ -126,3 +126,23 @@ test_that("two-way metamodel", {
                   psa = psa_big, outcome = "eff")
   expect_is(mm, "metamodel")
 })
+
+test_that("invalid metamodel parameters are reported", {
+  expect_error(
+    metamodel(psa = psa_big, params = "not_a_parameter", outcome = "cost"),
+    "the following parameters are not valid: not_a_parameter"
+  )
+})
+
+test_that("invalid parameters are reported by EVPPI and EVSI", {
+  expect_error(
+    calc_evppi(psa = psa_big, wtp = 100000, params = "not_a_parameter",
+               outcome = "nmb", progress = FALSE),
+    "the following parameters are not valid: not_a_parameter"
+  )
+  expect_error(
+    calc_evsi(psa = psa_big, wtp = 100000, params = "not_a_parameter",
+              outcome = "nmb", progress = FALSE),
+    "the following parameters are not valid: not_a_parameter"
+  )
+})

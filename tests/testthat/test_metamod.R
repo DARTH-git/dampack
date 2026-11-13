@@ -145,3 +145,29 @@ test_that("invalid parameters are reported by EVPPI and EVSI", {
     "the following parameters are not valid: not_a_parameter"
   )
 })
+
+# print() and summary() methods (#215)
+test_that("summary.metamodel() gives one R-squared per parameter and strategy", {
+  mm_lm <- metamodel("oneway", psa_big, params = c("pFailChemo", "cSurg"), outcome = "nmb", wtp = 1e5)
+  s <- summary(mm_lm)
+  expect_equal(nrow(s), 2 * length(psa_big$strategies))
+  expect_setequal(s$param, c("pFailChemo", "cSurg"))
+  expect_true(all(s$rsquared >= 0 & s$rsquared <= 1))
+  mm_gam <- metamodel("oneway", psa_big, params = "pFailChemo", outcome = "nmb", wtp = 1e5, type = "gam")
+  expect_true(all(summary(mm_gam)$rsquared <= 1))
+  mm_tw <- metamodel("twoway", psa_big, params = c("pFailChemo", "pFailRadio"), outcome = "nmb", wtp = 1e5)
+  s_tw <- summary(mm_tw)
+  expect_equal(nrow(s_tw), length(psa_big$strategies))
+  expect_true(all(c("param1", "param2", "rsquared") %in% names(s_tw)))
+  mm_mw <- metamodel("multiway", psa_big, params = c("pFailChemo", "pFailRadio"), outcome = "nmb",
+                     wtp = 1e5, type = "gam")
+  expect_error(summary(mm_mw), "not available for multiway")
+})
+
+test_that("print.metamodel() describes the analysis", {
+  mm <- metamodel("oneway", psa_big, params = "pFailChemo", outcome = "nmb", wtp = 1e5)
+  out <- capture.output(print(mm))
+  expect_true(any(grepl("metamodel object", out)))
+  expect_true(any(grepl("pFailChemo", out)))
+  expect_true(any(grepl("100000|1e\\+05", out)))
+})

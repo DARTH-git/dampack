@@ -117,7 +117,6 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     # Define progress bar
     if (progress == TRUE) {
       pb <- txtProgressBar(min = 0, max = nsamp * n_params, style = 3)
-      on.exit(close(pb))
     } else {
       pb <- NULL
     }
@@ -147,6 +146,9 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                                  paramval = unname(m_owsa_input))
 
     param_table_all <- rbind(param_table_all, df_param_table)
+
+    # Close this parameter's progress bar
+    if (!is.null(pb)) close(pb)
   }
 
   param_table_all$parameter <- as.character(param_table_all$parameter)

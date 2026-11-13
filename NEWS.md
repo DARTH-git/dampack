@@ -31,6 +31,7 @@
 - `metamodel()`, and the functions that use it (`owsa()` and `twsa()` on a PSA, `calc_evppi()`, `calc_evsi()`), now work with strategy names that are not syntactically valid R names (#208).
 - `owsa_opt_strat()` plots now draw one bar per range in which a strategy is optimal, and adjacent bars meet halfway between parameter values, so the bars line up with the switch points on the axis. Before, each bar covered only the values where its strategy was observed optimal (leaving gaps), and a strategy optimal in two separate ranges got a single bar spanning both. The data returned with `return = "data"` is unchanged (#67).
 - `summary.ceac()` no longer returns duplicated, mislabeled, and `NA`-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173).
+- `run_psa()` no longer drops the first parameter of a PSA sample that was not created by `gen_psa_samp()`; it removes only the `nsamp` sample-number column that `gen_psa_samp()` adds. When `FUN` fails on the PSA parameters, `run_psa()` now stops with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#174).
 - The y-axis label of the CEAC plot now correctly describes what is plotted (#165).
 - `owsa_tornado()` no longer omits parameters whose minimum value is negative (#166).
 - Fixed a pointer in the PSA vignette to a vignette that no longer exists (#168).

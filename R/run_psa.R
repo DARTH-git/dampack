@@ -40,14 +40,12 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
     l_fun_input_test <- c(list(psa_samp[1, ]), l_opt_arg_val)
   }
 
-  jj <- tryCatch({
-    userfun <- do.call(FUN, l_fun_input_test)
-  },
-  error = function(e) NA)
-  if (is.na(sum(is.na(jj)))) {
-    stop("FUN is not well defined by the parameter values and ...")
-  }
-  userfun <- do.call(FUN, l_fun_input_test)
+  # run FUN once on the first PSA sample to check it, and report its error if it fails
+  userfun <- tryCatch(do.call(FUN, l_fun_input_test),
+                      error = function(e) {
+                        stop("FUN is not well defined by the parameter values and ...: ",
+                             conditionMessage(e), call. = FALSE)
+                      })
 
   if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
@@ -114,11 +112,17 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
 
 
 
+  # drop the sample-number column that gen_psa_samp() adds first, but no real parameter
+  df_parameters <- psa_samp
+  if (names(df_parameters)[1] == "nsamp") {
+    df_parameters <- df_parameters[, -1, drop = FALSE]
+  }
+
   l_psa_out <- vector(mode = "list", length = n_outcomes)
   for (j in seq_len(n_outcomes)) {
     l_psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
                                    other_outcome = l_outcomes[[j]],
-                                   parameters = psa_samp[, -1], strategies = strategies,
+                                   parameters = df_parameters, strategies = strategies,
                                    currency = currency)
   }
 

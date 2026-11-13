@@ -87,6 +87,7 @@ calc_exp_loss <- function(psa, wtp) {
   df_exp_loss_melt$Strategy <- factor(df_exp_loss_melt$Strategy, levels = v_strategies, ordered = TRUE)
 
   class(df_exp_loss_melt) <- c("exp_loss", "data.frame")
+  attr(df_exp_loss_melt, "currency") <- psa$currency
   df_exp_loss_melt
 }
 
@@ -96,7 +97,8 @@ calc_exp_loss <- function(psa, wtp) {
 #' @param x object of class \code{exp_loss}, produced by function
 #'  \code{\link{calc_exp_loss}}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
+#'  Default: the currency of the PSA the results were computed from (or $), but it could be any
+#'  currency symbol or word (e.g., £, €, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @param log_y take the base 10 log of the y axis
 #' @param frontier indicate the frontier (also the expected value of perfect information).
@@ -117,7 +119,7 @@ plot.exp_loss <- function(x,
                           points = TRUE,
                           lsize = 1,
                           txtsize = 12,
-                          currency = "$",
+                          currency = NULL,
                           effect_units = "QALY",
                           n_y_ticks = 8,
                           n_x_ticks = 20,
@@ -128,6 +130,7 @@ plot.exp_loss <- function(x,
                           col = c("access", "full", "bw"),
                           ...) {
   On_Frontier <- NULL
+  currency <- resolve_currency(currency, x)
   wtp_name <- "WTP_thou"
   loss_name <- "Expected_Loss"
   strat_name <- "Strategy"

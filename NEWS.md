@@ -2,6 +2,7 @@
 
 ## New features
 
+- The currency of a `psa` object now carries through to its analyses: `ceac()`, `calc_exp_loss()`, `calc_evpi()`, `calc_evppi()`, `calc_evsi()`, and `calculate_icers_psa()` keep it, and their `plot()` and `print()` methods use it unless `currency` is given. `plot.ceac()` gains `effect_units` (#203).
 - `summary.psa()` gains `ref_str` and `wtp`. With a reference strategy it adds the mean incremental cost and effect and the proportion of PSA samples in each quadrant of the incremental cost-effectiveness plane (`propNE`, `propSE`, `propSW`, `propNW`); with `wtp` it adds the mean NMB and, with a reference, `meanIncNMB` and the proportion of samples that are cost-effective compared with the reference (`propCostEffective`) (#209, #202).
 - `calculate_icers_psa()` gains `ref_str`, `wtp`, and `nhb`. With `uncertainty = TRUE` and a reference strategy, it adds 95% intervals for the differences from the reference, computed sample by sample (#209).
 - `plot.icers()` gains `ref_str`, which plots the incremental cost-effectiveness plane with the reference strategy at the origin, and `wtp`, which draws a willingness-to-pay line. `plot.psa()` gains `wtp` for the same line on its incremental plane. `plot.icers()` uses the currency stored by `calculate_icers()` (#209, #202).
@@ -27,6 +28,7 @@
 
 ## Bug fixes
 
+- EVPPI and EVSI computed from net health benefit (`outcome = "nhb"`, the default of `calc_evsi()`) are in health units, and their plots are now labeled with `effect_units` (e.g., "EVSI (QALY)") instead of a currency (#203).
 - `plot.psa(ref_str = )` now works when there are only two strategies; it used to fail with "'dims' cannot be of length 0" (#209).
 - `plot.owsa(col = "bw")` now draws each strategy with its own line type; all strategies used to share one line type and could not be told apart (#176).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).

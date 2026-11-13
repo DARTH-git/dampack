@@ -55,6 +55,7 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 
   # declare class as both evpi (plotting) and data.frame (printing)
   class(df_evpi) <- c("evpi", "data.frame")
+  attr(df_evpi, "currency") <- psa$currency
   df_evpi
 }
 
@@ -66,7 +67,8 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 #' @param x object of class \code{evpi}, produced by function
 #'  \code{\link{calc_evpi}}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
+#'  Default: the currency of the PSA the results were computed from (or $), but it could be any
+#'  currency symbol or word (e.g., £, €, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
@@ -77,7 +79,7 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 #' @export
 plot.evpi <- function(x,
                       txtsize = 12,
-                      currency = "$",
+                      currency = NULL,
                       effect_units = "QALY",
                       n_y_ticks = 8,
                       n_x_ticks = 20,
@@ -87,6 +89,7 @@ plot.evpi <- function(x,
                       ylim = NULL,
                       ...) {
   WTP_thou <- EVPI <- NULL
+  currency <- resolve_currency(currency, x)
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
               aes(x = WTP_thou, y = EVPI)) +

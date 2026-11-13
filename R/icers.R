@@ -373,7 +373,8 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE, ref_str = NULL, wtp = 
   df_icers <- calculate_icers(cost = df_psa_sum$meanCost,
                               effect = df_psa_sum$meanEffect,
                               strategies = df_psa_sum$Strategy,
-                              ref_str = ref_str, wtp = wtp, nhb = nhb)
+                              ref_str = ref_str, wtp = wtp, nhb = nhb,
+                              currency = psa$currency)
 
   if (uncertainty == TRUE) {
     # the joins and column selection below drop the icers class and attributes; keep them

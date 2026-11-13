@@ -170,10 +170,11 @@ plot.exp_loss <- function(x,
       p <- p + geom_point()
     }
     p <- p +
-      geom_line(aes(linetype = !!sym(strat_name)))
+      geom_line(linewidth = lsize, aes(linetype = !!sym(strat_name)))
   }
 
-  p <- add_common_aes(p, txtsize, col = col, col_aes = c("color", "line"),
+  # in black and white, strategies are told apart by line type, so no color scale is added
+  p <- add_common_aes(p, txtsize, col = if (col == "bw") "none" else col, col_aes = "color",
                       continuous = c("x", "y"),
                       n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                       xbreaks = xbreaks, ybreaks = ybreaks,

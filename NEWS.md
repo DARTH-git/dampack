@@ -33,6 +33,10 @@
 - `summary.ceac()` no longer returns duplicated, mislabeled, and `NA`-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173).
 - `run_psa()` no longer drops the first parameter of a PSA sample that was not created by `gen_psa_samp()`; it removes only the `nsamp` sample-number column that `gen_psa_samp()` adds. When `FUN` fails on the PSA parameters, `run_psa()` now stops with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#174).
 - The y-axis label of the CEAC plot now correctly describes what is plotted (#165).
+- `twsa()` on a `dsa_twoway` object now works without an explicit `outcome`; it used to fail with "'arg' must be of length 1" (#210).
+- `make_psa_obj()` and the DSA constructors now name the columns of `other_outcome` after the strategies, like `cost` and `effectiveness` (#210).
+- When `FUN` fails on the base case, `run_owsa_det()` and `run_twsa_det()` now stop with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#210).
+- `plot.exp_loss(col = "bw")` now uses `lsize` for the line width and no longer warns about an unused color scale (#210).
 - `owsa_tornado()` no longer omits parameters whose minimum value is negative (#166).
 - Fixed a pointer in the PSA vignette to a vignette that no longer exists (#168).
 

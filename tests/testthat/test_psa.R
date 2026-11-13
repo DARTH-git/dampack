@@ -101,3 +101,11 @@ test_that("summary.psa returns correct output", {
   df_calc <- summary(psa_small)
   expect_equal(expected = df_expected, df_calc)
 })
+
+# other_outcome columns were never renamed to the strategy names (#210)
+test_that("make_psa_obj() names other_outcome columns after the strategies", {
+  df_other <- data.frame(x_out = c(1, 2), y_out = c(3, 4), z_out = c(5, 6))
+  df_cost <- data.frame(a = c(1, 2), b = c(1, 2), c = c(1, 2))
+  p <- make_psa_obj(df_cost, df_cost, strategies = c("A", "B", "C"), other_outcome = df_other)
+  expect_identical(names(p$other_outcome), c("A", "B", "C"))
+})

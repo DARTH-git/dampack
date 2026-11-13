@@ -24,14 +24,13 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
                  wtp = NULL,
                  strategies = NULL,
                  poly.order = 2) {
+  outcome <- match.arg(outcome)
   if (inherits(sa_obj, "psa")) {
     if (is.null(param1) || is.null(param2)) {
       stop("if using psa object, both param1 and param2 must be provided")
     }
 
     params <- c(param1, param2)
-
-    outcome <- match.arg(outcome)
 
     if (!is.null(sa_obj$other_outcome)) {
       sa_obj$effectiveness <- sa_obj$other_outcome

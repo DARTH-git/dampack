@@ -70,15 +70,12 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     stop("basecase has to be in between min and max")
   }
 
-  jj <- tryCatch({
-    userfun <- do.call(FUN, l_fun_input)
-  },
-  error = function(e) NA)
-  if (is.na(sum(is.na(jj)))) {
-    stop("FUN is not well defined by 'params_basecase' and ...")
-  }
-
-  userfun <- do.call(FUN, l_fun_input)
+  # run FUN once on the base case to check it, and report its error if it fails
+  userfun <- tryCatch(do.call(FUN, l_fun_input),
+                      error = function(e) {
+                        stop("FUN is not well defined by 'params_basecase' and ...: ",
+                             conditionMessage(e), call. = FALSE)
+                      })
   if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
   }
@@ -243,15 +240,12 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 
   names(params_range) <- c("pars", "min", "max")
 
-  jj <- tryCatch({
-    userfun <- do.call(FUN, l_fun_input)
-  },
-  error = function(e) NA)
-  if (is.na(sum(is.na(jj)))) {
-    stop("FUN is not well defined by the base case parameter values and ...")
-  }
-
-  userfun <- do.call(FUN, l_fun_input)
+  # run FUN once on the base case to check it, and report its error if it fails
+  userfun <- tryCatch(do.call(FUN, l_fun_input),
+                      error = function(e) {
+                        stop("FUN is not well defined by the base case parameter values and ...: ",
+                             conditionMessage(e), call. = FALSE)
+                      })
   if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
   }

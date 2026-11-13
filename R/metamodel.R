@@ -56,7 +56,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   if (is.null(params)) {
     params <- v_pnames
   } else if (!all(params %in% v_pnames)) {
-    v_wrong_p <- setdiff(p, v_pnames)
+    v_wrong_p <- setdiff(params, v_pnames)
     stop(paste0("the following parameters are not valid: ",
                 paste(v_wrong_p, collapse = ",")))
   } else if (length(params) != 2 && analysis == "twoway") {

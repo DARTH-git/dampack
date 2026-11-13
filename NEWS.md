@@ -28,6 +28,7 @@
 ## Bug fixes
 
 - `plot.psa(ref_str = )` now works when there are only two strategies; it used to fail with "'dims' cannot be of length 0" (#209).
+- `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).
 - `metamodel()`, and the functions that use it (`owsa()` and `twsa()` on a PSA, `calc_evppi()`, `calc_evsi()`), now work with strategy names that are not syntactically valid R names (#208).

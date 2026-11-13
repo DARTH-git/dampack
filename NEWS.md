@@ -21,6 +21,7 @@
 
 ## Bug fixes
 
+- `gen_psa_samp()` now accepts the documented `"value, weight"` parameterization for `"bootstrap"` distributions. It used to be dropped silently, which shifted the parameterization of every later parameter by one position. **Samples from calls with a bootstrap parameter before other parameters will differ, because they are now correct.** Unknown distributions or parameterizations, and `params`, `dists`, `parameterization_types`, and `dists_params` of different lengths, now give informative errors instead of being dropped silently (#175).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).

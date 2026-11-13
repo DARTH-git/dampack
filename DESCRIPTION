@@ -5,7 +5,7 @@ Version: 1.1.0.9000
 Authors@R: 
     c(person(given = "Fernando",
              family = "Alarid-Escudero",
-             role = "aut",
+             role = c("aut", "cre"),
              email = "falarid@stanford.edu",
              comment = c(ORCID = "0000-0001-5076-1172")),
       person(given = "Greg",
@@ -19,7 +19,7 @@ Authors@R:
              comment = c(ORCID = "0000-0001-7853-377X")),
       person(given = "David",
              family = "Garibay",
-             role = c("ctb", "cre"),
+             role = "ctb",
              email = "dgari039@uottawa.ca"),
       person(given = "Matthew B.",
              family = "Kaufmann",

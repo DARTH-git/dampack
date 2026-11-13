@@ -21,6 +21,7 @@
 
 ## Bug fixes
 
+- `run_psa()` no longer drops the first parameter of a PSA sample that was not created by `gen_psa_samp()`; it removes only the `nsamp` sample-number column that `gen_psa_samp()` adds. When `FUN` fails on the PSA parameters, `run_psa()` now stops with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#174).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).

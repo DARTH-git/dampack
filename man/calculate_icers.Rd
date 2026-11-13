@@ -50,8 +50,8 @@ and no more effective), \code{"More costly, more effective"},
 for dominant, dominated, and equivalent strategies.
 
 If \code{wtp} is given, \code{NMB} (\code{wtp * Effect - Cost}) is added, and with
-\code{ref_str} also \code{iNMB_ref}, the NMB minus that of the reference. With
-\code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) and \code{iNHB_ref} are added too.
+\code{ref_str} also \code{Inc_NMB_ref}, the NMB minus that of the reference. With
+\code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) and \code{Inc_NHB_ref} are added too.
 }
 \description{
 This function takes in strategies and their associated cost and effect, assigns them

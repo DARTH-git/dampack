@@ -39,7 +39,7 @@ With \code{ref_str}, \code{wtp}, or \code{nhb}, the reference-strategy and net-b
 described in \code{\link{calculate_icers}} are added. With \code{uncertainty = TRUE} and
 \code{ref_str}, the 2.5th and 97.5th quantiles of the sample-by-sample differences from the reference
 are also given for \code{Inc_Cost_ref}, \code{Inc_Effect_ref}, and (with \code{wtp})
-\code{iNMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
+\code{Inc_NMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
 }
 \description{
 The mean costs and QALYs for each strategy in a PSA are used

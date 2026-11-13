@@ -60,7 +60,7 @@ test_that("calculate_icers_psa(uncertainty = TRUE) adds intervals for the refere
   expect_equal(r$Lower_95_Inc_Cost_ref, unname(quantile(d_cost, 0.025)))
   expect_equal(r$Upper_95_Inc_Cost_ref, unname(quantile(d_cost, 0.975)))
   expect_equal(r$Lower_95_Inc_Effect_ref, unname(quantile(d_eff, 0.025)))
-  expect_equal(r$Upper_95_iNMB_ref, unname(quantile(50000 * d_eff - d_cost, 0.975)))
+  expect_equal(r$Upper_95_Inc_NMB_ref, unname(quantile(50000 * d_eff - d_cost, 0.975)))
   r_ref <- x[x$Strategy == "Surgery", ]
   expect_true(is.na(r_ref$Lower_95_Inc_Cost_ref))
   # the frontier-based columns and their existing intervals are unchanged

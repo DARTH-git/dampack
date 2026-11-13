@@ -38,5 +38,7 @@ a dataframe object - formatted CEA table
 By default, prints the sequential cost-effectiveness table: each strategy on the frontier is
 compared with the previous one. If the \code{icers} object was created with a reference
 strategy (\code{ref_str} in \code{\link{calculate_icers}}), \code{ref = "reference"} shows the
-comparison of every strategy with the reference instead, and \code{ref = "both"} shows both.
+comparison of every strategy with the reference instead, listing the reference first and the
+other strategies by increasing cost. \code{ref = "both"} shows both comparisons, in the
+frontier order of the sequential table.
 }

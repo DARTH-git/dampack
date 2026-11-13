@@ -73,7 +73,17 @@ test_that("plot.psa(wtp = ) draws the WTP line on the incremental plane", {
   expect_length(i, 1)
   expect_equal(ggplot2::layer_data(p, i)$slope, 2000)
   expect_match(p$labels$caption, "WTP = $2,000/QALY", fixed = TRUE)
-  expect_error(plot(psa_2, wtp = 2000), "needs `ref_str`")
   expect_error(plot(psa_2, ref_str = "Nope"), "must be one of the strategies")
   expect_length(abline_layers(plot(psa_2)), 0)
+})
+
+test_that("plot.psa(wtp = ) without ref_str draws the line through the least costly strategy", {
+  p <- plot(psa_2, wtp = 2000)
+  i <- abline_layers(p)
+  expect_length(i, 1)
+  d <- ggplot2::layer_data(p, i)
+  # A ("Standard of care") has the lower mean cost, so the line passes through its means
+  expect_equal(d$slope, 2000)
+  expect_equal(d$intercept, mean(df_cost2$A) - 2000 * mean(df_eff2$A))
+  expect_match(p$labels$caption, "WTP = $2,000/QALY", fixed = TRUE)
 })

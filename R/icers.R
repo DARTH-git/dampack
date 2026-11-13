@@ -39,8 +39,8 @@
 #' for dominant, dominated, and equivalent strategies.
 #'
 #' If \code{wtp} is given, \code{NMB} (\code{wtp * Effect - Cost}) is added, and with
-#' \code{ref_str} also \code{iNMB_ref}, the NMB minus that of the reference. With
-#' \code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) and \code{iNHB_ref} are added too.
+#' \code{ref_str} also \code{Inc_NMB_ref}, the NMB minus that of the reference. With
+#' \code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) and \code{Inc_NHB_ref} are added too.
 #'
 #' @seealso \code{\link{plot.icers}}
 #'
@@ -100,6 +100,8 @@ calculate_icers <- function(cost, effect, strategies, ref_str = NULL, wtp = NULL
   ref_str <- check_ref_str(ref_str, as.character(strategies))
   check_wtp_nhb(wtp, nhb)
 
+  # column names used unquoted in the dplyr code below; declaring them avoids the
+  # R CMD check note "no visible binding for global variable"
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
 
   # coerce to character, in case they are provided as numeric
@@ -288,31 +290,41 @@ status_vs_reference <- function(v_inc_cost, v_inc_effect) {
 #' @keywords internal
 add_reference_and_nmb <- function(df_icers, ref_str, wtp, nhb, currency) {
   if (!is.null(ref_str)) {
+    # row of the reference strategy; check_ref_str() has already confirmed it exists
     i_ref <- match(ref_str, df_icers$Strategy)
+    # differences of every strategy from the reference (the reference's own are 0)
     v_inc_cost <- df_icers$Cost - df_icers$Cost[i_ref]
     v_inc_effect <- df_icers$Effect - df_icers$Effect[i_ref]
+    # classify each strategy by its quadrant of the incremental CE plane
     v_status <- status_vs_reference(v_inc_cost, v_inc_effect)
+    # the reference has no comparison with itself: label it and blank its differences
     v_status[i_ref] <- "Reference"
     v_inc_cost[i_ref] <- NA_real_
     v_inc_effect[i_ref] <- NA_real_
+    # a ratio is only meaningful when cost and effect move in the same direction (NE and SW
+    # quadrants); for dominant, dominated, and equivalent strategies ICER_ref stays NA
     v_has_ratio <- v_status %in% c("More costly, more effective", "Less costly, less effective")
     df_icers$Inc_Cost_ref <- v_inc_cost
     df_icers$Inc_Effect_ref <- v_inc_effect
     df_icers$ICER_ref <- ifelse(v_has_ratio, v_inc_cost / v_inc_effect, NA_real_)
     df_icers$Status_ref <- v_status
+    # print.icers() and plot.icers() read the reference from this attribute
     attr(df_icers, "ref_str") <- ref_str
   }
   if (!is.null(wtp)) {
+    # net monetary benefit of each strategy at the given threshold
     df_icers$NMB <- wtp * df_icers$Effect - df_icers$Cost
     if (!is.null(ref_str)) {
-      df_icers$iNMB_ref <- df_icers$NMB - df_icers$NMB[i_ref]
-      df_icers$iNMB_ref[i_ref] <- NA_real_
+      # incremental NMB versus the reference; positive means cost-effective versus the reference
+      df_icers$Inc_NMB_ref <- df_icers$NMB - df_icers$NMB[i_ref]
+      df_icers$Inc_NMB_ref[i_ref] <- NA_real_
     }
     if (nhb) {
+      # net health benefit: the same comparison expressed in units of effect
       df_icers$NHB <- df_icers$Effect - df_icers$Cost / wtp
       if (!is.null(ref_str)) {
-        df_icers$iNHB_ref <- df_icers$NHB - df_icers$NHB[i_ref]
-        df_icers$iNHB_ref[i_ref] <- NA_real_
+        df_icers$Inc_NHB_ref <- df_icers$NHB - df_icers$NHB[i_ref]
+        df_icers$Inc_NHB_ref[i_ref] <- NA_real_
       }
     }
     attr(df_icers, "wtp") <- wtp
@@ -353,7 +365,7 @@ add_reference_and_nmb <- function(df_icers, ref_str, wtp, nhb, currency) {
 #' described in \code{\link{calculate_icers}} are added. With \code{uncertainty = TRUE} and
 #' \code{ref_str}, the 2.5th and 97.5th quantiles of the sample-by-sample differences from the reference
 #' are also given for \code{Inc_Cost_ref}, \code{Inc_Effect_ref}, and (with \code{wtp})
-#' \code{iNMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
+#' \code{Inc_NMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
 #' @seealso \code{\link{plot.icers}}
 #' @seealso \code{\link{calculate_icers}}
 #' @importFrom tidyr pivot_longer
@@ -366,6 +378,8 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE, ref_str = NULL, wtp = 
   # Calculate mean outcome values
   df_psa_sum <- summary(psa)
 
+  # column names used unquoted in the dplyr code below; declaring them avoids the
+  # R CMD check note "no visible binding for global variable"
   Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- value <-
     Lower_95_Cost <- Upper_95_Cost <- Lower_95_Effect <- Upper_95_Effect <- NULL
 
@@ -402,6 +416,8 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE, ref_str = NULL, wtp = 
     df_icers <- df_icers %>%
       left_join(df_cost_bounds, by = "Strategy") %>%
       left_join(df_effect_bounds, by = "Strategy") %>%
+      # put each interval next to its estimate; everything() keeps the remaining columns
+      # (the reference and net-benefit columns), which select() would otherwise drop
       select(Strategy, Cost, Lower_95_Cost, Upper_95_Cost,
              Effect, Lower_95_Effect, Upper_95_Effect,
              Inc_Cost, Inc_Effect, ICER, Status, everything())
@@ -429,18 +445,24 @@ calculate_icers_psa <- function(psa, uncertainty = FALSE, ref_str = NULL, wtp = 
 #' @return \code{df_icers} with the interval columns added.
 #' @keywords internal
 add_reference_intervals <- function(df_icers, psa, ref_str, wtp) {
+  # sample-by-sample differences from the reference: one row per PSA sample, one column per
+  # strategy (subtracting a vector from a matrix recycles it down each column)
   m_inc_cost <- as.matrix(psa$cost) - psa$cost[[ref_str]]
   m_inc_effect <- as.matrix(psa$effectiveness) - psa$effectiveness[[ref_str]]
+  # one matrix of differences per point-estimate column that gets an interval
   l_inc <- list(Inc_Cost_ref = m_inc_cost, Inc_Effect_ref = m_inc_effect)
   if (!is.null(wtp)) {
-    l_inc$iNMB_ref <- wtp * m_inc_effect - m_inc_cost
+    l_inc$Inc_NMB_ref <- wtp * m_inc_effect - m_inc_cost
   }
   v_strat <- df_icers$Strategy
+  # running column order, so each interval lands right after its point estimate
   v_cols <- names(df_icers)
   for (col in names(l_inc)) {
+    # reorder the matrix columns to match the rows of df_icers (frontier order)
     m_inc <- l_inc[[col]][, v_strat, drop = FALSE]
     v_lower <- unname(apply(m_inc, 2, quantile, probs = 0.025, names = FALSE))
     v_upper <- unname(apply(m_inc, 2, quantile, probs = 0.975, names = FALSE))
+    # the reference's differences are all 0, so its interval is reported as NA
     v_lower[v_strat == ref_str] <- NA_real_
     v_upper[v_strat == ref_str] <- NA_real_
     df_icers[[paste0("Lower_95_", col)]] <- v_lower
@@ -659,7 +681,9 @@ plot.icers <- function(x,
 #' By default, prints the sequential cost-effectiveness table: each strategy on the frontier is
 #' compared with the previous one. If the \code{icers} object was created with a reference
 #' strategy (\code{ref_str} in \code{\link{calculate_icers}}), \code{ref = "reference"} shows the
-#' comparison of every strategy with the reference instead, and \code{ref = "both"} shows both.
+#' comparison of every strategy with the reference instead, listing the reference first and the
+#' other strategies by increasing cost. \code{ref = "both"} shows both comparisons, in the
+#' frontier order of the sequential table.
 #'
 #' @param x Object of class \code{icers}
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
@@ -714,6 +738,13 @@ print.icers <- function(x,
   df_table_cea <- x
   class(df_table_cea) <- "data.frame"
   df_table_cea <- df_table_cea[, setdiff(names(df_table_cea), v_drop), drop = FALSE]
+  # the reference view lists the reference first, then the other strategies by cost; the
+  # sequential and combined views keep the frontier order, in which the sequential ICERs are read
+  if (ref == "reference") {
+    v_order <- order(df_table_cea$Strategy != ref_str, df_table_cea$Cost)
+    df_table_cea <- df_table_cea[v_order, , drop = FALSE]
+    rownames(df_table_cea) <- NULL
+  }
 
   # display digits and header for each known column
   vs <- paste0(" vs ", ref_str)
@@ -728,9 +759,9 @@ print.icers <- function(x,
     ICER_ref       = list(dig_icer, paste0("ICER", vs, " (", currency, "/QALY)")),
     Status_ref     = list(NA, paste0("Status", vs)),
     NMB            = list(dig_cost, paste0("NMB (", currency, ")")),
-    iNMB_ref       = list(dig_cost, paste0("iNMB", vs, " (", currency, ")")),
+    Inc_NMB_ref    = list(dig_cost, paste0("Incremental NMB", vs, " (", currency, ")")),
     NHB            = list(dig_eff, "NHB (QALYs)"),
-    iNHB_ref       = list(dig_eff, paste0("iNHB", vs, " (QALYs)"))
+    Inc_NHB_ref    = list(dig_eff, paste0("Incremental NHB", vs, " (QALYs)"))
   )
   for (col in intersect(names(l_format), names(df_table_cea))) {
     if (!is.na(l_format[[col]][[1]])) {

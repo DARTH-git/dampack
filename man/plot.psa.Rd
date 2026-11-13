@@ -61,8 +61,10 @@ will override \code{n_y_ticks} if provided.}
 Defaults to TRUE}
 
 \item{wtp}{a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
-drawn through the origin of the incremental cost-effectiveness plane; samples below the line are
-cost-effective compared with the reference strategy at this threshold. Requires \code{ref_str}.}
+drawn through the reference strategy, which with \code{ref_str} is the origin of the incremental
+cost-effectiveness plane. Without \code{ref_str}, the line goes through the mean cost and effect
+of the least costly strategy, as in \code{\link{plot.icers}}. Samples below the line are
+cost-effective compared with that strategy at this threshold.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

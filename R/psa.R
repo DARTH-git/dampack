@@ -184,8 +184,10 @@ summary.psa <- function(object, calc_sds = FALSE, ref_str = NULL, wtp = NULL, ..
 #' @param ref_caption Add the reference strategy (and the WTP threshold, if given) as a caption.
 #' Defaults to TRUE
 #' @param wtp a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
-#' drawn through the origin of the incremental cost-effectiveness plane; samples below the line are
-#' cost-effective compared with the reference strategy at this threshold. Requires \code{ref_str}.
+#' drawn through the reference strategy, which with \code{ref_str} is the origin of the incremental
+#' cost-effectiveness plane. Without \code{ref_str}, the line goes through the mean cost and effect
+#' of the least costly strategy, as in \code{\link{plot.icers}}. Samples below the line are
+#' cost-effective compared with that strategy at this threshold.
 #' @inheritParams add_common_aes
 #'
 #' @importFrom ellipse ellipse
@@ -216,10 +218,6 @@ plot.psa <- function(x,
   v_strategies <- x$strategies
   currency <- x$currency
   ref_str <- check_ref_str(ref_str, v_strategies)
-  if (!is.null(wtp) && is.null(ref_str)) {
-    stop("`wtp` draws a willingness-to-pay line on the incremental cost-effectiveness plane, ",
-         "so it needs `ref_str`.", call. = FALSE)
-  }
   check_wtp_nhb(wtp, nhb = FALSE)
 
   if (is.null(ref_str)) {
@@ -277,6 +275,18 @@ plot.psa <- function(x,
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
                                        linewidth = 1, linetype = 2, alpha = 1)
+    }
+
+    # WTP line through the mean of the least costly strategy, matching plot.icers()
+    if (!is.null(wtp)) {
+      v_mean_cost <- colMeans(df_cost_wide)
+      i_anchor <- which.min(v_mean_cost)
+      intercept <- v_mean_cost[[i_anchor]] - wtp * mean(df_effectiveness_wide[[i_anchor]])
+      psa_plot <- psa_plot +
+        geom_abline(intercept = intercept, slope = wtp, linetype = "dotted", color = "grey30")
+      if (ref_caption) {
+        psa_plot <- psa_plot + labs(caption = wtp_caption(wtp, currency))
+      }
     }
 
     # add common theme

@@ -63,17 +63,17 @@ test_that("a dominated or the most expensive strategy can be the reference", {
 test_that("NMB is added by default with wtp, NHB only on request", {
   x <- toy_icers(wtp = 150)
   expect_equal(x$NMB, 150 * x$Effect - x$Cost)
-  expect_false(any(c("NHB", "iNMB_ref", "iNHB_ref") %in% names(x)))
+  expect_false(any(c("NHB", "Inc_NMB_ref", "Inc_NHB_ref") %in% names(x)))
   expect_identical(attr(x, "wtp"), 150)
 
   y <- toy_icers(ref_str = "Ref", wtp = 150)
-  expect_equal(row_of(y, "More")$iNMB_ref, (150 * 2 - 200) - (150 * 1 - 100))
-  expect_true(is.na(row_of(y, "Ref")$iNMB_ref))
+  expect_equal(row_of(y, "More")$Inc_NMB_ref, (150 * 2 - 200) - (150 * 1 - 100))
+  expect_true(is.na(row_of(y, "Ref")$Inc_NMB_ref))
   expect_false("NHB" %in% names(y))
 
   z <- toy_icers(ref_str = "Ref", wtp = 150, nhb = TRUE)
   expect_equal(z$NHB, z$Effect - z$Cost / 150)
-  expect_equal(row_of(z, "Cheaper")$iNHB_ref, (1.5 - 50 / 150) - (1 - 100 / 150))
+  expect_equal(row_of(z, "Cheaper")$Inc_NHB_ref, (1.5 - 50 / 150) - (1 - 100 / 150))
 })
 
 test_that("hund_strat: reference columns equal the difference from the reference", {
@@ -120,4 +120,17 @@ test_that("print.icers shows the sequential table by default and the reference v
   expect_true(any(grepl("Incremental Costs (€)", out_both, fixed = TRUE)))
 
   expect_error(print(toy_icers(), ref = "reference"), "no reference strategy")
+})
+
+test_that("print(ref = \"reference\") lists the reference first, then by cost", {
+  data(hund_strat)
+  x <- calculate_icers(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy, ref_str = "1")
+  expect_true(which(x$Strategy == "1") > 1)
+  out <- utils::capture.output(tbl <- print(x, ref = "reference"))
+  expect_equal(tbl$Strategy[1], "1")
+  v_rest <- hund_strat[hund_strat$Strategy != 1, ]
+  expect_equal(tbl$Strategy[-1], as.character(v_rest$Strategy[order(v_rest$Cost)]))
+  # the sequential and combined views keep the frontier order of the object
+  out <- utils::capture.output(tbl_both <- print(x, ref = "both"))
+  expect_equal(tbl_both$Strategy, x$Strategy)
 })

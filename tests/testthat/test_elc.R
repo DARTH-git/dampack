@@ -1,4 +1,3 @@
-context("elc")
 library(dampack)
 
 
@@ -20,8 +19,8 @@ elc_obj <- calc_exp_loss(psa = psa_obj,
 
 # classes
 test_that("return object has classes evpi and data.frame", {
-  expect_is(elc_obj, "exp_loss")
-  expect_is(elc_obj, "data.frame")
+  expect_s3_class(elc_obj, "exp_loss")
+  expect_s3_class(elc_obj, "data.frame")
 })
 
 
@@ -34,11 +33,11 @@ test_that("return object has correct column names", {
 # calculation
 test_that("expected loss is what we'd expect", {
   nmb <-  v_wtp[1] * cancer_psa_data$effectiveness - cancer_psa_data$cost
-  max_str <- max.col(nmb)
+  max_str <- max.col(nmb, ties.method = "first")
   loss <- nmb[cbind(1:(psa_obj$n_sim), max_str)] - nmb
   exp_loss <- colMeans(loss)
   obs_loss <- unlist(c(elc_obj[1:3, 3]))
-  expect_equal(exp_loss, obs_loss, check.names = FALSE)
+  expect_equal(exp_loss, obs_loss, ignore_attr = TRUE)
 })
 
 # methods
@@ -47,7 +46,7 @@ test_that("expected loss is what we'd expect", {
 test_that("plot.exp_loss returns ggplot class", {
   p <- plot(elc_obj, title = "Title",
             txtsize = 16, effect_units = "QALY", currency = "Dollars ($%$%)")
-  expect_is(p, "ggplot")
+  expect_s3_class(p, "ggplot")
 })
 
 test_that("plot.exp_loss runs with several combinations of arguments", {

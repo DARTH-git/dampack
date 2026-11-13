@@ -70,4 +70,5 @@ LazyData: true
 BuildResaveData: no
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
+Config/testthat/edition: 3
 Config/Needs/website: pkgdown

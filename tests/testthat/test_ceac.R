@@ -1,4 +1,3 @@
-context("ceac")
 library(dampack)
 
 # test the class
@@ -86,16 +85,16 @@ test_that("summary.ceac summarizes a real psa whose frontier switches many times
 test_that("plot.ceac produces ggplot object", {
   ceac_obj <- ceac(wtp, psa_obj)
   gf <- plot(ceac_obj, frontier = TRUE)
-  expect_is(gf, "ggplot")
+  expect_s3_class(gf, "ggplot")
 
   gnof <- plot(ceac_obj, frontier = FALSE)
-  expect_is(gnof, "ggplot")
+  expect_s3_class(gnof, "ggplot")
 
   custom_breaks <- plot(ceac_obj, xbreaks = seq(0, 140))
-  expect_is(custom_breaks, "ggplot")
+  expect_s3_class(custom_breaks, "ggplot")
 
   # black and white
-  expect_is(plot(ceac_obj, col = "bw"), "ggplot")
+  expect_s3_class(plot(ceac_obj, col = "bw"), "ggplot")
 })
 
 # max.col() treats values within a relative tolerance of 1e-5 as ties and, by default, breaks

@@ -1,4 +1,3 @@
-context("run_psa")
 library(dampack)
 
 test_func <- function(params, extra_param) {

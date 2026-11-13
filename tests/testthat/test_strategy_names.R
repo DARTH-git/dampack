@@ -1,5 +1,3 @@
-context("strategy names are kept as typed (#208)")
-
 # Strategy names that are not syntactically valid R names: spaces, parentheses,
 # a leading digit, and a non-ASCII character.
 v_names <- c("Standard of care", "New drug (A)", "2-dose regimen ñ")

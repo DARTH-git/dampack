@@ -1,4 +1,3 @@
-context("evppi")
 library(dampack)
 
 

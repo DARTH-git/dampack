@@ -1,4 +1,3 @@
-context("gen_psa_samp")
 library(dampack)
 
 

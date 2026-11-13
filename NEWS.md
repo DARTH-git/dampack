@@ -21,12 +21,13 @@
 
 ## Bug fixes
 
-- `run_psa()` no longer drops the first parameter of a PSA sample that was not created by `gen_psa_samp()`; it removes only the `nsamp` sample-number column that `gen_psa_samp()` adds. When `FUN` fails on the PSA parameters, `run_psa()` now stops with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#174).
+- `plot.owsa(col = "bw")` now draws each strategy with its own line type; all strategies used to share one line type and could not be told apart (#176).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).
 - `metamodel()`, and the functions that use it (`owsa()` and `twsa()` on a PSA, `calc_evppi()`, `calc_evsi()`), now work with strategy names that are not syntactically valid R names (#208).
 - `summary.ceac()` no longer returns duplicated, mislabeled, and `NA`-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173).
+- `run_psa()` no longer drops the first parameter of a PSA sample that was not created by `gen_psa_samp()`; it removes only the `nsamp` sample-number column that `gen_psa_samp()` adds. When `FUN` fails on the PSA parameters, `run_psa()` now stops with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#174).
 - The y-axis label of the CEAC plot now correctly describes what is plotted (#165).
 - `owsa_tornado()` no longer omits parameters whose minimum value is negative (#166).
 - Fixed a pointer in the PSA vignette to a vignette that no longer exists (#168).

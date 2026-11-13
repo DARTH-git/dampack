@@ -254,3 +254,17 @@ test_that("checking warning error message from run_twsa_det", {
                             progress = FALSE),
                "FUN should return a data.frame with >= 2 columns. 1st column is strategy name; the rest are outcomes")
 })
+
+# the check that FUN runs was dead code (is.na(sum(is.na(jj))) is never TRUE), so a broken
+# FUN failed later with only its raw error (#210, same pattern as #174)
+test_that("run_owsa_det() and run_twsa_det() report a FUN that fails", {
+  bad_fun <- function(params) stop("this model cannot run")
+  range_1 <- data.frame(pars = "p_inf", min = 0, max = 0.5)
+  expect_error(run_owsa_det(range_1, params_basecase, nsamp = 5, FUN = bad_fun,
+                            outcomes = "tot_incidence", progress = FALSE),
+               "FUN is not well defined.*this model cannot run")
+  range_2 <- data.frame(pars = c("p_inf", "p_test_asymp"), min = c(0, 0), max = c(0.5, 0.2))
+  expect_error(run_twsa_det(range_2, params_basecase, nsamp = 5, FUN = bad_fun,
+                            outcomes = "tot_incidence", progress = FALSE),
+               "FUN is not well defined.*this model cannot run")
+})

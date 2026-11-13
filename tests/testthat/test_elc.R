@@ -59,3 +59,13 @@ test_that("plot.exp_loss runs with several combinations of arguments", {
   expect_silent(plot(elc_obj, ylim = c(1e3, 1e5), n_y_ticks = 10,
                      log_y = FALSE, frontier = TRUE, col = "full", points = FALSE))
 })
+
+# black-and-white expected loss curves ignored lsize and warned about an unused color scale (#210)
+test_that("plot.exp_loss(col = 'bw') uses lsize and builds without warnings", {
+  el <- calc_exp_loss(psa_obj, wtp = seq(1e4, 1e5, 1e4))
+  g <- plot(el, col = "bw", lsize = 3)
+  expect_warning(b <- ggplot2::ggplot_build(g), NA)
+  i_line <- which(vapply(g$layers, function(l) inherits(l$geom, "GeomLine"), logical(1)))
+  expect_equal(unique(b$data[[i_line]]$linewidth), 3)
+  expect_equal(length(unique(b$data[[i_line]]$linetype)), length(unique(el$Strategy)))
+})

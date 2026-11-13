@@ -37,3 +37,12 @@ test_that("dsa prints", {
   output <- capture.output(print(dsa))
   expect_equal(output[2], "Two-way Deterministic SA Object ")
 })
+
+# twsa() on a dsa_twoway object resolved the default outcome only in the psa branch, so
+# calling it without `outcome` failed with "'arg' must be of length 1" (#210)
+test_that("twsa() on a dsa_twoway object works with the default outcome", {
+  dsa <- create_dsa_twoway(params, effect, strategies, cost)
+  tw <- twsa(dsa)
+  expect_is(tw, "twsa")
+  expect_equal(tw$outcome_val[tw$strategy == "s1"], effect$s1)
+})

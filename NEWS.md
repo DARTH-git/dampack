@@ -21,6 +21,10 @@
 
 ## Bug fixes
 
+- `twsa()` on a `dsa_twoway` object now works without an explicit `outcome`; it used to fail with "'arg' must be of length 1" (#210).
+- `make_psa_obj()` and the DSA constructors now name the columns of `other_outcome` after the strategies, like `cost` and `effectiveness` (#210).
+- When `FUN` fails on the base case, `run_owsa_det()` and `run_twsa_det()` now stop with "FUN is not well defined ..." followed by `FUN`'s own error; that check never ran before (#210).
+- `plot.exp_loss(col = "bw")` now uses `lsize` for the line width and no longer warns about an unused color scale (#210).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).

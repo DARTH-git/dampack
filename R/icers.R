@@ -553,20 +553,18 @@ plot.icers <- function(x,
                        ref_axis = TRUE,
                        ref_caption = TRUE,
                        ...) {
-  Cost <- Effect <- Status <- Strategy <- Inc_Cost <- Inc_Effect <- ICER <- NULL
+  # column name used unquoted in arrange() below; avoids an R CMD check note
+  Status <- NULL
   if (is.null(currency)) {
     currency <- if (is.null(attr(x, "currency"))) "$" else attr(x, "currency")
   }
   ref_str <- check_ref_str(ref_str, x$Strategy)
   check_wtp_nhb(wtp, nhb = FALSE)
 
-  if (ncol(x) > 7) {
-    # reformat icers class object if uncertainty bounds are present
-    x <- x %>%
-      select(Strategy, Cost, Effect,
-             Inc_Cost, Inc_Effect,
-             ICER, Status)
-  }
+  # keep only the columns the plot uses, as a plain data frame, so the plot data are the same
+  # whether or not x has uncertainty bounds, reference columns, or stored attributes
+  v_plot_cols <- c("Strategy", "Cost", "Effect", "Inc_Cost", "Inc_Effect", "ICER", "Status")
+  x <- data.frame(unclass(x)[v_plot_cols], check.names = FALSE, stringsAsFactors = FALSE)
 
   # type checking
   label <- match.arg(label)

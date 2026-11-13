@@ -1,4 +1,4 @@
-context("reference strategy and WTP lines in plot.icers() and plot.psa() (#209, #202)")
+# reference strategy and WTP lines in plot.icers() and plot.psa() (#209, #202)
 
 df_toy <- data.frame(strategy = c("Standard of care", "New drug (A)", "Cheaper", "Worse"),
                      cost = c(100, 200, 50, 300),

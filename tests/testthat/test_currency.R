@@ -1,4 +1,4 @@
-context("the currency of a psa object carries through to results, plots, and tables (#203)")
+# the currency of a psa object carries through to results, plots, and tables (#203)
 
 cancer_psa_data <- dampack::cancer_psa_data
 psa_eur <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,

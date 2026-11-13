@@ -1,4 +1,4 @@
-context("summary.psa() and calculate_icers_psa() against a reference strategy (#209, #202)")
+# summary.psa() and calculate_icers_psa() against a reference strategy (#209, #202)
 
 # Four PSA samples; the difference "New" - "Ref" falls in a different quadrant in each:
 #   sample  inc effect  inc cost  quadrant

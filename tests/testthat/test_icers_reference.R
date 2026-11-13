@@ -1,4 +1,4 @@
-context("calculate_icers() against a reference strategy (#209) and net benefit (#200)")
+# calculate_icers() against a reference strategy (#209) and net benefit (#200)
 
 # Toy example with one strategy in each position relative to the reference "Ref":
 #   strategy  cost  effect   vs Ref: inc cost  inc effect  status

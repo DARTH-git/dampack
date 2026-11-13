@@ -76,7 +76,7 @@ ceac <- function(wtp, psa) {
   # vector to store strategy at the cost-effectiveness acceptability frontier
   v_frontv <- rep(0, n_wtps)
 
-  for (l in 1:n_wtps) {
+  for (l in seq_len(n_wtps)) {
     # calculate net monetary benefit at wtp[l]
     lth_wtp <- wtp[l]
     df_nmb <-  calculate_outcome("nmb", df_cost, df_effectiveness, lth_wtp)
@@ -286,7 +286,7 @@ summary.ceac <- function(object, ...) {
     # switch additionally contributes the interval running to the highest wtp,
     # giving n_switches + 1 rows. every index below is a single element -
     # indexing with the whole `switches` vector recycles and duplicates rows.
-    for (i in 1:n_switches) {
+    for (i in seq_len(n_switches)) {
       if (i == 1) {
         df_sum_row <- data.frame(v_wtp_range[1],
                                  v_wtp[v_switches[1]],

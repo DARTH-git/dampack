@@ -40,6 +40,15 @@ test_that("evpi is what we'd expect", {
   expect_equal(evpi, evpi_obj[1, 2])
 })
 
+# zero-length input: seq_len() loop must not misbehave when n == 0
+test_that("calc_evpi returns an empty evpi object for zero-length wtp", {
+  empty_evpi <- calc_evpi(psa = psa_obj, wtp = numeric(0))
+  expect_is(empty_evpi, "evpi")
+  expect_is(empty_evpi, "data.frame")
+  expect_equal(nrow(empty_evpi), 0)
+  expect_equal(names(empty_evpi), c("WTP", "EVPI"))
+})
+
 # methods
 
 ## plot

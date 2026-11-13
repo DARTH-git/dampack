@@ -103,7 +103,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
   n_outcomes <- length(outcomes)
   l_outcomes <- vector(mode = "list", length = n_outcomes)
   names(l_outcomes) <- outcomes
-  for (j in 1:n_outcomes) {
+  for (j in seq_len(n_outcomes)) {
     l_outcomes[[j]] <- lapply(l_sim_out,
                               function(x, tmp_out = outcomes[j]) {
                                 t(x[[outcomes[j]]])
@@ -115,7 +115,7 @@ run_psa <- function(psa_samp, params_basecase = NULL, FUN, outcomes = NULL,
 
 
   l_psa_out <- vector(mode = "list", length = n_outcomes)
-  for (j in 1:n_outcomes) {
+  for (j in seq_len(n_outcomes)) {
     l_psa_out[[j]] <- make_psa_obj(cost = NULL, effectiveness = NULL,
                                    other_outcome = l_outcomes[[j]],
                                    parameters = psa_samp[, -1], strategies = strategies,

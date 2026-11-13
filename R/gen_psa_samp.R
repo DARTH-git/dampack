@@ -144,7 +144,7 @@ gen_psa_samp <- function(params = NULL,
   n_params <- length(params)
   df_params <- vector(mode = "list", length = n_params)
 
-  for (i in 1:n_params) {
+  for (i in seq_len(n_params)) {
     #normal
     if (dists[i] == "normal") {
       df_params[[i]] <- data.frame(param_val = rnorm(nsamp, mean = dists_params[[i]][1],
@@ -227,7 +227,7 @@ gen_psa_samp <- function(params = NULL,
     #bootstrap
     if (dists[i] == "bootstrap") {
       v_samp <- vector(mode = "numeric", length = nsamp)
-      for (k in 1:nsamp) {
+      for (k in seq_len(nsamp)) {
         v_samp[k] <- mean(sample(x = dists_params[[i]][, 1],
                                  size = sum(dists_params[[i]][, 2]),
                                  replace = TRUE,
@@ -268,11 +268,9 @@ gen_psa_samp <- function(params = NULL,
 #'
 #' @param n number of observations
 #' @param alpha vector of parameters defining Dirichlet distribution
-#'
-#'
-#'  @importFrom stats rgamma
-#'  @return A vector random values sampled from a dirichlet distribution
-#'  @export
+#' @importFrom stats rgamma
+#' @return A vector random values sampled from a dirichlet distribution
+#' @keywords internal
 rdirichlet <- function(n, alpha) {
   k <- length(alpha)
   m_out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
@@ -355,7 +353,7 @@ dirichlet_params <- function(p.mean, sigma) {
   v_p_2 <- sigma ^ 2 + p.mean ^ 2
   # Initialize alpha vector
   v_alpha <- numeric(n.params)
-  for (i in 1:(n.params - 1)) {
+  for (i in seq_len(n.params - 1)) {
     v_alpha[i] <- (p.mean[1] - v_p_2[1]) * p.mean[i] / (v_p_2[1] - p.mean[1] ^ 2)
   }
   v_alpha[n.params] <- (p.mean[1] - v_p_2[1]) * (1 - sum(p.mean[- n.params])) / (v_p_2[1] - p.mean[1] ^ 2)

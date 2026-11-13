@@ -47,11 +47,11 @@ BugReports: https://github.com/DARTH-git/dampack/issues
 Encoding: UTF-8
 Depends:
     R (>= 4.1.0),
-    ggplot2 (>= 3.3.0)
+    ggplot2 (>= 3.5.0)
 Imports:
     ellipse,
     dplyr,
-    scales,
+    scales (>= 1.3.0),
     stringr,
     mgcv,
     truncnorm,

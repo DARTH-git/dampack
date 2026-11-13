@@ -205,7 +205,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
       scale_x_continuous(breaks = xb,
                          labels = labfun,
                          limits = xlim,
-                         trans = xtrans,
+                         transform = xtrans,
                          expand = xexpand)
   }
   if ("y" %in% continuous) {
@@ -218,7 +218,7 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
       scale_y_continuous(breaks = yb,
                          labels = labfun,
                          limits = ylim,
-                         trans = ytrans,
+                         transform = ytrans,
                          expand = yexpand)
   }
   p

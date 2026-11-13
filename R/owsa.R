@@ -298,11 +298,11 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
 #' @param offset the offset for the transformation (kind of the new 0)
 #' @return offset value supplied to ytrans in \code{add_common_aes}
 #' @keywords internal
-#' @importFrom scales trans_new
+#' @importFrom scales new_transform
 offset_trans <- function(offset = 0) {
-  trans_new(paste0("offset-", format(offset)),
-            function(x) x - offset,
-            function(x) x + offset)
+  new_transform(paste0("offset-", format(offset)),
+                function(x) x - offset,
+                function(x) x + offset)
 }
 
 #' plot the optimal strategy as the parameter values change
@@ -351,15 +351,16 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   ## filter to those parameter values
   ## that maximize the outcome for each strategy
   df_opt_strat <- owsa %>%
-    group_by(parameter, param_val, .groups = "drop_last") %>%
+    group_by(parameter, param_val) %>%
     filter(outcome_val == obj_fun(outcome_val)) %>%
     ungroup() %>%
-    group_by(parameter, strategy, .groups = "drop_last") %>%
-    summarize(pmin = min(param_val), pmax = max(param_val)) %>%
+    group_by(parameter, strategy) %>%
+    summarize(pmin = min(param_val), pmax = max(param_val),
+              .groups = "drop_last") %>%
     ungroup()
   if (!plot_const) {
     df_opt_strat <- df_opt_strat %>%
-      group_by(parameter, .groups = "drop_last") %>%
+      group_by(parameter) %>%
       filter(n() > 1) %>%
       ungroup()
   }

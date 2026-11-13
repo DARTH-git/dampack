@@ -27,6 +27,19 @@ test_that("plot.psa(ref_str = ): reference axes and caption are optional", {
   expect_setequal(as.character(unique(ggplot2::layer_data(p2, 1)$group)), c("1", "2"))
 })
 
+test_that("plot.psa() without center points builds without a fill-scale warning", {
+  # both the plain and the incremental CE plane, in every color option
+  for (col in c("access", "full", "bw")) {
+    expect_no_warning(ggplot2::ggplot_build(plot(psa_big, center = FALSE, ellipse = FALSE, col = col)))
+    expect_no_warning(ggplot2::ggplot_build(plot(psa_big, ref_str = "Chemo", center = FALSE,
+                                                 ellipse = FALSE, col = col)))
+  }
+  # with center points, strategies still get matching color and fill
+  p <- plot(psa_big)
+  v_aes <- unlist(lapply(p$scales$scales, function(s) s$aesthetics))
+  expect_true(all(c("colour", "fill") %in% v_aes))
+})
+
 test_that("plot.ceac(): frontier, points, and min_prob", {
   df_ceac <- ceac(v_wtp, psa_big)
   expect_true("GeomPoint" %in% geoms(plot(df_ceac)))

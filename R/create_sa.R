@@ -82,6 +82,9 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
   if (!is.null(effectiveness)) {
     names(effectiveness) <- strategies
   }
+  if (!is.null(other_outcome)) {
+    names(other_outcome) <- strategies
+  }
 
   # define sa as a named list
   sa <- list("n_strategies" = n_strategies,

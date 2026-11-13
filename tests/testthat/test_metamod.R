@@ -1,4 +1,3 @@
-context("metamodel")
 library(dampack)
 
 # test the class
@@ -17,7 +16,7 @@ psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
 
 test_that("metamodel object has correct classes", {
   mm <- metamodel(psa = psa_big, param = "pFailChemo", outcome = "cost")
-  expect_is(mm, "metamodel")
+  expect_s3_class(mm, "metamodel")
 })
 
 # methods
@@ -26,7 +25,7 @@ test_that("metamodel with one outcome", {
   # metamodel
   ## linear
   mm_lin <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo")
-  expect_is(mm_lin, "metamodel")
+  expect_s3_class(mm_lin, "metamodel")
 
   # predictions
   pred_lin <- predict(mm_lin)
@@ -36,7 +35,7 @@ test_that("metamodel with one outcome", {
   ## poly
   mm_poly <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo",
                        type = "poly")
-  expect_is(mm_poly, "metamodel")
+  expect_s3_class(mm_poly, "metamodel")
 
   # predictions
   pred_poly <- predict(mm_poly)
@@ -46,7 +45,7 @@ test_that("metamodel with one outcome", {
   ## GAM
   mm_gam <- metamodel(psa = psa_big, params = "pFailChemo", outcome = "cost", strategies = "Chemo",
                       type = "gam")
-  expect_is(mm_gam, "metamodel")
+  expect_s3_class(mm_gam, "metamodel")
 
   # predictions
   pred_gam <- predict(mm_gam)
@@ -57,7 +56,7 @@ test_that("metamodel with one outcome", {
 test_that("prediction with several outcomes", {
   # metamodel
   mm <- metamodel(psa = psa_big, outcome = "eff")
-  expect_is(mm, "metamodel")
+  expect_s3_class(mm, "metamodel")
 
   # number of linear models
   expect_equal(length(mm$mods), 8)
@@ -124,7 +123,7 @@ test_that("two-way metamodel", {
   # metamodel
   mm <- metamodel(analysis = "twoway", params = c("pFailChemo", "pFailRadio"),
                   psa = psa_big, outcome = "eff")
-  expect_is(mm, "metamodel")
+  expect_s3_class(mm, "metamodel")
 })
 
 test_that("invalid metamodel parameters are reported", {
@@ -145,4 +144,30 @@ test_that("invalid parameters are reported by EVPPI and EVSI", {
               outcome = "nmb", progress = FALSE),
     "the following parameters are not valid: not_a_parameter"
   )
+})
+
+# print() and summary() methods (#215)
+test_that("summary.metamodel() gives one R-squared per parameter and strategy", {
+  mm_lm <- metamodel("oneway", psa_big, params = c("pFailChemo", "cSurg"), outcome = "nmb", wtp = 1e5)
+  s <- summary(mm_lm)
+  expect_equal(nrow(s), 2 * length(psa_big$strategies))
+  expect_setequal(s$param, c("pFailChemo", "cSurg"))
+  expect_true(all(s$rsquared >= 0 & s$rsquared <= 1))
+  mm_gam <- metamodel("oneway", psa_big, params = "pFailChemo", outcome = "nmb", wtp = 1e5, type = "gam")
+  expect_true(all(summary(mm_gam)$rsquared <= 1))
+  mm_tw <- metamodel("twoway", psa_big, params = c("pFailChemo", "pFailRadio"), outcome = "nmb", wtp = 1e5)
+  s_tw <- summary(mm_tw)
+  expect_equal(nrow(s_tw), length(psa_big$strategies))
+  expect_true(all(c("param1", "param2", "rsquared") %in% names(s_tw)))
+  mm_mw <- metamodel("multiway", psa_big, params = c("pFailChemo", "pFailRadio"), outcome = "nmb",
+                     wtp = 1e5, type = "gam")
+  expect_error(summary(mm_mw), "not available for multiway")
+})
+
+test_that("print.metamodel() describes the analysis", {
+  mm <- metamodel("oneway", psa_big, params = "pFailChemo", outcome = "nmb", wtp = 1e5)
+  out <- capture.output(print(mm))
+  expect_true(any(grepl("metamodel object", out)))
+  expect_true(any(grepl("pFailChemo", out)))
+  expect_true(any(grepl("100000|1e\\+05", out)))
 })

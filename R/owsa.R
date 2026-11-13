@@ -298,11 +298,11 @@ owsa_tornado <- function(owsa, return = c("plot", "data"),
 #' @param offset the offset for the transformation (kind of the new 0)
 #' @return offset value supplied to ytrans in \code{add_common_aes}
 #' @keywords internal
-#' @importFrom scales trans_new
+#' @importFrom scales new_transform
 offset_trans <- function(offset = 0) {
-  trans_new(paste0("offset-", format(offset)),
-            function(x) x - offset,
-            function(x) x + offset)
+  new_transform(paste0("offset-", format(offset)),
+                function(x) x - offset,
+                function(x) x + offset)
 }
 
 #' plot the optimal strategy as the parameter values change
@@ -339,7 +339,7 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
     stop("must provide an owsa object created with owsa()")
   }
 
-  parameter <- param_val <- outcome_val <- strategy <- NULL
+  parameter <- param_val <- outcome_val <- strategy <- xmin <- xmax <- NULL
   # get optimal strategy
   ## either minimum or maximum
   if (maximize) {
@@ -351,15 +351,16 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   ## filter to those parameter values
   ## that maximize the outcome for each strategy
   df_opt_strat <- owsa %>%
-    group_by(parameter, param_val, .groups = "drop_last") %>%
+    group_by(parameter, param_val) %>%
     filter(outcome_val == obj_fun(outcome_val)) %>%
     ungroup() %>%
-    group_by(parameter, strategy, .groups = "drop_last") %>%
-    summarize(pmin = min(param_val), pmax = max(param_val)) %>%
+    group_by(parameter, strategy) %>%
+    summarize(pmin = min(param_val), pmax = max(param_val),
+              .groups = "drop_last") %>%
     ungroup()
   if (!plot_const) {
     df_opt_strat <- df_opt_strat %>%
-      group_by(parameter, .groups = "drop_last") %>%
+      group_by(parameter) %>%
       filter(n() > 1) %>%
       ungroup()
   }
@@ -378,10 +379,14 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
     df_opt_strat$parameter <- factor(df_opt_strat$parameter, levels = unique(owsa$parameter))
   }
 
-  g <- ggplot(df_opt_strat) +
-    facet_wrap("parameter", scales = "free_x", ncol = facet_ncol, nrow = facet_nrow) +
-    # a little bit hacky: rectangles with height 1
-    geom_rect(aes(xmin = pmin, xmax = pmax,
+  # bars for the plot: one per run of the same optimal strategy along each parameter's values,
+  # meeting halfway between the last value of one run and the first value of the next
+  df_bars <- opt_strat_runs(owsa, obj_fun, levels(droplevels(df_opt_strat$parameter)),
+                            levels(df_opt_strat$strategy))
+
+  g <- ggplot(df_bars) +
+    # rectangles with height 1; the y axis carries no information
+    geom_rect(aes(xmin = xmin, xmax = xmax,
                   ymin = 0, ymax = 1,
                   fill = strategy),
               position = "identity") +
@@ -418,4 +423,41 @@ is_owsa <- function(obj) {
   } else {
     FALSE
   }
+}
+
+#' Runs of the optimal strategy along each parameter in a one-way sensitivity analysis
+#'
+#' For each parameter, finds the optimal strategy at every parameter value (ties go to the
+#' first strategy) and collapses consecutive values with the same optimal strategy into one run.
+#' Runs meet halfway between the last value of one run and the first value of the next, so that
+#' the bars drawn by \code{\link{owsa_opt_strat}} cover the whole range without gaps or overlaps.
+#'
+#' @param owsa an \code{owsa} object.
+#' @param obj_fun \code{max} or \code{min}.
+#' @param v_params parameters to include, in plotting order.
+#' @param v_strategies strategies, in legend order.
+#' @return a data frame with columns \code{parameter}, \code{strategy}, \code{xmin}, \code{xmax}.
+#' @keywords internal
+opt_strat_runs <- function(owsa, obj_fun, v_params, v_strategies) {
+  l_runs <- lapply(v_params, function(p) {
+    df_p <- owsa[owsa$parameter == p, ]
+    v_x <- sort(unique(df_p$param_val))
+    v_best <- vapply(v_x, function(x) {
+      df_x <- df_p[df_p$param_val == x, ]
+      as.character(df_x$strategy)[which(df_x$outcome_val == obj_fun(df_x$outcome_val))[1]]
+    }, character(1))
+    l_rle <- rle(v_best)
+    v_end <- cumsum(l_rle$lengths)
+    v_start <- c(1, v_end[-length(v_end)] + 1)
+    v_mid <- (v_x[-length(v_x)] + v_x[-1]) / 2
+    data.frame(parameter = p,
+               strategy = l_rle$values,
+               xmin = ifelse(v_start == 1, v_x[1], v_mid[pmax(v_start - 1, 1)]),
+               xmax = ifelse(v_end == length(v_x), v_x[length(v_x)], v_mid[pmin(v_end, length(v_mid))]),
+               stringsAsFactors = FALSE)
+  })
+  df_runs <- do.call(rbind, l_runs)
+  df_runs$parameter <- factor(df_runs$parameter, levels = v_params)
+  df_runs$strategy <- factor(df_runs$strategy, levels = v_strategies)
+  df_runs
 }

@@ -9,13 +9,12 @@ rdirichlet(n, alpha)
 \arguments{
 \item{n}{number of observations}
 
-\item{alpha}{vector of parameters defining Dirichlet distribution
-
-
- @importFrom stats rgamma
- @return A vector random values sampled from a dirichlet distribution
- @export}
+\item{alpha}{vector of parameters defining Dirichlet distribution}
+}
+\value{
+A vector random values sampled from a dirichlet distribution
 }
 \description{
 Random number generation for the Dirichlet distribution with parameter vector alpha.
 }
+\keyword{internal}

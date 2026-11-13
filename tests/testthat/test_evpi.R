@@ -1,4 +1,3 @@
-context("evpi")
 library(dampack)
 
 
@@ -21,8 +20,8 @@ evpi_obj <- calc_evpi(psa = psa_obj,
 
 # classes
 test_that("return object has classes evpi and data.frame", {
-  expect_is(evpi_obj, "evpi")
-  expect_is(evpi_obj, "data.frame")
+  expect_s3_class(evpi_obj, "evpi")
+  expect_s3_class(evpi_obj, "data.frame")
 })
 
 # structure
@@ -40,6 +39,15 @@ test_that("evpi is what we'd expect", {
   expect_equal(evpi, evpi_obj[1, 2])
 })
 
+# zero-length input: seq_len() loop must not misbehave when n == 0
+test_that("calc_evpi returns an empty evpi object for zero-length wtp", {
+  empty_evpi <- calc_evpi(psa = psa_obj, wtp = numeric(0))
+  expect_s3_class(empty_evpi, "evpi")
+  expect_s3_class(empty_evpi, "data.frame")
+  expect_equal(nrow(empty_evpi), 0)
+  expect_equal(names(empty_evpi), c("WTP", "EVPI"))
+})
+
 # methods
 
 ## plot
@@ -47,5 +55,5 @@ test_that("plot.evpi has ggplot class", {
   p <- plot(evpi_obj,
             txtsize = 16, effect_units = "QALY", currency = "Dollars ($)",
             xbreaks = seq(0, 200, by = 10), ylim = c(0, 100000))
-  expect_is(p, "ggplot")
+  expect_s3_class(p, "ggplot")
 })

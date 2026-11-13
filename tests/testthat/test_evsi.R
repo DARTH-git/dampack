@@ -1,4 +1,3 @@
-context("evsi")
 library(dampack)
 
 # test return object

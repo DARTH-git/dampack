@@ -74,25 +74,27 @@ ceac <- function(wtp, psa) {
   colnames(m_cea) <- v_strategies
 
   # vector to store strategy at the cost-effectiveness acceptability frontier
-  v_frontv <- rep(0, n_wtps)
+  v_front <- rep(0, n_wtps)
 
-  for (l in 1:n_wtps) {
+  for (l in seq_len(n_wtps)) {
     # calculate net monetary benefit at wtp[l]
     lth_wtp <- wtp[l]
     df_nmb <-  calculate_outcome("nmb", df_cost, df_effectiveness, lth_wtp)
 
     # find the distribution of optimal strategies
-    v_max_nmb <- max.col(df_nmb)
+    # ties.method = "first": exact comparison; the default ("random") treats values within a
+    # relative tolerance of 1e-5 as ties and picks among them at random (#167)
+    v_max_nmb <- max.col(df_nmb, ties.method = "first")
     a_opt <- table(v_max_nmb)
     m_cea[l, as.numeric(names(a_opt))] <- a_opt / n_sim
 
     # calculate point on CEAF
     # the strategy with the highest expected nmb
-    v_frontv[l] <- which.max(colMeans(df_nmb))
+    v_front[l] <- which.max(colMeans(df_nmb))
   }
 
   # make cea df
-  df_cea <- data.frame(wtp, m_cea, v_strategies[v_frontv],
+  df_cea <- data.frame(wtp, m_cea, v_strategies[v_front],
                        stringsAsFactors = FALSE)
   colnames(df_cea) <- c("WTP", v_strategies, "fstrat")
 
@@ -291,7 +293,7 @@ summary.ceac <- function(object, ...) {
     # switch additionally contributes the interval running to the highest wtp,
     # giving n_switches + 1 rows. every index below is a single element -
     # indexing with the whole `switches` vector recycles and duplicates rows.
-    for (i in 1:n_switches) {
+    for (i in seq_len(n_switches)) {
       if (i == 1) {
         df_sum_row <- data.frame(v_wtp_range[1],
                                  v_wtp[v_switches[1]],

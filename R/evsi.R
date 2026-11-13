@@ -173,7 +173,7 @@ predict_ga <- function(object, n, n0) {
   m_x <- matrix(NA, n_row_x, n_col_x)
   m_x[, 1] <- 1
 
-  for (k in 1:n_smooth) {
+  for (k in seq_len(n_smooth)) {
     klab <- substr(object$smooth[[k]]$label, 1, 1)
     if (klab == "s") {
       m_x_frag <- predict_smooth_ga(object$smooth[[k]], df_param_vals, v_vrf[k])
@@ -327,7 +327,7 @@ plot.evsi <- function(x,
     g <- ggplot(data = x,
                 aes(x = WTP_thou, y = EVSI)) +
       xlab(scale_text)
-  } else if (length(unique(x$WTP > 1)) && length(unique(x$n)) > 1) {
+  } else if (length(unique(x$WTP)) > 1 && length(unique(x$n)) > 1) {
     x$WTP_thou <- as.factor(x$WTP_thou)
     g <- ggplot(data = x,
                 aes(x = n, y = EVSI, color = WTP_thou)) +

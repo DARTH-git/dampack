@@ -134,17 +134,30 @@ gen_psa_samp <- function(params = NULL,
                          parameterization_types = c("mean, sd", "a, b", "shape, scale",
                                                     "value, mean_prop, sd", "value, n",
                                                     "value, alpha", "mean, sd, ll, ul", "val",
-                                                    "meanlog, sdlog", "ll, ul, mode"),
+                                                    "meanlog, sdlog", "ll, ul, mode",
+                                                    "value, weight"),
                          dists_params = NULL,
                          nsamp = 100) {
 
-  dists <- match.arg(dists, several.ok = TRUE)
-  parameterization_types <- match.arg(parameterization_types, several.ok = TRUE)
+  # match each element exactly or by unique partial match, and stop on unknown values;
+  # match.arg(several.ok = TRUE) silently dropped them, shifting every later element
+  dists <- match_each(dists, eval(formals(gen_psa_samp)$dists), "dists")
+  parameterization_types <- match_each(parameterization_types,
+                                       eval(formals(gen_psa_samp)$parameterization_types),
+                                       "parameterization_types")
 
   n_params <- length(params)
+  v_lengths <- c(params = n_params, dists = length(dists),
+                 parameterization_types = length(parameterization_types),
+                 dists_params = length(dists_params))
+  if (length(unique(v_lengths)) != 1) {
+    stop("`params`, `dists`, `parameterization_types`, and `dists_params` must all have the same length ",
+         "(one element per parameter); they have lengths ",
+         paste0(names(v_lengths), " = ", v_lengths, collapse = ", "), ".", call. = FALSE)
+  }
   df_params <- vector(mode = "list", length = n_params)
 
-  for (i in 1:n_params) {
+  for (i in seq_len(n_params)) {
     #normal
     if (dists[i] == "normal") {
       df_params[[i]] <- data.frame(param_val = rnorm(nsamp, mean = dists_params[[i]][1],
@@ -227,7 +240,7 @@ gen_psa_samp <- function(params = NULL,
     #bootstrap
     if (dists[i] == "bootstrap") {
       v_samp <- vector(mode = "numeric", length = nsamp)
-      for (k in 1:nsamp) {
+      for (k in seq_len(nsamp)) {
         v_samp[k] <- mean(sample(x = dists_params[[i]][, 1],
                                  size = sum(dists_params[[i]][, 2]),
                                  replace = TRUE,
@@ -268,11 +281,9 @@ gen_psa_samp <- function(params = NULL,
 #'
 #' @param n number of observations
 #' @param alpha vector of parameters defining Dirichlet distribution
-#'
-#'
-#'  @importFrom stats rgamma
-#'  @return A vector random values sampled from a dirichlet distribution
-#'  @export
+#' @importFrom stats rgamma
+#' @return A vector random values sampled from a dirichlet distribution
+#' @keywords internal
 rdirichlet <- function(n, alpha) {
   k <- length(alpha)
   m_out <- matrix(rgamma(n * k, shape = alpha), n, k, byrow = TRUE)
@@ -355,7 +366,7 @@ dirichlet_params <- function(p.mean, sigma) {
   v_p_2 <- sigma ^ 2 + p.mean ^ 2
   # Initialize alpha vector
   v_alpha <- numeric(n.params)
-  for (i in 1:(n.params - 1)) {
+  for (i in seq_len(n.params - 1)) {
     v_alpha[i] <- (p.mean[1] - v_p_2[1]) * p.mean[i] / (v_p_2[1] - p.mean[1] ^ 2)
   }
   v_alpha[n.params] <- (p.mean[1] - v_p_2[1]) * (1 - sum(p.mean[- n.params])) / (v_p_2[1] - p.mean[1] ^ 2)
@@ -467,4 +478,23 @@ lnorm_params <- function(m = 1, v = 1) {
   sigma <- sqrt(log(1 + v / m ^ 2))
   list(mu = mu,
        sigma = sigma)
+}
+
+#' Match each element of a vector against a set of choices
+#'
+#' Like \code{match.arg(several.ok = TRUE)}, but keeps one result per element (in order) and
+#' stops on values that match no choice, instead of silently dropping them.
+#'
+#' @param x character vector to match.
+#' @param choices allowed values.
+#' @param arg_name argument name, used in the error message.
+#' @return the matched choices, one per element of \code{x}.
+#' @keywords internal
+match_each <- function(x, choices, arg_name) {
+  i <- pmatch(x, choices, duplicates.ok = TRUE)
+  if (anyNA(i)) {
+    stop("Unknown `", arg_name, "`: ", paste0("\"", x[is.na(i)], "\"", collapse = ", "),
+         ". Allowed values are: ", paste0("\"", choices, "\"", collapse = ", "), ".", call. = FALSE)
+  }
+  choices[i]
 }

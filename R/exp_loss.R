@@ -57,7 +57,8 @@ calc_exp_loss <- function(psa, wtp) {
   }
   # optimal strategy based on lowest expected loss (max of negative expected loss)
   # this was done because min.col isn't a function
-  v_optimal_str <- max.col(-m_exp_loss)
+  # exact comparison; ties go to the first strategy (see ceac())
+  v_optimal_str <- max.col(-m_exp_loss, ties.method = "first")
 
   # Format expected loss for plotting
   df_exp_loss <- data.frame(wtp, m_exp_loss, v_strategies[v_optimal_str])
@@ -172,10 +173,11 @@ plot.exp_loss <- function(x,
       p <- p + geom_point()
     }
     p <- p +
-      geom_line(aes(linetype = !!sym(strat_name)))
+      geom_line(linewidth = lsize, aes(linetype = !!sym(strat_name)))
   }
 
-  p <- add_common_aes(p, txtsize, col = col, col_aes = c("color", "line"),
+  # in black and white, strategies are told apart by line type, so no color scale is added
+  p <- add_common_aes(p, txtsize, col = if (col == "bw") "none" else col, col_aes = "color",
                       continuous = c("x", "y"),
                       n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                       xbreaks = xbreaks, ybreaks = ybreaks,

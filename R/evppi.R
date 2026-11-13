@@ -91,7 +91,7 @@ calc_evppi <- function(psa,
   l_mms <- vector(mode = "list", length = n_wtps)
 
   # calculate evppi at each wtp
-  for (l in 1:n_wtps) {
+  for (l in seq_len(n_wtps)) {
 
     # run the metamodels
     mms <- metamodel(analysis = "multiway",

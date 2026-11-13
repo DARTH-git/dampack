@@ -10,7 +10,7 @@ gen_psa_samp(
     "bootstrap", "constant", "triangle"),
   parameterization_types = c("mean, sd", "a, b", "shape, scale", "value, mean_prop, sd",
     "value, n", "value, alpha", "mean, sd, ll, ul", "val", "meanlog, sdlog",
-    "ll, ul, mode"),
+    "ll, ul, mode", "value, weight"),
   dists_params = NULL,
   nsamp = 100
 )

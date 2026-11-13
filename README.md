@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml)
+  [![Codecov test coverage](https://codecov.io/gh/DARTH-git/dampack/branch/main/graph/badge.svg)](https://app.codecov.io/gh/DARTH-git/dampack?branch=main)
   <!-- badges: end -->
   
 The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and visualizing the health economic outputs of mathematical models. 

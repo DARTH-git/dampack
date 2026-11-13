@@ -70,15 +70,12 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
     stop("basecase has to be in between min and max")
   }
 
-  jj <- tryCatch({
-    userfun <- do.call(FUN, l_fun_input)
-  },
-  error = function(e) NA)
-  if (is.na(sum(is.na(jj)))) {
-    stop("FUN is not well defined by 'params_basecase' and ...")
-  }
-
-  userfun <- do.call(FUN, l_fun_input)
+  # run FUN once on the base case to check it, and report its error if it fails
+  userfun <- tryCatch(do.call(FUN, l_fun_input),
+                      error = function(e) {
+                        stop("FUN is not well defined by 'params_basecase' and ...: ",
+                             conditionMessage(e), call. = FALSE)
+                      })
   if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
   }
@@ -105,7 +102,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
   n_outcomes <- length(outcomes)
   l_outcomes_all <- vector(mode = "list", length = n_outcomes)
 
-  for (i in 1:n_params) {
+  for (i in seq_len(n_params)) {
     # Generate matrix of inputs
     pars_i <- v_params[i]
     df_pars_range <- params_range[i, c("min", "max")]
@@ -132,7 +129,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                         param_counter = i,
                         nsamp = nsamp)
 
-    for (j in 1:n_outcomes) {
+    for (j in seq_len(n_outcomes)) {
       l_outcomes[[j]] <- lapply(l_sim_out,
                                 function(x, tmp_out = outcomes[j]) {
                                   t(x[outcomes[j]])
@@ -146,13 +143,16 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
                                  paramval = unname(m_owsa_input))
 
     param_table_all <- rbind(param_table_all, df_param_table)
+
+    # Close this parameter's progress bar
+    if (!is.null(pb)) close(pb)
   }
 
   param_table_all$parameter <- as.character(param_table_all$parameter)
 
   l_dsa_oneway <- vector(mode = "list", length = n_outcomes)
   owsa_out <- vector(mode = "list", length = n_outcomes)
-  for (k in 1:n_outcomes) {
+  for (k in seq_len(n_outcomes)) {
     l_dsa_oneway[[k]] <- create_dsa_oneway(parameters = param_table_all,
                                            other_outcome = l_outcomes_all[[k]],
                                            strategies = strategies)
@@ -240,15 +240,12 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
 
   names(params_range) <- c("pars", "min", "max")
 
-  jj <- tryCatch({
-    userfun <- do.call(FUN, l_fun_input)
-  },
-  error = function(e) NA)
-  if (is.na(sum(is.na(jj)))) {
-    stop("FUN is not well defined by the base case parameter values and ...")
-  }
-
-  userfun <- do.call(FUN, l_fun_input)
+  # run FUN once on the base case to check it, and report its error if it fails
+  userfun <- tryCatch(do.call(FUN, l_fun_input),
+                      error = function(e) {
+                        stop("FUN is not well defined by the base case parameter values and ...: ",
+                             conditionMessage(e), call. = FALSE)
+                      })
   if (is.null(strategies)) {
     strategies <- paste0("st_", userfun[, 1])
   }
@@ -287,6 +284,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   # Define progress bar
   if (progress == TRUE) {
     pb <- txtProgressBar(min = 0, max = n_run, style = 3)
+    on.exit(close(pb))
   } else {
     pb <- NULL
   }
@@ -302,7 +300,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
                       param_counter = 1,
                       nsamp = n_run)
 
-  for (j in 1:n_outcomes) {
+  for (j in seq_len(n_outcomes)) {
     df_sim_out[[j]] <- lapply(l_sim_out,
                               function(x, tmp_out = outcomes[j]) {
                                 t(x[outcomes[j]])
@@ -315,7 +313,7 @@ run_twsa_det <- function(params_range, params_basecase, nsamp = 40, FUN, outcome
   l_dsa_twoway <- vector(mode = "list", length = n_outcomes)
   twsa_out <- vector(mode = "list", length = n_outcomes)
 
-  for (k in 1:n_outcomes) {
+  for (k in seq_len(n_outcomes)) {
     l_dsa_twoway[[k]] <- create_dsa_twoway(parameters = df_param_table,
                                            other_outcome = df_sim_out[[k]],
                                            strategies = strategies)

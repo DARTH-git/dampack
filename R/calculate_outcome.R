@@ -37,7 +37,8 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
         net_outcome <- "nmb"
       }
       df_netben <- calculate_outcome(net_outcome, cost, effect, wtp)
-      v_max_str_rowwise <- max.col(df_netben)
+      # exact comparison; ties go to the first strategy (see ceac())
+      v_max_str_rowwise <- max.col(df_netben, ties.method = "first")
       df_outcome <-  df_netben[cbind(1:n_sim, v_max_str_rowwise)] - df_netben
     }
     if (outcome == "nhb_loss_voi" || outcome == "nmb_loss_voi") {

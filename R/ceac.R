@@ -82,7 +82,9 @@ ceac <- function(wtp, psa) {
     df_nmb <-  calculate_outcome("nmb", df_cost, df_effectiveness, lth_wtp)
 
     # find the distribution of optimal strategies
-    v_max_nmb <- max.col(df_nmb)
+    # ties.method = "first": exact comparison; the default ("random") treats values within a
+    # relative tolerance of 1e-5 as ties and picks among them at random (#167)
+    v_max_nmb <- max.col(df_nmb, ties.method = "first")
     a_opt <- table(v_max_nmb)
     m_cea[l, as.numeric(names(a_opt))] <- a_opt / n_sim
 

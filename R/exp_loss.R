@@ -57,7 +57,8 @@ calc_exp_loss <- function(psa, wtp) {
   }
   # optimal strategy based on lowest expected loss (max of negative expected loss)
   # this was done because min.col isn't a function
-  v_optimal_str <- max.col(-m_exp_loss)
+  # exact comparison; ties go to the first strategy (see ceac())
+  v_optimal_str <- max.col(-m_exp_loss, ties.method = "first")
 
   # Format expected loss for plotting
   df_exp_loss <- data.frame(wtp, m_exp_loss, v_strategies[v_optimal_str])

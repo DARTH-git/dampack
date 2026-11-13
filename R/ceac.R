@@ -74,7 +74,7 @@ ceac <- function(wtp, psa) {
   colnames(m_cea) <- v_strategies
 
   # vector to store strategy at the cost-effectiveness acceptability frontier
-  v_frontv <- rep(0, n_wtps)
+  v_front <- rep(0, n_wtps)
 
   for (l in 1:n_wtps) {
     # calculate net monetary benefit at wtp[l]
@@ -88,11 +88,11 @@ ceac <- function(wtp, psa) {
 
     # calculate point on CEAF
     # the strategy with the highest expected nmb
-    v_frontv[l] <- which.max(colMeans(df_nmb))
+    v_front[l] <- which.max(colMeans(df_nmb))
   }
 
   # make cea df
-  df_cea <- data.frame(wtp, m_cea, v_strategies[v_frontv],
+  df_cea <- data.frame(wtp, m_cea, v_strategies[v_front],
                        stringsAsFactors = FALSE)
   colnames(df_cea) <- c("WTP", v_strategies, "fstrat")
 

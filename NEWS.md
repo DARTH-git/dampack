@@ -21,6 +21,7 @@
 
 ## Bug fixes
 
+- `owsa_opt_strat()` plots now draw one bar per range in which a strategy is optimal, and adjacent bars meet halfway between parameter values, so the bars line up with the switch points on the axis. Before, each bar covered only the values where its strategy was observed optimal (leaving gaps), and a strategy optimal in two separate ranges got a single bar spanning both. The data returned with `return = "data"` is unchanged (#67).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).

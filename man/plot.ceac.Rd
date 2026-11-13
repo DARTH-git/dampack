@@ -8,7 +8,7 @@
   x,
   frontier = TRUE,
   points = TRUE,
-  currency = "$",
+  currency = NULL,
   min_prob = 0,
   txtsize = 12,
   n_x_ticks = 10,
@@ -18,6 +18,7 @@
   ylim = NULL,
   xlim = c(0, NA),
   col = c("access", "full", "bw"),
+  effect_units = "QALY",
   ...
 )
 }
@@ -29,7 +30,8 @@
 \item{points}{whether to plot points (TRUE) or not (FALSE)}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)}
+Defaults to the currency of the PSA the CEAC was computed from (or \code{$}), but can be any
+currency symbol or word (e.g., £, €, peso).}
 
 \item{min_prob}{minimum probability to show strategy in plot.
 For example, if the min_prob is 0.05, only strategies that ever
@@ -53,6 +55,8 @@ will override \code{n_y_ticks} if provided.}
 \item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
 
 \item{col}{either none, full color, accessible colors, or black and white}
+
+\item{effect_units}{units of effectiveness, used in the x-axis label. Default: QALY}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

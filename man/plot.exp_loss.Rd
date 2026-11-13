@@ -11,7 +11,7 @@
   points = TRUE,
   lsize = 1,
   txtsize = 12,
-  currency = "$",
+  currency = NULL,
   effect_units = "QALY",
   n_y_ticks = 8,
   n_x_ticks = 20,
@@ -39,7 +39,8 @@ To only plot the EVPI see \code{\link{calc_evpi}}.}
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
+Default: the currency of the PSA the results were computed from (or $), but it could be any
+currency symbol or word (e.g., £, €, peso)}
 
 \item{effect_units}{units of effectiveness. Default: QALY}
 

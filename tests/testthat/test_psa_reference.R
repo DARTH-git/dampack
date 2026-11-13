@@ -46,7 +46,7 @@ psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
 test_that("calculate_icers_psa() passes ref_str, wtp, and nhb to calculate_icers()", {
   s <- summary(psa_big)
   expected <- calculate_icers(s$meanCost, s$meanEffect, s$Strategy,
-                              ref_str = "Surgery", wtp = 50000, nhb = TRUE)
+                              ref_str = "Surgery", wtp = 50000, nhb = TRUE, currency = psa_big$currency)
   obtained <- calculate_icers_psa(psa_big, ref_str = "Surgery", wtp = 50000, nhb = TRUE)
   expect_equal(obtained, expected)
 })
@@ -65,7 +65,7 @@ test_that("calculate_icers_psa(uncertainty = TRUE) adds intervals for the refere
   expect_true(is.na(r_ref$Lower_95_Inc_Cost_ref))
   # the frontier-based columns and their existing intervals are unchanged
   x0 <- calculate_icers_psa(psa_big, uncertainty = TRUE)
-  expect_equal(as.data.frame(x)[, names(x0)], as.data.frame(x0))
+  expect_equal(as.data.frame(x)[, names(x0)], as.data.frame(x0)[, names(x0)])
 })
 
 test_that("print.icers() keeps reference intervals out of the sequential view", {

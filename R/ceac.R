@@ -122,6 +122,7 @@ ceac <- function(wtp, psa) {
   # define classes
   # defining data.frame as well allows the object to use print.data.frame, for example
   class(ceac) <- c("ceac", "data.frame")
+  attr(ceac, "currency") <- psa$currency
 
   ceac
 }
@@ -134,7 +135,9 @@ ceac <- function(wtp, psa) {
 #' @param frontier whether to plot acceptability frontier (TRUE) or not (FALSE)
 #' @param points whether to plot points (TRUE) or not (FALSE)
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'Defaults to \code{$}, but can be any currency symbol or word (e.g., £, €, peso)
+#' Defaults to the currency of the PSA the CEAC was computed from (or \code{$}), but can be any
+#' currency symbol or word (e.g., £, €, peso).
+#' @param effect_units units of effectiveness, used in the x-axis label. Default: QALY
 #' @param min_prob minimum probability to show strategy in plot.
 #' For example, if the min_prob is 0.05, only strategies that ever
 #' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
@@ -157,7 +160,7 @@ ceac <- function(wtp, psa) {
 plot.ceac <- function(x,
                       frontier = TRUE,
                       points = TRUE,
-                      currency = "$",
+                      currency = NULL,
                       min_prob = 0,
                       txtsize = 12,
                       n_x_ticks = 10,
@@ -167,7 +170,9 @@ plot.ceac <- function(x,
                       ylim = NULL,
                       xlim = c(0, NA),
                       col = c("access", "full", "bw"),
+                      effect_units = "QALY",
                       ...) {
+  currency <- resolve_currency(currency, x)
   wtp_name <- "WTP"
   prop_name <- "Proportion"
   strat_name <- "Strategy"
@@ -217,7 +222,7 @@ plot.ceac <- function(x,
                             y = !!sym(prop_name),
                             color = !!sym(strat_name))) +
     geom_line() +
-    xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
+    xlab(paste("Willingness to Pay (Thousand ", currency, " / ", effect_units, ")", sep = "")) +
     ylab("Pr Most Cost-Effective")
 
   if (points) {

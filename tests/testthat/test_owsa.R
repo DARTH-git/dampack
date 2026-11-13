@@ -30,6 +30,27 @@ test_that("plot.owsa returns a ggplot object", {
 })
 
 # test basecase argument for plot.owsa
+# black-and-white plots must distinguish strategies by line type (#176)
+test_that("plot.owsa(col = 'bw') gives each strategy its own line type", {
+  o <- owsa(psa_big, params = c("pFailChemo", "cSurg"), outcome = "nhb", wtp = 100000)
+  g <- plot(o, col = "bw")
+  expect_warning(ggplot2::ggplot_build(g), NA)
+  d <- ggplot2::layer_data(g, 1)
+  n_strat <- length(unique(o$strategy))
+  expect_equal(length(unique(d$linetype)), n_strat)
+  expect_equal(length(unique(d$group)), n_strat)
+  # one line type per strategy within each parameter panel
+  expect_true(all(tapply(d$linetype, d$PANEL, function(v) length(unique(v))) == n_strat))
+  expect_setequal(as.character(ggplot2::get_guide_data(g, "linetype")$.label), unique(o$strategy))
+})
+
+# colored plots are unchanged
+test_that("plot.owsa(col = 'full') still maps strategies to color", {
+  o <- owsa(psa_big, params = "pFailChemo", outcome = "nhb", wtp = 100000)
+  d <- ggplot2::layer_data(plot(o, col = "full"), 1)
+  expect_equal(length(unique(d$colour)), length(unique(o$strategy)))
+})
+
 test_that("plot.owsa basecase argument", {
   o <- owsa(psa_big, outcome = "nhb", wtp = 100000)
   # all params except 1

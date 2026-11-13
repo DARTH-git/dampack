@@ -127,8 +127,8 @@ plot.owsa <- function(x, txtsize = 12,
   }
   if (col == "bw") {
     owsa <- owsa +
-      geom_line(aes_(linetype = strategy),
-                size = size) +
+      geom_line(aes(linetype = strategy),
+                linewidth = size) +
       scale_linetype_discrete(name = "Strategy")
   }
 
@@ -148,7 +148,8 @@ plot.owsa <- function(x, txtsize = 12,
                  data = df_basecase)
   }
 
-  add_common_aes(owsa, txtsize, col = col, col_aes = "color",
+  # in black and white, strategies are told apart by line type, so no color scale is added
+  add_common_aes(owsa, txtsize, col = if (col == "bw") "none" else col, col_aes = "color",
                  scale_name = "Strategy",
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  continuous = c("x", "y"),

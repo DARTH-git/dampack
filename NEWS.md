@@ -21,11 +21,12 @@
 
 ## Bug fixes
 
-- `owsa_opt_strat()` plots now draw one bar per range in which a strategy is optimal, and adjacent bars meet halfway between parameter values, so the bars line up with the switch points on the axis. Before, each bar covered only the values where its strategy was observed optimal (leaving gaps), and a strategy optimal in two separate ranges got a single bar spanning both. The data returned with `return = "data"` is unchanged (#67).
+- `plot.owsa(col = "bw")` now draws each strategy with its own line type; all strategies used to share one line type and could not be told apart (#176).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).
 - `metamodel()`, and the functions that use it (`owsa()` and `twsa()` on a PSA, `calc_evppi()`, `calc_evsi()`), now work with strategy names that are not syntactically valid R names (#208).
+- `owsa_opt_strat()` plots now draw one bar per range in which a strategy is optimal, and adjacent bars meet halfway between parameter values, so the bars line up with the switch points on the axis. Before, each bar covered only the values where its strategy was observed optimal (leaving gaps), and a strategy optimal in two separate ranges got a single bar spanning both. The data returned with `return = "data"` is unchanged (#67).
 - `summary.ceac()` no longer returns duplicated, mislabeled, and `NA`-range rows when the cost-effectiveness frontier switches optimal strategy two or more times. It now returns one row per interval (#173).
 - The y-axis label of the CEAC plot now correctly describes what is plotted (#165).
 - `owsa_tornado()` no longer omits parameters whose minimum value is negative (#166).

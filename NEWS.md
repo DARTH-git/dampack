@@ -21,6 +21,7 @@
 
 ## Bug fixes
 
+- Plots that choose an accessible palette from the number of groups (`owsa_tornado()`, `owsa_opt_strat()`, `plot.twsa()`, and the value-of-information plots) no longer fail on ggplot2 versions before 4.0 with "no applicable method for `@` applied to an object of class 'ggplot_built'" (#198).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).

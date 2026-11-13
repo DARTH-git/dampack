@@ -21,6 +21,7 @@
 
 ## Bug fixes
 
+- `ceac()`, `calc_exp_loss()`, and the expected value of perfect information no longer pick the optimal strategy at random among strategies whose net benefits differ by less than a relative 1e-5 (for example, a few dollars at a scale of $1,000,000). `max.col()`'s default `ties.method = "random"` treated these as ties; comparisons are now exact, and exact ties go to the first strategy. Results for such near-tied strategies change and are now reproducible (#167).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `calculate_icers()` with a single strategy now returns a valid `icers` object, with the same columns as for several strategies (`Status` is `"ND"` and the incremental columns are `NA`), so `plot()` and `print()` work on it (#183).
 - `calculate_icers()` with no strategies now gives an informative error instead of "missing value where TRUE/FALSE needed", and its documentation no longer describes a reference-strategy option that does not exist (#178).

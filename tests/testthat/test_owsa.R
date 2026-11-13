@@ -1,4 +1,3 @@
-context("owsa")
 library(dampack)
 
 # test the class
@@ -17,8 +16,8 @@ psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
 
 test_that("metamod object has correct classes", {
   o <- owsa(psa_big, outcome = "eff", wtp = 100000)
-  expect_is(o, "owsa")
-  expect_is(o, "data.frame")
+  expect_s3_class(o, "owsa")
+  expect_s3_class(o, "data.frame")
 })
 
 # methods
@@ -26,7 +25,7 @@ test_that("metamod object has correct classes", {
 test_that("plot.owsa returns a ggplot object", {
   o <- owsa(psa_big, outcome = "nhb", wtp = 100000)
   g <- plot(o)
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
 })
 
 # test basecase argument for plot.owsa
@@ -58,7 +57,7 @@ test_that("plot.owsa basecase argument", {
             basecase = list(cRadio = 10000, cSurg = 30000, muDieCancer = 0.2,
                             pDieSurg = .1, pFailChemo = .45, pFailRadio = .5,
                             pFailSurg = .050))
-  expect_is(p, "ggplot")
+  expect_s3_class(p, "ggplot")
 
   # test error when wrong parameter is supplied
   expect_error(plot(o,
@@ -72,13 +71,13 @@ test_that("owsa_tornado", {
 
   # returning plot
   p <- owsa_tornado(o)
-  expect_is(p, "ggplot")
+  expect_s3_class(p, "ggplot")
 
   # some parameters
   p2 <- owsa_tornado(o, txtsize = 15,
                      min_rel_diff = 0.05,
                      col = "bw", ylim = c(7e5, 2e6))
-  expect_is(p2, "ggplot")
+  expect_s3_class(p2, "ggplot")
 
   # returning data
   d <- owsa_tornado(o, return = "data")
@@ -94,11 +93,11 @@ test_that("owsa_opt_strat", {
 
   # returning plot
   p <- owsa_opt_strat(o)
-  expect_is(p, "ggplot")
+  expect_s3_class(p, "ggplot")
 
   # returning data
   d <- owsa_opt_strat(o, return = "data")
-  expect_is(d, "data.frame")
+  expect_s3_class(d, "data.frame")
 
   # pFailChemo should have 1 switch between .4 and .5
   pfc <- d[d$parameter == "pFailChemo", ]

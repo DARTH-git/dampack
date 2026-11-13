@@ -1,4 +1,3 @@
-context("calculate_icers")
 library(dampack)
 
 data("hund_strat")

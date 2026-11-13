@@ -1,4 +1,3 @@
-context("run_psa")
 library(dampack)
 
 test_func <- function(params, extra_param) {
@@ -75,4 +74,39 @@ test_that("run_psa() reports a FUN that fails on the PSA parameters", {
   psa_hand <- data.frame(c_a = 1, c_b = 2, e_b = 3)
   expect_error(run_psa(psa_hand, FUN = bad_fun, strategies = c("A", "B"), progress = FALSE),
                "FUN is not well defined.*this model cannot run")
+})
+
+# remaining run_psa() paths (#215)
+test_that("run_psa() fills in parameters from params_basecase", {
+  basecase <- list(c_a = 10, c_b = 20, e_b = 1.5)
+  psa_part <- data.frame(c_b = c(25, 30))
+  out <- run_psa(psa_part, params_basecase = basecase, FUN = simple_fun,
+                 outcomes = "cost", strategies = c("A", "B"), progress = FALSE)
+  # c_a comes from the base case; c_b from the PSA sample
+  expect_equal(out$cost$other_outcome$A, c(10, 10))
+  expect_equal(out$cost$other_outcome$B, c(25, 30))
+})
+
+test_that("run_psa() names strategies from FUN when strategies is NULL", {
+  psa_hand <- data.frame(c_a = 1, c_b = 2, e_b = 3)
+  out <- run_psa(psa_hand, FUN = simple_fun, outcomes = "cost", progress = FALSE)
+  expect_identical(out$cost$strategies, c("st_A", "st_B"))
+})
+
+test_that("run_psa() checks FUN's output and the requested outcomes", {
+  psa_hand <- data.frame(c_a = 1, c_b = 2, e_b = 3)
+  not_df <- function(params) c(1, 2)
+  expect_error(run_psa(psa_hand, FUN = not_df, strategies = c("A", "B"), progress = FALSE),
+               "should return a data.frame")
+  expect_error(run_psa(psa_hand, FUN = simple_fun, strategies = c("A", "B", "C"), progress = FALSE),
+               "number of strategies")
+  expect_error(run_psa(psa_hand, FUN = simple_fun, outcomes = "qaly", strategies = c("A", "B"),
+                       progress = FALSE),
+               "not in FUN outcomes")
+})
+
+test_that("run_psa() reports progress when asked", {
+  psa_hand <- data.frame(c_a = 1:10, c_b = 1:10, e_b = 1:10)
+  expect_output(run_psa(psa_hand, FUN = simple_fun, outcomes = "cost", strategies = c("A", "B"),
+                        progress = TRUE), "100 % done")
 })

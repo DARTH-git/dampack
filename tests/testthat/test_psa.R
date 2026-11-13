@@ -1,4 +1,3 @@
-context("psa")
 library(dampack)
 
 # test the class
@@ -69,7 +68,7 @@ test_that("plot.psa runs", {
 
 test_that("Plot returns ggplot object", {
   p <- plot(psa_big)
-  expect_is(p, "ggplot")
+  expect_s3_class(p, "ggplot")
 })
 
 # print

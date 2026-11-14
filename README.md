@@ -1,5 +1,4 @@
 # dampack
-<!-- [![Build Status](https://www.travis-ci.com/DARTH-git/dampack.svg?branch=master)](https://www.travis-ci.com/DARTH-git/dampack) -->
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml)
@@ -8,7 +7,7 @@
   
 The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and visualizing the health economic outputs of mathematical models. 
 
-dampack is developed and maintained by the [Decision Analysis in R for Technologies in Health (DARTH)](https://darthworkgroup.com) workgroup; see [The DARTH team](#the-darth-team) below.
+dampack is developed and maintained by the [Decision Analysis in R for Technologies in Health (DARTH)](https://www.darthworkgroup.com/) workgroup; see [The DARTH team](#the-darth-team) below.
 
 This package was developed with funding from the National Institute of Allergy and Infectious Diseases of the National Institutes of Health under award no. R01AI138783. The content of this package is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 
@@ -47,7 +46,7 @@ There is some overlap between the topics and functions covered in the six vignet
 
 ## The DARTH team
 
-dampack is developed by members of the [DARTH workgroup](https://darthworkgroup.com), a group of researchers developing open-source tools for decision analysis in health.
+dampack is developed by members of the [DARTH workgroup](https://www.darthworkgroup.com/), a group of researchers developing open-source tools for decision analysis in health.
 
 **Package authors:** Fernando Alarid-Escudero, Greg Knowlton, Caleb W. Easterly, Matthew B. Kaufmann, and Eva Enns, with contributions from David Garibay (CRAN maintainer) and Mark Clements.
 

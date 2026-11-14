@@ -1,43 +1,40 @@
-## Resubmission
+## Submission: dampack 1.1.0
 
-### Version 1.0.2.1000
-This is a resubmission. In this version we:
+<!-- DRAFT for the v1.1.0 release (#219). Before submitting: set the version to 1.1.0, add the
+win-builder and mac-builder results below, and delete this comment. -->
 
-* Incorporated various minor changes to avoid grammar errors,
-* Check code to pass linter code style checks,
-* Updated code dependencies,
-* Updated code grammar used in plotting functions,
-* Updated code grammar used in data wrangling functions
+This is a feature and bug-fix release. The main changes are:
 
-### Version 1.0.1.9000
-In this version we:
+* Strategy names are kept exactly as given, including spaces and special characters, instead of
+  being converted with `make.names()`.
+* Cost-effectiveness results can be presented against a user-selected reference strategy, with
+  net monetary benefit and net health benefit.
+* The currency stored in a PSA object is used by every analysis, plot, and table.
+* New `bcea_to_psa()` and `psa_to_bcea()` for converting to and from 'BCEA' objects
+  ('BCEA' is in Suggests).
+* Many bug fixes, listed in NEWS.md.
 
-* adapted add_common_aes() to be compatible with new version of 3.3.1
-* implemented github actions for CI (not relevant for users)
+### Maintainer change
+
+The maintainer changes from David Garibay <dgari039@uottawa.ca> to
+Fernando Alarid-Escudero <falarid@stanford.edu>, who is an author of the package. David Garibay
+remains a contributor and will confirm the change by email.
 
 ## Test environments
 
-### Version 1.0.2.1000
-* win-builder (devel and release)
-* local macOS install, R R 4.2.1
-* win-builder (devel and release)
-
-### Version 1.0.1.9000
-* local Win install, R 4.1.0
-* linux Ubuntu 20.04 (via GitHub Actions), R release + devel
-* windows-latest (via GitHub Actions), R release
-* macOS-latest (via GitHub Actions), R release
-* win-builder (devel and release)
+* local macOS 27.0, R 4.5.3
+* GitHub Actions: macOS (release), Windows (release), Ubuntu (devel, release, oldrel-1)
+* GitHub Actions: Ubuntu (R release) with the minimum package versions in DESCRIPTION
+  (ggplot2 3.5.0, scales 1.3.0)
+* win-builder (devel and release): TO ADD
+* mac-builder: TO ADD
 
 ## R CMD check results
 
-### Version 1.0.2.1000
-* There were no ERRORs or WARNINGs.
-* The following URL is marked as possibly invalid, but it seems to work correcly: https://www.acpjournals.org/doi/10.7326/0003-4819-145-11-200612050-00004
+0 errors | 0 warnings | 1 note
 
-### Version 1.0.1.9000
-* There were no ERRORs or WARNINGs.
+* The note is the maintainer change described above (CRAN incoming feasibility).
 
+## Reverse dependencies
 
-## Downstream dependencies
-There are no downstream dependencies
+There are no reverse dependencies on CRAN.

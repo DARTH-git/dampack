@@ -43,8 +43,12 @@ scientists, health economists, and students.
 - **Probabilistic sensitivity analysis.** `make_psa_obj()` stores the
   PSA output of any model. Its `plot()` and `summary()` methods show the
   cost-effectiveness plane, `ceac()` computes cost-effectiveness
-  acceptability curves and the acceptability frontier, and
-  `calc_exp_loss()` computes expected loss curves.
+  acceptability curves (CEACs) together with the acceptability frontier
+  (CEAF), and `calc_exp_loss()` computes expected loss curves (ELCs),
+  which show in one figure the expected foregone benefit of each
+  strategy, the optimal strategy, and the expected value of perfect
+  information ([Alarid-Escudero et al.,
+  2019](https://doi.org/10.1016/j.jval.2019.02.008)).
 - **Value of information.** `calc_evpi()` computes the expected value of
   perfect information. `calc_evppi()` and `calc_evsi()` estimate the
   expected value of partial perfect information and of sample
@@ -117,6 +121,37 @@ plot(df_ceac)
 
 <img src="man/figures/README-ceac-1.png" alt="Cost-effectiveness acceptability curves for chemotherapy, radiation and surgery, with the acceptability frontier." width="100%" />
 
+The strategy most likely to be cost-effective is not always the optimal
+one. At a willingness to pay of \$50,000 per QALY, Surgery has the
+highest probability of being cost-effective (0.369), but Chemo has the
+highest expected net benefit (probability 0.356), so Chemo is the
+strategy on the frontier. This is why a CEAC should always be shown with
+its frontier.
+
+### Expected loss curves
+
+Expected loss curves go one step further. For each strategy, they show
+the benefit expected to be lost by choosing it instead of the strategy
+that would turn out best, so they combine how likely a strategy is to be
+the wrong choice with how much is lost when it is. In a single figure,
+the strategy with the lowest expected loss is the optimal one, the
+curves show where the optimal strategy switches across thresholds, and
+the expected loss of the optimal strategy equals the expected value of
+perfect information (EVPI). Alarid-Escudero et
+al. ([2019](https://doi.org/10.1016/j.jval.2019.02.008)) describe these
+advantages of ELCs over CEACs and the CEAF, and recommend reporting them
+alongside CEACs, the CEAF and the EVPI.
+
+``` r
+df_elc <- calc_exp_loss(l_psa, wtp = v_wtp)
+plot(df_elc, n_x_ticks = 10)
+```
+
+<img src="man/figures/README-elc-1.png" alt="Expected loss curves for chemotherapy, radiation and surgery on a log scale, with the frontier, which equals the expected value of perfect information." width="100%" />
+
+At \$50,000 per QALY, Chemo has the lowest expected loss, \$14,954 per
+patient, which is also the EVPI at that threshold.
+
 ## Learn more
 
 The [package website](https://darth-git.github.io/dampack/) has the full
@@ -141,6 +176,16 @@ The same articles are installed with the package: see
 ## Citation
 
 Run `citation("dampack")` for how to cite the package.
+
+The expected loss curves in dampack, and why they complement CEACs and
+the CEAF, are described in:
+
+> Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. “Time
+> Traveling Is Just Too Dangerous” but Some Methods Are Worth
+> Revisiting: The Advantages of Expected Loss Curves Over
+> Cost-Effectiveness Acceptability Curves and Frontier. *Value in
+> Health*. 2019;22(5):611-618.
+> [doi:10.1016/j.jval.2019.02.008](https://doi.org/10.1016/j.jval.2019.02.008)
 
 ## Getting help and contributing
 

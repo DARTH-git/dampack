@@ -66,8 +66,10 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    kableExtra
+    kableExtra,
+    ragg
 LazyData: true
+LazyDataCompression: xz
 BuildResaveData: no
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

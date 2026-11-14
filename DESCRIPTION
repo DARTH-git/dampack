@@ -59,6 +59,7 @@ Imports:
     triangle,
     ggrepel,
     tidyr,
+    lifecycle (>= 1.0.0),
     rlang,
     viridis,
     RColorBrewer

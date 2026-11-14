@@ -100,12 +100,15 @@ calc_exp_loss <- function(psa, wtp) {
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: the currency of the PSA the results were computed from (or $), but it could be any
 #'  currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @param log_y take the base 10 log of the y axis
 #' @param frontier indicate the frontier (also the expected value of perfect information).
 #' To only plot the EVPI see \code{\link{calc_evpi}}.
 #' @param points whether to plot points on the curve (TRUE) or not (FALSE)
-#' @param lsize line size. defaults to 1.
+#' @param linewidth width of the lines. Defaults to 1.
+#' @param lsize deprecated; use \code{linewidth} instead.
 #' @inheritParams add_common_aes
 #'
 #' @return A \code{ggplot2} object with the expected loss
@@ -118,10 +121,10 @@ plot.exp_loss <- function(x,
                           log_y = TRUE,
                           frontier = TRUE,
                           points = TRUE,
-                          lsize = 1,
+                          linewidth = 1,
                           txtsize = 12,
                           currency = NULL,
-                          effect_units = "QALY",
+                          effect_units = "QALYs",
                           n_y_ticks = 8,
                           n_x_ticks = 20,
                           xbreaks = NULL,
@@ -129,7 +132,12 @@ plot.exp_loss <- function(x,
                           xlim = c(0, NA),
                           ylim = NULL,
                           col = c("access", "full", "bw"),
+                          lsize = deprecated(),
                           ...) {
+  if (is_present(lsize)) {
+    deprecate_soft("1.1.0", "plot.exp_loss(lsize)", "plot.exp_loss(linewidth)")
+    linewidth <- lsize
+  }
   On_Frontier <- NULL
   currency <- resolve_currency(currency, x)
   wtp_name <- "WTP_thou"
@@ -154,7 +162,7 @@ plot.exp_loss <- function(x,
 
   p <- ggplot(data = df_nofront, aes(x = !!sym(wtp_name),
                                      y = !!sym(loss_name))) +
-    xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
+    xlab(paste0("Willingness to Pay (Thousand ", currency, "/", per_unit(effect_units), ")")) +
     ylab(paste0("Expected Loss (", currency, ")"))
 
   # color
@@ -165,7 +173,7 @@ plot.exp_loss <- function(x,
       p <- p + geom_point(aes(color = !!sym(strat_name)))
     }
     p <- p +
-      geom_line(linewidth = lsize, aes(color = !!sym(strat_name)))
+      geom_line(linewidth = linewidth, aes(color = !!sym(strat_name)))
 
   }
   if (col == "bw") {
@@ -173,7 +181,7 @@ plot.exp_loss <- function(x,
       p <- p + geom_point()
     }
     p <- p +
-      geom_line(linewidth = lsize, aes(linetype = !!sym(strat_name)))
+      geom_line(linewidth = linewidth, aes(linetype = !!sym(strat_name)))
   }
 
   # in black and white, strategies are told apart by line type, so no color scale is added

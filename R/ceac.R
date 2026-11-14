@@ -5,10 +5,14 @@
 #' \code{ceac} is used to compute and plot the cost-effectiveness acceptability
 #' curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 #'
-#' @param wtp numeric vector with willingness-to-pay (WTP) thresholds
 #' @param psa psa object from \code{\link{make_psa_obj}}
+#' @param wtp numeric vector with willingness-to-pay (WTP) thresholds
 #' @keywords cost-effectiveness acceptability curves
 #' @details
+#' Like \code{\link{calc_exp_loss}} and \code{\link{calc_evpi}}, \code{ceac} takes the
+#' \code{psa} object first. The order used before dampack 1.1.0, \code{ceac(wtp, psa)}, still
+#' works but is deprecated; named arguments work in any order.
+#'
 #' \code{ceac} computes the probability of each of the strategies being
 #' cost-effective at each \code{wtp} threshold. The returned object has classes
 #' \code{ceac} and \code{data.frame}, and has its own plot method (\code{\link{plot.ceac}}).
@@ -28,7 +32,7 @@
 #'
 #' # define wtp threshold vector (can also use a single wtp)
 #' wtp <- seq(1e4, 1e5, by = 1e4)
-#' ceac_obj <- ceac(wtp, psa_cancer)
+#' ceac_obj <- ceac(psa_cancer, wtp)
 #' plot(ceac_obj) # see ?plot.ceac for options
 #'
 #' # this is most useful when there are many strategies
@@ -54,8 +58,17 @@
 #'
 #'
 #' @importFrom tidyr pivot_longer
+#' @importFrom lifecycle deprecate_soft deprecated is_present
 #' @export
-ceac <- function(wtp, psa) {
+ceac <- function(psa, wtp) {
+  # the order before 1.1.0 was ceac(wtp, psa): accept it, with a soft deprecation warning
+  if (inherits(wtp, "psa") && !inherits(psa, "psa")) {
+    deprecate_soft("1.1.0", "ceac(wtp = 'must come after `psa`')",
+                   details = "Use `ceac(psa, wtp)`, the order of `calc_exp_loss()` and `calc_evpi()`.")
+    tmp <- psa
+    psa <- wtp
+    wtp <- tmp
+  }
   # check that psa has class 'psa'
   check_psa_object(psa)
 
@@ -139,7 +152,9 @@ ceac <- function(wtp, psa) {
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #' Defaults to the currency of the PSA the CEAC was computed from (or \code{$}), but can be any
 #' currency symbol or word (e.g., £, €, peso).
-#' @param effect_units units of effectiveness, used in the x-axis label. Default: QALY
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @param min_prob minimum probability to show strategy in plot.
 #' For example, if the min_prob is 0.05, only strategies that ever
 #' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
@@ -172,7 +187,7 @@ plot.ceac <- function(x,
                       ylim = NULL,
                       xlim = c(0, NA),
                       col = c("access", "full", "bw"),
-                      effect_units = "QALY",
+                      effect_units = "QALYs",
                       ...) {
   currency <- resolve_currency(currency, x)
   wtp_name <- "WTP"
@@ -224,7 +239,7 @@ plot.ceac <- function(x,
                             y = !!sym(prop_name),
                             color = !!sym(strat_name))) +
     geom_line() +
-    xlab(paste("Willingness to Pay (Thousand ", currency, " / ", effect_units, ")", sep = "")) +
+    xlab(paste("Willingness to Pay (Thousand ", currency, " / ", per_unit(effect_units), ")", sep = "")) +
     ylab("Pr Most Cost-Effective")
 
   if (points) {

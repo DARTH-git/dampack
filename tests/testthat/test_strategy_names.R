@@ -29,7 +29,7 @@ test_that("ICERs, CEAC, expected loss, and EVPI keep the names", {
   df_icers <- calculate_icers(df_sum$meanCost, df_sum$meanEffect, df_sum$Strategy)
   expect_setequal(df_icers$Strategy, v_names)
 
-  df_ceac <- ceac(v_wtp, l_psa)
+  df_ceac <- ceac(l_psa, v_wtp)
   expect_setequal(as.character(unique(df_ceac$Strategy)), v_names)
   expect_true(all(summary(df_ceac)$optimal_strategy %in% v_names))
 
@@ -59,7 +59,7 @@ test_that("metamodel-based analyses work with non-syntactic names", {
 test_that("plot legends show the names exactly as typed", {
   l_psa <- make_named_psa()
   expect_setequal(guide_labels(plot(l_psa)), v_names)
-  expect_setequal(guide_labels(plot(ceac(v_wtp, l_psa))), v_names)
+  expect_setequal(guide_labels(plot(ceac(l_psa, v_wtp))), v_names)
   expect_setequal(guide_labels(plot(calc_exp_loss(l_psa, v_wtp))), v_names)
   df_owsa <- owsa(l_psa, params = "pFailChemo", outcome = "nmb", wtp = 50000)
   expect_setequal(guide_labels(plot(df_owsa)), v_names)

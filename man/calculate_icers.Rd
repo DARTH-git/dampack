@@ -60,7 +60,7 @@ calculates the incremental cost-effectiveness ratios for the non-dominated strat
 
 The cost-effectiveness frontier can be visualized with \code{plot}, which calls \code{\link{plot.icers}}.
 
-An efficent way to get from a probabilistic sensitivity analysis to an ICER table
+An efficient way to get from a probabilistic sensitivity analysis to an ICER table
 is by using \code{summary} on the PSA object and then using its columns as
 inputs to \code{calculate_icers}.
 }

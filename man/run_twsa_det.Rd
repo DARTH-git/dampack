@@ -57,7 +57,7 @@ given function that produces outcomes.
 \itemize{
 \item "pars" are the names of the two input parameters of interest. The two variables in "pars" column
  must be a subset of variables in \code{params_basecase}
-\item "min" and "max" are the mininum and maximum values of the parameters of interest.}
+\item "min" and "max" are the minimum and maximum values of the parameters of interest.}
 }
 }
 

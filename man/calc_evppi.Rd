@@ -50,11 +50,11 @@ Information (EVPPI) using a linear regression metamodel approach from a
 probabilistic sensitivity analysis (PSA) dataset.
 }
 \details{
-The expected value of partial pefect information (EVPPI) is the expected
+The expected value of partial perfect information (EVPPI) is the expected
 value of perfect information from a subset of parameters of interest,
 \eqn{\theta_I}, of a cost-effectiveness analysis (CEA) of \eqn{D} different
 strategies with parameters \eqn{\theta = \{ \theta_I, \theta_C\}}, where
-\eqn{\theta_C} is the set of complimenatry parameters of the CEA. The
+\eqn{\theta_C} is the set of complementary parameters of the CEA. The
 function \code{calc_evppi} computes the EVPPI of \eqn{\theta_I} from a
 matrix of net monetary benefits \eqn{B} of the CEA. Each column of \eqn{B}
 corresponds to the net benefit \eqn{B_d} of strategy \eqn{d}. The function

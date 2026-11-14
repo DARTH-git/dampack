@@ -31,6 +31,8 @@
 
 - EVPPI and EVSI computed from net health benefit (`outcome = "nhb"`, the default of `calc_evsi()`) are in health units, and their plots are now labeled with `effect_units` (e.g., "EVSI (QALY)") instead of a currency (#203).
 - `plot.psa(ref_str = )` now works when there are only two strategies; it used to fail with "'dims' cannot be of length 0" (#209).
+- The `hund_strat` help page now describes the data (simulated costs and QALYs for 100 hypothetical strategies) and its columns, with an example. Typos in several help pages are fixed (#219).
+- `plot.psa(center = FALSE)` no longer warns "No shared levels found between `names(values)` of the manual scale and the data's fill values" when it is drawn. The fill scale is now added only when the center points that use it are.
 - `plot.owsa(col = "bw")` now draws each strategy with its own line type; all strategies used to share one line type and could not be told apart (#176).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).
 - `gen_psa_samp()` now accepts the documented `"value, weight"` parameterization for `"bootstrap"` distributions. It used to be dropped silently, which shifted the parameterization of every later parameter by one position. **Samples from calls with a bootstrap parameter before other parameters will differ, because they are now correct.** Unknown distributions or parameterizations, and `params`, `dists`, `parameterization_types`, and `dists_params` of different lengths, now give informative errors instead of being dropped silently (#175).
@@ -50,6 +52,7 @@
 - `owsa_tornado()` no longer omits parameters whose minimum value is negative (#166).
 - Code hygiene throughout the package: progress bars in `run_owsa_det()` and `run_twsa_det()` are now closed, loops handle zero-length inputs (for example, `calc_evpi()` with an empty `wtp` returns an empty result), deprecated `trans`/`scales::trans_new()` are replaced by ggplot2's `transform` and `scales::new_transform()`, `cor()` is imported, and the `rdirichlet()` documentation is fixed. Thanks to @IG-ABHINAV for this contribution (#211, #224).
 - Fixed a pointer in the PSA vignette to a vignette that no longer exists (#168).
+- `citation("dampack")` now returns a single, current entry built from the package's DESCRIPTION; it used to also return a stale entry for version 1.0.1 (#213).
 
 # dampack 1.0.2.1000
 

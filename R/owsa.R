@@ -16,6 +16,24 @@
 #' @return An object of class \code{data.frame} and \code{owsa} with the results of the sensitivity analysis.
 #' Can be visualized with \code{\link{plot.owsa}, \link{owsa_tornado}, and \link{owsa_opt_strat}}
 #'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # metamodel predictions of the net monetary benefit as each parameter varies
+#' df_owsa <- owsa(l_psa, params = c("pFailChemo", "pFailSurg", "cChemo"),
+#'                 outcome = "nmb", wtp = 1e5)
+#' head(df_owsa)
+#' plot(df_owsa)
+#'
+#' # parameter ranges can be given, and only some strategies kept
+#' df_owsa_chemo <- owsa(l_psa, params = "pFailChemo", ranges = list(pFailChemo = c(0.3, 0.5)),
+#'                       outcome = "nmb", wtp = 1e5, strategies = c("Chemo", "Surgery"))
+#' plot(df_owsa_chemo)
+#'
 #' @export
 owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
                  outcome = c("eff", "cost", "nhb", "nmb", "nhb_loss", "nmb_loss"),
@@ -99,6 +117,18 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 #' @inheritParams add_common_aes
 #'
 #' @return A \code{ggplot2} plot of the \code{owsa} object.
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_owsa <- owsa(l_psa, params = c("pFailChemo", "pFailSurg"), outcome = "nmb", wtp = 1e5)
+#' plot(df_owsa)
+#'
+#' # highlight a base case value of each parameter (here, close to its PSA mean), in black and white
+#' plot(df_owsa, basecase = list(pFailChemo = 0.45, pFailSurg = 0.05), col = "bw")
 #'
 #' @import ggplot2
 #' @importFrom tidyr pivot_longer
@@ -191,6 +221,22 @@ plot.owsa <- function(x, txtsize = 12,
 #' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
 #' A tornado plot is a visual aid used to identify which parameters are driving most of the variation
 #' in a specified model outcome.
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_owsa <- owsa(l_psa, outcome = "nmb", wtp = 1e5)
+#'
+#' # parameters driving the net monetary benefit of Chemo
+#' owsa_tornado(df_owsa, select_str = "Chemo", outcome_name = "NMB")
+#'
+#' # and the difference in net monetary benefit between Surgery and Chemo
+#' owsa_tornado(df_owsa, select_str = c("Chemo", "Surgery"), outcome_name = "NMB")
+#'
+#' # the data behind the plot
+#' owsa_tornado(df_owsa, return = "data", select_str = "Chemo")
 #' @importFrom stats median reorder
 #' @import ggplot2
 #' @export
@@ -332,6 +378,21 @@ offset_trans <- function(offset = 0) {
 #' object, or if \code{return == "data"}, a \code{data.frame} containing all data contained in the plot.
 #' The plot allows us to see how the strategy that maximizes the expectation of the outcome of interest
 #' changes as a function of each parameter of interest.
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_owsa <- owsa(l_psa, params = c("pFailChemo", "pFailSurg", "cChemo"),
+#'                 outcome = "nmb", wtp = 1e5)
+#' owsa_opt_strat(df_owsa)
+#'
+#' # only the parameters that change the optimal strategy
+#' owsa_opt_strat(df_owsa, plot_const = FALSE)
+#'
+#' # the ranges of each parameter over which each strategy is optimal
+#' owsa_opt_strat(df_owsa, return = "data")
 #' @import ggplot2
 #' @export
 owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,

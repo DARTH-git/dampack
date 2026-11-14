@@ -55,11 +55,20 @@ A \code{ggplot2} plot with the EVPPI
 \description{
 Plots the \code{evppi} object created by \code{\link{calc_evppi}}.
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+l_evppi <- calc_evppi(l_psa, wtp = c(5e4, 1e5, 2e5), params = "pFailChemo",
+                      progress = FALSE)
+plot(l_evppi)
+
+# ggplot2 layers can be added to the plot
+plot(l_evppi, n_x_ticks = 5) + ggtitle("EVPPI of pFailChemo")
+}
 \seealso{
 \code{\link{calc_evppi}}
 }
-\keyword{expected}
-\keyword{information}
-\keyword{of}
-\keyword{perfect}
-\keyword{value}
+\concept{expected value of partial perfect information}

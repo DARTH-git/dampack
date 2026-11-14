@@ -20,3 +20,12 @@ None (invisible NULL).
 \description{
 print a psa object
 }
+\examples{
+data("psa_cdiff")
+
+# the list of strategies is truncated at 5
+print(psa_cdiff)
+
+# print all of them
+print(psa_cdiff, all_strat = TRUE)
+}

@@ -45,8 +45,6 @@ Dec Sci. 1975;6(1):1–13.
 distribution. Comput Math with Appl. 1992;24(10):11–7.
 }
 }
-\keyword{dirichlet}
-\keyword{distribution;}
-\keyword{method}
-\keyword{moments}
-\keyword{of}
+\concept{Dirichlet distribution}
+\concept{method of moments}
+\keyword{distribution}

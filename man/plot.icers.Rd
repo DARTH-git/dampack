@@ -94,3 +94,22 @@ a ggplot2 object which can be modified by adding additional geoms
 \description{
 Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
 }
+\examples{
+data("psa_cdiff")
+df_cdiff <- summary(psa_cdiff)
+df_icers <- calculate_icers(cost = df_cdiff$meanCost,
+                            effect = df_cdiff$meanEffect,
+                            strategies = df_cdiff$Strategy)
+plot(df_icers)
+
+# label every strategy, or show only the efficient frontier
+plot(df_icers, label = "all")
+plot(df_icers, plot_frontier_only = TRUE)
+
+# incremental cost-effectiveness plane with s3 at the origin and a WTP line
+plot(df_icers, ref_str = "s3", wtp = 1e5)
+
+}
+\seealso{
+\code{\link{calculate_icers}}, \code{\link{calculate_icers_psa}}
+}

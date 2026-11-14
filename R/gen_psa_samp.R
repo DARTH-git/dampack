@@ -302,7 +302,9 @@ rdirichlet <- function(n, alpha) {
 #' deviation \eqn{\sigma} of the random variable of interest.
 #' @param mean mean of the random variable.
 #' @param sigma standard deviation of the random variable (i.e., standard error).
-#' @keywords beta distribution; methods of moments
+#' @keywords distribution
+#' @concept beta distribution
+#' @concept method of moments
 #' @section Details:
 #' Based on methods of moments. If \eqn{\mu} is the mean and
 #' \eqn{\sigma} is the standard deviation of the random variable, then
@@ -313,6 +315,13 @@ rdirichlet <- function(n, alpha) {
 #' @return a list containing the following:
 #' @return alpha The method-of-moments estimate for the alpha parameter of the beta distribution
 #' @return beta The method-of-moments estimate for the beta parameter of the beta distribution
+#' @examples
+#' # a probability with a mean of 0.2 and a standard error of 0.05
+#' l_beta <- beta_params(mean = 0.2, sigma = 0.05)
+#' l_beta
+#'
+#' # the mean of the resulting beta distribution recovers the input mean
+#' l_beta$alpha / (l_beta$alpha + l_beta$beta)
 #' @export
 beta_params <- function(mean, sigma) {
   alpha <- ((1 - mean) / sigma ^ 2 - 1 / mean) * mean ^ 2
@@ -332,7 +341,9 @@ beta_params <- function(mean, sigma) {
 #' @param p.mean Vector of means of the random variables.
 #' @param sigma Vector of standard deviation of the random variables
 #' (i.e., standard error).
-#' @keywords dirichlet distribution; method of moments
+#' @keywords distribution
+#' @concept Dirichlet distribution
+#' @concept method of moments
 #' @section Details:
 #' Based on methods of moments. If \eqn{\mu} is a vector of means and
 #' \eqn{\sigma} is a vector of standard deviations of the random variables, then
@@ -385,7 +396,9 @@ dirichlet_params <- function(p.mean, sigma) {
 #' @param sigma scalar with the standard deviation of the random variable.
 #' @param scale logical variable indicating scale parameterization of the gamma distribution
 #' (Default is TRUE). If FALSE, rate parameterization is retrieved
-#' @keywords gamma distribution; method of moments
+#' @keywords distribution
+#' @concept gamma distribution
+#' @concept method of moments
 #' @section Details:
 #' Based on method of moments. If \eqn{\mu} is the mean and
 #' \eqn{\sigma} is the standard deviation of the random variable, then the
@@ -439,7 +452,9 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
 #' @param m Scalar with the mean of the random variable.
 #' @param v Scalar with the variance of the random variable.
 #' (i.e., squared standard error).
-#' @keywords log-normal distribution; method of moments
+#' @keywords distribution
+#' @concept log-normal distribution
+#' @concept method of moments
 #' @section Details:
 #' Based on method of moments. If \eqn{m} is the mean and
 #' \eqn{v} is the variance of the random variable, then the
@@ -463,8 +478,11 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
 #' @examples
 #' m <- 3
 #' v <- 0.01
-#' lnorm_params(m, v)
-#' # True values: 100, 30, 70
+#' l_lnorm <- lnorm_params(m, v)
+#' l_lnorm
+#'
+#' # the mean of the resulting log-normal distribution recovers m
+#' exp(l_lnorm$mu + l_lnorm$sigma^2 / 2)
 #' @export
 lnorm_params <- function(m = 1, v = 1) {
   ### Sanity checkd

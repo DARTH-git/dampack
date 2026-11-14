@@ -63,11 +63,26 @@ as a function of each willingness-to-pay
 threshold, depending upon the usage of \code{\link{calc_evsi}}
 used to create the \code{evsi} object.
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# one WTP threshold and several sample sizes: EVSI by additional sample size
+l_evsi <- calc_evsi(l_psa, wtp = 1e5, params = "pFailSurg", outcome = "nmb",
+                    n = c(10, 50, 100, 200), n0 = 50, progress = FALSE)
+plot(l_evsi)
+
+\donttest{
+# several WTP thresholds and one sample size: EVSI by WTP threshold
+l_evsi_wtp <- calc_evsi(l_psa, wtp = c(5e4, 1e5, 2e5), params = "pFailSurg",
+                        outcome = "nmb", n = 100, n0 = 50, progress = FALSE)
+plot(l_evsi_wtp)
+}
+}
 \seealso{
 \code{\link{calc_evsi}}
 }
-\keyword{expected}
-\keyword{information}
-\keyword{of}
-\keyword{sample}
-\keyword{value}
+\concept{expected value of sample information}

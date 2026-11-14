@@ -42,3 +42,24 @@ comparison of every strategy with the reference instead, listing the reference f
 other strategies by increasing cost. \code{ref = "both"} shows both comparisons, in the
 frontier order of the sequential table.
 }
+\examples{
+data("psa_cdiff")
+df_cdiff <- summary(psa_cdiff)
+df_icers <- calculate_icers(cost = df_cdiff$meanCost,
+                            effect = df_cdiff$meanEffect,
+                            strategies = df_cdiff$Strategy,
+                            ref_str = "s3",
+                            wtp = 1e5)
+
+# sequential table: each strategy on the frontier against the previous one
+df_icers
+
+# every strategy against the reference, with more digits for costs and effects
+print(df_icers, ref = "reference", dig_cost = 2, dig_eff = 3)
+
+# both comparisons, with costs labeled in euros
+print(df_icers, ref = "both", currency = "EUR")
+}
+\seealso{
+\code{\link{calculate_icers}}
+}

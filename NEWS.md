@@ -57,6 +57,7 @@
 - Code hygiene throughout the package: progress bars in `run_owsa_det()` and `run_twsa_det()` are now closed, loops handle zero-length inputs (for example, `calc_evpi()` with an empty `wtp` returns an empty result), deprecated `trans`/`scales::trans_new()` are replaced by ggplot2's `transform` and `scales::new_transform()`, `cor()` is imported, and the `rdirichlet()` documentation is fixed. Thanks to @IG-ABHINAV for this contribution (#211, #224).
 - Fixed a pointer in the PSA vignette to a vignette that no longer exists (#168).
 - `citation("dampack")` now returns a single, current entry built from the package's DESCRIPTION; it used to also return a stale entry for version 1.0.1 (#213).
+- Every exported function now has a runnable example, and several help pages have corrected titles, links, and keywords (#212).
 
 # dampack 1.0.2.1000
 

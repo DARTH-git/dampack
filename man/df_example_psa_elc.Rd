@@ -60,7 +60,7 @@ l_psa <- make_psa_obj(cost = df_example_psa_elc[, 1:6],
                       effectiveness = df_example_psa_elc[, 7:12])
 
 # the frontier switches three times, so the summary has four intervals
-df_ceac <- ceac(wtp = seq(1000, 150000, 1000), psa = l_psa)
+df_ceac <- ceac(l_psa, wtp = seq(1000, 150000, 1000))
 summary(df_ceac)
 
 # the strategy most likely to be cost effective is not necessarily the one

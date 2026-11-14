@@ -85,7 +85,7 @@ make_psa_obj <- function(cost, effectiveness, parameters = NULL,
 check_psa_object <- function(psa) {
   if (!inherits(psa, "psa")) {
     stop(paste0("The psa results parameter must be an object of class `psa`.\n",
-                "Please run the make_psa() function to create this object."))
+                "Please run the make_psa_obj() function to create this object."))
   }
 }
 
@@ -125,6 +125,27 @@ check_df_and_coerce <- function(obj) {
 #' With \code{wtp}, \code{meanNMB} (\code{wtp * effect - cost}, averaged over samples) is added; with
 #' \code{ref_str} too, also \code{meanIncNMB} and \code{propCostEffective}, the proportion of samples in
 #' which the strategy has a higher NMB than the reference (it lies below the willingness-to-pay line).
+#'
+#' @seealso \code{\link{make_psa_obj}}, \code{\link{calculate_icers}}
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # mean cost and effectiveness of each strategy, with their standard deviations
+#' summary(l_psa, calc_sds = TRUE)
+#'
+#' # compare every strategy with Radio, sample by sample, at a WTP of 100,000
+#' summary(l_psa, ref_str = "Radio", wtp = 1e5)
+#'
+#' # the means can be passed to calculate_icers()
+#' df_psa_sum <- summary(l_psa)
+#' calculate_icers(cost = df_psa_sum$meanCost,
+#'                 effect = df_psa_sum$meanEffect,
+#'                 strategies = df_psa_sum$Strategy)
 #' @export
 summary.psa <- function(object, calc_sds = FALSE, ref_str = NULL, wtp = NULL, ...) {
   ref_str <- check_ref_str(ref_str, object$strategies)
@@ -201,6 +222,20 @@ summary.psa <- function(object, calc_sds = FALSE, ref_str = NULL, wtp = NULL, ..
 #' @importFrom scales dollar_format
 #' @return A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy
 #' on the cost-effectiveness plane.
+#' @seealso \code{\link{make_psa_obj}}
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' plot(l_psa)
+#'
+#' # incremental cost-effectiveness plane with Radio at the origin and a WTP line
+#' plot(l_psa, ref_str = "Radio", wtp = 1e5)
+#'
+#' # without ellipses, in black and white
+#' plot(l_psa, ellipse = FALSE, col = "bw")
 #' @importFrom tidyr pivot_longer
 #' @importFrom stats cor
 #' @export

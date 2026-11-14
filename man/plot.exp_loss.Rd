@@ -74,3 +74,18 @@ A \code{ggplot2} object with the expected loss
 \description{
 Plot of Expected Loss Curves (ELC)
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_exp_loss <- calc_exp_loss(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
+plot(df_exp_loss)
+
+# linear y axis, without the points or the frontier
+plot(df_exp_loss, log_y = FALSE, points = FALSE, frontier = FALSE)
+}
+\seealso{
+\code{\link{calc_exp_loss}}
+}

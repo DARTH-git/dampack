@@ -25,3 +25,18 @@ for each strategy and each combination of parameter values defined by \code{rang
 \description{
 Predict from a one-way or two-way metamodel
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+l_mm <- metamodel(analysis = "oneway", psa = l_psa,
+                  params = c("pFailChemo", "cChemo"), outcome = "eff")
+
+# predictions over the middle 95\\% of the PSA samples of each parameter
+head(predict(l_mm, nsamp = 10))
+
+# predictions over a range given for one parameter
+predict(l_mm, ranges = list("pFailChemo" = c(0.3, 0.6)), nsamp = 4)
+}

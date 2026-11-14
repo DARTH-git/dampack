@@ -13,7 +13,7 @@ calculate_icers_psa(
 )
 }
 \arguments{
-\item{psa}{\code{psa} object from \code{link{make_psa_object}}}
+\item{psa}{\code{psa} object from \code{\link{make_psa_obj}}}
 
 \item{uncertainty}{whether or not 95\% quantiles for the cost and QALY outcomes should be included
 in the resulting ICER table. Defaults to \code{FALSE}.}
@@ -53,8 +53,28 @@ quantiles for each strategy's cost and QALY outcomes based on the variation pres
 Because the dominated vs. non-dominated status and the ordering of strategies in the ICER table are
 liable to change across different samples of the PSA, confidence intervals are not provided for the
 incremental costs and QALYs along the cost-effectiveness acceptability frontier.
-\code{link{plot.psa}} does not show the confidence intervals in the resulting plot
+\code{\link{plot.icers}} does not show the confidence intervals in the resulting plot
 even if present in the ICER table.
+}
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# ICERs from the mean cost and effectiveness of each strategy
+df_icers <- calculate_icers_psa(l_psa)
+df_icers
+plot(df_icers)
+
+# add the 2.5th and 97.5th percentiles of the cost and effectiveness of each strategy
+df_icers_unc <- calculate_icers_psa(l_psa, uncertainty = TRUE)
+df_icers_unc
+
+# compare every strategy with Radio, adding the net monetary benefit at a WTP of 100,000
+df_icers_ref <- calculate_icers_psa(l_psa, ref_str = "Radio", wtp = 1e5)
+print(df_icers_ref, ref = "reference")
 }
 \seealso{
 \code{\link{plot.icers}}

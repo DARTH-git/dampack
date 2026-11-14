@@ -2,7 +2,7 @@
 % Please edit documentation in R/dsa_twoway.R
 \name{create_dsa_twoway}
 \alias{create_dsa_twoway}
-\title{Create one-way deterministic sensitivity analysis object}
+\title{Create two-way deterministic sensitivity analysis object}
 \usage{
 create_dsa_twoway(
   parameters,
@@ -46,6 +46,30 @@ to visualize the two-way sensitivity analysis contained in the object.
 }
 \description{
 The object returned by this function can be passed to
-\code{\link{owsa}} to do a one-way sensitivity analysis on each
-parameter of interest.
+\code{\link{twsa}} to do a two-way sensitivity analysis on the two
+parameters of interest.
+}
+\examples{
+# Outcomes of two strategies on a 5 x 5 grid of the failure probability p_fail and
+# the cost of the new treatment c_trt
+df_params <- expand.grid(p_fail = seq(0.1, 0.5, length.out = 5),
+                         c_trt = seq(5000, 25000, length.out = 5))
+df_cost <- data.frame(Standard = 20000 * df_params$p_fail,
+                      New = df_params$c_trt + 10000 * df_params$p_fail)
+df_effect <- data.frame(Standard = 10 - 2 * df_params$p_fail,
+                        New = 10 - df_params$p_fail)
+
+l_dsa <- create_dsa_twoway(parameters = df_params,
+                           effectiveness = df_effect,
+                           strategies = c("Standard", "New"),
+                           cost = df_cost)
+l_dsa
+
+# strategy with the highest net monetary benefit at a WTP of 50,000
+df_twsa <- twsa(l_dsa, outcome = "nmb", wtp = 5e4)
+plot(df_twsa)
+}
+\seealso{
+\code{\link{run_twsa_det}}, which runs a model function over the parameter ranges,
+builds this object internally, and returns the result of \code{\link{twsa}}.
 }

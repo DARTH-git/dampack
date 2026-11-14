@@ -19,7 +19,7 @@ twsa(
 \arguments{
 \item{sa_obj}{sensitivity analysis object;
 either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
-a deterministic sensitivity analysis object (\code{\link{run_owsa_det}})}
+a two-way deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})}
 
 \item{param1}{String with the name of the first parameter of interest}
 
@@ -45,11 +45,28 @@ used in internal function calls of metamodel within other VOI functions.}
 Default: 2}
 }
 \value{
-twsa A \code{ggplot2} object with the TWSA graph of \code{param1} and
-\code{param2} on the outcome of interest.
+A \code{data.frame} of class \code{twsa} with the outcome of each strategy over a grid of
+values of \code{param1} and \code{param2}. It can be visualized with \code{\link{plot.twsa}}.
 }
 \description{
 This function displays a two-way sensitivity analysis (TWSA) graph
 by estimating a linear regression metamodel of a PSA for a given
 decision-analytic model
+}
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# strategy with the highest predicted net monetary benefit as two parameters vary
+df_twsa <- twsa(l_psa, param1 = "pFailChemo", param2 = "muDieCancer",
+                outcome = "nmb", wtp = 1e5)
+head(df_twsa)
+plot(df_twsa)
+
+}
+\seealso{
+\code{\link{plot.twsa}}, \code{\link{run_twsa_det}}
 }

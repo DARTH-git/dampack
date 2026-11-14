@@ -1,54 +1,173 @@
+
+<!-- README.md is generated from README.Rmd. Please edit README.Rmd, then run devtools::build_readme(). -->
+
 # dampack
 
 <!-- badges: start -->
-  [![R-CMD-check](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml)
-  [![Codecov test coverage](https://codecov.io/gh/DARTH-git/dampack/branch/main/graph/badge.svg)](https://app.codecov.io/gh/DARTH-git/dampack?branch=main)
-  <!-- badges: end -->
-  
-The Decision Analytic Modeling Package (dampack) is a suite of functions for analyzing and visualizing the health economic outputs of mathematical models. 
 
-dampack is developed and maintained by the [Decision Analysis in R for Technologies in Health (DARTH)](https://www.darthworkgroup.com/) workgroup; see [The DARTH team](#the-darth-team) below.
+[![CRAN
+status](https://www.r-pkg.org/badges/version/dampack)](https://CRAN.R-project.org/package=dampack)
+[![R-CMD-check](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/DARTH-git/dampack/actions/workflows/check-standard.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/DARTH-git/dampack/branch/main/graph/badge.svg)](https://app.codecov.io/gh/DARTH-git/dampack?branch=main)
+<!-- badges: end -->
 
-This package was developed with funding from the National Institute of Allergy and Infectious Diseases of the National Institutes of Health under award no. R01AI138783. The content of this package is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
+The Decision Analytic Modeling Package (dampack) is a suite of functions
+for analyzing and visualizing the health economic outputs of
+mathematical models.
+
+## Why dampack
+
+Decision-analytic models, such as decision trees, Markov cohort models,
+microsimulations and discrete-event simulations, estimate the costs and
+health outcomes of a set of strategies. Turning those outputs into the
+results that cost-effectiveness studies and health technology
+assessments report takes the same analyses every time: finding the
+efficient frontier, computing incremental cost-effectiveness ratios
+(ICERs), summarizing the probabilistic sensitivity analysis (PSA), and
+estimating the value of collecting more information.
+
+dampack does these analyses in R for any model. It only needs the
+model’s outputs, so it works the same whether the model was written in R
+or elsewhere. It is developed by the [DARTH
+workgroup](https://www.darthworkgroup.com/), alongside the DARTH coding
+framework for decision models ([Alarid-Escudero et al.,
+2019](https://doi.org/10.1007/s40273-019-00837-x)), for health decision
+scientists, health economists, and students.
+
+## What it does
+
+- **Cost-effectiveness analysis.** `calculate_icers()` identifies
+  dominated and extendedly dominated strategies and computes ICERs along
+  the efficient frontier; `plot()` draws the frontier.
+- **Probabilistic sensitivity analysis.** `make_psa_obj()` stores the
+  PSA output of any model. Its `plot()` and `summary()` methods show the
+  cost-effectiveness plane, `ceac()` computes cost-effectiveness
+  acceptability curves and the acceptability frontier, and
+  `calc_exp_loss()` computes expected loss curves.
+- **Value of information.** `calc_evpi()` computes the expected value of
+  perfect information. `calc_evppi()` and `calc_evsi()` estimate the
+  expected value of partial perfect information and of sample
+  information from regression metamodels of the PSA, so no further model
+  runs are needed.
+- **Deterministic sensitivity analysis.** One-way and two-way analyses
+  come either from the PSA, through metamodels (`owsa()`, `twsa()`), or
+  from running your model directly (`run_owsa_det()`, `run_twsa_det()`),
+  with tornado diagrams and optimal-strategy plots.
+- **PSA inputs.** `gen_psa_samp()` draws parameter samples from common
+  distributions, helpers such as `beta_params()` and `gamma_params()`
+  convert means and standard deviations into distribution parameters,
+  and `run_psa()` runs your model over the samples.
 
 ## Installation
+
+Install the released version from CRAN:
+
 ``` r
-# Install release version from CRAN
 install.packages("dampack")
 ```
 
+Or the development version from GitHub:
+
 ``` r
-# Install development version from GitHub
-devtools::install_github("DARTH-git/dampack")
+# install.packages("remotes")
+remotes::install_github("DARTH-git/dampack")
 ```
 
-Trying to install dampack from Github in a non-US locale on macOS may produce the following error:
+Installing from GitHub on macOS with a non-US locale may fail with
+`Error: (converted from warning) Setting LC_CTYPE failed, using "C"`.
+Running `defaults write org.R-project.R force.LANG en_US.UTF-8` in the
+terminal fixes it.
 
-``` 
-Error: (converted from warning) Setting LC_CTYPE failed, using "C"
+## Example
+
+`cancer_psa_data` holds the PSA output of an illustrative model that
+compares three cancer treatments over 10,000 samples.
+
+``` r
+library(dampack)
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# ICERs from the mean costs and QALYs of each strategy
+calculate_icers_psa(l_psa)
+#>   Strategy Costs ($) QALYs Incremental Costs ($) Incremental QALYs
+#> 1    Radio    16,129 10.68                     -                 -
+#> 2    Chemo    30,901 11.07                14,772              0.38
+#> 3  Surgery    25,110 10.88                     -                 -
+#>   ICER ($/QALY) Status
+#> 1             -     ND
+#> 2        38,492     ND
+#> 3             -     ED
 ```
 
-To solve this problem, run the following code in the terminal:
-```
-defaults write org.R-project.R force.LANG en_US.UTF-8 
+How likely is each strategy to be cost-effective across
+willingness-to-pay thresholds? The acceptability frontier (squares)
+marks the strategy with the highest expected net benefit at each
+threshold.
+
+``` r
+v_wtp <- seq(0, 200000, by = 10000)
+df_ceac <- ceac(l_psa, wtp = v_wtp)
+plot(df_ceac)
 ```
 
-## Vignettes
-dampack has a series of vignettes designed to showcase the functionality of the package and explain its underlying methodology. 
-The vignettes serve as a guide for proper usage, and it is highly recommended that new users read any relevant vignettes before using the package.
-After installing the package, vignettes can be accessed by typing `vignette(topic, package = "dampack")`, where topic is a character string corresponding to the name of the vignette.
-There is some overlap between the topics and functions covered in the six vignettes, and they should ideally be read in the following order:
-1. basic_cea
-2. psa_analysis
-3. voi
-4. psa_generation
-5. dsa_generation
+<img src="man/figures/README-ceac-1.png" alt="Cost-effectiveness acceptability curves for chemotherapy, radiation and surgery, with the acceptability frontier." width="100%" />
+
+## Learn more
+
+The [package website](https://darth-git.github.io/dampack/) has the full
+[function reference](https://darth-git.github.io/dampack/reference/) and
+these articles, best read in this order:
+
+1.  [Basic Cost Effectiveness
+    Analysis](https://darth-git.github.io/dampack/articles/basic_cea.html)
+2.  [Probabilistic Sensitivity
+    Analysis](https://darth-git.github.io/dampack/articles/psa_analysis.html)
+3.  [Value of Information
+    Analysis](https://darth-git.github.io/dampack/articles/voi.html)
+4.  [Probabilistic Sensitivity Analysis:
+    Generation](https://darth-git.github.io/dampack/articles/psa_generation.html)
+5.  [Deterministic Sensitivity Analysis:
+    Generation](https://darth-git.github.io/dampack/articles/dsa_generation.html)
+
+The same articles are installed with the package: see
+`vignette(package = "dampack")`. What changed in each release is in the
+[news](https://darth-git.github.io/dampack/news/).
+
+## Citation
+
+Run `citation("dampack")` for how to cite the package.
+
+## Getting help and contributing
+
+Please report bugs and suggest features in the [issue
+tracker](https://github.com/DARTH-git/dampack/issues). To contribute
+code, see the [contributing
+guide](https://github.com/DARTH-git/dampack/blob/main/.github/CONTRIBUTING.md).
+Everyone taking part in the project agrees to follow its [code of
+conduct](https://github.com/DARTH-git/dampack/blob/main/CODE_OF_CONDUCT.md).
+
+## Funding
+
+This package was developed with funding from the National Institute of
+Allergy and Infectious Diseases of the National Institutes of Health
+under award no. R01AI138783. The content of this package is solely the
+responsibility of the authors and does not necessarily represent the
+official views of the National Institutes of Health.
 
 ## The DARTH team
 
-dampack is developed by members of the [DARTH workgroup](https://www.darthworkgroup.com/), a group of researchers developing open-source tools for decision analysis in health.
+dampack is developed by members of the [DARTH
+workgroup](https://www.darthworkgroup.com/), a group of researchers
+developing open-source tools for decision analysis in health.
 
-**Package authors:** Fernando Alarid-Escudero, Greg Knowlton, Caleb W. Easterly, Matthew B. Kaufmann, and Eva Enns, with contributions from David Garibay (CRAN maintainer) and Mark Clements.
+**Package authors:** Fernando Alarid-Escudero (maintainer), Greg
+Knowlton, Caleb W. Easterly, Matthew B. Kaufmann, and Eva Enns, with
+contributions from David Garibay and Mark Clements.
 
 **DARTH workgroup members:**
 
@@ -59,11 +178,14 @@ dampack is developed by members of the [DARTH workgroup](https://www.darthworkgr
 - Matthew B. Kaufmann ([@mbkauf](https://github.com/mbkauf))
 - Gregory Knowlton ([@gknowlt](https://github.com/gknowlt))
 - Eline Krijkamp ([@krijkamp](https://github.com/krijkamp))
-- Alexandra Moskalewicz ([@amoskalewicz](https://github.com/amoskalewicz))
+- Alexandra Moskalewicz
+  ([@amoskalewicz](https://github.com/amoskalewicz))
 - Petros Pechlivanoglou ([@ppehli](https://github.com/ppehli))
 - Jorge Roa ([@jurjoroa](https://github.com/jurjoroa))
 - Mathyn Vervaart ([@matverv](https://github.com/matverv))
 - Ervin Wu ([@ervinro](https://github.com/ervinro))
 - Yansi Wu ([@yansi5](https://github.com/yansi5))
 
-**Other code contributors:** Szu-Yu Zoe Kao ([@syzoekao](https://github.com/syzoekao)) and Michael Fairley ([@mfairley](https://github.com/mfairley)).
+**Other code contributors:** Szu-Yu Zoe Kao
+([@syzoekao](https://github.com/syzoekao)) and Michael Fairley
+([@mfairley](https://github.com/mfairley)).

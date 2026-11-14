@@ -17,7 +17,7 @@
 
 - Strategy names are now kept exactly as provided in `make_psa_obj()`, `create_dsa_oneway()`, `create_dsa_twoway()`, and the objects built from them, so names such as "Standard of care" appear unchanged in tables and plot legends. Previously they were converted with `make.names()` (to `Standard.of.care`) with a warning. Code that refers to the converted names must use the original ones, for example `psa$cost[["Standard of care"]]` instead of `psa$cost$Standard.of.care`. Strategy names must be unique and not missing or empty, and a wrong number of names now gives an informative error (#208).
 - `summary.ceac()` renames its third output column from `cost_eff_strat` to `optimal_strategy`. Code that refers to the old column name with `$cost_eff_strat` must be updated (#173).
-- dampack now requires R 4.1.0 or later, the minimum required by current versions of ggplot2.
+- dampack now requires R 4.1.3 or later, the minimum required by current versions of its dependencies (triangle needs R 4.1.3, ggplot2 needs R 4.1).
 - dampack now requires ggplot2 3.5.0 or later and scales 1.3.0 or later, for ggplot2's `transform` argument and `scales::new_transform()` (#211).
 
 ## Bug fixes

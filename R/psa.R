@@ -327,7 +327,9 @@ plot.psa <- function(x,
 
     # add common theme
     col <- match.arg(col)
-    add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
+    # only the center points use fill; a fill scale without them makes ggplot2 warn
+    add_common_aes(psa_plot, txtsize, col = col,
+                   col_aes = if (center) c("color", "fill") else "color",
                    continuous = c("x", "y"),
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
@@ -422,7 +424,9 @@ plot.psa <- function(x,
 
     # add common theme
     col <- match.arg(col)
-    add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
+    # only the center points use fill; a fill scale without them makes ggplot2 warn
+    add_common_aes(psa_plot, txtsize, col = col,
+                   col_aes = if (center) c("color", "fill") else "color",
                    continuous = c("x", "y"),
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,

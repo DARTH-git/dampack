@@ -71,7 +71,7 @@ and Values. 2nd ed. Cambridge University Press; 2014.
 \code{citation("dampack")} for how to cite the package.
 }
 \author{
-\strong{Maintainer}: David Garibay \email{dgari039@uottawa.ca} [contributor]
+\strong{Maintainer}: Fernando Alarid-Escudero \email{falarid@stanford.edu} (\href{https://orcid.org/0000-0001-5076-1172}{ORCID})
 
 Authors:
 \itemize{
@@ -84,6 +84,7 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item David Garibay \email{dgari039@uottawa.ca} [contributor]
   \item Mark Clements \email{mark.clements@ki.se} [contributor]
 }
 

@@ -415,7 +415,7 @@ dirichlet_params <- function(p.mean, sigma) {
 #' Encyclopedia. Retrieved 17:23, February 11, 2018,
 #' from https://en.wikipedia.org/w/index.php?title=Gamma_distribution&oldid=824541785
 #' }
-#' @return A list contianing the following:
+#' @return A list containing the following:
 #' @return shape Shape parameter of gamma distribution
 #' @return scale Scale parameter of gamma distribution (If scale=TRUE)
 #' @return rate Rate parameter of gamma distribution (If scale=FALSE)
@@ -446,19 +446,19 @@ gamma_params <- function(mu, sigma, scale = TRUE) {
 #' Calculate location and scale parameters of a log-normal distribution.
 #'
 #' Function to calculate the location, \eqn{\mu}, and scale, \eqn{\sigma},
-#' parameteres of a log-normal distribution based on the method of moments (MoM)
+#' parameters of a log-normal distribution based on the method of moments (MoM)
 #' using the mean \eqn{m} and variance \eqn{v} of the non-logarithmized random
 #' variable of interest.
 #' @param m Scalar with the mean of the random variable.
 #' @param v Scalar with the variance of the random variable.
-#' (i.e., squared standar error).
+#' (i.e., squared standard error).
 #' @keywords distribution
 #' @concept log-normal distribution
 #' @concept method of moments
 #' @section Details:
 #' Based on method of moments. If \eqn{m} is the mean and
 #' \eqn{v} is the variance of the random variable, then the
-#' the location, \eqn{\mu}, and scale, \eqn{\sigma}, parameteres are computed
+#' the location, \eqn{\mu}, and scale, \eqn{\sigma}, parameters are computed
 #' as follows
 #' \deqn{\mu = \ln{(\frac{m}{\sqrt{(1 + \frac{v}{m^2})}})}}
 #' and

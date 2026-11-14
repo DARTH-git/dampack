@@ -35,7 +35,7 @@
 #' \item "pars" are the names of the input parameters of interest. These are the parameters that will
 #'  be varied in the deterministic sensitivity analysis. variables in "pars" column
 #'  must be a subset of variables in \code{params_basecase}
-#' \item "min" and "max" are the mininum and maximum values of the parameters of interest.}
+#' \item "min" and "max" are the minimum and maximum values of the parameters of interest.}
 #' }
 #'
 #' @seealso \code{\link{plot.owsa}}, \code{\link{owsa_tornado}}, \code{\link{owsa_opt_strat}},
@@ -249,7 +249,7 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
 #' \itemize{
 #' \item "pars" are the names of the two input parameters of interest. The two variables in "pars" column
 #'  must be a subset of variables in \code{params_basecase}
-#' \item "min" and "max" are the mininum and maximum values of the parameters of interest.}
+#' \item "min" and "max" are the minimum and maximum values of the parameters of interest.}
 #' }
 #'
 #' @seealso \code{\link{plot.twsa}}, \code{\link{run_owsa_det}}

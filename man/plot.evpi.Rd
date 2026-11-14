@@ -63,7 +63,7 @@ df_evpi <- calc_evpi(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
 plot(df_evpi)
 
 # change the labels and the number of axis ticks
-plot(df_evpi, currency = "USD", effect_units = "QALE", n_x_ticks = 5)
+plot(df_evpi, currency = "USD", effect_units = "life-years", n_x_ticks = 5)
 }
 \seealso{
 \code{\link{calc_evpi}}

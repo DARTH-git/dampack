@@ -85,7 +85,7 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 #' plot(df_evpi)
 #'
 #' # change the labels and the number of axis ticks
-#' plot(df_evpi, currency = "USD", effect_units = "QALE", n_x_ticks = 5)
+#' plot(df_evpi, currency = "USD", effect_units = "life-years", n_x_ticks = 5)
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export

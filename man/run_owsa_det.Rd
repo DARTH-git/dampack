@@ -61,7 +61,7 @@ given function that produces outcomes.
 \item "pars" are the names of the input parameters of interest. These are the parameters that will
  be varied in the deterministic sensitivity analysis. variables in "pars" column
  must be a subset of variables in \code{params_basecase}
-\item "min" and "max" are the mininum and maximum values of the parameters of interest.}
+\item "min" and "max" are the minimum and maximum values of the parameters of interest.}
 }
 }
 

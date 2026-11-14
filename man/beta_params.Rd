@@ -32,8 +32,14 @@ and
 \deqn{\beta = \alpha (\frac{1}{\mu} -1)}
 }
 
-\keyword{beta}
-\keyword{distribution;}
-\keyword{methods}
-\keyword{moments}
-\keyword{of}
+\examples{
+# a probability with a mean of 0.2 and a standard error of 0.05
+l_beta <- beta_params(mean = 0.2, sigma = 0.05)
+l_beta
+
+# the mean of the resulting beta distribution recovers the input mean
+l_beta$alpha / (l_beta$alpha + l_beta$beta)
+}
+\concept{beta distribution}
+\concept{method of moments}
+\keyword{distribution}

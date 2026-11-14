@@ -17,3 +17,14 @@ a \code{data.frame} containing the r-squared for each strategy and parameter's m
 \description{
 Summary of metamodel
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# which parameters explain most of the variation in the net monetary benefit?
+l_mm <- metamodel(analysis = "oneway", psa = l_psa, outcome = "nmb", wtp = 1e5)
+summary(l_mm)
+}

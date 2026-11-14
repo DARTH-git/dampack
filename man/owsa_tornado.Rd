@@ -55,3 +55,20 @@ in a specified model outcome.
 \description{
 Tornado plot of a one-way sensitivity analysis
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_owsa <- owsa(l_psa, outcome = "nmb", wtp = 1e5)
+
+# parameters driving the net monetary benefit of Chemo
+owsa_tornado(df_owsa, select_str = "Chemo", outcome_name = "NMB")
+
+# and the difference in net monetary benefit between Surgery and Chemo
+owsa_tornado(df_owsa, select_str = c("Chemo", "Surgery"), outcome_name = "NMB")
+
+# the data behind the plot
+owsa_tornado(df_owsa, return = "data", select_str = "Chemo")
+}

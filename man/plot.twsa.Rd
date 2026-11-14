@@ -42,3 +42,20 @@ A \code{ggplot2} plot of the two-way sensitivity analysis.
 \description{
 Two-way sensitivity analysis plot
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_twsa <- twsa(l_psa, param1 = "pFailChemo", param2 = "muDieCancer",
+                outcome = "nmb", wtp = 1e5)
+plot(df_twsa)
+
+# mark a base case (here, close to the PSA means), in black and white
+plot(df_twsa, basecase = list(pFailChemo = 0.45, muDieCancer = 0.2), col = "bw")
+
+# the strategy with the lowest expected cost
+df_twsa_cost <- twsa(l_psa, param1 = "pFailChemo", param2 = "muDieCancer", outcome = "cost")
+plot(df_twsa_cost, maximize = FALSE)
+}

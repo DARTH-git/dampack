@@ -61,6 +61,4 @@ summary(ceac_obj)
 \seealso{
 \code{\link{plot.ceac}}, \code{\link{summary.ceac}}
 }
-\keyword{acceptability}
-\keyword{cost-effectiveness}
-\keyword{curves}
+\concept{cost-effectiveness acceptability curves}

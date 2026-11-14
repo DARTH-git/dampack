@@ -11,7 +11,7 @@ number_ticks(n)
 \code{ggplot2} plots. Non-integer values are rounded down.}
 }
 \value{
-a vector of axis-label breaks
+a function that takes the axis limits and returns a vector of axis-label breaks
 }
 \description{
 Function for determining number of ticks on axis of \code{ggplot2} plots.
@@ -21,3 +21,15 @@ Function for determining number of ticks on axis of \code{ggplot2} plots.
 Based on function \code{pretty}.
 }
 
+\examples{
+# number_ticks() returns a function of the axis limits
+f_breaks <- number_ticks(5)
+f_breaks(c(0, 97))
+
+# use it for the breaks of a ggplot2 axis
+data("hund_strat")
+ggplot(hund_strat, aes(x = QALYs, y = Cost)) +
+  geom_point() +
+  scale_x_continuous(breaks = number_ticks(4)) +
+  scale_y_continuous(breaks = number_ticks(8))
+}

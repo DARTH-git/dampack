@@ -348,10 +348,10 @@ add_reference_and_nmb <- function(df_icers, ref_str, wtp, nhb, currency) {
 #' Because the dominated vs. non-dominated status and the ordering of strategies in the ICER table are
 #' liable to change across different samples of the PSA, confidence intervals are not provided for the
 #' incremental costs and QALYs along the cost-effectiveness acceptability frontier.
-#' \code{link{plot.psa}} does not show the confidence intervals in the resulting plot
+#' \code{\link{plot.icers}} does not show the confidence intervals in the resulting plot
 #' even if present in the ICER table.
 #'
-#' @param psa \code{psa} object from \code{link{make_psa_object}}
+#' @param psa \code{psa} object from \code{\link{make_psa_obj}}
 #' @param uncertainty whether or not 95\% quantiles for the cost and QALY outcomes should be included
 #' in the resulting ICER table. Defaults to \code{FALSE}.
 #' @inheritParams calculate_icers
@@ -368,6 +368,25 @@ add_reference_and_nmb <- function(df_icers, ref_str, wtp, nhb, currency) {
 #' \code{Inc_NMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
 #' @seealso \code{\link{plot.icers}}
 #' @seealso \code{\link{calculate_icers}}
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # ICERs from the mean cost and effectiveness of each strategy
+#' df_icers <- calculate_icers_psa(l_psa)
+#' df_icers
+#' plot(df_icers)
+#'
+#' # add the 2.5th and 97.5th percentiles of the cost and effectiveness of each strategy
+#' df_icers_unc <- calculate_icers_psa(l_psa, uncertainty = TRUE)
+#' df_icers_unc
+#'
+#' # compare every strategy with Radio, adding the net monetary benefit at a WTP of 100,000
+#' df_icers_ref <- calculate_icers_psa(l_psa, ref_str = "Radio", wtp = 1e5)
+#' print(df_icers_ref, ref = "reference")
 #' @importFrom tidyr pivot_longer
 #' @export
 calculate_icers_psa <- function(psa, uncertainty = FALSE, ref_str = NULL, wtp = NULL, nhb = FALSE) {
@@ -525,6 +544,23 @@ compute_icers <- function(non_d) {
 #' @inheritParams ggrepel::geom_label_repel
 #'
 #' @return a ggplot2 object which can be modified by adding additional geoms
+#'
+#' @seealso \code{\link{calculate_icers}}, \code{\link{calculate_icers_psa}}
+#'
+#' @examples
+#' data("psa_cdiff")
+#' df_cdiff <- summary(psa_cdiff)
+#' df_icers <- calculate_icers(cost = df_cdiff$meanCost,
+#'                             effect = df_cdiff$meanEffect,
+#'                             strategies = df_cdiff$Strategy)
+#' plot(df_icers)
+#'
+#' # label every strategy, or show only the efficient frontier
+#' plot(df_icers, label = "all")
+#' plot(df_icers, plot_frontier_only = TRUE)
+#'
+#' # incremental cost-effectiveness plane with s3 at the origin and a WTP line
+#' plot(df_icers, ref_str = "s3", wtp = 1e5)
 #'
 #' @importFrom stringr str_sub
 #' @importFrom ggrepel geom_label_repel
@@ -693,6 +729,26 @@ plot.icers <- function(x,
 #' or \code{"both"}.
 #' @param ... Additional arguments passed to other methods.
 #' @return a dataframe object - formatted CEA table
+#'
+#' @seealso \code{\link{calculate_icers}}
+#'
+#' @examples
+#' data("psa_cdiff")
+#' df_cdiff <- summary(psa_cdiff)
+#' df_icers <- calculate_icers(cost = df_cdiff$meanCost,
+#'                             effect = df_cdiff$meanEffect,
+#'                             strategies = df_cdiff$Strategy,
+#'                             ref_str = "s3",
+#'                             wtp = 1e5)
+#'
+#' # sequential table: each strategy on the frontier against the previous one
+#' df_icers
+#'
+#' # every strategy against the reference, with more digits for costs and effects
+#' print(df_icers, ref = "reference", dig_cost = 2, dig_eff = 3)
+#'
+#' # both comparisons, with costs labeled in euros
+#' print(df_icers, ref = "both", currency = "EUR")
 #' @export
 print.icers <- function(x,
                         currency = NULL,

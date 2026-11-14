@@ -71,4 +71,19 @@ Plots the CEAC, using the object created by \code{\link{ceac}}.
 \code{ceac} computes the probability of each of the strategies being
 cost-effective at each \code{wtp} value.
 }
-\keyword{internal}
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_ceac <- ceac(wtp = seq(1e4, 1e5, by = 1e4), psa = l_psa)
+plot(df_ceac)
+
+# without the frontier, and with fewer x-axis ticks
+plot(df_ceac, frontier = FALSE, n_x_ticks = 5)
+
+}
+\seealso{
+\code{\link{ceac}}, \code{\link{summary.ceac}}
+}

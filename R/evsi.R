@@ -19,6 +19,42 @@
 #' for the selected parameters and 2) a list of metamodels used to estimate EVSI for each
 #' strategy at each willingness to pay threshold.
 #'
+#' @seealso \code{\link{plot.evsi}}, \code{\link{calc_evppi}}
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # EVSI of a study of n additional patients that informs both failure probabilities,
+#' # which were each estimated from an initial study of n0 = 50 patients
+#' l_evsi <- calc_evsi(l_psa,
+#'                     wtp = 1e5,
+#'                     params = c("pFailSurg", "pFailChemo"),
+#'                     outcome = "nmb",
+#'                     k = 3,
+#'                     n = c(10, 50, 100, 200),
+#'                     n0 = 50,
+#'                     progress = FALSE)
+#' l_evsi$df_evsi
+#' plot(l_evsi)
+#'
+#' \donttest{
+#' # a separate initial and additional sample size for each parameter
+#' l_evsi_by_param <- calc_evsi(l_psa,
+#'                              wtp = c(5e4, 1e5, 2e5),
+#'                              params = c("pFailSurg", "pFailChemo"),
+#'                              outcome = "nmb",
+#'                              k = 3,
+#'                              n = c(100, 50),
+#'                              n0 = c(50, 20),
+#'                              n_by_param = TRUE,
+#'                              progress = FALSE)
+#' l_evsi_by_param$df_evsi
+#' }
+#'
 #' @export
 calc_evsi <- function(psa,
                       wtp,
@@ -289,9 +325,27 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #'  currency symbol or word (e.g., £, €, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
-#' @keywords expected value of sample information
+#' @concept expected value of sample information
 #' @return A \code{ggplot2} plot with the EVSI
 #' @seealso \code{\link{calc_evsi}}
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # one WTP threshold and several sample sizes: EVSI by additional sample size
+#' l_evsi <- calc_evsi(l_psa, wtp = 1e5, params = "pFailSurg", outcome = "nmb",
+#'                     n = c(10, 50, 100, 200), n0 = 50, progress = FALSE)
+#' plot(l_evsi)
+#'
+#' \donttest{
+#' # several WTP thresholds and one sample size: EVSI by WTP threshold
+#' l_evsi_wtp <- calc_evsi(l_psa, wtp = c(5e4, 1e5, 2e5), params = "pFailSurg",
+#'                         outcome = "nmb", n = 100, n0 = 50, progress = FALSE)
+#' plot(l_evsi_wtp)
+#' }
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export

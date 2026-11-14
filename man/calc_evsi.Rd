@@ -56,3 +56,41 @@ strategy at each willingness to pay threshold.
 \description{
 Calculate Expected Value of Sample Information (EVSI)
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# EVSI of a study of n additional patients that informs both failure probabilities,
+# which were each estimated from an initial study of n0 = 50 patients
+l_evsi <- calc_evsi(l_psa,
+                    wtp = 1e5,
+                    params = c("pFailSurg", "pFailChemo"),
+                    outcome = "nmb",
+                    k = 3,
+                    n = c(10, 50, 100, 200),
+                    n0 = 50,
+                    progress = FALSE)
+l_evsi$df_evsi
+plot(l_evsi)
+
+\donttest{
+# a separate initial and additional sample size for each parameter
+l_evsi_by_param <- calc_evsi(l_psa,
+                             wtp = c(5e4, 1e5, 2e5),
+                             params = c("pFailSurg", "pFailChemo"),
+                             outcome = "nmb",
+                             k = 3,
+                             n = c(100, 50),
+                             n0 = c(50, 20),
+                             n_by_param = TRUE,
+                             progress = FALSE)
+l_evsi_by_param$df_evsi
+}
+
+}
+\seealso{
+\code{\link{plot.evsi}}, \code{\link{calc_evppi}}
+}

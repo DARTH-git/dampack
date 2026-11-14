@@ -48,11 +48,5 @@ plot(evpi) + ggtitle("Expected Value of Perfect Information")
 \seealso{
 \code{\link{plot.evpi}}, \code{\link{make_psa_obj}}
 }
-\keyword{benefit}
-\keyword{expected}
-\keyword{information;}
-\keyword{monetary}
-\keyword{net}
-\keyword{of}
-\keyword{perfect}
-\keyword{value}
+\concept{expected value of perfect information}
+\concept{net monetary benefit}

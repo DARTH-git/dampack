@@ -5,7 +5,8 @@
 #' @param wtp numeric vector with willingness-to-pay (WTP) thresholds
 #' @param psa psa object from \code{\link{make_psa_obj}}
 #' @param pop scalar that corresponds to the total population
-#' @keywords expected value of perfect information; net monetary benefit
+#' @concept expected value of perfect information
+#' @concept net monetary benefit
 #' @section Details:
 #' \code{evpi} calculates the value of eliminating all the uncertainty of a
 #' cost-effectiveness analysis at each WTP threshold.
@@ -71,9 +72,20 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 #'  currency symbol or word (e.g., £, €, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
-#' @keywords expected value of perfect information
+#' @concept expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPI
 #' @seealso \code{\link{calc_evpi}}
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_evpi <- calc_evpi(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
+#' plot(df_evpi)
+#'
+#' # change the labels and the number of axis ticks
+#' plot(df_evpi, currency = "USD", effect_units = "QALE", n_x_ticks = 5)
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export

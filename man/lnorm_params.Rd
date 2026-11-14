@@ -39,8 +39,11 @@ and
 \examples{
 m <- 3
 v <- 0.01
-lnorm_params(m, v)
-# True values: 100, 30, 70
+l_lnorm <- lnorm_params(m, v)
+l_lnorm
+
+# the mean of the resulting log-normal distribution recovers m
+exp(l_lnorm$mu + l_lnorm$sigma^2 / 2)
 }
 \references{
 \enumerate{
@@ -51,8 +54,6 @@ Encyclopedia. Retrieved 16:47, April 23, 2017,
 from https://en.wikipedia.org/w/index.php?title=Log-normal_distribution&oldid=776357974
 }
 }
-\keyword{distribution;}
-\keyword{log-normal}
-\keyword{method}
-\keyword{moments}
-\keyword{of}
+\concept{log-normal distribution}
+\concept{method of moments}
+\keyword{distribution}

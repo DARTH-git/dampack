@@ -63,6 +63,25 @@
 #' 2014;34(3):311–26.
 #' }
 #'
+#' @seealso \code{\link{plot.evppi}}, \code{\link{calc_evpi}}, \code{\link{calc_evsi}}
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # EVPPI of the two treatment-failure probabilities, jointly, at three WTP thresholds
+#' l_evppi <- calc_evppi(l_psa,
+#'                       wtp = c(5e4, 1e5, 2e5),
+#'                       params = c("pFailChemo", "pFailSurg"),
+#'                       outcome = "nmb",
+#'                       k = 3,
+#'                       progress = FALSE)
+#' l_evppi$df_evppi
+#' plot(l_evppi)
+#'
 #' @importFrom dplyr bind_cols
 #'
 #' @export
@@ -145,9 +164,21 @@ calc_evppi <- function(psa,
 #'  currency symbol or word (e.g., £, €, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
-#' @keywords expected value of perfect information
+#' @concept expected value of partial perfect information
 #' @return A \code{ggplot2} plot with the EVPPI
 #' @seealso \code{\link{calc_evppi}}
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' l_evppi <- calc_evppi(l_psa, wtp = c(5e4, 1e5, 2e5), params = "pFailChemo",
+#'                       progress = FALSE)
+#' plot(l_evppi)
+#'
+#' # ggplot2 layers can be added to the plot
+#' plot(l_evppi, n_x_ticks = 5) + ggtitle("EVPPI of pFailChemo")
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export

@@ -54,3 +54,16 @@ A \code{ggplot2} plot of the \code{owsa} object.
 \description{
 Plot a sensitivity analysis
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_owsa <- owsa(l_psa, params = c("pFailChemo", "pFailSurg"), outcome = "nmb", wtp = 1e5)
+plot(df_owsa)
+
+# highlight a base case value of each parameter (here, close to its PSA mean), in black and white
+plot(df_owsa, basecase = list(pFailChemo = 0.45, pFailSurg = 0.05), col = "bw")
+
+}

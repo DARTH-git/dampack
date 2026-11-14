@@ -58,3 +58,19 @@ changes as a function of each parameter of interest.
 \description{
 plot the optimal strategy as the parameter values change
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_owsa <- owsa(l_psa, params = c("pFailChemo", "pFailSurg", "cChemo"),
+                outcome = "nmb", wtp = 1e5)
+owsa_opt_strat(df_owsa)
+
+# only the parameters that change the optimal strategy
+owsa_opt_strat(df_owsa, plot_const = FALSE)
+
+# the ranges of each parameter over which each strategy is optimal
+owsa_opt_strat(df_owsa, return = "data")
+}

@@ -108,6 +108,15 @@ create_sa <- function(parameters, parnames, effectiveness, strategies,
 #' @param ... further arguments to print (not used)
 #'
 #' @return None (invisible NULL).
+#'
+#' @examples
+#' data("psa_cdiff")
+#'
+#' # the list of strategies is truncated at 5
+#' print(psa_cdiff)
+#'
+#' # print all of them
+#' print(psa_cdiff, all_strat = TRUE)
 #' @export
 print.sa <- function(x, all_strat = FALSE, ...) {
   v_xclass <- class(x)

@@ -245,7 +245,18 @@ labfun <- function(x) {
 #' \code{ggplot2} plots. Non-integer values are rounded down.
 #' @section Details:
 #' Based on function \code{pretty}.
-#' @return a vector of axis-label breaks
+#' @return a function that takes the axis limits and returns a vector of axis-label breaks
+#' @examples
+#' # number_ticks() returns a function of the axis limits
+#' f_breaks <- number_ticks(5)
+#' f_breaks(c(0, 97))
+#'
+#' # use it for the breaks of a ggplot2 axis
+#' data("hund_strat")
+#' ggplot(hund_strat, aes(x = QALYs, y = Cost)) +
+#'   geom_point() +
+#'   scale_x_continuous(breaks = number_ticks(4)) +
+#'   scale_y_continuous(breaks = number_ticks(8))
 #' @export
 number_ticks <- function(n) {
   function(limits) {

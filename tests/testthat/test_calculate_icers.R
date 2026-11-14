@@ -90,7 +90,8 @@ test_that("psa icers returns icers df corresponding to means", {
   psa_sum <- summary(psa_big)
   exp_icers <- calculate_icers(cost = psa_sum$meanCost,
                                effect = psa_sum$meanEffect,
-                               strategies = psa_sum$Strategy)
+                               strategies = psa_sum$Strategy,
+                               currency = psa_big$currency)
   expect_equal(psa_icers, exp_icers)
 })
 

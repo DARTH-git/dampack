@@ -41,7 +41,7 @@ test_that("plot.psa() without center points builds without a fill-scale warning"
 })
 
 test_that("plot.ceac(): frontier, points, and min_prob", {
-  df_ceac <- ceac(v_wtp, psa_big)
+  df_ceac <- ceac(psa_big, v_wtp)
   expect_true("GeomPoint" %in% geoms(plot(df_ceac)))
   p_plain <- plot(df_ceac, frontier = FALSE, points = FALSE)
   expect_false("GeomPoint" %in% geoms(p_plain))

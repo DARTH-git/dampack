@@ -100,7 +100,10 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
 #' @param x an owsa object
 #' @param txtsize base text size in the plot
 #' @param col either full-color ("full") or black and white ("bw")
-#' @param size either point size (ptype = "point") and/or line size (ptype = "line")
+#' @param linewidth width of the lines. Defaults to 1.
+#' @param xlim,ylim limits of the x (parameter values) and y (outcome) axes, applied to every
+#' panel, or \code{NULL} (the default) to set them automatically.
+#' @param size deprecated; use \code{linewidth} instead.
 #' @param facet_scales whether the x or y axes should be fixed.
 #' See \code{\link[ggplot2]{facet_grid}} in the \code{ggplo2} package for
 #' more details.
@@ -135,11 +138,18 @@ plot.owsa <- function(x, txtsize = 12,
                       facet_scales = c("free_x", "free_y", "free", "fixed"),
                       facet_nrow = NULL,
                       facet_ncol = NULL,
-                      size = 1,
+                      linewidth = 1,
                       n_x_ticks = 6,
                       n_y_ticks = 6,
                       basecase = NULL,
+                      xlim = NULL,
+                      ylim = NULL,
+                      size = deprecated(),
                       ...) {
+  if (is_present(size)) {
+    deprecate_soft("1.1.0", "plot.owsa(size)", "plot.owsa(linewidth)")
+    linewidth <- size
+  }
   param_val <- outcome_val <- strategy <- NULL
   v_strategies <- unique(x$strategy)
   scales <- match.arg(facet_scales)
@@ -153,12 +163,12 @@ plot.owsa <- function(x, txtsize = 12,
   if (col == "full" || col == "access") {
     owsa <- owsa +
       geom_line(aes(color = strategy),
-                linewidth = size)
+                linewidth = linewidth)
   }
   if (col == "bw") {
     owsa <- owsa +
       geom_line(aes(linetype = strategy),
-                linewidth = size) +
+                linewidth = linewidth) +
       scale_linetype_discrete(name = "Strategy")
   }
 
@@ -183,6 +193,7 @@ plot.owsa <- function(x, txtsize = 12,
                  scale_name = "Strategy",
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  continuous = c("x", "y"),
+                 xlim = xlim, ylim = ylim,
                  v_str = v_strategies)
 }
 
@@ -394,7 +405,8 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
                            facet_ncol = 1,
                            facet_nrow = NULL,
                            facet_lab_txtsize = NULL,
-                           n_x_ticks = 10) {
+                           n_x_ticks = 10,
+                           xlim = NULL) {
   # check that is owsa object
   if (!is_owsa(owsa)) {
     stop("must provide an owsa object created with owsa()")
@@ -457,7 +469,7 @@ owsa_opt_strat <- function(owsa, params = NULL, maximize = TRUE,
   g <- add_common_aes(g, txtsize, scale_name = "Optimal Strategy: ",
                       col, col_aes = "fill", continuous = "x",
                       facet_lab_txtsize = facet_lab_txtsize,
-                      n_x_ticks = n_x_ticks) +
+                      n_x_ticks = n_x_ticks, xlim = xlim) +
     # these remove the meaningless y axis labels and text
     theme(axis.line.y = element_blank(),
           axis.text.y = element_blank(),

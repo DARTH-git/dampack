@@ -222,7 +222,7 @@ calculate_icers <- function(cost, effect, strategies, ref_str = NULL, wtp = NULL
 #' @return a string such as \code{"Dotted line: WTP = $50,000/QALY"}.
 #' @keywords internal
 wtp_caption <- function(wtp, currency, effect_units = "QALYs") {
-  unit <- sub("s$", "", effect_units)
+  unit <- per_unit(effect_units)
   paste0("Dotted line: WTP = ", currency, format(wtp, big.mark = ",", scientific = FALSE, trim = TRUE),
          "/", unit)
 }

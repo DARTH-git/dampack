@@ -8,7 +8,7 @@
   x,
   txtsize = 12,
   currency = NULL,
-  effect_units = "QALY",
+  effect_units = "QALYs",
   n_y_ticks = 8,
   n_x_ticks = 20,
   xbreaks = NULL,
@@ -29,7 +29,9 @@
 Default: the currency of the PSA the results were computed from (or $), but it could be any
 currency symbol or word (e.g., £, €, peso)}
 
-\item{effect_units}{units of effectiveness. Default: QALY}
+\item{effect_units}{units of effectiveness, in the plural (for example \code{"QALYs"} or
+\code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+("$/QALY"), and a value already in the singular is used as given.}
 
 \item{n_y_ticks}{number of y-axis ticks}
 

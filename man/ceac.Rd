@@ -4,12 +4,12 @@
 \alias{ceac}
 \title{Cost-Effectiveness Acceptability Curve (CEAC)}
 \usage{
-ceac(wtp, psa)
+ceac(psa, wtp)
 }
 \arguments{
-\item{wtp}{numeric vector with willingness-to-pay (WTP) thresholds}
-
 \item{psa}{psa object from \code{\link{make_psa_obj}}}
+
+\item{wtp}{numeric vector with willingness-to-pay (WTP) thresholds}
 }
 \value{
 An object of class \code{ceac} that can be visualized with \code{plot}. The \code{ceac}
@@ -22,6 +22,10 @@ particular WTP is on the cost-efficient frontier.
 curves (CEAC) from a probabilistic sensitivity analysis (PSA) dataset.
 }
 \details{
+Like \code{\link{calc_exp_loss}} and \code{\link{calc_evpi}}, \code{ceac} takes the
+\code{psa} object first. The order used before dampack 1.1.0, \code{ceac(wtp, psa)}, still
+works but is deprecated; named arguments work in any order.
+
 \code{ceac} computes the probability of each of the strategies being
 cost-effective at each \code{wtp} threshold. The returned object has classes
 \code{ceac} and \code{data.frame}, and has its own plot method (\code{\link{plot.ceac}}).
@@ -36,7 +40,7 @@ psa_cancer <- make_psa_obj(cost = cancer_psa_data$cost,
 
 # define wtp threshold vector (can also use a single wtp)
 wtp <- seq(1e4, 1e5, by = 1e4)
-ceac_obj <- ceac(wtp, psa_cancer)
+ceac_obj <- ceac(psa_cancer, wtp)
 plot(ceac_obj) # see ?plot.ceac for options
 
 # this is most useful when there are many strategies

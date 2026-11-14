@@ -129,6 +129,8 @@ plot.twsa <- function(x, maximize = TRUE,
                       n_y_ticks = 6,
                       txtsize = 12,
                       basecase = NULL,
+                      xlim = NULL,
+                      ylim = NULL,
                       ...) {
 
   outcome_val <- strategy <- NULL
@@ -173,6 +175,7 @@ plot.twsa <- function(x, maximize = TRUE,
                  continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks,
                  n_y_ticks = n_y_ticks,
+                 xlim = xlim, ylim = ylim,
                  xexpand = c(0, 0),
                  yexpand = c(0, 0))
 }

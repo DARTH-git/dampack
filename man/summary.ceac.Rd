@@ -28,7 +28,7 @@ l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
                       effectiveness = cancer_psa_data$effectiveness,
                       parameters = cancer_psa_data$parameters,
                       strategies = cancer_psa_data$strategies)
-df_ceac <- ceac(wtp = seq(1e4, 1e5, by = 1e4), psa = l_psa)
+df_ceac <- ceac(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
 
 # Radio is optimal up to a WTP of 40,000 and Chemo from there on
 summary(df_ceac)

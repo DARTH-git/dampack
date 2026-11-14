@@ -323,7 +323,9 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: the currency of the PSA the results were computed from (or $), but it could be any
 #'  currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @inheritParams add_common_aes
 #' @concept expected value of sample information
 #' @return A \code{ggplot2} plot with the EVSI
@@ -352,7 +354,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
 plot.evsi <- function(x,
                       txtsize = 12,
                       currency = NULL,
-                      effect_units = "QALY",
+                      effect_units = "QALYs",
                       n_y_ticks = 8,
                       n_x_ticks = 20,
                       xbreaks = NULL,
@@ -371,7 +373,7 @@ plot.evsi <- function(x,
   if (length(unique(x$WTP)) == 1) {
     col <- "bw"
   }
-  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
+  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", per_unit(effect_units), ")", sep = "")
 
   if (length(unique(x$WTP)) == 1 && "n" %in% names(x)) {
     g <- ggplot(data = x,

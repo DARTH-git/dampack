@@ -70,7 +70,9 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: the currency of the PSA the results were computed from (or $), but it could be any
 #'  currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @inheritParams add_common_aes
 #' @concept expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPI
@@ -92,7 +94,7 @@ calc_evpi <- function(psa, wtp, pop = 1) {
 plot.evpi <- function(x,
                       txtsize = 12,
                       currency = NULL,
-                      effect_units = "QALY",
+                      effect_units = "QALYs",
                       n_y_ticks = 8,
                       n_x_ticks = 20,
                       xbreaks = NULL,
@@ -106,7 +108,7 @@ plot.evpi <- function(x,
   g <- ggplot(data = x,
               aes(x = WTP_thou, y = EVPI)) +
     geom_line() +
-    xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
+    xlab(paste("Willingness to Pay (Thousand ", currency, "/", per_unit(effect_units), ")", sep = "")) +
     ylab(paste("EVPI (", currency, ")", sep = ""))
   add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,

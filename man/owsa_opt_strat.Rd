@@ -17,7 +17,8 @@ owsa_opt_strat(
   facet_ncol = 1,
   facet_nrow = NULL,
   facet_lab_txtsize = NULL,
-  n_x_ticks = 10
+  n_x_ticks = 10,
+  xlim = NULL
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ changes in optimal strategy as they vary.}
 \item{facet_lab_txtsize}{text size for plot facet labels}
 
 \item{n_x_ticks}{number of x-axis ticks}
+
+\item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
 }
 \value{
 If \code{return == "plot"}, a \code{ggplot2} optimal strategy plot derived from the \code{owsa}

@@ -18,7 +18,7 @@
   ylim = NULL,
   xlim = c(0, NA),
   col = c("access", "full", "bw"),
-  effect_units = "QALY",
+  effect_units = "QALYs",
   ...
 )
 }
@@ -56,7 +56,9 @@ will override \code{n_y_ticks} if provided.}
 
 \item{col}{either none, full color, accessible colors, or black and white}
 
-\item{effect_units}{units of effectiveness, used in the x-axis label. Default: QALY}
+\item{effect_units}{units of effectiveness, in the plural (for example \code{"QALYs"} or
+\code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+("$/QALY"), and a value already in the singular is used as given.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}
@@ -77,7 +79,7 @@ l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
                       effectiveness = cancer_psa_data$effectiveness,
                       parameters = cancer_psa_data$parameters,
                       strategies = cancer_psa_data$strategies)
-df_ceac <- ceac(wtp = seq(1e4, 1e5, by = 1e4), psa = l_psa)
+df_ceac <- ceac(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
 plot(df_ceac)
 
 # without the frontier, and with fewer x-axis ticks

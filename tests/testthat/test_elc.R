@@ -68,3 +68,22 @@ test_that("plot.exp_loss(col = 'bw') uses lsize and builds without warnings", {
   expect_equal(unique(b$data[[i_line]]$linewidth), 3)
   expect_equal(length(unique(b$data[[i_line]]$linetype)), length(unique(el$Strategy)))
 })
+
+# with log_y = TRUE, the default y breaks were evenly spaced: they bunched up at the top of
+# the log axis and left the lower orders of magnitude without labels
+test_that("plot.exp_loss(log_y = TRUE) labels every order of magnitude of the y axis", {
+  el <- calc_exp_loss(psa_obj, wtp = seq(0, 2e5, by = 1e4))
+  b <- ggplot2::ggplot_build(plot(el))
+  v_breaks <- b$layout$panel_params[[1]]$y$breaks          # on the log10 scale
+  v_breaks <- v_breaks[!is.na(v_breaks)]
+  v_range <- log10(range(el$Expected_Loss))
+  # a labelled break in every order of magnitude the data cover
+  v_decades <- seq(ceiling(v_range[1]), floor(v_range[2]))
+  expect_true(all(v_decades %in% round(v_breaks, 10)))
+  # user-supplied breaks still win, and a linear axis keeps its evenly spaced breaks
+  b2 <- ggplot2::ggplot_build(plot(el, ybreaks = c(1e3, 1e4)))
+  expect_equal(10^b2$layout$panel_params[[1]]$y$breaks[!is.na(b2$layout$panel_params[[1]]$y$breaks)],
+               c(1e3, 1e4))
+  b3 <- ggplot2::ggplot_build(plot(el, log_y = FALSE))
+  expect_equal(diff(range(diff(stats::na.omit(b3$layout$panel_params[[1]]$y$breaks)))), 0)
+})

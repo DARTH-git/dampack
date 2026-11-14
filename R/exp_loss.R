@@ -145,6 +145,11 @@ plot.exp_loss <- function(x,
   # formatting if logging the y axis
   if (log_y) {
     tr <- "log10"
+    # evenly spaced breaks (number_ticks()) bunch up at the top of a log axis and leave its
+    # lower part without labels, so use breaks spread over the orders of magnitude instead
+    if (is.null(ybreaks)) {
+      ybreaks <- scales::breaks_log(n = n_y_ticks)
+    }
   } else {
     tr <- "identity"
   }

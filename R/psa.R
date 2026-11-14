@@ -188,6 +188,11 @@ summary.psa <- function(object, calc_sds = FALSE, ref_str = NULL, wtp = NULL, ..
 #' cost-effectiveness plane. Without \code{ref_str}, the line goes through the mean cost and effect
 #' of the least costly strategy, as in \code{\link{plot.icers}}. Samples below the line are
 #' cost-effective compared with that strategy at this threshold.
+#' @param xtrans,ytrans transformation of the effectiveness (x) and cost (y) axes, such as
+#' \code{"log10"}, passed to \code{\link[ggplot2]{scale_continuous}}. Defaults to
+#' \code{"identity"}. The ellipses are computed on the transformed scale, so they keep their
+#' shape on a log axis; the center points stay at the arithmetic means. A log axis needs every
+#' value on it to be positive, which on the incremental plane (\code{ref_str}) is rarely the case.
 #' @inheritParams add_common_aes
 #'
 #' @importFrom ellipse ellipse
@@ -211,6 +216,8 @@ plot.psa <- function(x,
                      ref_axis = TRUE,
                      ref_caption = TRUE,
                      wtp = NULL,
+                     xtrans = "identity",
+                     ytrans = "identity",
                      ...) {
 
   Effectiveness <- Cost <- Strategy <- Eff.mean <- Cost.mean <- y <- group <- NULL
@@ -243,6 +250,7 @@ plot.psa <- function(x,
     # make strategies in psa object into ordered factors
     df_ce$Strategy <- factor(df_ce$Strategy, levels = v_strategies, ordered = TRUE)
 
+    check_axis_transform(df_ce, xtrans, ytrans)
     psa_plot <- ggplot(df_ce, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
       ylab(paste("Cost (", currency, ")", sep = ""))
@@ -263,15 +271,7 @@ plot.psa <- function(x,
 
     if (ellipse) {
       # make points for ellipse plotting
-      l_ell <- lapply(v_strategies, function(s) {
-        df_strat_specific <- df_ce[df_ce$Strategy == s, ]
-        els <-  with(df_strat_specific,
-                     ellipse(cor(Effectiveness, Cost),
-                             scale = c(sd(Effectiveness), sd(Cost)),
-                             centre = c(mean(Effectiveness), mean(Cost))))
-        data.frame(els, group = s, stringsAsFactors = FALSE)
-      })
-      df_ell <- bind_rows(l_ell)
+      df_ell <- psa_ellipses(df_ce, v_strategies, xtrans, ytrans)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
@@ -299,6 +299,7 @@ plot.psa <- function(x,
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
                    xlim = xlim, ylim = ylim,
+                   xtrans = xtrans, ytrans = ytrans,
                    v_str = v_strategies)
 
   } else {
@@ -333,6 +334,7 @@ plot.psa <- function(x,
 
     df_ice$Strategy <- factor(df_ice$Strategy, levels = v_comp_strategies, ordered = TRUE)
 
+    check_axis_transform(df_ice, xtrans, ytrans, incremental = TRUE)
     psa_plot <- ggplot(df_ice, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
       ylab(paste("Incremental Cost (", currency, ")", sep = "")) +
@@ -372,15 +374,7 @@ plot.psa <- function(x,
 
     if (ellipse) {
       # make points for ellipse plotting
-      l_ell <- lapply(v_comp_strategies, function(s) {
-        df_strat_specific <- df_ice[df_ice$Strategy == s, ]
-        els <-  with(df_strat_specific,
-                     ellipse(cor(Effectiveness, Cost),
-                             scale = c(sd(Effectiveness), sd(Cost)),
-                             centre = c(mean(Effectiveness), mean(Cost))))
-        data.frame(els, group = s, stringsAsFactors = FALSE)
-      })
-      df_ell <- bind_rows(l_ell)
+      df_ell <- psa_ellipses(df_ice, v_comp_strategies, xtrans, ytrans)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
@@ -396,7 +390,59 @@ plot.psa <- function(x,
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
                    xlim = xlim, ylim = ylim,
+                   xtrans = xtrans, ytrans = ytrans,
                    v_str = v_strategies)
 
   }
+}
+
+#' Ellipses around each strategy's PSA samples
+#'
+#' Each ellipse is computed from the mean, standard deviation and correlation of the samples on
+#' the transformed scale of the axes and mapped back, so that it keeps its shape when the axes
+#' are, for example, on a log scale. With identity transformations this is the usual ellipse.
+#'
+#' @param df_samples data frame with columns \code{Strategy}, \code{Effectiveness} and \code{Cost}.
+#' @param v_str strategies to draw an ellipse for.
+#' @inheritParams plot.psa
+#' @return a data frame with columns \code{x}, \code{y} and \code{group}.
+#' @keywords internal
+psa_ellipses <- function(df_samples, v_str, xtrans, ytrans) {
+  tr_x <- scales::as.transform(xtrans)
+  tr_y <- scales::as.transform(ytrans)
+  l_ell <- lapply(v_str, function(s) {
+    v_sel <- df_samples$Strategy == s
+    # samples on the scale of the axes
+    v_x <- tr_x$transform(df_samples$Effectiveness[v_sel])
+    v_y <- tr_y$transform(df_samples$Cost[v_sel])
+    m_ell <- ellipse(cor(v_x, v_y), scale = c(sd(v_x), sd(v_y)), centre = c(mean(v_x), mean(v_y)))
+    # back to the data scale, where ggplot2 applies the axis transformation again
+    data.frame(x = tr_x$inverse(m_ell[, 1]), y = tr_y$inverse(m_ell[, 2]),
+               group = s, stringsAsFactors = FALSE)
+  })
+  bind_rows(l_ell)
+}
+
+#' Check that the PSA samples can be shown on transformed axes
+#'
+#' @param df_samples data frame with columns \code{Effectiveness} and \code{Cost}.
+#' @param incremental whether the samples are differences from a reference strategy.
+#' @inheritParams plot.psa
+#' @return \code{NULL}, invisibly; called for the error.
+#' @keywords internal
+check_axis_transform <- function(df_samples, xtrans, ytrans, incremental = FALSE) {
+  l_axes <- list(list(xtrans, df_samples$Effectiveness, "xtrans", "effectiveness"),
+                 list(ytrans, df_samples$Cost, "ytrans", "cost"))
+  for (axis in l_axes) {
+    tr <- scales::as.transform(axis[[1]])
+    if (!all(is.finite(suppressWarnings(tr$transform(axis[[2]]))))) {
+      tr_name <- if (is.character(axis[[1]])) axis[[1]] else tr$name
+      stop("`", axis[[3]], " = \"", tr_name, "\"` cannot show every ",
+           if (incremental) "incremental ", axis[[4]], " value: some are outside its domain ",
+           "(zero or negative, for a log scale)",
+           if (incremental) ". Differences from the reference strategy are often negative",
+           ".", call. = FALSE)
+    }
+  }
+  invisible(NULL)
 }

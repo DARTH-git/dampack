@@ -108,3 +108,44 @@ test_that("make_psa_obj() names other_outcome columns after the strategies", {
   p <- make_psa_obj(df_cost, df_cost, strategies = c("A", "B", "C"), other_outcome = df_other)
   expect_identical(names(p$other_outcome), c("A", "B", "C"))
 })
+
+# log axes (#201): the ellipse is computed on the scale of the axes
+test_that("plot.psa(xtrans, ytrans) draws the ellipses on log axes", {
+  p <- plot(psa_big, xtrans = "log10", ytrans = "log10")
+  expect_no_warning(b <- ggplot2::ggplot_build(p))
+  expect_equal(b$layout$panel_scales_x[[1]]$trans$name, "log-10")
+  expect_equal(b$layout$panel_scales_y[[1]]$trans$name, "log-10")
+  i_path <- which(vapply(p$layers, function(l) inherits(l$geom, "GeomPath"), logical(1)))
+  df_ell <- ggplot2::layer_data(p, i_path)
+  # layer data are on the axis scale (log10) and finite: no part of an ellipse falls below 0
+  expect_true(all(is.finite(df_ell$x) & is.finite(df_ell$y)))
+  # each ellipse is the usual ellipse of the log10 samples
+  v_lcost <- log10(psa_big$cost[["Chemo"]])
+  v_leff <- log10(psa_big$effectiveness[["Chemo"]])
+  m_ell <- ellipse::ellipse(cor(v_leff, v_lcost), scale = c(sd(v_leff), sd(v_lcost)),
+                            centre = c(mean(v_leff), mean(v_lcost)))
+  df_chemo <- df_ell[df_ell$group == which(psa_big$strategies == "Chemo"), ]
+  expect_equal(unname(as.matrix(df_chemo[, c("x", "y")])), unname(m_ell))
+})
+
+test_that("plot.psa() with the default identity axes keeps the usual ellipse", {
+  p <- plot(psa_big)
+  i_path <- which(vapply(p$layers, function(l) inherits(l$geom, "GeomPath"), logical(1)))
+  df_ell <- p$layers[[i_path]]$data
+  v_cost <- psa_big$cost[["Chemo"]]
+  v_eff <- psa_big$effectiveness[["Chemo"]]
+  m_ell <- ellipse::ellipse(cor(v_eff, v_cost), scale = c(sd(v_eff), sd(v_cost)),
+                            centre = c(mean(v_eff), mean(v_cost)))
+  expect_equal(unname(as.matrix(df_ell[df_ell$group == "Chemo", c("x", "y")])), unname(m_ell))
+})
+
+test_that("plot.psa() explains when values cannot be shown on a log axis", {
+  expect_error(plot(psa_big, ref_str = "Chemo", ytrans = "log10"),
+               "`ytrans = \"log10\"` cannot show every incremental cost value")
+  df_cost_zero <- psa_big$cost
+  df_cost_zero[1, 1] <- 0
+  psa_zero <- make_psa_obj(df_cost_zero, psa_big$effectiveness, psa_big$parameters,
+                           psa_big$strategies)
+  expect_error(plot(psa_zero, ytrans = "log10"), "cannot show every cost value")
+  expect_s3_class(plot(psa_zero, xtrans = "log10"), "ggplot")
+})

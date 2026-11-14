@@ -91,6 +91,16 @@ l_evsi_by_param$df_evsi
 }
 
 }
+\references{
+\enumerate{
+\item Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach for Value of
+Information Analysis. Med Decis Making. 2018;38(2):174-188.
+\doi{10.1177/0272989X17715627}
+\item Strong M, Oakley JE, Brennan A. Estimating Multiparameter Partial Expected Value
+of Perfect Information from a Probabilistic Sensitivity Analysis Sample: A Nonparametric
+Regression Approach. Med Decis Making. 2014;34(3):311-326. \doi{10.1177/0272989X13505910}
+}
+}
 \seealso{
 \code{\link{plot.evsi}}, \code{\link{calc_evppi}}
 }

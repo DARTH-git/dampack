@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit README.Rmd, then run devtools::build_readme(). -->
 
-# dampack
+# dampack <a href="https://darth-git.github.io/dampack/"><img src="man/figures/logo.png" align="right" height="139" alt="dampack website" /></a>
 
 <!-- badges: start -->
 

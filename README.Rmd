@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# dampack
+# dampack <a href="https://darth-git.github.io/dampack/"><img src="man/figures/logo.png" align="right" height="139" alt="dampack website" /></a>
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/dampack)](https://CRAN.R-project.org/package=dampack)

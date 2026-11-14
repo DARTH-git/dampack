@@ -3,6 +3,7 @@
 ## New features
 
 - `plot.psa()` gains `xtrans` and `ytrans` to put the effectiveness and cost axes on, for example, a log scale. The ellipses are computed on the transformed scale, so they keep their shape instead of breaking where they cross zero; values a log axis cannot show give an informative error (#201).
+- Plot arguments are more consistent across methods (#214): `plot.owsa()` and `plot.exp_loss()` take `linewidth` (as in ggplot2); `plot.owsa()` and `plot.twsa()` gain `xlim` and `ylim`, and `owsa_opt_strat()` gains `xlim`; `effect_units` defaults to `"QALYs"` in every plot, and willingness-to-pay labels use its singular ("$/QALY"). The naming rules are recorded in an API style section of CONTRIBUTING.md.
 - The currency of a `psa` object now carries through to its analyses: `ceac()`, `calc_exp_loss()`, `calc_evpi()`, `calc_evppi()`, `calc_evsi()`, and `calculate_icers_psa()` keep it, and their `plot()` and `print()` methods use it unless `currency` is given. `plot.ceac()` gains `effect_units` (#203).
 - `summary.psa()` gains `ref_str` and `wtp`. With a reference strategy it adds the mean incremental cost and effect and the proportion of PSA samples in each quadrant of the incremental cost-effectiveness plane (`propNE`, `propSE`, `propSW`, `propNW`); with `wtp` it adds the mean NMB and, with a reference, `meanIncNMB` and the proportion of samples that are cost-effective compared with the reference (`propCostEffective`) (#209, #202).
 - `calculate_icers_psa()` gains `ref_str`, `wtp`, and `nhb`. With `uncertainty = TRUE` and a reference strategy, it adds 95% intervals for the differences from the reference, computed sample by sample (#209).
@@ -19,6 +20,8 @@
 
 ## Superseded
 
+- `ceac()` now takes the `psa` object first, like `calc_exp_loss()` and `calc_evpi()`: `ceac(psa, wtp)`. The old positional order `ceac(wtp, psa)` still works but gives a soft deprecation warning; named arguments work in either order (#214).
+- `plot.owsa(size = )` and `plot.exp_loss(lsize = )` are deprecated in favor of `linewidth`; the old arguments still work, with a soft deprecation warning (#214).
 - `example_psa` and `example_psa_obj` are superseded by `cancer_psa_data`, which contains the same PSA samples. Both remain available for backward compatibility and will be removed in dampack 2.0. They are now rebuilt from `cancer_psa_data` when the package is installed, so the samples are stored only once.
 
 ## Breaking changes

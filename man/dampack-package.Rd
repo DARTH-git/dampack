@@ -84,7 +84,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item David Garibay \email{dgari039@uottawa.ca} [contributor]
+  \item David Garibay \email{dgari039@uottawa.ca} (\href{https://orcid.org/0000-0002-0459-1579}{ORCID}) [contributor]
   \item Mark Clements \email{mark.clements@ki.se} [contributor]
 }
 

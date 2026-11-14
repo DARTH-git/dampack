@@ -36,7 +36,7 @@ dampack does these analyses in R for any model. It only needs the model's output
 ## What it does
 
 - **Cost-effectiveness analysis.** `calculate_icers()` identifies dominated and extendedly dominated strategies and computes ICERs along the efficient frontier; `plot()` draws the frontier.
-- **Probabilistic sensitivity analysis.** `make_psa_obj()` stores the PSA output of any model. Its `plot()` and `summary()` methods show the cost-effectiveness plane, `ceac()` computes cost-effectiveness acceptability curves and the acceptability frontier, and `calc_exp_loss()` computes expected loss curves.
+- **Probabilistic sensitivity analysis.** `make_psa_obj()` stores the PSA output of any model. Its `plot()` and `summary()` methods show the cost-effectiveness plane, `ceac()` computes cost-effectiveness acceptability curves (CEACs) together with the acceptability frontier (CEAF), and `calc_exp_loss()` computes expected loss curves (ELCs), which show in one figure the expected foregone benefit of each strategy, the optimal strategy, and the expected value of perfect information ([Alarid-Escudero et al., 2019](https://doi.org/10.1016/j.jval.2019.02.008)).
 - **Value of information.** `calc_evpi()` computes the expected value of perfect information. `calc_evppi()` and `calc_evsi()` estimate the expected value of partial perfect information and of sample information from regression metamodels of the PSA, so no further model runs are needed.
 - **Deterministic sensitivity analysis.** One-way and two-way analyses come either from the PSA, through metamodels (`owsa()`, `twsa()`), or from running your model directly (`run_owsa_det()`, `run_twsa_det()`), with tornado diagrams and optimal-strategy plots.
 - **PSA inputs.** `gen_psa_samp()` draws parameter samples from common distributions, helpers such as `beta_params()` and `gamma_params()` convert means and standard deviations into distribution parameters, and `run_psa()` runs your model over the samples.
@@ -82,6 +82,34 @@ df_ceac <- ceac(l_psa, wtp = v_wtp)
 plot(df_ceac)
 ```
 
+```{r ceac-50k, include = FALSE}
+df_ceac_50k <- df_ceac[df_ceac$WTP == 50000, ]
+most_likely <- df_ceac_50k$Strategy[which.max(df_ceac_50k$Proportion)]
+optimal <- df_ceac_50k$Strategy[df_ceac_50k$On_Frontier]
+pr_most_likely <- max(df_ceac_50k$Proportion)
+pr_optimal <- df_ceac_50k$Proportion[df_ceac_50k$On_Frontier]
+```
+
+The strategy most likely to be cost-effective is not always the optimal one. At a willingness to pay of $50,000 per QALY, `r most_likely` has the highest probability of being cost-effective (`r round(pr_most_likely, 3)`), but `r optimal` has the highest expected net benefit (probability `r round(pr_optimal, 3)`), so `r optimal` is the strategy on the frontier. This is why a CEAC should always be shown with its frontier.
+
+### Expected loss curves
+
+Expected loss curves go one step further. For each strategy, they show the benefit expected to be lost by choosing it instead of the strategy that would turn out best, so they combine how likely a strategy is to be the wrong choice with how much is lost when it is. In a single figure, the strategy with the lowest expected loss is the optimal one, the curves show where the optimal strategy switches across thresholds, and the expected loss of the optimal strategy equals the expected value of perfect information (EVPI). Alarid-Escudero et al. ([2019](https://doi.org/10.1016/j.jval.2019.02.008)) describe these advantages of ELCs over CEACs and the CEAF, and recommend reporting them alongside CEACs, the CEAF and the EVPI.
+
+```{r elc, fig.alt = "Expected loss curves for chemotherapy, radiation and surgery on a log scale, with the frontier, which equals the expected value of perfect information."}
+df_elc <- calc_exp_loss(l_psa, wtp = v_wtp)
+plot(df_elc, n_x_ticks = 10)
+```
+
+```{r elc-50k, include = FALSE}
+df_elc_50k <- df_elc[df_elc$WTP == 50000, ]
+loss_optimal <- df_elc_50k$Expected_Loss[df_elc_50k$On_Frontier]
+evpi_50k <- calc_evpi(l_psa, wtp = 50000)$EVPI
+stopifnot(isTRUE(all.equal(loss_optimal, evpi_50k)))
+```
+
+At $50,000 per QALY, `r optimal` has the lowest expected loss, $`r format(round(loss_optimal), big.mark = ",")` per patient, which is also the EVPI at that threshold.
+
 ## Learn more
 
 The [package website](https://darth-git.github.io/dampack/) has the full [function reference](https://darth-git.github.io/dampack/reference/) and these articles, best read in this order:
@@ -97,6 +125,10 @@ The same articles are installed with the package: see `vignette(package = "dampa
 ## Citation
 
 Run `citation("dampack")` for how to cite the package.
+
+The expected loss curves in dampack, and why they complement CEACs and the CEAF, are described in:
+
+> Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. "Time Traveling Is Just Too Dangerous" but Some Methods Are Worth Revisiting: The Advantages of Expected Loss Curves Over Cost-Effectiveness Acceptability Curves and Frontier. *Value in Health*. 2019;22(5):611-618. [doi:10.1016/j.jval.2019.02.008](https://doi.org/10.1016/j.jval.2019.02.008)
 
 ## Getting help and contributing
 

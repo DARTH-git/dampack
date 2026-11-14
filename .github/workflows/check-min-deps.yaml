@@ -21,15 +21,20 @@ concurrency:
 
 jobs:
   min-deps:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     name: minimum dependency versions (R ${{ matrix.r }})
     strategy:
       fail-fast: false
       matrix:
-        r: ['release', 'minimum']
+        include:
+          - {r: 'release', os: ubuntu-latest}
+          # An old R needs an Ubuntu release that the package manager still builds binaries
+          # for, and the Bioconductor mirrors of that era are gone (dampack uses none).
+          - {r: 'minimum', os: ubuntu-24.04}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      PKG_USE_BIOCONDUCTOR: false
     steps:
       - uses: actions/checkout@v6
 

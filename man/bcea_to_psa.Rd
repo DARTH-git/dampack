@@ -47,7 +47,7 @@ if (requireNamespace("BCEA", quietly = TRUE)) {
 
   # BCEA -> dampack
   psa_vaccine <- bcea_to_psa(m, currency = "£")
-  plot(ceac(seq(0, 50000, by = 5000), psa_vaccine))
+  plot(ceac(psa_vaccine, wtp = seq(0, 50000, by = 5000)))
 
   # dampack -> BCEA
   m2 <- psa_to_bcea(psa_vaccine, ref_str = "Vaccination", Kmax = 50000)

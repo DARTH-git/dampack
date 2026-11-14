@@ -22,6 +22,7 @@
 
 ## Bug fixes
 
+- The `hund_strat` help page now describes the data (simulated costs and QALYs for 100 hypothetical strategies) and its columns, with an example. Typos in several help pages are fixed (#219).
 - `plot.psa(center = FALSE)` no longer warns "No shared levels found between `names(values)` of the manual scale and the data's fill values" when it is drawn. The fill scale is now added only when the center points that use it are.
 - `plot.owsa(col = "bw")` now draws each strategy with its own line type; all strategies used to share one line type and could not be told apart (#176).
 - `metamodel()` now names invalid parameters in its error message, including when called through `calc_evppi()` and `calc_evsi()` (#177).

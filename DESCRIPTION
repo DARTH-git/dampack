@@ -45,6 +45,7 @@ License: GPL-3
 URL: https://github.com/DARTH-git/dampack, https://darth-git.github.io/dampack/
 BugReports: https://github.com/DARTH-git/dampack/issues
 Encoding: UTF-8
+Language: en-US
 Depends:
     R (>= 4.1.0),
     ggplot2 (>= 3.5.0)

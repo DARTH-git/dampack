@@ -15,7 +15,9 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.width = 7,
   fig.height = 5,
-  fig.align = "center"
+  fig.align = "center",
+  # ragg writes smaller PNGs than the default device, which keeps the installed size down
+  dev = if (requireNamespace("ragg", quietly = TRUE)) "ragg_png" else "png"
 )
 ```
 

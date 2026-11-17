@@ -3,6 +3,8 @@
 # Runs R CMD check with the *minimum* versions of the dependencies declared in DESCRIPTION
 # (for example ggplot2 (>= 3.5.0) installs ggplot2 3.5.0), so that a lower bound that is too low
 # fails CI instead of failing for users with older packages (as with #198).
+# It runs twice: on the current R release, and on the minimum R version in DESCRIPTION
+# (`R (>= x.y)`), so that the R bound is tested too.
 on:
   push:
     branches: [main]
@@ -19,18 +21,39 @@ concurrency:
 
 jobs:
   min-deps:
-    runs-on: ubuntu-latest
-    name: minimum dependency versions
+    runs-on: ${{ matrix.os }}
+    name: minimum dependency versions (R ${{ matrix.r }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {r: 'release', os: ubuntu-latest}
+          # An old R needs an Ubuntu release that the package manager still builds binaries
+          # for, and the Bioconductor mirrors of that era are gone (dampack uses none).
+          - {r: 'minimum', os: ubuntu-24.04}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      PKG_USE_BIOCONDUCTOR: false
     steps:
       - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-pandoc@v2
 
+      - name: Resolve the R version
+        id: rver
+        run: |
+          if [ "${{ matrix.r }}" = "minimum" ]; then
+            v=$(grep -oE 'R \(>= *[0-9.]+\)' DESCRIPTION | grep -oE '[0-9.]+')
+          else
+            v=release
+          fi
+          echo "R version: $v"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
       - uses: r-lib/actions/setup-r@v2
         with:
+          r-version: ${{ steps.rver.outputs.version }}
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2

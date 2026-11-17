@@ -15,7 +15,9 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.width = 7,
   fig.height = 5,
-  fig.align = "center"
+  fig.align = "center",
+  # ragg writes smaller PNGs than the default device, which keeps the installed size down
+  dev = if (requireNamespace("ragg", quietly = TRUE)) "ragg_png" else "png"
 )
 ```
 
@@ -110,6 +112,13 @@ plot(icer_hiv,
   ggtitle("Cost-effectiveness of HIV screening strategies")
 ```
 
+Decisions are based on incremental costs and effects, so it can help to plot them directly. With `incremental = TRUE`, the costs and effects of every strategy are shown relative to the first non-dominated strategy, the least costly strategy on the frontier (here, the status quo), which is placed at the origin. A willingness-to-pay line (`wtp`) through the origin shows which strategies are cost-effective compared with it at that threshold.
+```{r}
+plot(icer_hiv,
+     incremental = TRUE,
+     wtp = 100000)
+```
+
 ***
 ***
 
@@ -174,3 +183,32 @@ plot(icer_cdiff, label = "all") # can lead to a 'busy' plot
 plot(icer_cdiff, plot_frontier_only = TRUE) # completely removes dominated strategies from plot
 plot(icer_cdiff, currency = "USD", effect_units = "quality-adjusted life-years") # customize axis labels
 ```
+
+***
+***
+
+# Comparing every strategy with a reference strategy
+
+When more than two strategies are compared, health technology assessment guidelines require the fully incremental (sequential) analysis that `calculate_icers()` performs: dominated and extendedly dominated strategies are removed, and each remaining strategy is compared with the next less costly one on the frontier. This is the case in the guidelines of Canada's CDA-AMC ([2017](https://www.cda-amc.ca/sites/default/files/pdf/guidelines_for_the_economic_evaluation_of_health_technologies_canada_4th_ed.pdf)), England's NICE ([2022](https://www.nice.org.uk/process/pmg36/chapter/economic-evaluation-2)), and the Netherlands' Zorginstituut Nederland ([2024](https://english.zorginstituutnederland.nl/documents/2024/01/16/guideline-for-economic-evaluations-in-healthcare)).
+
+Some settings also call for comparing each strategy with a single reference strategy, such as the current standard of care. NICE, for example, states that "pairwise comparisons may be presented when relevant and justified (for example, when the technology is expected to specifically displace individual comparators)". These comparisons complement the fully incremental analysis; they do not replace it.
+
+`calculate_cers_ref()` compares every strategy with a reference strategy given in `ref_str`. For each strategy, it gives the difference in cost and effect from the reference, the cost-effectiveness ratio (CER) of that difference, and its status relative to the reference (dominant, dominated, or in one of the two quadrants where a ratio is meaningful). The reference is listed first, followed by the other strategies in order of increasing cost. With `wtp`, the net monetary benefit and its difference from the reference are added. Using the HIV screening example, with the status quo as the reference:
+```{r}
+cers_hiv <- calculate_cers_ref(cost = v_hiv_costs,
+                               effect = v_hiv_qalys,
+                               strategies = v_hiv_strat_names,
+                               ref_str = "status quo",
+                               wtp = 100000)
+cers_hiv
+```
+
+Compared with the status quo, every screening strategy is more costly and more effective, so each has a CER. Annual screening has a CER below $100,000 per QALY and so looks cost-effective compared with the status quo, yet the fully incremental analysis above shows that it is strongly dominated by screening every 3 years, which costs less and gives more QALYs. This is why the comparison with a reference does not replace the fully incremental analysis.
+
+The `plot()` method draws the incremental cost-effectiveness plane centered at the reference strategy, with a segment from the reference to each strategy. The willingness-to-pay line stored in the object goes through the origin: strategies below it are cost-effective compared with the reference at that threshold.
+```{r}
+plot(cers_hiv)
+```
+
+With many strategies, the segments are left out by default; `lines = TRUE` or `lines = FALSE` overrides this. For a PSA, `calculate_cers_ref_psa()` makes the same comparison from the mean costs and effects, and with `uncertainty = TRUE` adds 95% intervals for the differences and the proportion of PSA samples in each quadrant of the incremental plane. `plot.psa()` with `ref_str` shows the PSA samples themselves on the incremental plane.
+

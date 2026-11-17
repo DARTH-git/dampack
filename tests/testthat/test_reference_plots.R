@@ -1,4 +1,4 @@
-# reference strategy and WTP lines in plot.icers() and plot.psa() (#209, #202)
+# incremental plane and WTP lines in plot.icers(), plot.psa() and plot.cers_ref() (#209, #202)
 
 df_toy <- data.frame(strategy = c("Standard of care", "New drug (A)", "Cheaper", "Worse"),
                      cost = c(100, 200, 50, 300),
@@ -21,30 +21,32 @@ test_that("plot.icers() is unchanged by default", {
   expect_setequal(point_layer(p)$y, df_toy$cost)
 })
 
-test_that("plot.icers(ref_str = ) puts the reference at the origin", {
-  p <- plot(x_toy, ref_str = "Standard of care")
+test_that("plot.icers(incremental = TRUE) puts the first non-dominated strategy at the origin", {
+  # "Cheaper" (cost 50, effect 1.5) is the least costly strategy on the frontier
+  p <- plot(x_toy, incremental = TRUE)
   d <- point_layer(p)
-  expect_setequal(d$x, df_toy$effect - 1)
-  expect_setequal(d$y, df_toy$cost - 100)
+  expect_setequal(d$x, df_toy$effect - 1.5)
+  expect_setequal(d$y, df_toy$cost - 50)
   expect_equal(p$labels$y, "Incremental Cost ($)")
   expect_equal(p$labels$x, "Incremental Effect (QALYs)")
-  expect_match(p$labels$caption, "Reference Strategy: Standard of care", fixed = TRUE)
-  expect_error(plot(x_toy, ref_str = "Nope"), "must be one of the strategies")
+  expect_match(p$labels$caption, "Origin: Cheaper", fixed = TRUE)
+  # the frontier and statuses do not change
+  expect_equal(table(d$shape), table(point_layer(plot(x_toy))$shape))
+  expect_error(plot(x_toy, incremental = "yes"), "TRUE or FALSE")
+  expect_false("ref_str" %in% names(formals(plot.icers)))
 })
 
-test_that("plot.icers(wtp = ) draws the WTP line", {
-  p_ref <- plot(x_toy, ref_str = "Standard of care", wtp = 150)
-  i <- abline_layers(p_ref)
-  expect_length(i, 1)
-  d <- ggplot2::layer_data(p_ref, i)
-  expect_equal(d$slope, 150)
-  expect_equal(d$intercept, 0)
-  expect_match(p_ref$labels$caption, "WTP = $150/QALY", fixed = TRUE)
-
-  # without a reference, the line goes through the least costly strategy on the frontier
+test_that("plot.icers(wtp = ) draws the WTP line through the least costly frontier strategy", {
   p_abs <- plot(x_toy, wtp = 150)
-  d <- ggplot2::layer_data(p_abs, abline_layers(p_abs))
+  i <- abline_layers(p_abs)
+  expect_length(i, 1)
+  d <- ggplot2::layer_data(p_abs, i)
+  expect_equal(d$slope, 150)
   expect_equal(d$intercept, 50 - 150 * 1.5)
+  expect_match(p_abs$labels$caption, "WTP = $150/QALY", fixed = TRUE)
+
+  p_inc <- plot(x_toy, incremental = TRUE, wtp = 150)
+  expect_equal(ggplot2::layer_data(p_inc, abline_layers(p_inc))$intercept, 0)
 })
 
 test_that("plot.icers() uses the currency stored by calculate_icers()", {
@@ -86,4 +88,38 @@ test_that("plot.psa(wtp = ) without ref_str draws the line through the least cos
   expect_equal(d$slope, 2000)
   expect_equal(d$intercept, mean(df_cost2$A) - 2000 * mean(df_eff2$A))
   expect_match(p$labels$caption, "WTP = $2,000/QALY", fixed = TRUE)
+})
+
+# plot.cers_ref(): the star around the reference strategy
+segment_layers <- function(p) {
+  which(vapply(p$layers, function(l) inherits(l$geom, "GeomSegment"), logical(1)))
+}
+
+test_that("plot.cers_ref() centers the plane at the reference and draws the star", {
+  x_ref <- calculate_cers_ref(df_toy$cost, df_toy$effect, df_toy$strategy,
+                              ref_str = "Standard of care", wtp = 150)
+  p <- plot(x_ref)
+  expect_s3_class(p, "ggplot")
+  d <- point_layer(p)
+  others <- df_toy$strategy != "Standard of care"
+  expect_setequal(d$x, df_toy$effect[others] - 1)
+  expect_setequal(d$y, df_toy$cost[others] - 100)
+  expect_length(segment_layers(p), 1)
+  # the stored threshold draws the WTP line through the origin; NULL removes it
+  d_wtp <- ggplot2::layer_data(p, abline_layers(p))
+  expect_equal(d_wtp$intercept, 0)
+  expect_equal(d_wtp$slope, 150)
+  expect_length(abline_layers(plot(x_ref, wtp = NULL)), 0)
+  expect_match(p$labels$caption, "Reference Strategy (diamond): Standard of care", fixed = TRUE)
+  expect_length(segment_layers(plot(x_ref, lines = FALSE)), 0)
+  expect_no_warning(ggplot2::ggplot_build(plot(x_ref, col = "bw", label = "none")))
+})
+
+test_that("plot.cers_ref() leaves out the segments for many strategies", {
+  data(hund_strat)
+  x_hund <- calculate_cers_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy, ref_str = "1")
+  p <- plot(x_hund, label = "none")
+  expect_length(segment_layers(p), 0)
+  expect_length(segment_layers(plot(x_hund, label = "none", lines = TRUE)), 1)
+  expect_no_warning(ggplot2::ggplot_build(p))
 })

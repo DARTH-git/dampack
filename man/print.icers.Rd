@@ -4,15 +4,7 @@
 \alias{print.icers}
 \title{Print the formatted CEA table}
 \usage{
-\method{print}{icers}(
-  x,
-  currency = NULL,
-  dig_cost = 0,
-  dig_eff = 2,
-  dig_icer = 0,
-  ref = c("sequential", "reference", "both"),
-  ...
-)
+\method{print}{icers}(x, currency = NULL, dig_cost = 0, dig_eff = 2, dig_icer = 0, ...)
 }
 \arguments{
 \item{x}{Object of class \code{icers}}
@@ -26,21 +18,14 @@ Defaults to the currency stored in \code{x}, or \code{"$"}.}
 
 \item{dig_icer}{integer. number of digits to round ICER to}
 
-\item{ref}{which comparison to show: \code{"sequential"} (the default), \code{"reference"},
-or \code{"both"}.}
-
 \item{...}{Additional arguments passed to other methods.}
 }
 \value{
 a dataframe object - formatted CEA table
 }
 \description{
-By default, prints the sequential cost-effectiveness table: each strategy on the frontier is
-compared with the previous one. If the \code{icers} object was created with a reference
-strategy (\code{ref_str} in \code{\link{calculate_icers}}), \code{ref = "reference"} shows the
-comparison of every strategy with the reference instead, listing the reference first and the
-other strategies by increasing cost. \code{ref = "both"} shows both comparisons, in the
-frontier order of the sequential table.
+Prints the sequential cost-effectiveness table: each strategy on the frontier is compared with
+the previous one.
 }
 \examples{
 data("psa_cdiff")
@@ -48,17 +33,16 @@ df_cdiff <- summary(psa_cdiff)
 df_icers <- calculate_icers(cost = df_cdiff$meanCost,
                             effect = df_cdiff$meanEffect,
                             strategies = df_cdiff$Strategy,
-                            ref_str = "s3",
                             wtp = 1e5)
 
 # sequential table: each strategy on the frontier against the previous one
 df_icers
 
-# every strategy against the reference, with more digits for costs and effects
-print(df_icers, ref = "reference", dig_cost = 2, dig_eff = 3)
+# more digits for costs and effects
+print(df_icers, dig_cost = 2, dig_eff = 3)
 
-# both comparisons, with costs labeled in euros
-print(df_icers, ref = "both", currency = "EUR")
+# costs labeled in euros
+print(df_icers, currency = "EUR")
 }
 \seealso{
 \code{\link{calculate_icers}}

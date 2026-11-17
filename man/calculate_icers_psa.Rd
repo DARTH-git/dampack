@@ -4,24 +4,13 @@
 \alias{calculate_icers_psa}
 \title{Calculate incremental cost-effectiveness ratios from a \code{psa} object.}
 \usage{
-calculate_icers_psa(
-  psa,
-  uncertainty = FALSE,
-  ref_str = NULL,
-  wtp = NULL,
-  nhb = FALSE
-)
+calculate_icers_psa(psa, uncertainty = FALSE, wtp = NULL, nhb = FALSE)
 }
 \arguments{
 \item{psa}{\code{psa} object from \code{\link{make_psa_obj}}}
 
 \item{uncertainty}{whether or not 95\% quantiles for the cost and QALY outcomes should be included
 in the resulting ICER table. Defaults to \code{FALSE}.}
-
-\item{ref_str}{name of a reference strategy (one of \code{strategies}) to compare every
-strategy against, for example \code{"Standard of care"}. The default (\code{NULL}) adds no
-reference columns. The frontier-based results (\code{Status}, \code{Inc_Cost},
-\code{Inc_Effect}, \code{ICER}) never depend on the reference.}
 
 \item{wtp}{a single willingness-to-pay threshold (currency per unit of effect). If given,
 the net monetary benefit (\code{NMB}) of each strategy is added. The default (\code{NULL})
@@ -35,11 +24,8 @@ status, cost, effect, incremental cost, incremental effect, and ICER. If \code{u
 set to \code{TRUE}, four additional columns are provided for the 2.5th and 97.5th quantiles for
 each strategy's cost and effect.
 
-With \code{ref_str}, \code{wtp}, or \code{nhb}, the reference-strategy and net-benefit columns
-described in \code{\link{calculate_icers}} are added. With \code{uncertainty = TRUE} and
-\code{ref_str}, the 2.5th and 97.5th quantiles of the sample-by-sample differences from the reference
-are also given for \code{Inc_Cost_ref}, \code{Inc_Effect_ref}, and (with \code{wtp})
-\code{Inc_NMB_ref}, in columns such as \code{Lower_95_Inc_Cost_ref} and \code{Upper_95_Inc_Cost_ref}.
+With \code{wtp} or \code{nhb}, the net-benefit columns described in
+\code{\link{calculate_icers}} are added.
 }
 \description{
 The mean costs and QALYs for each strategy in a PSA are used
@@ -72,12 +58,13 @@ plot(df_icers)
 df_icers_unc <- calculate_icers_psa(l_psa, uncertainty = TRUE)
 df_icers_unc
 
-# compare every strategy with Radio, adding the net monetary benefit at a WTP of 100,000
-df_icers_ref <- calculate_icers_psa(l_psa, ref_str = "Radio", wtp = 1e5)
-print(df_icers_ref, ref = "reference")
+# add the net monetary benefit of each strategy at a WTP of 100,000
+calculate_icers_psa(l_psa, wtp = 1e5)
 }
 \seealso{
 \code{\link{plot.icers}}
 
 \code{\link{calculate_icers}}
+
+\code{\link{calculate_cers_ref_psa}} to compare every strategy with a reference strategy
 }

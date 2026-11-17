@@ -8,7 +8,6 @@ calculate_icers(
   cost,
   effect,
   strategies,
-  ref_str = NULL,
   wtp = NULL,
   nhb = FALSE,
   currency = NULL
@@ -20,11 +19,6 @@ calculate_icers(
 \item{effect}{vector of effect for each strategy}
 
 \item{strategies}{string vector of strategy names}
-
-\item{ref_str}{name of a reference strategy (one of \code{strategies}) to compare every
-strategy against, for example \code{"Standard of care"}. The default (\code{NULL}) adds no
-reference columns. The frontier-based results (\code{Status}, \code{Inc_Cost},
-\code{Inc_Effect}, \code{ICER}) never depend on the reference.}
 
 \item{wtp}{a single willingness-to-pay threshold (currency per unit of effect). If given,
 the net monetary benefit (\code{NMB}) of each strategy is added. The default (\code{NULL})
@@ -40,18 +34,14 @@ A data frame and \code{icers} object of strategies and their associated
 status, incremental cost, incremental effect, and ICER, computed sequentially along the
 cost-effectiveness frontier.
 
-If \code{ref_str} is given, four columns compare each strategy with the reference:
-\code{Inc_Cost_ref} and \code{Inc_Effect_ref} (cost and effect minus those of the
-reference), \code{ICER_ref}, and \code{Status_ref}, one of \code{"Reference"},
-\code{"Dominant"} (less costly and at least as effective), \code{"Dominated"} (more costly
-and no more effective), \code{"More costly, more effective"},
-\code{"Less costly, less effective"}, or \code{"Equivalent"} (same cost and effect).
-\code{ICER_ref} is \code{NA} where a ratio is not meaningful: for the reference itself and
-for dominant, dominated, and equivalent strategies.
+If \code{wtp} is given, \code{NMB} (\code{wtp * Effect - Cost}) is added. With
+\code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) is added too.
 
-If \code{wtp} is given, \code{NMB} (\code{wtp * Effect - Cost}) is added, and with
-\code{ref_str} also \code{Inc_NMB_ref}, the NMB minus that of the reference. With
-\code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) and \code{Inc_NHB_ref} are added too.
+The ICERs are always sequential: each strategy on the frontier is compared with the next less
+costly one, after removing dominated and extendedly dominated strategies. This is the fully
+incremental analysis that health technology assessment guidelines require when more than two
+strategies are compared. To compare every strategy with a single reference strategy instead,
+use \code{\link{calculate_cers_ref}}.
 }
 \description{
 This function takes in strategies and their associated cost and effect, assigns them
@@ -97,14 +87,14 @@ plot(icers)
 # note that longer strategy names will get truncated
 plot(icers, label = "all")
 
-## Comparing every strategy with a reference strategy
-hund_ref <- calculate_icers(hund_strat$Cost,
-                            hund_strat$QALYs,
-                            hund_strat$Strategy,
-                            ref_str = hund_strat$Strategy[1],
-                            wtp = 50000)
-print(hund_ref, ref = "reference")
+# the incremental cost-effectiveness plane, with the least costly strategy on the
+# frontier at the origin
+plot(icers, incremental = TRUE)
+
+## Net monetary benefit at a willingness-to-pay threshold
+calculate_icers(sum_cdiff$meanCost, sum_cdiff$meanEffect, sum_cdiff$Strategy,
+                wtp = 50000)
 }
 \seealso{
-\code{\link{plot.icers}}
+\code{\link{plot.icers}}, \code{\link{calculate_cers_ref}}
 }

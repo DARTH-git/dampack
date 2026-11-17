@@ -50,10 +50,16 @@ scientists, health economists, and students.
   information ([Alarid-Escudero et al.,
   2019](https://doi.org/10.1016/j.jval.2019.02.008)).
 - **Value of information.** `calc_evpi()` computes the expected value of
-  perfect information. `calc_evppi()` and `calc_evsi()` estimate the
-  expected value of partial perfect information and of sample
-  information from regression metamodels of the PSA, so no further model
-  runs are needed.
+  perfect information (EVPI). `calc_evppi()` estimates the expected
+  value of partial perfect information (EVPPI) with regression
+  metamodels of the PSA ([Strong et al.,
+  2014](https://doi.org/10.1177/0272989X13505910); [Jalal and
+  Alarid-Escudero, 2018](https://doi.org/10.1177/0272989X17715627)), and
+  `calc_evsi()` estimates the expected value of sample information
+  (EVSI) of a future study with the Gaussian approximation approach
+  ([Jalal and Alarid-Escudero,
+  2018](https://doi.org/10.1177/0272989X17715627)). Both work from the
+  PSA sample you already have, so no further model runs are needed.
 - **Deterministic sensitivity analysis.** One-way and two-way analyses
   come either from the PSA, through metamodels (`owsa()`, `twsa()`), or
   from running your model directly (`run_owsa_det()`, `run_twsa_det()`),
@@ -152,6 +158,60 @@ plot(df_elc, n_x_ticks = 10)
 At \$50,000 per QALY, Chemo has the lowest expected loss, \$14,954 per
 patient, which is also the EVPI at that threshold.
 
+### Value of research: EVPPI and EVSI from one PSA
+
+The EVPI is the most a decision maker should pay to remove all
+uncertainty. To decide which research is worth doing, it helps to know
+how much of that value comes from a few parameters, the EVPPI, and how
+much a study of a given size would capture, the EVSI. Both usually need
+nested simulations: running the model again for every possible study
+result.
+
+dampack avoids them. `calc_evppi()` fits a regression metamodel of the
+net benefit on the parameters of interest across the PSA samples.
+`calc_evsi()` uses the Gaussian approximation approach of Jalal and
+Alarid-Escudero ([2018](https://doi.org/10.1177/0272989X17715627)). A
+regression metamodel relates the net benefit to the parameters, and a
+Gaussian approximation of the preposterior distribution tells how much a
+study of `n` patients would narrow the uncertainty around them. It needs
+only the PSA sample, and it works for correlated parameters,
+non-Gaussian distributions, and several parameters informed by one
+study.
+
+Here the parameters of interest are the probabilities of treatment
+failure with chemotherapy and with surgery, each estimated from an
+earlier study of `n0 = 50` patients:
+
+``` r
+v_params <- c("pFailChemo", "pFailSurg")
+calc_evpi(l_psa, wtp = 100000)
+#>     WTP     EVPI
+#> 1 1e+05 22683.95
+l_evppi <- calc_evppi(l_psa, wtp = 100000, params = v_params,
+                      outcome = "nmb", k = 3, progress = FALSE)
+l_evppi$df_evppi
+#>     WTP    EVPPI
+#> 1 1e+05 8213.325
+l_evsi <- calc_evsi(l_psa, wtp = 100000, params = v_params,
+                    outcome = "nmb", k = 3, n0 = 50,
+                    n = c(10, 50, 100, 500, 1000), progress = FALSE)
+l_evsi$df_evsi
+#>     WTP    n     EVSI
+#> 1 1e+05   10 1331.363
+#> 2 1e+05   50 4492.632
+#> 3 1e+05  100 5837.748
+#> 4 1e+05  500 7599.690
+#> 5 1e+05 1000 7894.617
+```
+
+At \$100,000 per QALY, removing all uncertainty is worth \$22,684 per
+patient, and 36% of that comes from the two failure probabilities. A new
+study of 10 patients would capture \$1,331 per patient, and one of 1,000
+patients would capture \$7,895, close to the EVPPI. Scaled to the
+population affected by the decision and compared with the cost of each
+study design, these values show whether a study is worth running, and
+how large it should be.
+
 ## Learn more
 
 The [package website](https://darth-git.github.io/dampack/) has the full
@@ -186,6 +246,14 @@ the CEAF, are described in:
 > Cost-Effectiveness Acceptability Curves and Frontier. *Value in
 > Health*. 2019;22(5):611-618.
 > [doi:10.1016/j.jval.2019.02.008](https://doi.org/10.1016/j.jval.2019.02.008)
+
+The Gaussian approximation approach that `calc_evsi()` uses to compute
+the EVSI from a single PSA sample is described in:
+
+> Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach for
+> Value of Information Analysis. *Medical Decision Making*.
+> 2018;38(2):174-188.
+> [doi:10.1177/0272989X17715627](https://doi.org/10.1177/0272989X17715627)
 
 ## Getting help and contributing
 

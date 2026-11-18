@@ -55,11 +55,19 @@ A \code{ggplot2} plot with the EVPI
 \description{
 Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_evpi <- calc_evpi(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
+plot(df_evpi)
+
+# change the labels and the number of axis ticks
+plot(df_evpi, currency = "USD", effect_units = "life-years", n_x_ticks = 5)
+}
 \seealso{
 \code{\link{calc_evpi}}
 }
-\keyword{expected}
-\keyword{information}
-\keyword{of}
-\keyword{perfect}
-\keyword{value}
+\concept{expected value of perfect information}

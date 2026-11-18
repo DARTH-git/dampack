@@ -34,6 +34,25 @@
 #' \code{\link{owsa}},
 #' \code{\link{twsa}}
 #'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # one linear metamodel of the effectiveness per parameter and strategy
+#' l_mm <- metamodel(analysis = "oneway", psa = l_psa,
+#'                   params = c("pFailChemo", "cChemo"), outcome = "eff")
+#' l_mm
+#' summary(l_mm)
+#'
+#' # a two-way polynomial metamodel of the net monetary benefit of Chemo
+#' l_mm_twoway <- metamodel(analysis = "twoway", psa = l_psa,
+#'                          params = c("pFailChemo", "cChemo"), strategies = "Chemo",
+#'                          outcome = "nmb", wtp = 1e5, type = "poly", poly.order = 2)
+#' head(predict(l_mm_twoway, nsamp = 5))
+#'
 #' @importFrom stats as.formula formula getCall lm
 #' @export
 metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
@@ -235,6 +254,15 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
 #' @param x metamodel to print
 #' @param ... further arguments to print
 #' @return None (invisible NULL)
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' l_mm <- metamodel(analysis = "oneway", psa = l_psa, params = "pFailChemo",
+#'                   outcome = "nmb", wtp = 1e5)
+#' print(l_mm)
 #' @export
 print.metamodel <- function(x, ...) {
   wtp <- x$wtp
@@ -259,6 +287,16 @@ print.metamodel <- function(x, ...) {
 #' @param object metamodel to summarize
 #' @param ... further arguments to summary
 #' @return a \code{data.frame} containing the r-squared for each strategy and parameter's metamodel.
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # which parameters explain most of the variation in the net monetary benefit?
+#' l_mm <- metamodel(analysis = "oneway", psa = l_psa, outcome = "nmb", wtp = 1e5)
+#' summary(l_mm)
 #' @export
 summary.metamodel <- function(object, ...) {
   analysis <- object$analysis
@@ -311,6 +349,20 @@ summary.metamodel <- function(object, ...) {
 #' @importFrom stats quantile predict
 #' @return a \code{data.frame} containing the outcome values predicted by the metamodel
 #' for each strategy and each combination of parameter values defined by \code{ranges}.
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' l_mm <- metamodel(analysis = "oneway", psa = l_psa,
+#'                   params = c("pFailChemo", "cChemo"), outcome = "eff")
+#'
+#' # predictions over the middle 95\% of the PSA samples of each parameter
+#' head(predict(l_mm, nsamp = 10))
+#'
+#' # predictions over a range given for one parameter
+#' predict(l_mm, ranges = list("pFailChemo" = c(0.3, 0.6)), nsamp = 4)
 #' @export
 predict.metamodel <- function(object, ranges = NULL, nsamp = 100, ...) {
 

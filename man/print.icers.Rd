@@ -27,3 +27,23 @@ a dataframe object - formatted CEA table
 Prints the sequential cost-effectiveness table: each strategy on the frontier is compared with
 the previous one.
 }
+\examples{
+data("psa_cdiff")
+df_cdiff <- summary(psa_cdiff)
+df_icers <- calculate_icers(cost = df_cdiff$meanCost,
+                            effect = df_cdiff$meanEffect,
+                            strategies = df_cdiff$Strategy,
+                            wtp = 1e5)
+
+# sequential table: each strategy on the frontier against the previous one
+df_icers
+
+# more digits for costs and effects
+print(df_icers, dig_cost = 2, dig_eff = 3)
+
+# costs labeled in euros
+print(df_icers, currency = "EUR")
+}
+\seealso{
+\code{\link{calculate_icers}}
+}

@@ -38,6 +38,54 @@
 #' \item "min" and "max" are the minimum and maximum values of the parameters of interest.}
 #' }
 #'
+#' @seealso \code{\link{plot.owsa}}, \code{\link{owsa_tornado}}, \code{\link{owsa_opt_strat}},
+#' \code{\link{run_twsa_det}}
+#'
+#' @examples
+#' # A tiny decision model. Treatment fails with probability p_fail under standard care
+#' # and with half that probability under the new treatment, which costs c_trt. A failure
+#' # costs 20,000 and loses 2 QALYs. FUN takes a named list of parameters and returns a data
+#' # frame with the strategy names in its first column and one column per outcome.
+#' f_model <- function(l_params, wtp = 5e4) {
+#'   v_p_fail <- l_params$p_fail * c(1, 0.5)
+#'   v_cost <- c(0, l_params$c_trt) + 20000 * v_p_fail
+#'   v_qaly <- 10 - 2 * v_p_fail
+#'   data.frame(Strategy = c("Standard", "New"),
+#'              Cost = v_cost,
+#'              QALY = v_qaly,
+#'              NMB = wtp * v_qaly - v_cost)
+#' }
+#' l_params_basecase <- list(p_fail = 0.3, c_trt = 15000)
+#' f_model(l_params_basecase)
+#'
+#' # vary each parameter over its range, one at a time
+#' df_params_range <- data.frame(pars = c("p_fail", "c_trt"),
+#'                               min = c(0.1, 5000),
+#'                               max = c(0.5, 25000))
+#' df_owsa_nmb <- run_owsa_det(params_range = df_params_range,
+#'                             params_basecase = l_params_basecase,
+#'                             nsamp = 20,
+#'                             FUN = f_model,
+#'                             outcomes = "NMB",
+#'                             strategies = c("Standard", "New"),
+#'                             progress = FALSE)
+#' plot(df_owsa_nmb)
+#' owsa_tornado(df_owsa_nmb, select_str = c("Standard", "New"), outcome_name = "NMB")
+#' owsa_opt_strat(df_owsa_nmb)
+#'
+#' # with more than one outcome, a list with one owsa object per outcome is returned,
+#' # and arguments of FUN other than l_params are passed through ...
+#' l_owsa <- run_owsa_det(params_range = df_params_range,
+#'                        params_basecase = l_params_basecase,
+#'                        nsamp = 20,
+#'                        FUN = f_model,
+#'                        outcomes = c("Cost", "NMB"),
+#'                        strategies = c("Standard", "New"),
+#'                        progress = FALSE,
+#'                        wtp = 1e5)
+#' names(l_owsa)
+#' owsa_opt_strat(l_owsa$owsa_NMB)
+#'
 #' @importFrom  utils txtProgressBar
 #' @export
 run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
@@ -203,6 +251,39 @@ run_owsa_det <- function(params_range, params_basecase, nsamp = 100, FUN,
 #'  must be a subset of variables in \code{params_basecase}
 #' \item "min" and "max" are the minimum and maximum values of the parameters of interest.}
 #' }
+#'
+#' @seealso \code{\link{plot.twsa}}, \code{\link{run_owsa_det}}
+#'
+#' @examples
+#' # A tiny decision model. Treatment fails with probability p_fail under standard care
+#' # and with half that probability under the new treatment, which costs c_trt. A failure
+#' # costs 20,000 and loses 2 QALYs. FUN takes a named list of parameters and returns a data
+#' # frame with the strategy names in its first column and one column per outcome.
+#' f_model <- function(l_params, wtp = 5e4) {
+#'   v_p_fail <- l_params$p_fail * c(1, 0.5)
+#'   v_cost <- c(0, l_params$c_trt) + 20000 * v_p_fail
+#'   v_qaly <- 10 - 2 * v_p_fail
+#'   data.frame(Strategy = c("Standard", "New"),
+#'              Cost = v_cost,
+#'              QALY = v_qaly,
+#'              NMB = wtp * v_qaly - v_cost)
+#' }
+#' l_params_basecase <- list(p_fail = 0.3, c_trt = 15000)
+#' f_model(l_params_basecase)
+#'
+#' # vary both parameters together over a 20 x 20 grid
+#' df_params_range <- data.frame(pars = c("p_fail", "c_trt"),
+#'                               min = c(0.1, 5000),
+#'                               max = c(0.5, 25000))
+#' df_twsa_nmb <- run_twsa_det(params_range = df_params_range,
+#'                             params_basecase = l_params_basecase,
+#'                             nsamp = 20,
+#'                             FUN = f_model,
+#'                             outcomes = "NMB",
+#'                             strategies = c("Standard", "New"),
+#'                             progress = FALSE)
+#' head(df_twsa_nmb)
+#' plot(df_twsa_nmb, basecase = l_params_basecase)
 #'
 #' @importFrom  utils txtProgressBar
 #' @export

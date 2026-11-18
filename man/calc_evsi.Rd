@@ -56,3 +56,51 @@ strategy at each willingness to pay threshold.
 \description{
 Calculate Expected Value of Sample Information (EVSI)
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# EVSI of a study of n additional patients that informs both failure probabilities,
+# which were each estimated from an initial study of n0 = 50 patients
+l_evsi <- calc_evsi(l_psa,
+                    wtp = 1e5,
+                    params = c("pFailSurg", "pFailChemo"),
+                    outcome = "nmb",
+                    k = 3,
+                    n = c(10, 50, 100, 200),
+                    n0 = 50,
+                    progress = FALSE)
+l_evsi$df_evsi
+plot(l_evsi)
+
+\donttest{
+# a separate initial and additional sample size for each parameter
+l_evsi_by_param <- calc_evsi(l_psa,
+                             wtp = c(5e4, 1e5, 2e5),
+                             params = c("pFailSurg", "pFailChemo"),
+                             outcome = "nmb",
+                             k = 3,
+                             n = c(100, 50),
+                             n0 = c(50, 20),
+                             n_by_param = TRUE,
+                             progress = FALSE)
+l_evsi_by_param$df_evsi
+}
+
+}
+\references{
+\enumerate{
+\item Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach for Value of
+Information Analysis. Med Decis Making. 2018;38(2):174-188.
+\doi{10.1177/0272989X17715627}
+\item Strong M, Oakley JE, Brennan A. Estimating Multiparameter Partial Expected Value
+of Perfect Information from a Probabilistic Sensitivity Analysis Sample: A Nonparametric
+Regression Approach. Med Decis Making. 2014;34(3):311-326. \doi{10.1177/0272989X13505910}
+}
+}
+\seealso{
+\code{\link{plot.evsi}}, \code{\link{calc_evppi}}
+}

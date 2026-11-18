@@ -7,7 +7,7 @@
 #'
 #' @param psa psa object from \code{\link{make_psa_obj}}
 #' @param wtp numeric vector with willingness-to-pay (WTP) thresholds
-#' @keywords cost-effectiveness acceptability curves
+#' @concept cost-effectiveness acceptability curves
 #' @details
 #' Like \code{\link{calc_exp_loss}} and \code{\link{calc_evpi}}, \code{ceac} takes the
 #' \code{psa} object first. The order used before dampack 1.1.0, \code{ceac(wtp, psa)}, still
@@ -161,12 +161,24 @@ ceac <- function(psa, wtp) {
 #' with many strategies.
 #' @inheritParams add_common_aes
 #'
-#' @keywords internal
-#'
 #' @details
 #' \code{ceac} computes the probability of each of the strategies being
 #' cost-effective at each \code{wtp} value.
 #' @return A \code{ggplot2} plot of the CEAC.
+#'
+#' @seealso \code{\link{ceac}}, \code{\link{summary.ceac}}
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_ceac <- ceac(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
+#' plot(df_ceac)
+#'
+#' # without the frontier, and with fewer x-axis ticks
+#' plot(df_ceac, frontier = FALSE, n_x_ticks = 5)
 #'
 #' @import ggplot2
 #' @import dplyr
@@ -278,7 +290,18 @@ plot.ceac <- function(x,
 #' strategy on the cost-effectiveness frontier there. The intervals are open on
 #' the right endpoint - i.e., [\code{range_min}, \code{range_max})
 #'
-#' @keywords internal
+#' @seealso \code{\link{ceac}}, \code{\link{plot.ceac}}
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_ceac <- ceac(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
+#'
+#' # Radio is optimal up to a WTP of 40,000 and Chemo from there on
+#' summary(df_ceac)
 #'
 #' @export
 summary.ceac <- function(object, ...) {

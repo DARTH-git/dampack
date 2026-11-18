@@ -61,6 +61,26 @@ for each combination of the parameters in \code{params} and strategies in \code{
 If \code{analysis == "twoway"}, \code{params} must be a vector of two parameters, and a metamodel
 is created with these two parameters for each strategy in \code{strategies}.
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# one linear metamodel of the effectiveness per parameter and strategy
+l_mm <- metamodel(analysis = "oneway", psa = l_psa,
+                  params = c("pFailChemo", "cChemo"), outcome = "eff")
+l_mm
+summary(l_mm)
+
+# a two-way polynomial metamodel of the net monetary benefit of Chemo
+l_mm_twoway <- metamodel(analysis = "twoway", psa = l_psa,
+                         params = c("pFailChemo", "cChemo"), strategies = "Chemo",
+                         outcome = "nmb", wtp = 1e5, type = "poly", poly.order = 2)
+head(predict(l_mm_twoway, nsamp = 5))
+
+}
 \seealso{
 \code{\link{predict.metamodel}},
 \code{\link{make_psa_obj}},

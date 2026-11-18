@@ -84,3 +84,20 @@ on the cost-effectiveness plane.
 \description{
 Plot the psa object
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+plot(l_psa)
+
+# incremental cost-effectiveness plane with Radio at the origin and a WTP line
+plot(l_psa, ref_str = "Radio", wtp = 1e5)
+
+# without ellipses, in black and white
+plot(l_psa, ellipse = FALSE, col = "bw")
+}
+\seealso{
+\code{\link{make_psa_obj}}
+}

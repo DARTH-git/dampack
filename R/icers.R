@@ -218,27 +218,6 @@ wtp_caption <- function(wtp, currency, effect_units = "QALYs") {
          "/", unit)
 }
 
-#' Check a reference strategy name
-#'
-#' @param ref_str reference strategy name, or \code{NULL}.
-#' @param strategies names of the strategies in the analysis.
-#' @return \code{ref_str} as a character string, or \code{NULL}.
-#' @keywords internal
-check_ref_str <- function(ref_str, strategies) {
-  if (is.null(ref_str)) {
-    return(NULL)
-  }
-  if (length(ref_str) != 1 || is.na(ref_str)) {
-    stop("`ref_str` must be a single strategy name.", call. = FALSE)
-  }
-  ref_str <- as.character(ref_str)
-  if (!ref_str %in% strategies) {
-    stop("`ref_str` must be one of the strategies: ",
-         paste0("\"", strategies, "\"", collapse = ", "), ".", call. = FALSE)
-  }
-  ref_str
-}
-
 #' Check the willingness-to-pay and NHB arguments of calculate_icers()
 #'
 #' @inheritParams calculate_icers

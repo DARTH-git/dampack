@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit README.Rmd, then run devtools::build_readme(). -->
 
-# dampack
+# dampack <a href="https://darth-git.github.io/dampack/"><img src="man/figures/logo.png" align="right" height="139" alt="dampack website" /></a>
 
 <!-- badges: start -->
 
@@ -43,13 +43,23 @@ scientists, health economists, and students.
 - **Probabilistic sensitivity analysis.** `make_psa_obj()` stores the
   PSA output of any model. Its `plot()` and `summary()` methods show the
   cost-effectiveness plane, `ceac()` computes cost-effectiveness
-  acceptability curves and the acceptability frontier, and
-  `calc_exp_loss()` computes expected loss curves.
+  acceptability curves (CEACs) together with the acceptability frontier
+  (CEAF), and `calc_exp_loss()` computes expected loss curves (ELCs),
+  which show in one figure the expected foregone benefit of each
+  strategy, the optimal strategy, and the expected value of perfect
+  information ([Alarid-Escudero et al.,
+  2019](https://doi.org/10.1016/j.jval.2019.02.008)).
 - **Value of information.** `calc_evpi()` computes the expected value of
-  perfect information. `calc_evppi()` and `calc_evsi()` estimate the
-  expected value of partial perfect information and of sample
-  information from regression metamodels of the PSA, so no further model
-  runs are needed.
+  perfect information (EVPI). `calc_evppi()` estimates the expected
+  value of partial perfect information (EVPPI) with regression
+  metamodels of the PSA ([Strong et al.,
+  2014](https://doi.org/10.1177/0272989X13505910); [Jalal and
+  Alarid-Escudero, 2018](https://doi.org/10.1177/0272989X17715627)), and
+  `calc_evsi()` estimates the expected value of sample information
+  (EVSI) of a future study with the Gaussian approximation approach
+  ([Jalal and Alarid-Escudero,
+  2018](https://doi.org/10.1177/0272989X17715627)). Both work from the
+  PSA sample you already have, so no further model runs are needed.
 - **Deterministic sensitivity analysis.** One-way and two-way analyses
   come either from the PSA, through metamodels (`owsa()`, `twsa()`), or
   from running your model directly (`run_owsa_det()`, `run_twsa_det()`),
@@ -117,6 +127,91 @@ plot(df_ceac)
 
 <img src="man/figures/README-ceac-1.png" alt="Cost-effectiveness acceptability curves for chemotherapy, radiation and surgery, with the acceptability frontier." width="100%" />
 
+The strategy most likely to be cost-effective is not always the optimal
+one. At a willingness to pay of \$50,000 per QALY, Surgery has the
+highest probability of being cost-effective (0.369), but Chemo has the
+highest expected net benefit (probability 0.356), so Chemo is the
+strategy on the frontier. This is why a CEAC should always be shown with
+its frontier.
+
+### Expected loss curves
+
+Expected loss curves go one step further. For each strategy, they show
+the benefit expected to be lost by choosing it instead of the strategy
+that would turn out best, so they combine how likely a strategy is to be
+the wrong choice with how much is lost when it is. In a single figure,
+the strategy with the lowest expected loss is the optimal one, the
+curves show where the optimal strategy switches across thresholds, and
+the expected loss of the optimal strategy equals the expected value of
+perfect information (EVPI). Alarid-Escudero et
+al. ([2019](https://doi.org/10.1016/j.jval.2019.02.008)) describe these
+advantages of ELCs over CEACs and the CEAF, and recommend reporting them
+alongside CEACs, the CEAF and the EVPI.
+
+``` r
+df_elc <- calc_exp_loss(l_psa, wtp = v_wtp)
+plot(df_elc, n_x_ticks = 10)
+```
+
+<img src="man/figures/README-elc-1.png" alt="Expected loss curves for chemotherapy, radiation and surgery on a log scale, with the frontier, which equals the expected value of perfect information." width="100%" />
+
+At \$50,000 per QALY, Chemo has the lowest expected loss, \$14,954 per
+patient, which is also the EVPI at that threshold.
+
+### Value of research: EVPPI and EVSI from one PSA
+
+The EVPI is the most a decision maker should pay to remove all
+uncertainty. To decide which research is worth doing, it helps to know
+how much of that value comes from a few parameters, the EVPPI, and how
+much a study of a given size would capture, the EVSI. Both usually need
+nested simulations: running the model again for every possible study
+result.
+
+dampack avoids them. `calc_evppi()` fits a regression metamodel of the
+net benefit on the parameters of interest across the PSA samples.
+`calc_evsi()` uses the Gaussian approximation approach of Jalal and
+Alarid-Escudero ([2018](https://doi.org/10.1177/0272989X17715627)). A
+regression metamodel relates the net benefit to the parameters, and a
+Gaussian approximation of the preposterior distribution tells how much a
+study of `n` patients would narrow the uncertainty around them. It needs
+only the PSA sample, and it works for correlated parameters,
+non-Gaussian distributions, and several parameters informed by one
+study.
+
+Here the parameters of interest are the probabilities of treatment
+failure with chemotherapy and with surgery, each estimated from an
+earlier study of `n0 = 50` patients:
+
+``` r
+v_params <- c("pFailChemo", "pFailSurg")
+calc_evpi(l_psa, wtp = 100000)
+#>     WTP     EVPI
+#> 1 1e+05 22683.95
+l_evppi <- calc_evppi(l_psa, wtp = 100000, params = v_params,
+                      outcome = "nmb", k = 3, progress = FALSE)
+l_evppi$df_evppi
+#>     WTP    EVPPI
+#> 1 1e+05 8213.325
+l_evsi <- calc_evsi(l_psa, wtp = 100000, params = v_params,
+                    outcome = "nmb", k = 3, n0 = 50,
+                    n = c(10, 50, 100, 500, 1000), progress = FALSE)
+l_evsi$df_evsi
+#>     WTP    n     EVSI
+#> 1 1e+05   10 1331.363
+#> 2 1e+05   50 4492.632
+#> 3 1e+05  100 5837.748
+#> 4 1e+05  500 7599.690
+#> 5 1e+05 1000 7894.617
+```
+
+At \$100,000 per QALY, removing all uncertainty is worth \$22,684 per
+patient, and 36% of that comes from the two failure probabilities. A new
+study of 10 patients would capture \$1,331 per patient, and one of 1,000
+patients would capture \$7,895, close to the EVPPI. Scaled to the
+population affected by the decision and compared with the cost of each
+study design, these values show whether a study is worth running, and
+how large it should be.
+
 ## Learn more
 
 The [package website](https://darth-git.github.io/dampack/) has the full
@@ -142,6 +237,24 @@ The same articles are installed with the package: see
 
 Run `citation("dampack")` for how to cite the package.
 
+The expected loss curves in dampack, and why they complement CEACs and
+the CEAF, are described in:
+
+> Alarid-Escudero F, Enns EA, Kuntz KM, Michaud TL, Jalal H. “Time
+> Traveling Is Just Too Dangerous” but Some Methods Are Worth
+> Revisiting: The Advantages of Expected Loss Curves Over
+> Cost-Effectiveness Acceptability Curves and Frontier. *Value in
+> Health*. 2019;22(5):611-618.
+> [doi:10.1016/j.jval.2019.02.008](https://doi.org/10.1016/j.jval.2019.02.008)
+
+The Gaussian approximation approach that `calc_evsi()` uses to compute
+the EVSI from a single PSA sample is described in:
+
+> Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach for
+> Value of Information Analysis. *Medical Decision Making*.
+> 2018;38(2):174-188.
+> [doi:10.1177/0272989X17715627](https://doi.org/10.1177/0272989X17715627)
+
 ## Getting help and contributing
 
 Please report bugs and suggest features in the [issue
@@ -153,9 +266,17 @@ conduct](https://github.com/DARTH-git/dampack/blob/main/CODE_OF_CONDUCT.md).
 
 ## Funding
 
-This package was developed with funding from the National Institute of
-Allergy and Infectious Diseases of the National Institutes of Health
-under award no. R01AI138783. The content of this package is solely the
+Development of dampack was supported by the National Institutes of
+Health (NIH). The first version of the package was developed with
+funding from the National Institute of Allergy and Infectious Diseases
+(NIAID) under award R01AI138783. Its further development was supported
+by the National Institute on Drug Abuse (NIDA) through award
+K01DA048985, and by the National Cancer Institute (NCI) through grants
+U01CA319117 (SimCRC, colorectal cancer), U01CA319219 (DESCIPHR-GC,
+gastric cancer) and U01CA319218 (COBRAS, bladder cancer), all part of
+the Cancer Intervention and Surveillance Modeling Network (CISNET). The
+package will be used to analyze the cost-effectiveness and uncertainty
+of the models in several CISNET analyses. The content is solely the
 responsibility of the authors and does not necessarily represent the
 official views of the National Institutes of Health.
 

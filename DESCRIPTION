@@ -47,7 +47,7 @@ BugReports: https://github.com/DARTH-git/dampack/issues
 Encoding: UTF-8
 Language: en-US
 Depends:
-    R (>= 4.1.0),
+    R (>= 4.2.0),
     ggplot2 (>= 3.5.0)
 Imports:
     ellipse,
@@ -67,8 +67,10 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    kableExtra
+    kableExtra,
+    ragg
 LazyData: true
+LazyDataCompression: xz
 BuildResaveData: no
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

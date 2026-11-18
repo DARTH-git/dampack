@@ -45,6 +45,7 @@
 - Code hygiene throughout the package: progress bars in `run_owsa_det()` and `run_twsa_det()` are now closed, loops handle zero-length inputs (for example, `calc_evpi()` with an empty `wtp` returns an empty result), deprecated `trans`/`scales::trans_new()` are replaced by ggplot2's `transform` and `scales::new_transform()`, `cor()` is imported, and the `rdirichlet()` documentation is fixed. Thanks to @IG-ABHINAV for this contribution (#211, #224).
 - Fixed a pointer in the PSA vignette to a vignette that no longer exists (#168).
 - `citation("dampack")` now returns a single, current entry built from the package's DESCRIPTION; it used to also return a stale entry for version 1.0.1 (#213).
+- The author list is updated for 1.1.0: David U. Garibay-Treviño becomes an author, Eline Krijkamp, Petros Pechlivanoglou and Hawre Jalal join as authors, Szu-Yu Zoe Kao and Michael Fairley are listed as contributors, and the three NIH institutes that funded dampack are listed as funders with their award numbers (#213).
 
 # dampack 1.0.2.1000
 

@@ -266,6 +266,27 @@ add_cers_ref_uncertainty <- function(df_ref, psa, wtp, nhb) {
   df_ref
 }
 
+#' Check a reference strategy name
+#'
+#' @param ref_str reference strategy name, or \code{NULL}.
+#' @param strategies names of the strategies in the analysis.
+#' @return \code{ref_str} as a character string, or \code{NULL}.
+#' @keywords internal
+check_ref_str <- function(ref_str, strategies) {
+  if (is.null(ref_str)) {
+    return(NULL)
+  }
+  if (length(ref_str) != 1 || is.na(ref_str)) {
+    stop("`ref_str` must be a single strategy name.", call. = FALSE)
+  }
+  ref_str <- as.character(ref_str)
+  if (!ref_str %in% strategies) {
+    stop("`ref_str` must be one of the strategies: ",
+         paste0("\"", strategies, "\"", collapse = ", "), ".", call. = FALSE)
+  }
+  ref_str
+}
+
 #' Status of each strategy relative to a reference strategy
 #'
 #' @param v_inc_cost,v_inc_effect cost and effect of each strategy minus those of the reference.

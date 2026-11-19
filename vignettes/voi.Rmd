@@ -71,7 +71,7 @@ The metamodeling functions are internal to `dampack`'s VoI functions, but they c
 
 # EVPPI
 
-The expected value of partial pefect information (EVPPI) is the expected value of perfect information from only a subset of parameters of interest in a PSA. The function `calc_evppi` computes the EVPPI from a PSA using the following these steps:
+The expected value of partial perfect information (EVPPI) is the expected value of perfect information from only a subset of parameters of interest in a PSA. The function `calc_evppi` computes the EVPPI from a PSA using the following these steps:
 
 1. The optimal strategy given current information is determined from the PSA.
 2. The opportunity loss for each strategy is computed relative to the optimal strategy.

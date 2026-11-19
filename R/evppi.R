@@ -54,6 +54,21 @@
 #' \deqn{EVPPI_{\theta_I} = \frac{1}{K}\sum_{i=1}^{K}\max_d(\hat{L}_d)}
 #' The spline model in step 3 is fitted using the `mgcv` package.
 #' }
+#'
+#' For \code{type = "gam"}, the metamodel has a smooth, \code{s()}, of each
+#' parameter in \eqn{\theta_I} and a tensor-product interaction, \code{ti()}, of
+#' every subset of two or more of them. For two parameters, \eqn{a} and \eqn{b},
+#' this is \code{s(a) + s(b) + ti(a, b)}, the metamodel of Jalal and
+#' Alarid-Escudero (2018). For more parameters, it spans the same functions as a
+#' full tensor-product smooth, \code{te()}, with a separate smoothing penalty for
+#' each interaction. Its number of coefficients grows quickly with the number of
+#' parameters. When it would exceed 500, interactions among three or more
+#' parameters are left out, with a warning, and if the metamodel with pairwise
+#' interactions only is still too large with the default \code{k}, \code{k = 3}
+#' is used. For \code{type = "poly"}, the metamodel is a polynomial with all
+#' terms up to total degree \code{poly.order}, including the interactions between
+#' parameters; it is biased when the expected loss is not a polynomial of that
+#' order.
 
 #' @references
 #' \enumerate{
@@ -91,24 +106,26 @@ calc_evppi <- function(psa,
 
   l_mms <- vector(mode = "list", length = n_wtps)
 
-  # check the basis dimension once, not at every WTP
+  # warn about the metamodel specification once, not at every WTP
   n_params <- length(if (is.null(params)) psa$parnames else params)
   if (type == "gam" && n_params > 1) {
-    k <- mm_check_k(k, n_params)
+    mm_gam_spec(k, n_params)
   }
 
   # calculate evppi at each wtp
   for (l in seq_len(n_wtps)) {
 
     # run the metamodels
-    mms <- metamodel(analysis = "multiway",
-                     psa = psa,
-                     params = params,
-                     outcome = outcome,
-                     wtp = wtp[l],
-                     type = type,
-                     poly.order = poly.order,
-                     k = k)
+    mms <- withCallingHandlers(
+      metamodel(analysis = "multiway",
+                psa = psa,
+                params = params,
+                outcome = outcome,
+                wtp = wtp[l],
+                type = type,
+                poly.order = poly.order,
+                k = k),
+      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning"))
 
     l_mms[[l]] <- mms
 

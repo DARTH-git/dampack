@@ -32,6 +32,7 @@ calc_evsi <- function(psa,
                       progress = TRUE) {
   # define parameter values and make sure they correspond to a valid option
   outcome <- match.arg(outcome)
+  outcome_input <- outcome
 
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
@@ -108,6 +109,8 @@ calc_evsi <- function(psa,
   }
   evsi_ls <- list(df_evsi = df_evsi, metamodel_ls = l_mms)
   class(evsi_ls) <- c("evsi")
+  attr(evsi_ls, "currency") <- psa$currency
+  attr(evsi_ls, "outcome") <- outcome_input
   evsi_ls
 }
 
@@ -282,8 +285,11 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #' @param x object of class \code{evsi}, produced by function
 #'  \code{\link{calc_evsi}}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#'  Default: the currency of the PSA the results were computed from (or $), but it could be any
+#'  currency symbol or word (e.g., £, €, peso)
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @inheritParams add_common_aes
 #' @keywords expected value of sample information
 #' @return A \code{ggplot2} plot with the EVSI
@@ -293,8 +299,8 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #' @export
 plot.evsi <- function(x,
                       txtsize = 12,
-                      currency = "$",
-                      effect_units = "QALY",
+                      currency = NULL,
+                      effect_units = "QALYs",
                       n_y_ticks = 8,
                       n_x_ticks = 20,
                       xbreaks = NULL,
@@ -305,13 +311,15 @@ plot.evsi <- function(x,
                       ...) {
   # Select EVSI data.frame, discarding metamodel list
   EVSI <- WTP_thou <- NULL
+  currency <- resolve_currency(currency, x)
+  v_units <- voi_units(x, currency, effect_units)
   x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
   if (length(unique(x$WTP)) == 1) {
     col <- "bw"
   }
-  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
+  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", per_unit(effect_units), ")", sep = "")
 
   if (length(unique(x$WTP)) == 1 && "n" %in% names(x)) {
     g <- ggplot(data = x,
@@ -332,7 +340,7 @@ plot.evsi <- function(x,
 
   g <- g +
     geom_line() +
-    ylab(paste("EVSI (", currency, ")", sep = ""))
+    ylab(paste("EVSI (", v_units, ")", sep = ""))
   add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,

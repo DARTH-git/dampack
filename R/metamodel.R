@@ -303,7 +303,7 @@ summary.metamodel <- function(object, ...) {
 #' @param object object with class "metamodel"
 #' @param ranges a named list of the form c("param" = c(0, 1), ...)
 #' that gives the ranges for the parameter of interest. If NULL,
-#' parameter values from the middle 95% of the PSA samples are used. The number of samples
+#' parameter values from the middle 95\% of the PSA samples are used. The number of samples
 #' from this range is determined by \code{nsamp}.
 #' @param nsamp number of samples from ranges
 #' @param ... further arguments to \code{predict} (not used)

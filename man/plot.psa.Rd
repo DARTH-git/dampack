@@ -20,6 +20,9 @@
   ylim = NULL,
   ref_axis = TRUE,
   ref_caption = TRUE,
+  wtp = NULL,
+  xtrans = "identity",
+  ytrans = "identity",
   ...
 )
 }
@@ -56,7 +59,20 @@ will override \code{n_y_ticks} if provided.}
 
 \item{ref_axis}{Add dotted axes lines at (0,0). Defaults to TRUE}
 
-\item{ref_caption}{Add the reference strategy as a caption. Defaults to TRUE}
+\item{ref_caption}{Add the reference strategy (and the WTP threshold, if given) as a caption.
+Defaults to TRUE}
+
+\item{wtp}{a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
+drawn through the reference strategy, which with \code{ref_str} is the origin of the incremental
+cost-effectiveness plane. Without \code{ref_str}, the line goes through the mean cost and effect
+of the least costly strategy, as in \code{\link{plot.icers}}. Samples below the line are
+cost-effective compared with that strategy at this threshold.}
+
+\item{xtrans, ytrans}{transformation of the effectiveness (x) and cost (y) axes, such as
+\code{"log10"}, passed to \code{\link[ggplot2]{scale_continuous}}. Defaults to
+\code{"identity"}. The ellipses are computed on the transformed scale, so they keep their
+shape on a log axis; the center points stay at the arithmetic means. A log axis needs every
+value on it to be positive, which on the incremental plane (\code{ref_str}) is rarely the case.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

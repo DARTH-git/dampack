@@ -78,6 +78,7 @@ calc_evppi <- function(psa,
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
+  outcome_input <- outcome
 
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
@@ -127,6 +128,8 @@ calc_evppi <- function(psa,
 
   evppi_ls <- list(df_evppi = df_evppi, metamodel_ls = l_mms)
   class(evppi_ls) <- c("evppi")
+  attr(evppi_ls, "currency") <- psa$currency
+  attr(evppi_ls, "outcome") <- outcome_input
   evppi_ls
 }
 
@@ -138,8 +141,11 @@ calc_evppi <- function(psa,
 #' @param x object of class \code{evppi}, produced by function
 #'  \code{\link{calc_evppi}}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#'  Default: the currency of the PSA the results were computed from (or $), but it could be any
+#'  currency symbol or word (e.g., £, €, peso)
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPPI
@@ -149,8 +155,8 @@ calc_evppi <- function(psa,
 #' @export
 plot.evppi <- function(x,
                        txtsize = 12,
-                       currency = "$",
-                       effect_units = "QALY",
+                       currency = NULL,
+                       effect_units = "QALYs",
                        n_y_ticks = 8,
                        n_x_ticks = 20,
                        xbreaks = NULL,
@@ -159,13 +165,15 @@ plot.evppi <- function(x,
                        ylim = NULL,
                        ...) {
   WTP_thou <- EVPPI <- NULL
+  currency <- resolve_currency(currency, x)
+  v_units <- voi_units(x, currency, effect_units)
   x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
               aes(x = WTP_thou, y = EVPPI)) +
     geom_line() +
-    xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
-    ylab(paste("EVPPI (", currency, ")", sep = ""))
+    xlab(paste("Willingness to Pay (Thousand ", currency, "/", per_unit(effect_units), ")", sep = "")) +
+    ylab(paste("EVPPI (", v_units, ")", sep = ""))
   add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,

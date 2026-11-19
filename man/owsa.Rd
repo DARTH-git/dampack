@@ -24,7 +24,7 @@ a deterministic sensitivity analysis object (\code{\link{run_owsa_det}})}
 
 \item{ranges}{a named list of the form c("param" = c(0, 1), ...)
 that gives the ranges for the parameter of interest. If NULL,
-parameter values from the middle 95% of the PSA samples are used. The number of samples
+parameter values from the middle 95\% of the PSA samples are used. The number of samples
 from this range is determined by \code{nsamp}.}
 
 \item{nsamp}{number of samples to take from the ranges}

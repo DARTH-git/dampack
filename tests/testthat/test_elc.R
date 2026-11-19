@@ -60,9 +60,9 @@ test_that("plot.exp_loss runs with several combinations of arguments", {
 })
 
 # black-and-white expected loss curves ignored lsize and warned about an unused color scale (#210)
-test_that("plot.exp_loss(col = 'bw') uses lsize and builds without warnings", {
+test_that("plot.exp_loss(col = 'bw') uses linewidth and builds without warnings", {
   el <- calc_exp_loss(psa_obj, wtp = seq(1e4, 1e5, 1e4))
-  g <- plot(el, col = "bw", lsize = 3)
+  g <- plot(el, col = "bw", linewidth = 3)
   expect_warning(b <- ggplot2::ggplot_build(g), NA)
   i_line <- which(vapply(g$layers, function(l) inherits(l$geom, "GeomLine"), logical(1)))
   expect_equal(unique(b$data[[i_line]]$linewidth), 3)

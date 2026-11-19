@@ -2,6 +2,13 @@
 
 ## New features
 
+- `plot.psa()` gains `xtrans` and `ytrans` to put the effectiveness and cost axes on, for example, a log scale. The ellipses are computed on the transformed scale, so they keep their shape instead of breaking where they cross zero; values a log axis cannot show give an informative error (#201).
+- Plot arguments are more consistent across methods (#214): `plot.owsa()` and `plot.exp_loss()` take `linewidth` (as in ggplot2); `plot.owsa()` and `plot.twsa()` gain `xlim` and `ylim`, and `owsa_opt_strat()` gains `xlim`; `effect_units` defaults to `"QALYs"` in every plot, and willingness-to-pay labels use its singular ("$/QALY"). The naming rules are recorded in an API style section of CONTRIBUTING.md.
+- The currency of a `psa` object now carries through to its analyses: `ceac()`, `calc_exp_loss()`, `calc_evpi()`, `calc_evppi()`, `calc_evsi()`, and `calculate_icers_psa()` keep it, and their `plot()` and `print()` methods use it unless `currency` is given. `plot.ceac()` gains `effect_units` (#203).
+- New `calculate_cers_ref()` and `calculate_cers_ref_psa()` compare every strategy with a reference strategy chosen by the user, such as the standard of care: the difference in cost and effect from the reference, the cost-effectiveness ratio (CER) of that difference, and the status relative to the reference ("Dominant", "Dominated", "More costly, more effective", "Less costly, less effective", or "Equivalent"). With `wtp`, they add the net monetary benefit and its difference from the reference. From a PSA, `uncertainty = TRUE` adds 95% intervals for the differences and the proportion of samples in each quadrant of the incremental cost-effectiveness plane and, with `wtp`, the proportion that is cost-effective compared with the reference. `plot()` draws the incremental plane centered at the reference, with a segment to each strategy and an optional willingness-to-pay line. These comparisons complement, and do not replace, the fully incremental analysis of `calculate_icers()`, which HTA guidelines require; the documentation cites the NICE, CDA-AMC, and Zorginstituut Nederland guidelines (#209).
+- `plot.icers()` gains `incremental = TRUE`, which plots the incremental cost-effectiveness plane with the first non-dominated strategy (the least costly strategy on the frontier) at the origin, and `wtp`, which draws a willingness-to-pay line through that strategy. `plot.psa()` gains `wtp` for the same line, drawn through the reference strategy or, without one, through the least costly strategy (#209, #202).
+- `calculate_icers()` and `calculate_icers_psa()` gain `wtp`, which adds the net monetary benefit (`NMB`) of each strategy, and `nhb = TRUE`, which also adds the net health benefit (`NHB`) (#200).
+- `calculate_icers()` gains `currency`, which `print.icers()` and `plot.icers()` use (#203).
 - `print.icers()` prints a formatted ICER table, with options for the currency symbol and the number of digits (#184, #171).
 - `plot.psa()` gains a `ref_str` argument that plots the PSA on the incremental cost-effectiveness plane relative to a chosen reference strategy (#188).
 - Plotting functions now default to an accessible, colorblind-friendly palette (`col = "access"`, based on viridis). The previous palettes remain available as `col = "full"` and `col = "bw"`.
@@ -11,6 +18,8 @@
 
 ## Superseded
 
+- `ceac()` now takes the `psa` object first, like `calc_exp_loss()` and `calc_evpi()`: `ceac(psa, wtp)`. The old positional order `ceac(wtp, psa)` still works but gives a soft deprecation warning; named arguments work in either order (#214).
+- `plot.owsa(size = )` and `plot.exp_loss(lsize = )` are deprecated in favor of `linewidth`; the old arguments still work, with a soft deprecation warning (#214).
 - `example_psa` and `example_psa_obj` are superseded by `cancer_psa_data`, which contains the same PSA samples. Both remain available for backward compatibility and will be removed in dampack 2.0. They are now rebuilt from `cancer_psa_data` when the package is installed, so the samples are stored only once.
 
 ## Breaking changes
@@ -22,6 +31,8 @@
 
 ## Bug fixes
 
+- EVPPI and EVSI computed from net health benefit (`outcome = "nhb"`, the default of `calc_evsi()`) are in health units, and their plots are now labeled with `effect_units` (e.g., "EVSI (QALY)") instead of a currency (#203).
+- `plot.psa(ref_str = )` now works when there are only two strategies; it used to fail with "'dims' cannot be of length 0" (#209).
 - `plot.exp_loss()` with its default log-scale y axis (`log_y = TRUE`) now labels every order of magnitude. Its evenly spaced default breaks used to bunch up at the top of the log axis and leave the lower curves without any labels.
 - The `hund_strat` help page now describes the data (simulated costs and QALYs for 100 hypothetical strategies) and its columns, with an example. Typos in several help pages are fixed (#219).
 - `plot.psa(center = FALSE)` no longer warns "No shared levels found between `names(values)` of the manual scale and the data's fill values" when it is drawn. The fill scale is now added only when the center points that use it are.

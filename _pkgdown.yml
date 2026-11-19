@@ -50,6 +50,17 @@ reference:
       - print.icers
       - plot.icers
 
+  - title: Comparisons with a reference strategy
+    desc: >
+      Compare every strategy with a single reference strategy, such as
+      the standard of care, where guidelines allow it alongside the fully
+      incremental analysis.
+    contents:
+      - calculate_cers_ref
+      - calculate_cers_ref_psa
+      - print.cers_ref
+      - plot.cers_ref
+
   - title: Probabilistic sensitivity analysis (PSA) objects
     desc: >
       Build a `psa` object from the costs, effects, and parameter draws of any

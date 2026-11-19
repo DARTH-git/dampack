@@ -139,7 +139,18 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
 #' @param alpha opacity of the scatterplot points.
 #' 0 is completely transparent, 1 is completely opaque
 #' @param ref_axis Add dotted axes lines at (0,0). Defaults to TRUE
-#' @param ref_caption Add the reference strategy as a caption. Defaults to TRUE
+#' @param ref_caption Add the reference strategy (and the WTP threshold, if given) as a caption.
+#' Defaults to TRUE
+#' @param wtp a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
+#' drawn through the reference strategy, which with \code{ref_str} is the origin of the incremental
+#' cost-effectiveness plane. Without \code{ref_str}, the line goes through the mean cost and effect
+#' of the least costly strategy, as in \code{\link{plot.icers}}. Samples below the line are
+#' cost-effective compared with that strategy at this threshold.
+#' @param xtrans,ytrans transformation of the effectiveness (x) and cost (y) axes, such as
+#' \code{"log10"}, passed to \code{\link[ggplot2]{scale_continuous}}. Defaults to
+#' \code{"identity"}. The ellipses are computed on the transformed scale, so they keep their
+#' shape on a log axis; the center points stay at the arithmetic means. A log axis needs every
+#' value on it to be positive, which on the incremental plane (\code{ref_str}) is rarely the case.
 #' @inheritParams add_common_aes
 #'
 #' @importFrom ellipse ellipse
@@ -162,6 +173,9 @@ plot.psa <- function(x,
                      ylim = NULL,
                      ref_axis = TRUE,
                      ref_caption = TRUE,
+                     wtp = NULL,
+                     xtrans = "identity",
+                     ytrans = "identity",
                      ...) {
 
   Effectiveness <- Cost <- Strategy <- Eff.mean <- Cost.mean <- y <- group <- NULL
@@ -169,6 +183,8 @@ plot.psa <- function(x,
   df_cost_wide <- x$cost
   v_strategies <- x$strategies
   currency <- x$currency
+  ref_str <- check_ref_str(ref_str, v_strategies)
+  check_wtp_nhb(wtp, nhb = FALSE)
 
   if (is.null(ref_str)) {
     # expect that effectiveness and costs have strategy column names
@@ -192,6 +208,7 @@ plot.psa <- function(x,
     # make strategies in psa object into ordered factors
     df_ce$Strategy <- factor(df_ce$Strategy, levels = v_strategies, ordered = TRUE)
 
+    check_axis_transform(df_ce, xtrans, ytrans)
     psa_plot <- ggplot(df_ce, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
       ylab(paste("Cost (", currency, ")", sep = ""))
@@ -212,19 +229,23 @@ plot.psa <- function(x,
 
     if (ellipse) {
       # make points for ellipse plotting
-      l_ell <- lapply(v_strategies, function(s) {
-        df_strat_specific <- df_ce[df_ce$Strategy == s, ]
-        els <-  with(df_strat_specific,
-                     ellipse(cor(Effectiveness, Cost),
-                             scale = c(sd(Effectiveness), sd(Cost)),
-                             centre = c(mean(Effectiveness), mean(Cost))))
-        data.frame(els, group = s, stringsAsFactors = FALSE)
-      })
-      df_ell <- bind_rows(l_ell)
+      df_ell <- psa_ellipses(df_ce, v_strategies, xtrans, ytrans)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
                                        linewidth = 1, linetype = 2, alpha = 1)
+    }
+
+    # WTP line through the mean of the least costly strategy, matching plot.icers()
+    if (!is.null(wtp)) {
+      v_mean_cost <- colMeans(df_cost_wide)
+      i_anchor <- which.min(v_mean_cost)
+      intercept <- v_mean_cost[[i_anchor]] - wtp * mean(df_effectiveness_wide[[i_anchor]])
+      psa_plot <- psa_plot +
+        geom_abline(intercept = intercept, slope = wtp, linetype = "dotted", color = "grey30")
+      if (ref_caption) {
+        psa_plot <- psa_plot + labs(caption = wtp_caption(wtp, currency))
+      }
     }
 
     # add common theme
@@ -236,17 +257,15 @@ plot.psa <- function(x,
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
                    xlim = xlim, ylim = ylim,
+                   xtrans = xtrans, ytrans = ytrans,
                    v_str = v_strategies)
 
   } else {
-    ### Check that the reference strategy is in the list of strategies
-    if (!(ref_str %in% v_strategies)) {
-      stop("ref_str must be in the list of strategies")
-    }
     ## Function to convert the raw outcomes to incremental outcomes
     make_df_inc <- function(df) {
       v_ref    <- df[, ref_str]
-      df_inc   <- df[, !(names(df) %in% ref_str)]
+      # drop = FALSE keeps a data frame when there is a single comparator
+      df_inc   <- df[, !(names(df) %in% ref_str), drop = FALSE]
       df_inc   <- sweep(df_inc, 1, v_ref, "-")
       df_inc
     }
@@ -273,6 +292,7 @@ plot.psa <- function(x,
 
     df_ice$Strategy <- factor(df_ice$Strategy, levels = v_comp_strategies, ordered = TRUE)
 
+    check_axis_transform(df_ice, xtrans, ytrans, incremental = TRUE)
     psa_plot <- ggplot(df_ice, aes(x = Effectiveness, y = Cost, color = Strategy)) +
       geom_point(size = 0.7, alpha = alpha, shape = 21) +
       ylab(paste("Incremental Cost (", currency, ")", sep = "")) +
@@ -284,9 +304,16 @@ plot.psa <- function(x,
         geom_vline(xintercept = 0, linetype = "dashed", color = "black")
     }
 
-    if (ref_caption == TRUE) {
+    if (!is.null(wtp)) {
       psa_plot <- psa_plot +
-        labs(caption = paste("Reference Strategy: ", ref_str))
+        geom_abline(intercept = 0, slope = wtp, linetype = "dotted", color = "grey30")
+    }
+
+    if (ref_caption == TRUE) {
+      v_caption <- c(paste0("Reference Strategy: ", ref_str),
+                     if (!is.null(wtp)) wtp_caption(wtp, currency))
+      psa_plot <- psa_plot +
+        labs(caption = paste(v_caption, collapse = "; "))
     }
 
     # define strategy-specific means for the center of the ellipse
@@ -305,15 +332,7 @@ plot.psa <- function(x,
 
     if (ellipse) {
       # make points for ellipse plotting
-      l_ell <- lapply(v_comp_strategies, function(s) {
-        df_strat_specific <- df_ice[df_ice$Strategy == s, ]
-        els <-  with(df_strat_specific,
-                     ellipse(cor(Effectiveness, Cost),
-                             scale = c(sd(Effectiveness), sd(Cost)),
-                             centre = c(mean(Effectiveness), mean(Cost))))
-        data.frame(els, group = s, stringsAsFactors = FALSE)
-      })
-      df_ell <- bind_rows(l_ell)
+      df_ell <- psa_ellipses(df_ice, v_comp_strategies, xtrans, ytrans)
       # draw ellipse lines
       psa_plot <- psa_plot + geom_path(data = df_ell,
                                        aes(x = x, y = y, colour = group),
@@ -329,7 +348,59 @@ plot.psa <- function(x,
                    n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                    xbreaks = xbreaks, ybreaks = ybreaks,
                    xlim = xlim, ylim = ylim,
+                   xtrans = xtrans, ytrans = ytrans,
                    v_str = v_strategies)
 
   }
+}
+
+#' Ellipses around each strategy's PSA samples
+#'
+#' Each ellipse is computed from the mean, standard deviation and correlation of the samples on
+#' the transformed scale of the axes and mapped back, so that it keeps its shape when the axes
+#' are, for example, on a log scale. With identity transformations this is the usual ellipse.
+#'
+#' @param df_samples data frame with columns \code{Strategy}, \code{Effectiveness} and \code{Cost}.
+#' @param v_str strategies to draw an ellipse for.
+#' @inheritParams plot.psa
+#' @return a data frame with columns \code{x}, \code{y} and \code{group}.
+#' @keywords internal
+psa_ellipses <- function(df_samples, v_str, xtrans, ytrans) {
+  tr_x <- scales::as.transform(xtrans)
+  tr_y <- scales::as.transform(ytrans)
+  l_ell <- lapply(v_str, function(s) {
+    v_sel <- df_samples$Strategy == s
+    # samples on the scale of the axes
+    v_x <- tr_x$transform(df_samples$Effectiveness[v_sel])
+    v_y <- tr_y$transform(df_samples$Cost[v_sel])
+    m_ell <- ellipse(cor(v_x, v_y), scale = c(sd(v_x), sd(v_y)), centre = c(mean(v_x), mean(v_y)))
+    # back to the data scale, where ggplot2 applies the axis transformation again
+    data.frame(x = tr_x$inverse(m_ell[, 1]), y = tr_y$inverse(m_ell[, 2]),
+               group = s, stringsAsFactors = FALSE)
+  })
+  bind_rows(l_ell)
+}
+
+#' Check that the PSA samples can be shown on transformed axes
+#'
+#' @param df_samples data frame with columns \code{Effectiveness} and \code{Cost}.
+#' @param incremental whether the samples are differences from a reference strategy.
+#' @inheritParams plot.psa
+#' @return \code{NULL}, invisibly; called for the error.
+#' @keywords internal
+check_axis_transform <- function(df_samples, xtrans, ytrans, incremental = FALSE) {
+  l_axes <- list(list(xtrans, df_samples$Effectiveness, "xtrans", "effectiveness"),
+                 list(ytrans, df_samples$Cost, "ytrans", "cost"))
+  for (axis in l_axes) {
+    tr <- scales::as.transform(axis[[1]])
+    if (!all(is.finite(suppressWarnings(tr$transform(axis[[2]]))))) {
+      tr_name <- if (is.character(axis[[1]])) axis[[1]] else tr$name
+      stop("`", axis[[3]], " = \"", tr_name, "\"` cannot show every ",
+           if (incremental) "incremental ", axis[[4]], " value: some are outside its domain ",
+           "(zero or negative, for a log scale)",
+           if (incremental) ". Differences from the reference strategy are often negative",
+           ".", call. = FALSE)
+    }
+  }
+  invisible(NULL)
 }

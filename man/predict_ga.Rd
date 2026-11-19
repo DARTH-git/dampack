@@ -8,11 +8,15 @@ basis functions of the GAM model.}
 predict_ga(object, n, n0)
 }
 \arguments{
-\item{object}{gam object}
+\item{object}{gam object with an intercept and smooth terms only
+(\code{s()} of one parameter, \code{ti()} or \code{te()}).}
 
-\item{n}{scalar or vector of new sample size to compute evsi on}
+\item{n}{scalar or vector of new sample size to compute evsi on. A vector
+has one value per parameter; a named vector is matched to the parameters by
+name, and an unnamed vector follows the order of the parameters in the model.}
 
-\item{n0}{scalar or vector of effective prior sample size}
+\item{n0}{scalar or vector of effective prior sample size, in the same
+format as \code{n}.}
 }
 \value{
 the conditional loss associated with a gam, effective prior sample size,

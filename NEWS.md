@@ -22,6 +22,7 @@
 
 ## Bug fixes
 
+- `calc_evsi()` now matches a named `n` and `n0` to `params` by name. Names used to be ignored and values were matched by position, so a named vector in a different order than `params` gave a wrong EVSI without warning. A named vector that misses a parameter or names an unknown one, or an unnamed vector of the wrong length, now gives an informative error. The internal Gaussian approximation also now identifies each smooth's parameter by name and tensor-product smooths by class, as in the maintained code of Jalal and Alarid-Escudero (2018).
 - `plot.exp_loss()` with its default log-scale y axis (`log_y = TRUE`) now labels every order of magnitude. Its evenly spaced default breaks used to bunch up at the top of the log axis and leave the lower curves without any labels.
 - The `hund_strat` help page now describes the data (simulated costs and QALYs for 100 hypothetical strategies) and its columns, with an example. Typos in several help pages are fixed (#219).
 - `plot.psa(center = FALSE)` no longer warns "No shared levels found between `names(values)` of the manual scale and the data's fill values" when it is drawn. The fill scale is now added only when the center points that use it are.

@@ -85,7 +85,7 @@ Authors:
   \item Fernando Alarid-Escudero \email{falarid@stanford.edu} (\href{https://orcid.org/0000-0001-5076-1172}{ORCID})
   \item David U. Garibay-Treviño \email{dgari039@uottawa.ca} (\href{https://orcid.org/0000-0002-0459-1579}{ORCID})
   \item Caleb W. Easterly \email{caleb_easterly@unc.edu} (\href{https://orcid.org/0000-0001-7853-377X}{ORCID})
-  \item Greg Knowlton \email{knowl193@umn.edu}
+  \item Greg Knowlton \email{knowl193@umn.edu} (\href{https://orcid.org/0009-0001-7039-3204}{ORCID})
   \item Matthew B. Kaufmann \email{kaufm458@umn.edu} (\href{https://orcid.org/0000-0002-9947-936X}{ORCID})
   \item Eline Krijkamp (\href{https://orcid.org/0000-0003-3970-2205}{ORCID})
   \item Petros Pechlivanoglou (\href{https://orcid.org/0000-0001-5090-7936}{ORCID})

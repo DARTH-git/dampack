@@ -8,7 +8,7 @@ calc_evsi(
   psa,
   wtp,
   params = NULL,
-  outcome = c("nhb", "nmb"),
+  outcome = c("nmb", "nhb"),
   k = -1,
   n = 100,
   n0 = 10,

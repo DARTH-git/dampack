@@ -32,7 +32,9 @@ polynomial models (\code{"poly"})}
 
 \item{poly.order}{order of the polynomial, if \code{type == "poly"}}
 
-\item{k}{basis dimension, if \code{type == "gam"}}
+\item{k}{basis dimension, if \code{type == "gam"}. The default, \code{-1}, uses
+the defaults of \code{mgcv}: 10 for the smooth of each parameter and 5 for each
+margin of the interaction between parameters.}
 
 \item{pop}{scalar that corresponds to the total population}
 

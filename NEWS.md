@@ -22,6 +22,7 @@
 
 ## Bug fixes
 
+- `calc_evppi()` and `calc_evsi()` with two or more parameters and the default `k = -1` now fit mgcv's default metamodel, `s()` of each parameter plus their `ti()` interaction, as in Jalal and Alarid-Escudero (2018). The default used to be replaced by `k = 3` with the warning "k has been set to its minimum value of 3", so dampack could not reproduce the published method. **Multi-parameter EVPPI and EVSI with the default `k` will differ** (for the paper's two-parameter example, EVPPI is now $2,879, as published, instead of $2,905). When the default metamodel would be too large (five or more parameters), `k = 3` is still used, with a warning that says why. Warnings about `k` are now given once per call instead of once per strategy and willingness-to-pay threshold.
 - `plot.exp_loss()` with its default log-scale y axis (`log_y = TRUE`) now labels every order of magnitude. Its evenly spaced default breaks used to bunch up at the top of the log axis and leave the lower curves without any labels.
 - The `hund_strat` help page now describes the data (simulated costs and QALYs for 100 hypothetical strategies) and its columns, with an example. Typos in several help pages are fixed (#219).
 - `plot.psa(center = FALSE)` no longer warns "No shared levels found between `names(values)` of the manual scale and the data's fill values" when it is drawn. The fill scale is now added only when the center points that use it are.

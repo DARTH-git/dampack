@@ -32,3 +32,16 @@ test_that("evsi produces error when nsamps < nparams", {
                "The number of parameters to be estimated by the metamodel
                      cannot be greater than the number of PSA samples")
 })
+
+test_that("NHB at a willingness-to-pay threshold of 0 gives an informative error", {
+  psa_nhb <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                          cancer_psa_data$parameters, cancer_psa_data$strategies)
+  expect_error(calc_evsi(psa_nhb, wtp = c(0, 1e5), params = "pFailChemo", outcome = "nhb",
+                         progress = FALSE),
+               "not defined at a willingness-to-pay threshold of 0")
+  expect_error(calc_evppi(psa_nhb, wtp = 0, params = "pFailChemo", outcome = "nhb",
+                          progress = FALSE),
+               "not defined at a willingness-to-pay threshold of 0")
+  # NMB at a threshold of 0 is defined
+  expect_no_error(calc_evppi(psa_nhb, wtp = 0, params = "pFailChemo", progress = FALSE))
+})

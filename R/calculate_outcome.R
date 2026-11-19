@@ -24,6 +24,11 @@ calculate_outcome <- function(outcome = c("nhb", "nmb", "eff", "cost", "nhb_loss
       stop("must provide cost for NHB and NMB.",  call. = FALSE)
     }
     if (outcome == "nhb") {
+      if (any(!(wtp > 0))) {
+        stop("The net health benefit (NHB) is not defined at a willingness-to-pay ",
+             "threshold of 0 or less. Use positive thresholds, or the net monetary ",
+             "benefit (\"nmb\").", call. = FALSE)
+      }
       df_outcome <- effect - cost / wtp
     }
     if (outcome == "nmb") {

@@ -4,7 +4,16 @@
 \alias{mm_run_reg}
 \title{Build formula and run linear regression for metamodel}
 \usage{
-mm_run_reg(analysis, dep, params, dat, type, poly.order, k)
+mm_run_reg(
+  analysis,
+  dep,
+  params,
+  dat,
+  type,
+  poly.order,
+  k,
+  max_order = length(params)
+)
 }
 \arguments{
 \item{analysis}{either "oneway" or "twoway"}
@@ -26,6 +35,9 @@ Default: 2}
     null space of the penalty for the term (see
     \code{\link[mgcv]{null.space.dimension}}), but will be reset if
   it is. See \code{\link[mgcv]{choose.k}} for further information.}
+
+\item{max_order}{highest order of the \code{ti()} interactions in a GAM
+metamodel, from \code{\link{mm_gam_spec}}.}
 }
 \value{
 a statistical metamodel

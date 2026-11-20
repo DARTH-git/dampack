@@ -54,6 +54,12 @@ calc_evsi <- function(psa,
 
   l_mms <- vector(mode = "list", length = n_wtps)
 
+  # check the basis dimension once, not at every WTP
+  n_params <- length(if (is.null(params)) psa$parnames else params)
+  if (n_params > 1) {
+    k <- mm_check_k(k, n_params)
+  }
+
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
 

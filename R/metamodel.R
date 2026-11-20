@@ -93,6 +93,11 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
     stop(errmsg)
   }
 
+  # check the basis dimension once, not for every strategy
+  if (type == "gam" && analysis != "oneway") {
+    k <- mm_check_k(k, length(params))
+  }
+
   # list to hold linear models
   lms <- NULL
 
@@ -129,6 +134,40 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   metamodel
 }
 
+#' Check the basis dimension of a GAM metamodel
+#'
+#' @param k basis dimension requested.
+#' @param n_params number of parameters in the metamodel.
+#' @return the basis dimension to use, with a warning when it differs from \code{k}.
+#' @keywords internal
+mm_check_k <- function(k, n_params) {
+  # k = -1 keeps mgcv's default basis dimensions: 10 for s() and 5 for each
+  # margin of ti(), as in the metamodel of Jalal and Alarid-Escudero (2018)
+  k_margin <- if (k == -1) 5 else k
+
+  if (n_params != 1 && k == -1 && (k_margin - 1) ^ n_params > 500) {
+    k <- 3
+    k_margin <- 3
+    warning("k has been set to 3 because mgcv's default basis dimensions would give ",
+            "a metamodel too large to fit for ", n_params, " parameters.", call. = FALSE)
+  }
+
+  if (k != -1 && k < 3 && n_params != 1) {
+    k <- 3
+    k_margin <- 3
+    warning("k has been set to its minimum value of 3")
+  }
+
+  if (((k_margin - 1) ^ n_params > 500)) {
+    stop(paste0("\nIn your proposed metamodel, k-1 to the power of the number of parameters must not
+ be greater than 500 (i.e. (k-1)^n_params < 500). This proposed model has ", n_params, " parameters,
+ and a k value of ", k, ". Models that exceed this approximate threshold will fail to execute
+ due to memory constraints and/or take an excessively long time to fit."))
+  }
+
+  k
+}
+
 #' Build formula and run linear regression for metamodel
 #' @param dep dependent variable in regression
 #' @param dat data to use in regression
@@ -141,18 +180,6 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
 mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
 
   n_params <- length(params)
-
-  if (type == "gam" && k < 3 && n_params != 1) {
-    k <- 3
-    warning("k has been set to its minimum value of 3")
-  }
-
-  if (type == "gam" && ((k - 1) ^ n_params > 500)) {
-    stop(paste0("\nIn your proposed metamodel, k-1 to the power of the number of parameters must not
- be greater than 500 (i.e. (k-1)^n_params < 500). This proposed model has ", n_params, " parameters,
- and a k value of ", k, ". Models that exceed this approximate threshold will fail to execute
- due to memory constraints and/or take an excessively long time to fit."))
-  }
 
   if (type == "linear") {
     # build formula

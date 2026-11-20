@@ -87,7 +87,8 @@ This is exact for a normal mean with a conjugate normal prior, whose
 preposterior variance is \eqn{n / (n + n_0)} times the prior variance, and an
 approximation otherwise. The GA applies the shrinkage to each basis function
 of the metamodel,
-\eqn{\tilde{x}_j = \bar{x}_j + \sqrt{n / (n + n_0)} (x_j - \bar{x}_j)}{x~_j = mean(x_j) + sqrt(n / (n + n0)) (x_j - mean(x_j))};
+\eqn{\tilde{x}_j = \bar{x}_j + \sqrt{n / (n + n_0)} (x_j - \bar{x}_j)}{
+x~_j = mean(x_j) + sqrt(n / (n + n0)) (x_j - mean(x_j))};
 for an interaction, it shrinks the basis of each parameter with that
 parameter's \eqn{n} and \eqn{n_0} before forming their tensor product.
 \item Compute the expected conditional loss of each strategy,

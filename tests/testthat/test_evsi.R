@@ -104,4 +104,3 @@ test_that("calc_evsi() computes the EVSI in net monetary benefit by default", {
                         progress = FALSE)
   expect_equal(evsi_default$df_evsi, evsi_nmb$df_evsi)
 })
-

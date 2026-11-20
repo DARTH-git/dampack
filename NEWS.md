@@ -15,6 +15,7 @@
 
 ## Breaking changes
 
+- `calc_evsi()` now computes the EVSI in net monetary benefit by default (`outcome = "nmb"`), like `calc_evpi()` and `calc_evppi()`. It used to default to net health benefit, so its results were in health units while EVPI and EVPPI were in currency. Code that relied on the default must set `outcome = "nhb"` to get the previous results (#271).
 - Strategy names are now kept exactly as provided in `make_psa_obj()`, `create_dsa_oneway()`, `create_dsa_twoway()`, and the objects built from them, so names such as "Standard of care" appear unchanged in tables and plot legends. Previously they were converted with `make.names()` (to `Standard.of.care`) with a warning. Code that refers to the converted names must use the original ones, for example `psa$cost[["Standard of care"]]` instead of `psa$cost$Standard.of.care`. Strategy names must be unique and not missing or empty, and a wrong number of names now gives an informative error (#208).
 - `summary.ceac()` renames its third output column from `cost_eff_strat` to `optimal_strategy`. Code that refers to the old column name with `$cost_eff_strat` must be updated (#173).
 - dampack now requires R 4.2.0 or later. Current versions of its dependencies need at least R 4.1.3 (triangle), and CRAN only accepts R bounds of the form x.y.0.

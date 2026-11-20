@@ -98,7 +98,7 @@ Whereas EVPI and EVPPI considers the benefit of removing all uncertainty from al
 
 `dampack`'s calculation of EVSI follows the same steps as the calculation for EVPPI until the point at which the metamodel is used to estimate the opportunity loss of each strategy for each PSA sample. Assuming that the means and variances of the underlying parameter distributions in the PSA came from a previous study of effective sample size n0, a Gaussian approximation is used to estimate the new means and variances of these parameters after a hypothetical study of effective sample size n has been completed. For in-depth details on `dampack`'s methodology for estimating EVPPI and EVSI, please refer to:
 
-Jalal H, Alarid-Escudero F. A General Gaussian Approximation Approach for Value of Information Analysis. Med Decis Making. 2018;38(2):174-188.
+Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach for Value of Information Analysis. Med Decis Making. 2018;38(2):174-188.
 
 ```{r}
 evsi <- calc_evsi(psa = psa_big,
@@ -116,7 +116,7 @@ head(evsi[[1]])
 plot(evsi)
 ```
 
-By default, `calc_evsi` will assume that all parameters included in `params` came from the same study of sample size `n0` and will both be informed by a new study of sample size `n`. Providing a sequence of values for `n` will allow the user to assess how EVSI changes as a function of the additional sample size. However, it may be the case that each parameter in `params` came from a separate study with a unique initial sample size `n0`, and a unique additional sample size `n`. If this is the case, the user should set argument `n_by_param` to `TRUE`, and provide a numeric vector of sample sizes for `n0` and `n` corresponding to the order of the parameters in `params`.
+By default, `calc_evsi` will assume that all parameters included in `params` have the same effective prior sample size `n0` (the number of observations the current information about each parameter is worth; see `?calc_evsi`) and will all be informed by a new study of sample size `n`. Providing a sequence of values for `n` will allow the user to assess how EVSI changes as a function of the additional sample size. However, it may be the case that each parameter in `params` has its own effective prior sample size `n0` and its own additional sample size `n`. If this is the case, the user should set argument `n_by_param` to `TRUE`, and provide numeric vectors for `n0` and `n` with one value per parameter, either named by parameter or in the order of the parameters in `params`.
 
 # Metamodeling Appendix
 

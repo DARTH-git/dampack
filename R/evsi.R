@@ -130,7 +130,8 @@ calc_evsi <- function(psa,
                 type = "gam",
                 poly.order = 2,
                 k = k),
-      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning"))
+      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning")
+    )
 
     l_mms[[l]] <- mms
 

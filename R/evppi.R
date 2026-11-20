@@ -125,7 +125,8 @@ calc_evppi <- function(psa,
                 type = type,
                 poly.order = poly.order,
                 k = k),
-      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning"))
+      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning")
+    )
 
     l_mms[[l]] <- mms
 

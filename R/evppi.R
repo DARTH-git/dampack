@@ -13,7 +13,9 @@
 #' @param type either generalized additive models (\code{"gam"}) or
 #' polynomial models (\code{"poly"})
 #' @param poly.order order of the polynomial, if \code{type == "poly"}
-#' @param k basis dimension, if \code{type == "gam"}
+#' @param k basis dimension, if \code{type == "gam"}. The default, \code{-1}, uses
+#' the defaults of \code{mgcv}: 10 for the smooth of each parameter and 5 for each
+#' margin of the interaction between parameters.
 #' @param pop scalar that corresponds to the total population
 #' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
 #' should be displayed in console.
@@ -88,6 +90,12 @@ calc_evppi <- function(psa,
   v_evppi <- rep(0, n_wtps)
 
   l_mms <- vector(mode = "list", length = n_wtps)
+
+  # check the basis dimension once, not at every WTP
+  n_params <- length(if (is.null(params)) psa$parnames else params)
+  if (type == "gam" && n_params > 1) {
+    k <- mm_check_k(k, n_params)
+  }
 
   # calculate evppi at each wtp
   for (l in seq_len(n_wtps)) {

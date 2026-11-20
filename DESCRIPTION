@@ -94,6 +94,7 @@ Imports:
     viridis,
     RColorBrewer
 Suggests:
+    BCEA,
     testthat,
     knitr,
     rmarkdown,

@@ -2,6 +2,7 @@
 
 ## New features
 
+- New `bcea_to_psa()` and `psa_to_bcea()` convert between BCEA objects (`BCEA::bcea()`) and dampack `psa` objects, so an analysis can move between the two packages. BCEA is a suggested package, needed only for `psa_to_bcea()`. Thanks to Eline Krijkamp for the suggestion (#204).
 - `print.icers()` prints a formatted ICER table, with options for the currency symbol and the number of digits (#184, #171).
 - `plot.psa()` gains a `ref_str` argument that plots the PSA on the incremental cost-effectiveness plane relative to a chosen reference strategy (#188).
 - Plotting functions now default to an accessible, colorblind-friendly palette (`col = "access"`, based on viridis). The previous palettes remain available as `col = "full"` and `col = "bw"`.

@@ -59,6 +59,7 @@ reference:
       - summary.psa
       - plot.psa
       - print.sa
+      - bcea_to_psa
 
   - title: Cost-effectiveness acceptability curves and expected loss
     contents:

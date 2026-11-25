@@ -9,6 +9,7 @@
 - `plot.icers()` gains `incremental = TRUE`, which plots the incremental cost-effectiveness plane with the first non-dominated strategy (the least costly strategy on the frontier) at the origin, and `wtp`, which draws a willingness-to-pay line through that strategy. `plot.psa()` gains `wtp` for the same line, drawn through the reference strategy or, without one, through the least costly strategy (#209, #202).
 - `calculate_icers()` and `calculate_icers_psa()` gain `wtp`, which adds the net monetary benefit (`NMB`) of each strategy, and `nhb = TRUE`, which also adds the net health benefit (`NHB`) (#200).
 - `calculate_icers()` gains `currency`, which `print.icers()` and `plot.icers()` use (#203).
+- New `bcea_to_psa()` and `psa_to_bcea()` convert between BCEA objects (`BCEA::bcea()`) and dampack `psa` objects, so an analysis can move between the two packages. BCEA is a suggested package, needed only for `psa_to_bcea()`. Thanks to Eline Krijkamp for the suggestion (#204).
 - `print.icers()` prints a formatted ICER table, with options for the currency symbol and the number of digits (#184, #171).
 - `plot.psa()` gains a `ref_str` argument that plots the PSA on the incremental cost-effectiveness plane relative to a chosen reference strategy (#188).
 - `summary.psa()` gains a `ref_str` argument, like `plot.psa()`. It adds the mean differences in cost and effect from the reference strategy (`meanIncCost`, `meanIncEffect`) and, with `calc_sds = TRUE`, their standard deviations across the PSA samples (`sdIncCost`, `sdIncEffect`), computed sample by sample (#209).

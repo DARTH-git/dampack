@@ -9,7 +9,7 @@ This is a feature and bug-fix release. The main changes are:
   being converted with `make.names()`.
 * `calculate_icers()` can add net monetary and net health benefit at a willingness-to-pay
   threshold, and `plot.icers()` can draw the frontier on the incremental cost-effectiveness plane.
-* New `calculate_cers_ref()` and `calculate_cers_ref_psa()` compare every strategy with a
+* New `calculate_ce_ref()` and `calculate_ce_ref_psa()` compare every strategy with a
   user-selected reference strategy, with `print()` and `plot()` methods.
 * The currency stored in a PSA object is used by every analysis, plot, and table.
 * New `bcea_to_psa()` and `psa_to_bcea()` for converting to and from 'BCEA' objects

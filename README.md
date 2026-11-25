@@ -270,9 +270,17 @@ conduct](https://github.com/DARTH-git/dampack/blob/main/CODE_OF_CONDUCT.md).
 
 ## Funding
 
-This package was developed with funding from the National Institute of
-Allergy and Infectious Diseases of the National Institutes of Health
-under award no. R01AI138783. The content of this package is solely the
+Development of dampack was supported by the National Institutes of
+Health (NIH). The first version of the package was developed with
+funding from the National Institute of Allergy and Infectious Diseases
+(NIAID) under award R01AI138783. Its further development was supported
+by the National Institute on Drug Abuse (NIDA) through award
+K01DA048985, and by the National Cancer Institute (NCI) through grants
+U01CA319117 (SimCRC, colorectal cancer), U01CA319219 (DESCIPHR-GC,
+gastric cancer) and U01CA319218 (COBRAS, bladder cancer), all part of
+the Cancer Intervention and Surveillance Modeling Network (CISNET). The
+package will be used to analyze the cost-effectiveness and uncertainty
+of the models in several CISNET analyses. The content is solely the
 responsibility of the authors and does not necessarily represent the
 official views of the National Institutes of Health.
 

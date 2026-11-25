@@ -54,11 +54,18 @@ this order:
 
 \section{Funding}{
 
-\code{dampack} was developed with funding from the National Institute of
-Allergy and Infectious Diseases of the National Institutes of Health under
-award no. R01AI138783. The content is solely the responsibility of the
-authors and does not necessarily represent the official views of the
-National Institutes of Health.
+Development of \code{dampack} was supported by the National Institutes of Health
+(NIH). The first version of the package was developed with funding from the
+National Institute of Allergy and Infectious Diseases (NIAID) under award
+R01AI138783. Its further development was supported by the National Institute
+on Drug Abuse (NIDA) through award K01DA048985, and by the National Cancer
+Institute (NCI) through grants U01CA319117 (SimCRC, colorectal cancer),
+U01CA319219 (DESCIPHR-GC, gastric cancer) and U01CA319218 (COBRAS, bladder
+cancer), all part of the Cancer Intervention and Surveillance Modeling
+Network (CISNET). The package will be used to analyze the cost-effectiveness
+and uncertainty of the models in several CISNET analyses. The content is
+solely the responsibility of the authors and does not necessarily represent
+the official views of the National Institutes of Health.
 }
 
 \references{
@@ -76,16 +83,24 @@ and Values. 2nd ed. Cambridge University Press; 2014.
 Authors:
 \itemize{
   \item Fernando Alarid-Escudero \email{falarid@stanford.edu} (\href{https://orcid.org/0000-0001-5076-1172}{ORCID})
-  \item Greg Knowlton \email{knowl193@umn.edu}
+  \item David U. Garibay-Treviño \email{dgari039@uottawa.ca} (\href{https://orcid.org/0000-0002-0459-1579}{ORCID})
   \item Caleb W. Easterly \email{caleb_easterly@unc.edu} (\href{https://orcid.org/0000-0001-7853-377X}{ORCID})
+  \item Greg Knowlton \email{knowl193@umn.edu} (\href{https://orcid.org/0009-0001-7039-3204}{ORCID})
   \item Matthew B. Kaufmann \email{kaufm458@umn.edu} (\href{https://orcid.org/0000-0002-9947-936X}{ORCID})
+  \item Eline Krijkamp (\href{https://orcid.org/0000-0003-3970-2205}{ORCID})
+  \item Petros Pechlivanoglou (\href{https://orcid.org/0000-0001-5090-7936}{ORCID})
+  \item Hawre Jalal (\href{https://orcid.org/0000-0002-8224-6834}{ORCID})
   \item Eva Enns \email{eenns@umn.edu} (\href{https://orcid.org/0000-0003-0693-7358}{ORCID})
 }
 
 Other contributors:
 \itemize{
-  \item David Garibay \email{dgari039@uottawa.ca} [contributor]
+  \item Szu-Yu Zoe Kao (\href{https://orcid.org/0000-0002-4987-3983}{ORCID}) [contributor]
+  \item Michael Fairley (\href{https://orcid.org/0000-0003-4518-0714}{ORCID}) [contributor]
   \item Mark Clements \email{mark.clements@ki.se} [contributor]
+  \item National Institute of Allergy and Infectious Diseases (R01AI138783) [funder]
+  \item National Institute on Drug Abuse (K01DA048985) [funder]
+  \item National Cancer Institute (U01CA319117, U01CA319219, U01CA319218) [funder]
 }
 
 }

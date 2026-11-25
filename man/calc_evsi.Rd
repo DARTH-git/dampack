@@ -8,7 +8,7 @@ calc_evsi(
   psa,
   wtp,
   params = NULL,
-  outcome = c("nhb", "nmb"),
+  outcome = c("nmb", "nhb"),
   k = -1,
   n = 100,
   n0 = 10,
@@ -27,20 +27,24 @@ calc_evsi(
 \item{outcome}{either net monetary benefit (\code{"nmb"})
 or net health benefit (\code{"nhb"})}
 
-\item{k}{basis dimension, if \code{type == "gam"}}
+\item{k}{basis dimension, if \code{type == "gam"}. The default, \code{-1}, uses
+the defaults of \code{mgcv}: 10 for the smooth of each parameter and 5 for each
+margin of the interaction between parameters.}
 
 \item{n}{additional sample size}
 
-\item{n0}{initial sample size}
+\item{n0}{initial sample size (the effective prior sample size)}
 
 \item{n_by_param}{if \code{TRUE}, each parameter in the metamodel can have a unique
 initial and additional sample size. \code{n} and \code{n0} must be numerical
 vectors of equal length to \code{params}, with each value corresponding to the
 initial and additional sample sizes for each parameter in the metamodel. By default,
 \code{n_by_param = FALSE}, and each value of \code{n} and \code{n0} is shared by
-each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a single
-numeric value, and \code{n} must be a numerical vector of additional sample sizes for
-which EVSI is calculated from the metamodel.}
+each parameter in the model. Named vectors of \code{n} and \code{n0} are matched to
+\code{params} by name; unnamed vectors follow the order of \code{params}.
+When \code{n_by_param = FALSE}, \code{n0} must be a single numeric value, and
+\code{n} must be a numerical vector of additional sample sizes for which EVSI is
+calculated from the metamodel.}
 
 \item{pop}{scalar that corresponds to the total population}
 

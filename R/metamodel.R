@@ -112,6 +112,14 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
     stop(errmsg)
   }
 
+  # specification of the GAM metamodel, set once for every strategy
+  max_order <- 1
+  if (type == "gam" && analysis != "oneway") {
+    l_spec <- mm_gam_spec(k, length(params))
+    k <- l_spec$k
+    max_order <- l_spec$max_order
+  }
+
   # list to hold linear models
   lms <- NULL
 
@@ -131,7 +139,7 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   if (analysis == "twoway" || analysis == "multiway") {
     # loop over strategies
     for (s in strategies) {
-      mod <- mm_run_reg(analysis, s, params, df_dat, type, poly.order, k)
+      mod <- mm_run_reg(analysis, s, params, df_dat, type, poly.order, k, max_order)
       # for accessing later in predict
       mod$param_of_int <- params
       mod$strat <- s
@@ -148,30 +156,87 @@ metamodel <- function(analysis = c("oneway", "twoway", "multiway"),
   metamodel
 }
 
+#' Specification of a GAM metamodel
+#'
+#' The metamodel of \eqn{p} parameters has a smooth, \code{s()}, of each parameter
+#' and a tensor-product interaction, \code{ti()}, for every subset of two or more
+#' parameters. For two parameters this is the metamodel of Jalal and
+#' Alarid-Escudero (2018); for more, it spans the same functions as a full
+#' tensor product, \code{te()}, but each interaction has its own smoothing
+#' penalty. When this metamodel would have more than \code{max_coef}
+#' coefficients, interactions among three or more parameters are left out, with
+#' a warning. With the default \code{k = -1}, \code{k = 3} is used if even the
+#' metamodel with pairwise interactions only is too large.
+#'
+#' @param k basis dimension requested (\code{-1} for mgcv's defaults: 10 for
+#' \code{s()} and 5 for each margin of \code{ti()}).
+#' @param n_params number of parameters in the metamodel.
+#' @param max_coef largest number of coefficients allowed in the metamodel.
+#' @return a list with the basis dimension, \code{k}, and the highest order of
+#' the interactions in the metamodel, \code{max_order}. Warnings have class
+#' \code{"dampack_metamodel_spec"}.
+#' @keywords internal
+mm_gam_spec <- function(k, n_params, max_coef = 500) {
+  spec_warning <- function(...) {
+    warning(warningCondition(paste0(...), class = "dampack_metamodel_spec"))
+  }
+
+  if (n_params == 1) {
+    return(list(k = k, max_order = 1))
+  }
+
+  if (k != -1 && k < 3) {
+    k <- 3
+    spec_warning("k has been set to its minimum value of 3")
+  }
+
+  # number of coefficients of the metamodel with interactions up to order j,
+  # with k_s - 1 coefficients per s() and k_m - 1 per margin of ti()
+  n_coef <- function(k, j) {
+    k_s <- if (k == -1) 10 else k
+    k_m <- if (k == -1) 5 else k
+    1 + n_params * (k_s - 1) +
+      sum(choose(n_params, 2:j) * (k_m - 1) ^ (2:j))
+  }
+
+  if (n_coef(k, n_params) <= max_coef) {
+    return(list(k = k, max_order = n_params))
+  }
+  if (k == -1 && n_coef(-1, 2) > max_coef) {
+    k <- 3
+  }
+  if (n_coef(k, 2) > max_coef) {
+    stop("The metamodel of ", n_params, " parameters with k = ", k, " would have ",
+         n_coef(k, 2), " coefficients even with pairwise interactions only, more than ",
+         "the ", max_coef, " that can be fitted in reasonable time. Use fewer parameters ",
+         "or a smaller k.", call. = FALSE)
+  }
+  spec_warning("The metamodel of ", n_params, " parameters with all their interactions ",
+               "would have ", n_coef(k, n_params), " coefficients, more than the ",
+               max_coef, " that can be fitted in reasonable time, so it includes only ",
+               "pairwise interactions (", n_coef(k, 2), " coefficients)",
+               if (k == 3) " with k = 3" else "",
+               ". Interactions among three or more parameters are left out; ",
+               "use fewer parameters or a smaller k to include them.")
+  list(k = k, max_order = 2)
+}
+
 #' Build formula and run linear regression for metamodel
 #' @param dep dependent variable in regression
 #' @param dat data to use in regression
 #' @param params all params in PSA
+#' @param max_order highest order of the \code{ti()} interactions in a GAM
+#' metamodel, from \code{\link{mm_gam_spec}}.
 #'
 #' @importFrom mgcv gam
+#' @importFrom utils combn
 #' @keywords internal
 #' @return a statistical metamodel
 #' @inheritParams metamodel
-mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
+mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k,
+                       max_order = length(params)) {
 
   n_params <- length(params)
-
-  if (type == "gam" && k < 3 && n_params != 1) {
-    k <- 3
-    warning("k has been set to its minimum value of 3")
-  }
-
-  if (type == "gam" && ((k - 1) ^ n_params > 500)) {
-    stop(paste0("\nIn your proposed metamodel, k-1 to the power of the number of parameters must not
- be greater than 500 (i.e. (k-1)^n_params < 500). This proposed model has ", n_params, " parameters,
- and a k value of ", k, ". Models that exceed this approximate threshold will fail to execute
- due to memory constraints and/or take an excessively long time to fit."))
-  }
 
   if (type == "linear") {
     # build formula
@@ -203,6 +268,12 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
     fparam <- ""
     l_ps <- lapply(params, function(p) paste("poly(", p, ",", poly.order, ", raw=TRUE)"))
 
+    if (analysis == "multiway" && n_params > 1) {
+      # all terms up to total degree poly.order, including the interactions
+      l_ps <- paste0("poly(", paste(params, collapse = ", "), ", degree = ", poly.order,
+                     ", raw = TRUE)")
+    }
+
     if (analysis == "twoway") {
       l_ps <- append(l_ps,
                      paste0("poly(", params[1], ",", poly.order, ", raw=TRUE):",
@@ -230,16 +301,18 @@ mm_run_reg <- function(analysis, dep, params, dat, type, poly.order, k) {
     # build formula
     fbeg <- paste0(backtick_name(dep), " ~ ")
 
-    ## parameters of interest
-    fparam <- ""
-    if (n_params == 1) {
-      fparam <- paste0(fparam, "s(", params, ", k=", k, ")")
-    } else {
-      v_params_k <- paste0("s(", params,  ", k=", k, ")")
-      f_s <- paste(v_params_k, collapse = " + ")
-      k_ti <- ifelse(k == -1, NA, k)
-      fparam <- paste0(f_s, " + ti(", paste(params, collapse = ", "), ", k = ", k_ti, ")")
+    ## parameters of interest: s() of each parameter and ti() of every subset of
+    ## up to max_order parameters (see mm_gam_spec())
+    k_arg <- if (k == -1) "" else paste0(", k = ", k)
+    v_terms <- paste0("s(", params, k_arg, ")")
+    if (n_params > 1 && max_order > 1) {
+      for (j in 2:max_order) {
+        v_terms <- c(v_terms, combn(params, j, function(x) {
+          paste0("ti(", paste(x, collapse = ", "), k_arg, ")")
+        }))
+      }
     }
+    fparam <- paste(v_terms, collapse = " + ")
 
     f <- as.formula(paste0(fbeg, fparam))
 

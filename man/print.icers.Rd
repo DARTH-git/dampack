@@ -4,12 +4,13 @@
 \alias{print.icers}
 \title{Print the formatted CEA table}
 \usage{
-\method{print}{icers}(x, currency = "$", dig_cost = 0, dig_eff = 2, dig_icer = 0, ...)
+\method{print}{icers}(x, currency = NULL, dig_cost = 0, dig_eff = 2, dig_icer = 0, ...)
 }
 \arguments{
 \item{x}{Object of class \code{icers}}
 
-\item{currency}{string. with currency used in the cost-effectiveness analysis (CEA).}
+\item{currency}{string. with currency used in the cost-effectiveness analysis (CEA).
+Defaults to the currency stored in \code{x}, or \code{"$"}.}
 
 \item{dig_cost}{integer. number of digits to round costs to}
 
@@ -23,5 +24,6 @@
 a dataframe object - formatted CEA table
 }
 \description{
-Print the formatted CEA table
+Prints the sequential cost-effectiveness table: each strategy on the frontier is compared with
+the previous one.
 }

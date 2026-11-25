@@ -252,3 +252,42 @@ number_ticks <- function(n) {
     pretty(limits, n + 1)
   }
 }
+
+#' Currency to use for labels
+#'
+#' @param currency currency given by the user, or \code{NULL}.
+#' @param x a result object that may carry a \code{"currency"} attribute.
+#' @return \code{currency} if given, otherwise the currency stored on \code{x}, otherwise \code{"$"}.
+#' @keywords internal
+resolve_currency <- function(currency, x) {
+  if (!is.null(currency)) {
+    return(currency)
+  }
+  if (is.null(attr(x, "currency"))) "$" else attr(x, "currency")
+}
+
+#' Units of a value-of-information result
+#'
+#' EVPPI and EVSI computed from net health benefit are in health units; from net monetary
+#' benefit, in currency.
+#'
+#' @param x an \code{evppi} or \code{evsi} object.
+#' @param currency currency label.
+#' @param effect_units units of effectiveness.
+#' @return \code{effect_units} if \code{x} was computed with \code{outcome = "nhb"}, else \code{currency}.
+#' @keywords internal
+voi_units <- function(x, currency, effect_units) {
+  if (identical(attr(x, "outcome"), "nhb")) effect_units else currency
+}
+
+#' Singular form of the effect units, for "per unit" labels
+#'
+#' Drops a final "s", so \code{"QALYs"} becomes \code{"QALY"} in labels such as "$/QALY". A unit
+#' already in the singular is returned unchanged.
+#'
+#' @param effect_units units of effectiveness, such as \code{"QALYs"}.
+#' @return a string.
+#' @keywords internal
+per_unit <- function(effect_units) {
+  sub("s$", "", effect_units)
+}

@@ -12,6 +12,8 @@
   n_y_ticks = 6,
   txtsize = 12,
   basecase = NULL,
+  xlim = NULL,
+  ylim = NULL,
   ...
 )
 }
@@ -32,6 +34,10 @@
 \item{basecase}{named list of specific combination of param1 and param2 values to highlight
 on the returned plot. Each list element must have the same name as the corresponding
 parameter in the \code{owsa} object.}
+
+\item{xlim}{vector of x-axis limits, or NULL, which sets limits automatically}
+
+\item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

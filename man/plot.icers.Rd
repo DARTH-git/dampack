@@ -7,7 +7,7 @@
 \method{plot}{icers}(
   x,
   txtsize = 12,
-  currency = "$",
+  currency = NULL,
   effect_units = "QALYs",
   label = c("frontier", "all", "none"),
   label_max_char = NULL,
@@ -22,6 +22,10 @@
   xexpand = expansion(0.1),
   yexpand = expansion(0.1),
   max.iter = 20000,
+  incremental = FALSE,
+  wtp = NULL,
+  ref_axis = TRUE,
+  ref_caption = TRUE,
   ...
 )
 }
@@ -66,6 +70,23 @@ for how to modify this.}
 
 \item{max.iter}{Maximum number of iterations to try to resolve overlaps.
 Defaults to 10000.}
+
+\item{incremental}{if \code{TRUE}, plot the incremental cost-effectiveness plane: the costs
+and effects of every strategy are shown relative to those of the first non-dominated strategy
+(the least costly strategy on the frontier), which is placed at the origin (0, 0). The frontier
+and the status of each strategy do not change. Defaults to \code{FALSE} (absolute costs and
+effects). To compare every strategy with a reference strategy of your choice, use
+\code{\link{calculate_ce_ref}} and its \code{plot} method.}
+
+\item{wtp}{a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
+drawn through the least costly strategy on the frontier. Strategies below the line are
+cost-effective compared with that strategy at this threshold.}
+
+\item{ref_axis}{with \code{incremental = TRUE}, draw dashed axes through the origin.
+Defaults to \code{TRUE}.}
+
+\item{ref_caption}{add a caption naming the strategy at the origin (with
+\code{incremental = TRUE}) and the WTP threshold (with \code{wtp}). Defaults to \code{TRUE}.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

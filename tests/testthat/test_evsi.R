@@ -96,3 +96,11 @@ test_that("NHB at a willingness-to-pay threshold of 0 gives an informative error
   # NMB at a threshold of 0 is defined
   expect_no_error(calc_evppi(psa_nhb, wtp = 0, params = "pFailChemo", progress = FALSE))
 })
+test_that("calc_evsi() computes the EVSI in net monetary benefit by default", {
+  psa_def <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                          cancer_psa_data$parameters, cancer_psa_data$strategies)
+  evsi_default <- calc_evsi(psa_def, wtp = 1e5, params = "pFailChemo", progress = FALSE)
+  evsi_nmb <- calc_evsi(psa_def, wtp = 1e5, params = "pFailChemo", outcome = "nmb",
+                        progress = FALSE)
+  expect_equal(evsi_default$df_evsi, evsi_nmb$df_evsi)
+})

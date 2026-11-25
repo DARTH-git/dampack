@@ -97,6 +97,24 @@ terms up to total degree \code{poly.order}, including the interactions between
 parameters; it is biased when the expected loss is not a polynomial of that
 order.
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# EVPPI of the two treatment-failure probabilities, jointly, at three WTP thresholds
+l_evppi <- calc_evppi(l_psa,
+                      wtp = c(5e4, 1e5, 2e5),
+                      params = c("pFailChemo", "pFailSurg"),
+                      outcome = "nmb",
+                      k = 3,
+                      progress = FALSE)
+l_evppi$df_evppi
+plot(l_evppi)
+
+}
 \references{
 \enumerate{
 \item Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach
@@ -106,4 +124,7 @@ Expected Value of Perfect Information from a Probabilistic Sensitivity
 Analysis Sample: A Nonparametric Regression Approach. Med Decis Making.
 2014;34(3):311–26.
 }
+}
+\seealso{
+\code{\link{plot.evppi}}, \code{\link{calc_evpi}}, \code{\link{calc_evsi}}
 }

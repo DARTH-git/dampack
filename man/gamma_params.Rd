@@ -56,8 +56,6 @@ Encyclopedia. Retrieved 17:23, February 11, 2018,
 from https://en.wikipedia.org/w/index.php?title=Gamma_distribution&oldid=824541785
 }
 }
-\keyword{distribution;}
-\keyword{gamma}
-\keyword{method}
-\keyword{moments}
-\keyword{of}
+\concept{gamma distribution}
+\concept{method of moments}
+\keyword{distribution}

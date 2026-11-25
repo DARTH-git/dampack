@@ -22,4 +22,18 @@ the right endpoint - i.e., [\code{range_min}, \code{range_max})
 Describes cost-effective strategies and their
 associated intervals of cost-effectiveness
 }
-\keyword{internal}
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+df_ceac <- ceac(l_psa, wtp = seq(1e4, 1e5, by = 1e4))
+
+# Radio is optimal up to a WTP of 40,000 and Chemo from there on
+summary(df_ceac)
+
+}
+\seealso{
+\code{\link{ceac}}, \code{\link{plot.ceac}}
+}

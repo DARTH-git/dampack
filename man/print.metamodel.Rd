@@ -17,3 +17,13 @@ None (invisible NULL)
 \description{
 Print metamodel
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+l_mm <- metamodel(analysis = "oneway", psa = l_psa, params = "pFailChemo",
+                  outcome = "nmb", wtp = 1e5)
+print(l_mm)
+}

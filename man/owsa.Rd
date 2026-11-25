@@ -53,3 +53,22 @@ as a function of the input parameter of interest. In the DSA context, this funct
 internally by \code{\link{run_owsa_det}} and should not be called by the user. In the PSA context,
 the user must use this function to produce an \code{owsa} object.
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# metamodel predictions of the net monetary benefit as each parameter varies
+df_owsa <- owsa(l_psa, params = c("pFailChemo", "pFailSurg", "cChemo"),
+                outcome = "nmb", wtp = 1e5)
+head(df_owsa)
+plot(df_owsa)
+
+# parameter ranges can be given, and only some strategies kept
+df_owsa_chemo <- owsa(l_psa, params = "pFailChemo", ranges = list(pFailChemo = c(0.3, 0.5)),
+                      outcome = "nmb", wtp = 1e5, strategies = c("Chemo", "Surgery"))
+plot(df_owsa_chemo)
+
+}

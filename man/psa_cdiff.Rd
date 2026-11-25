@@ -3,14 +3,55 @@
 \docType{data}
 \name{psa_cdiff}
 \alias{psa_cdiff}
-\title{Sample PSA dataset}
+\title{PSA of treatment strategies for Clostridioides difficile infection}
 \format{
-An object of class \code{psa} (inherits from \code{sa}) of length 6.
+A \code{psa} object (see \code{\link{make_psa_obj}}): a list with 6
+elements.
+\describe{
+  \item{n_strategies}{number of strategies, 11.}
+  \item{strategies}{character vector of the 11 strategy names (\code{"s3"},
+  \code{"s27"}, and so on), which follow the strategy numbering of the
+  source study.}
+  \item{n_sim}{number of PSA samples, 1,000.}
+  \item{cost}{data frame with 1,000 rows (PSA samples) and 11 columns (one
+  per strategy) with the cost of each strategy.}
+  \item{effectiveness}{data frame with 1,000 rows and 11 columns with the
+  quality-adjusted life years (QALYs) of each strategy.}
+  \item{currency}{currency symbol, \code{"$"}.}
+}
+The parameter values drawn in each sample are not included, so the sample
+supports cost-effectiveness analysis but not metamodeling or EVPPI.
+}
+\source{
+Rajasingham R, Enns EA, Khoruts A, Vaughn BP. Cost-effectiveness of
+Treatment Regimens for Clostridioides difficile Infection: An Evaluation of
+the 2018 Infectious Diseases Society of America Guidelines. Clinical
+Infectious Diseases. 2020;70(5):754-762. \doi{10.1093/cid/ciz318}
 }
 \usage{
 psa_cdiff
 }
 \description{
-Sample PSA dataset
+Probabilistic sensitivity analysis (PSA) output from a decision model of
+treatment strategies for \emph{Clostridioides difficile} infection (CDI).
+The model compared 48 strategies, which varied in the treatment regimen
+used for initial versus recurrent CDI and for different infection
+severities; this sample keeps the 11 most relevant strategies. Costs include
+all treatment costs and lifetime downstream medical costs, and effectiveness
+is quality-adjusted life expectancy, for a 67-year-old patient (the median
+age of patients with CDI).
+}
+\examples{
+data("psa_cdiff")
+df_cdiff <- summary(psa_cdiff)
+df_icers <- calculate_icers(cost = df_cdiff$meanCost,
+                            effect = df_cdiff$meanEffect,
+                            strategies = df_cdiff$Strategy)
+df_icers
+plot(df_icers)
+}
+\seealso{
+\code{vignette("basic_cea", package = "dampack")}, which uses this
+dataset.
 }
 \keyword{datasets}

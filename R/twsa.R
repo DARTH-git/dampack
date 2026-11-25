@@ -6,7 +6,7 @@
 #'
 #' @param sa_obj sensitivity analysis object;
 #' either a probabilistic sensitivity analysis (\code{\link{make_psa_obj}}) or
-#' a deterministic sensitivity analysis object (\code{\link{run_owsa_det}})
+#' a two-way deterministic sensitivity analysis object (\code{\link{create_dsa_twoway}})
 #'
 #' @param param1 String with the name of the first parameter of interest
 #' @param param2 String with the name of the second parameter of interest
@@ -14,8 +14,23 @@
 #' @inheritParams metamodel
 #' @inheritParams predict.metamodel
 #'
-#' @return twsa A \code{ggplot2} object with the TWSA graph of \code{param1} and
-#' \code{param2} on the outcome of interest.
+#' @return A \code{data.frame} of class \code{twsa} with the outcome of each strategy over a grid of
+#' values of \code{param1} and \code{param2}. It can be visualized with \code{\link{plot.twsa}}.
+#'
+#' @seealso \code{\link{plot.twsa}}, \code{\link{run_twsa_det}}
+#'
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#'
+#' # strategy with the highest predicted net monetary benefit as two parameters vary
+#' df_twsa <- twsa(l_psa, param1 = "pFailChemo", param2 = "muDieCancer",
+#'                 outcome = "nmb", wtp = 1e5)
+#' head(df_twsa)
+#' plot(df_twsa)
 #'
 #' @export
 twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
@@ -91,6 +106,22 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
 #' @importFrom rlang !!
 #' @importFrom rlang sym
 #' @return A \code{ggplot2} plot of the two-way sensitivity analysis.
+#' @examples
+#' data("cancer_psa_data")
+#' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+#'                       effectiveness = cancer_psa_data$effectiveness,
+#'                       parameters = cancer_psa_data$parameters,
+#'                       strategies = cancer_psa_data$strategies)
+#' df_twsa <- twsa(l_psa, param1 = "pFailChemo", param2 = "muDieCancer",
+#'                 outcome = "nmb", wtp = 1e5)
+#' plot(df_twsa)
+#'
+#' # mark a base case (here, close to the PSA means), in black and white
+#' plot(df_twsa, basecase = list(pFailChemo = 0.45, muDieCancer = 0.2), col = "bw")
+#'
+#' # the strategy with the lowest expected cost
+#' df_twsa_cost <- twsa(l_psa, param1 = "pFailChemo", param2 = "muDieCancer", outcome = "cost")
+#' plot(df_twsa_cost, maximize = FALSE)
 #' @export
 plot.twsa <- function(x, maximize = TRUE,
                       col = c("access", "full", "bw"),

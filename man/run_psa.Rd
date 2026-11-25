@@ -44,8 +44,50 @@ A list containing PSA objects for each outcome in \code{outcomes}.
 \code{run_psa} calculates outcomes using a user-defined function and creates PSA objects
 corresponding to the specified outcomes.
 }
+\examples{
+# A tiny decision model. Treatment fails with probability p_fail under standard care
+# and with half that probability under the new treatment, which costs c_trt. A failure
+# costs 20,000 and loses 2 QALYs. FUN takes a named list of parameters and returns a data
+# frame with the strategy names in its first column and one column per outcome.
+f_model <- function(l_params, wtp = 5e4) {
+  v_p_fail <- l_params$p_fail * c(1, 0.5)
+  v_cost <- c(0, l_params$c_trt) + 20000 * v_p_fail
+  v_qaly <- 10 - 2 * v_p_fail
+  data.frame(Strategy = c("Standard", "New"),
+             Cost = v_cost,
+             QALY = v_qaly,
+             NMB = wtp * v_qaly - v_cost)
+}
+l_params_basecase <- list(p_fail = 0.3, c_trt = 15000)
+f_model(l_params_basecase)
+
+# 100 PSA samples of the two parameters
+set.seed(2026)
+df_psa_samp <- gen_psa_samp(params = c("p_fail", "c_trt"),
+                            dists = c("beta", "gamma"),
+                            parameterization_types = c("mean, sd", "mean, sd"),
+                            dists_params = list(c(0.3, 0.05), c(15000, 3000)),
+                            nsamp = 100)
+
+# run the model on every sample: a list with one psa object per outcome
+l_psa_out <- run_psa(psa_samp = df_psa_samp,
+                     params_basecase = l_params_basecase,
+                     FUN = f_model,
+                     outcomes = c("Cost", "QALY"),
+                     strategies = c("Standard", "New"),
+                     progress = FALSE)
+names(l_psa_out)
+
+# combine the cost and QALY outcomes into one psa object for cost-effectiveness analysis
+l_psa <- make_psa_obj(cost = l_psa_out$Cost$other_outcome,
+                      effectiveness = l_psa_out$QALY$other_outcome,
+                      parameters = l_psa_out$Cost$parameters,
+                      strategies = l_psa_out$Cost$strategies)
+plot(l_psa)
+calculate_icers_psa(l_psa)
+}
 \seealso{
 \code{\link{run_psa}},
 \code{\link{make_psa_obj}},
-\code{\link{gen_psa_samp}},
+\code{\link{gen_psa_samp}}
 }

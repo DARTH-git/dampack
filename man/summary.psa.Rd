@@ -32,8 +32,28 @@ effects of the two strategies vary together.
 \description{
 summarize a psa object across all simulations
 }
+\examples{
+data("cancer_psa_data")
+l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
+                      effectiveness = cancer_psa_data$effectiveness,
+                      parameters = cancer_psa_data$parameters,
+                      strategies = cancer_psa_data$strategies)
+
+# mean cost and effectiveness of each strategy, with their standard deviations
+summary(l_psa, calc_sds = TRUE)
+
+# the means can be passed to calculate_icers()
+df_psa_sum <- summary(l_psa)
+calculate_icers(cost = df_psa_sum$meanCost,
+                effect = df_psa_sum$meanEffect,
+                strategies = df_psa_sum$Strategy)
+
+# mean differences from a reference strategy, with their standard deviations
+summary(l_psa, calc_sds = TRUE, ref_str = "Radio")
+}
 \seealso{
-\code{\link{plot.psa}}, which with \code{ref_str} plots the same differences on the
-incremental cost-effectiveness plane, and \code{\link{calculate_ce_ref_psa}}, which adds
-cost-effectiveness ratios, 95\% intervals, and quadrant proportions.
+\code{\link{make_psa_obj}}, \code{\link{calculate_icers}}, \code{\link{plot.psa}},
+which with \code{ref_str} plots the same differences on the incremental cost-effectiveness plane,
+and \code{\link{calculate_ce_ref_psa}}, which adds cost-effectiveness ratios, 95\% intervals,
+and quadrant proportions.
 }

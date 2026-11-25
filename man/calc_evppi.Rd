@@ -32,7 +32,9 @@ polynomial models (\code{"poly"})}
 
 \item{poly.order}{order of the polynomial, if \code{type == "poly"}}
 
-\item{k}{basis dimension, if \code{type == "gam"}}
+\item{k}{basis dimension, if \code{type == "gam"}. The default, \code{-1}, uses
+the defaults of \code{mgcv}: 10 for the smooth of each parameter and 5 for each
+margin of the interaction between parameters.}
 
 \item{pop}{scalar that corresponds to the total population}
 
@@ -79,6 +81,21 @@ and applying the following equation:
 \deqn{EVPPI_{\theta_I} = \frac{1}{K}\sum_{i=1}^{K}\max_d(\hat{L}_d)}
 The spline model in step 3 is fitted using the `mgcv` package.
 }
+
+For \code{type = "gam"}, the metamodel has a smooth, \code{s()}, of each
+parameter in \eqn{\theta_I} and a tensor-product interaction, \code{ti()}, of
+every subset of two or more of them. For two parameters, \eqn{a} and \eqn{b},
+this is \code{s(a) + s(b) + ti(a, b)}, the metamodel of Jalal and
+Alarid-Escudero (2018). For more parameters, it spans the same functions as a
+full tensor-product smooth, \code{te()}, with a separate smoothing penalty for
+each interaction. Its number of coefficients grows quickly with the number of
+parameters. When it would exceed 500, interactions among three or more
+parameters are left out, with a warning, and if the metamodel with pairwise
+interactions only is still too large with the default \code{k}, \code{k = 3}
+is used. For \code{type = "poly"}, the metamodel is a polynomial with all
+terms up to total degree \code{poly.order}, including the interactions between
+parameters; it is biased when the expected loss is not a polynomial of that
+order.
 }
 \references{
 \enumerate{

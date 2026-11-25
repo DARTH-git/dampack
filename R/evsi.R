@@ -54,24 +54,27 @@ calc_evsi <- function(psa,
 
   l_mms <- vector(mode = "list", length = n_wtps)
 
-  # check the basis dimension once, not at every WTP
+  # warn about the metamodel specification once, not at every WTP
   n_params <- length(if (is.null(params)) psa$parnames else params)
   if (n_params > 1) {
-    k <- mm_check_k(k, n_params)
+    mm_gam_spec(k, n_params)
   }
 
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
 
     # run the metamodels
-    mms <- metamodel(analysis = "multiway",
-                     psa = psa,
-                     params = params,
-                     outcome = outcome,
-                     wtp = wtp[l],
-                     type = "gam",
-                     poly.order = 2,
-                     k = k)
+    mms <- withCallingHandlers(
+      metamodel(analysis = "multiway",
+                psa = psa,
+                params = params,
+                outcome = outcome,
+                wtp = wtp[l],
+                type = "gam",
+                poly.order = 2,
+                k = k),
+      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning")
+    )
 
     l_mms[[l]] <- mms
 

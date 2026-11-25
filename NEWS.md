@@ -11,6 +11,7 @@
 - `calculate_icers()` gains `currency`, which `print.icers()` and `plot.icers()` use (#203).
 - `print.icers()` prints a formatted ICER table, with options for the currency symbol and the number of digits (#184, #171).
 - `plot.psa()` gains a `ref_str` argument that plots the PSA on the incremental cost-effectiveness plane relative to a chosen reference strategy (#188).
+- `summary.psa()` gains a `ref_str` argument, like `plot.psa()`. It adds the mean differences in cost and effect from the reference strategy (`meanIncCost`, `meanIncEffect`) and, with `calc_sds = TRUE`, their standard deviations across the PSA samples (`sdIncCost`, `sdIncEffect`), computed sample by sample (#209).
 - Plotting functions now default to an accessible, colorblind-friendly palette (`col = "access"`, based on viridis). The previous palettes remain available as `col = "full"` and `col = "bw"`.
 - Added `cancer_psa_data`, PSA output from an illustrative model of three cancer treatments (chemotherapy, radiation, surgery). It is now the example dataset used throughout the examples, tests, and vignettes.
 - Added `df_example_psa_elc`, a de-identified six-strategy PSA sample whose cost-effectiveness frontier switches optimal strategy three times. It is useful for exercising CEAC and expected loss curve functions, which behave differently when the frontier switches more than once (#180).

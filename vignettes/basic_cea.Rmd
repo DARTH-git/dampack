@@ -210,5 +210,5 @@ The `plot()` method draws the incremental cost-effectiveness plane centered at t
 plot(ce_ref_hiv)
 ```
 
-With many strategies, the segments are left out by default; `lines = TRUE` or `lines = FALSE` overrides this. For a PSA, `calculate_ce_ref_psa()` makes the same comparison from the mean costs and effects, and with `uncertainty = TRUE` adds 95% intervals for the differences and the proportion of PSA samples in each quadrant of the incremental plane. `plot.psa()` with `ref_str` shows the PSA samples themselves on the incremental plane.
+With many strategies, the segments are left out by default; `lines = TRUE` or `lines = FALSE` overrides this. For a PSA, `calculate_ce_ref_psa()` makes the same comparison from the mean costs and effects, and with `uncertainty = TRUE` adds 95% intervals for the differences and the proportion of PSA samples in each quadrant of the incremental plane. `plot.psa()` with `ref_str` shows the PSA samples themselves on the incremental plane. `summary.psa()` with `ref_str` gives the mean differences in cost and effect from the reference and, with `calc_sds = TRUE`, their standard deviations across the PSA samples.
 

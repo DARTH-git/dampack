@@ -111,7 +111,6 @@ test_that("print() names the reference and formats the table", {
 test_that("calculate_icers() has no reference strategy", {
   expect_false("ref_str" %in% names(formals(calculate_icers)))
   expect_false("ref_str" %in% names(formals(calculate_icers_psa)))
-  expect_false("ref_str" %in% names(formals(summary.psa)))
   x <- calculate_icers(df_toy$cost, df_toy$effect, df_toy$strategy)
   expect_identical(names(x), c("Strategy", "Cost", "Effect", "Inc_Cost", "Inc_Effect", "ICER", "Status"))
   y <- calculate_icers(df_toy$cost, df_toy$effect, df_toy$strategy, wtp = 150, nhb = TRUE)
@@ -133,6 +132,36 @@ test_that("calculate_icers() has no reference strategy", {
 df_cost <- data.frame(Ref = c(1000, 1000, 1000, 1000), New = c(1100, 950, 950, 1100))
 df_eff <- data.frame(Ref = c(1, 1, 1, 1), New = c(1.2, 1.2, 0.9, 0.9))
 psa_q <- make_psa_obj(df_cost, df_eff, strategies = c("Ref", "New"), currency = "€")
+
+test_that("summary.psa() with ref_str gives the mean differences from the reference", {
+  s <- summary(psa_q, ref_str = "Ref")
+  expect_identical(names(s), c("Strategy", "meanCost", "meanEffect", "meanIncCost", "meanIncEffect"))
+  expect_equal(s$meanIncCost, c(NA, 25))
+  expect_equal(s$meanIncEffect, c(NA, 0.05))
+  # the same as the difference of the means
+  s0 <- summary(psa_q)
+  expect_equal(s$meanIncCost[2], s0$meanCost[2] - s0$meanCost[1])
+  # without ref_str, the summary is unchanged
+  expect_identical(names(s0), c("Strategy", "meanCost", "meanEffect"))
+  expect_error(summary(psa_q, ref_str = "Other"), "must be one of the strategies")
+})
+
+test_that("summary.psa() with ref_str and calc_sds gives the SDs of the differences", {
+  s <- summary(psa_q, calc_sds = TRUE, ref_str = "Ref")
+  expect_identical(names(s), c("Strategy", "meanCost", "meanEffect", "sdCost", "sdEffect",
+                               "meanIncCost", "meanIncEffect", "sdIncCost", "sdIncEffect"))
+  expect_equal(s$sdIncCost, c(NA, sd(c(100, -50, -50, 100))))
+  expect_equal(s$sdIncEffect, c(NA, sd(c(0.2, 0.2, -0.1, -0.1))))
+  # computed sample by sample: a strategy that always costs 100 more than the reference
+  # has a difference with SD 0, although both costs vary
+  psa_shift <- make_psa_obj(data.frame(Ref = c(1000, 2000, 3000), New = c(1100, 2100, 3100)),
+                            data.frame(Ref = c(1, 2, 3), New = c(1.5, 2.5, 3.5)),
+                            strategies = c("Ref", "New"))
+  s_shift <- summary(psa_shift, calc_sds = TRUE, ref_str = "Ref")
+  expect_equal(s_shift$sdCost, c(1000, 1000))
+  expect_equal(s_shift$sdIncCost, c(NA, 0))
+  expect_equal(s_shift$sdIncEffect, c(NA, 0))
+})
 
 test_that("calculate_ce_ref_psa() uses the means of the PSA and keeps its currency", {
   s <- summary(psa_q)

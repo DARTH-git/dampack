@@ -31,8 +31,9 @@ test_that("EVPI, EVPPI, and EVSI plots use the currency or the health units of t
   evppi_nhb <- calc_evppi(psa_eur, v_wtp, params = "pFailChemo", outcome = "nhb", progress = FALSE)
   expect_equal(plot(evppi_nhb)$labels$y, "EVPPI (QALYs)")
 
-  # calc_evsi() defaults to outcome = "nhb", whose EVSI is in health units, not currency
-  evsi_nhb <- calc_evsi(psa_eur, v_wtp, params = "pFailChemo", n = 100, n0 = 10, progress = FALSE)
+  # with outcome = "nhb", the EVSI is in health units, not currency
+  evsi_nhb <- calc_evsi(psa_eur, v_wtp, params = "pFailChemo", n = 100, n0 = 10,
+                        outcome = "nhb", progress = FALSE)
   expect_equal(plot(evsi_nhb)$labels$y, "EVSI (QALYs)")
   evsi_nmb <- calc_evsi(psa_eur, v_wtp, params = "pFailChemo", n = 100, n0 = 10,
                         outcome = "nmb", progress = FALSE)

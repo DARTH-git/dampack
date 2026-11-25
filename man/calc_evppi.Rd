@@ -99,7 +99,7 @@ order.
 }
 \references{
 \enumerate{
-\item Jalal H, Alarid-Escudero F. A General Gaussian Approximation Approach
+\item Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach
 for Value of Information Analysis. Med Decis Making. 2018;38(2):174-188.
 \item Strong M, Oakley JE, Brennan A. Estimating Multiparameter Partial
 Expected Value of Perfect Information from a Probabilistic Sensitivity

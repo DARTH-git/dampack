@@ -31,19 +31,20 @@ or net health benefit (\code{"nhb"})}
 the defaults of \code{mgcv}: 10 for the smooth of each parameter and 5 for each
 margin of the interaction between parameters.}
 
-\item{n}{additional sample size}
+\item{n}{sample size of the proposed study (the additional sample size).}
 
-\item{n0}{initial sample size (the effective prior sample size)}
+\item{n0}{effective prior sample size: the number of observations that the
+current information about each parameter is worth (see Details).}
 
-\item{n_by_param}{if \code{TRUE}, each parameter in the metamodel can have a unique
-initial and additional sample size. \code{n} and \code{n0} must be numerical
-vectors of equal length to \code{params}, with each value corresponding to the
-initial and additional sample sizes for each parameter in the metamodel. By default,
-\code{n_by_param = FALSE}, and each value of \code{n} and \code{n0} is shared by
-each parameter in the model. Named vectors of \code{n} and \code{n0} are matched to
-\code{params} by name; unnamed vectors follow the order of \code{params}.
-When \code{n_by_param = FALSE}, \code{n0} must be a single numeric value, and
-\code{n} must be a numerical vector of additional sample sizes for which EVSI is
+\item{n_by_param}{if \code{TRUE}, each parameter in the metamodel can have its
+own effective prior sample size and additional sample size. \code{n} and
+\code{n0} must then be numeric vectors with one value per parameter in
+\code{params}. By default, \code{n_by_param = FALSE}, and each value of
+\code{n} and \code{n0} is shared by all the parameters in the model. Named
+vectors of \code{n} and \code{n0} are matched to \code{params} by name;
+unnamed vectors follow the order of \code{params}. When
+\code{n_by_param = FALSE}, \code{n0} must be a single numeric value, and
+\code{n} must be a numeric vector of additional sample sizes for which EVSI is
 calculated from the metamodel.}
 
 \item{pop}{scalar that corresponds to the total population}
@@ -59,6 +60,63 @@ strategy at each willingness to pay threshold.
 }
 \description{
 Calculate Expected Value of Sample Information (EVSI)
+}
+\details{
+The expected value of sample information (EVSI) is the expected value of a
+study of \eqn{n} observations that informs the parameters of interest,
+\eqn{\theta_I}, of a cost-effectiveness analysis of \eqn{D} strategies with
+net benefits \eqn{B_d}. If \eqn{X_n} are the data the study would collect,
+\deqn{EVSI = E_{X_n}\left[\max_d E(B_d \mid X_n)\right] - \max_d E(B_d).}{
+EVSI = E_X[max_d E(B_d | X)] - max_d E(B_d).}
+\code{calc_evsi} estimates it from the PSA sample alone, with the Gaussian
+approximation (GA) of Jalal and Alarid-Escudero (2018):
+\enumerate{
+\item Determine the optimal strategy with current information,
+\eqn{d^* = argmax_d \{\bar{B}_d\}}{d* = argmax_d mean(B_d)}, and the opportunity loss of each strategy,
+\eqn{L_d = B_d - B_{d^*}}{L_d = B_d - B_d*}.
+\item Fit a metamodel of the loss of each strategy on \eqn{\theta_I}, as in
+\code{\link{calc_evppi}}, which is a linear combination of basis functions,
+\deqn{L_d = \beta_0 + \sum_j \beta_j x_j(\theta_I) + \epsilon.}
+\item Approximate the preposterior distribution, the distribution of
+\eqn{E(\theta \mid X_n)}{E(theta | X_n)} over the studies that could be observed, by
+shrinking each PSA sample of a parameter toward its mean by a factor that
+depends only on \eqn{n} and the effective prior sample size, \eqn{n_0}:
+\deqn{\tilde{\theta} = E(\theta) + \sqrt{\frac{n}{n + n_0}} \left(\theta - E(\theta)\right).}{
+theta~ = E(theta) + sqrt(n / (n + n0)) (theta - E(theta)).}
+This is exact for a normal mean with a conjugate normal prior, whose
+preposterior variance is \eqn{n / (n + n_0)} times the prior variance, and an
+approximation otherwise. The GA applies the shrinkage to each basis function
+of the metamodel,
+\eqn{\tilde{x}_j = \bar{x}_j + \sqrt{n / (n + n_0)} (x_j - \bar{x}_j)}{
+x~_j = mean(x_j) + sqrt(n / (n + n0)) (x_j - mean(x_j))};
+for an interaction, it shrinks the basis of each parameter with that
+parameter's \eqn{n} and \eqn{n_0} before forming their tensor product.
+\item Compute the expected conditional loss of each strategy,
+\eqn{\tilde{L}_d = \beta_0 + \sum_j \beta_j \tilde{x}_j}{L~_d = beta_0 + sum_j beta_j x~_j}, and
+\deqn{EVSI = \frac{1}{K}\sum_{i=1}^{K}\max_d(\tilde{L}_{d,i}),}{
+EVSI = (1/K) sum_i max_d(L~_d,i),}
+where \eqn{K} is the number of PSA samples.
+}
+EVSI is 0 for \eqn{n = 0} and tends to the EVPPI of \eqn{\theta_I}
+(\code{\link{calc_evppi}}) as \eqn{n} grows.
+
+The effective prior sample size, \eqn{n_0}, is the number of observations
+that the current information about a parameter is worth, so that a study of
+\eqn{n} observations reduces its variance by the factor \eqn{n_0 / (n + n_0)}.
+With a conjugate prior it can be read from the prior: \eqn{n_0 = \alpha + \beta}
+for a probability with a beta(\eqn{\alpha}, \eqn{\beta}) prior and binomial
+data; \eqn{n_0 = \sigma^2 / \sigma_0^2} for a normal mean with prior variance
+\eqn{\sigma_0^2} and data with variance \eqn{\sigma^2}; and, for a rate
+with a gamma prior of rate parameter \eqn{\beta} and Poisson counts, the
+person-time \eqn{\beta}. When no conjugate prior applies, Jalal and
+Alarid-Escudero (2018, Appendix C) show how to estimate \eqn{n_0} with a
+summary statistic or by Markov chain Monte Carlo. \eqn{n} and \eqn{n_0} must
+be in the same units (for example, patients or person-years).
+
+Use \code{n_by_param = TRUE} when the study would inform the parameters with
+different sample sizes, or when they have different effective prior sample
+sizes. Each parameter is then shrunk with its own factor, which ignores how
+data on one parameter would also update the parameters correlated with it.
 }
 \examples{
 data("cancer_psa_data")

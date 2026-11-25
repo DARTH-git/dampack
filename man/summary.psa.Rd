@@ -4,18 +4,30 @@
 \alias{summary.psa}
 \title{summarize a psa object across all simulations}
 \usage{
-\method{summary}{psa}(object, calc_sds = FALSE, ...)
+\method{summary}{psa}(object, calc_sds = FALSE, ref_str = NULL, ...)
 }
 \arguments{
 \item{object}{the psa object}
 
 \item{calc_sds}{whether or not to calculate the standard deviations. Defaults to FALSE}
 
+\item{ref_str}{name of a reference strategy, one of the strategies in \code{object}. If
+given, the cost and effect of each strategy are compared with those of the reference in every
+PSA sample (see Value). Defaults to \code{NULL}.}
+
 \item{...}{further arguments to summary (not used)}
 }
 \value{
 a \code{data.frame} containing the mean cost and effectiveness for each strategy and, if requested,
 the standard deviations of the cost and effectiveness for each strategy.
+
+With \code{ref_str}, it also contains \code{meanIncCost} and \code{meanIncEffect}, the mean
+differences in cost and effect from the reference strategy, and, with \code{calc_sds = TRUE},
+\code{sdIncCost} and \code{sdIncEffect}, the standard deviations of these differences across
+the PSA samples. These columns are \code{NA} for the reference strategy. The mean difference is
+the difference of the means, but the standard deviation of the difference is not the difference
+of the standard deviations: it is computed sample by sample, so it reflects how the costs and
+effects of the two strategies vary together.
 }
 \description{
 summarize a psa object across all simulations
@@ -35,7 +47,13 @@ df_psa_sum <- summary(l_psa)
 calculate_icers(cost = df_psa_sum$meanCost,
                 effect = df_psa_sum$meanEffect,
                 strategies = df_psa_sum$Strategy)
+
+# mean differences from a reference strategy, with their standard deviations
+summary(l_psa, calc_sds = TRUE, ref_str = "Radio")
 }
 \seealso{
-\code{\link{make_psa_obj}}, \code{\link{calculate_icers}}
+\code{\link{make_psa_obj}}, \code{\link{calculate_icers}}, \code{\link{plot.psa}},
+which with \code{ref_str} plots the same differences on the incremental cost-effectiveness plane,
+and \code{\link{calculate_ce_ref_psa}}, which adds cost-effectiveness ratios, 95\% intervals,
+and quadrant proportions.
 }

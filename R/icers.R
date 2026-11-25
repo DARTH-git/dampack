@@ -32,9 +32,9 @@
 #' costly one, after removing dominated and extendedly dominated strategies. This is the fully
 #' incremental analysis that health technology assessment guidelines require when more than two
 #' strategies are compared. To compare every strategy with a single reference strategy instead,
-#' use \code{\link{calculate_cers_ref}}.
+#' use \code{\link{calculate_ce_ref}}.
 #'
-#' @seealso \code{\link{plot.icers}}, \code{\link{calculate_cers_ref}}
+#' @seealso \code{\link{plot.icers}}, \code{\link{calculate_ce_ref}}
 #'
 #' @examples
 #' ## Base Case
@@ -291,7 +291,7 @@ add_nmb <- function(df_icers, wtp, nhb, currency) {
 #' \code{\link{calculate_icers}} are added.
 #' @seealso \code{\link{plot.icers}}
 #' @seealso \code{\link{calculate_icers}}
-#' @seealso \code{\link{calculate_cers_ref_psa}} to compare every strategy with a reference strategy
+#' @seealso \code{\link{calculate_ce_ref_psa}} to compare every strategy with a reference strategy
 #' @examples
 #' data("cancer_psa_data")
 #' l_psa <- make_psa_obj(cost = cancer_psa_data$cost,
@@ -417,7 +417,7 @@ compute_icers <- function(non_d) {
 #' (the least costly strategy on the frontier), which is placed at the origin (0, 0). The frontier
 #' and the status of each strategy do not change. Defaults to \code{FALSE} (absolute costs and
 #' effects). To compare every strategy with a reference strategy of your choice, use
-#' \code{\link{calculate_cers_ref}} and its \code{plot} method.
+#' \code{\link{calculate_ce_ref}} and its \code{plot} method.
 #' @param wtp a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
 #' drawn through the least costly strategy on the frontier. Strategies below the line are
 #' cost-effective compared with that strategy at this threshold.

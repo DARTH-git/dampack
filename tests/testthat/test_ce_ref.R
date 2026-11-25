@@ -1,4 +1,4 @@
-# calculate_cers_ref() and calculate_cers_ref_psa(): every strategy against a reference (#209)
+# calculate_ce_ref() and calculate_ce_ref_psa(): every strategy against a reference (#209)
 
 # Toy example with one strategy in each position relative to the reference "Ref":
 #   strategy  cost  effect   vs Ref: inc cost  inc effect  status
@@ -13,13 +13,13 @@ df_toy <- data.frame(strategy = c("Ref", "More", "Cheaper", "Worse", "Less", "Sa
                      effect = c(1, 2, 1.5, 0.5, 0.8, 1),
                      stringsAsFactors = FALSE)
 toy_cers <- function(ref_str = "Ref", ...) {
-  calculate_cers_ref(df_toy$cost, df_toy$effect, df_toy$strategy, ref_str = ref_str, ...)
+  calculate_ce_ref(df_toy$cost, df_toy$effect, df_toy$strategy, ref_str = ref_str, ...)
 }
 row_of <- function(x, s) x[x$Strategy == s, ]
 
 test_that("comparisons with the reference match hand calculations", {
   x <- toy_cers()
-  expect_s3_class(x, "cers_ref")
+  expect_s3_class(x, "ce_ref")
   expect_identical(names(x), c("Strategy", "Cost", "Effect", "Inc_Cost", "Inc_Effect", "CER", "Status"))
   expect_identical(attr(x, "ref_str"), "Ref")
 
@@ -46,7 +46,7 @@ test_that("the reference comes first, then the other strategies by cost", {
   expect_equal(x$Strategy, c("More", "Cheaper", "Less", "Ref", "Same", "Worse"))
 
   data(hund_strat)
-  y <- calculate_cers_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy, ref_str = "1")
+  y <- calculate_ce_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy, ref_str = "1")
   v_rest <- hund_strat[hund_strat$Strategy != 1, ]
   expect_equal(y$Strategy, c("1", as.character(v_rest$Strategy[order(v_rest$Cost)])))
   r0 <- row_of(y, "1")
@@ -77,25 +77,25 @@ test_that("wtp adds NMB and its difference from the reference; nhb adds NHB", {
 })
 
 test_that("edge cases: one strategy, two strategies, names with spaces", {
-  one <- calculate_cers_ref(10, 1, "Standard of care", ref_str = "Standard of care", wtp = 100)
+  one <- calculate_ce_ref(10, 1, "Standard of care", ref_str = "Standard of care", wtp = 100)
   expect_equal(one$Status, "Reference")
   expect_equal(one$NMB, 90)
 
-  two <- calculate_cers_ref(c(10, 30), c(1, 2), c("Standard of care", "New drug (A)"),
-                            ref_str = "Standard of care")
+  two <- calculate_ce_ref(c(10, 30), c(1, 2), c("Standard of care", "New drug (A)"),
+                          ref_str = "Standard of care")
   expect_equal(row_of(two, "New drug (A)")$CER, 20)
   expect_equal(row_of(two, "New drug (A)")$Status, "More costly, more effective")
 })
 
 test_that("invalid inputs give informative errors", {
-  expect_error(calculate_cers_ref(df_toy$cost, df_toy$effect, df_toy$strategy), "must name the reference")
+  expect_error(calculate_ce_ref(df_toy$cost, df_toy$effect, df_toy$strategy), "must name the reference")
   expect_error(toy_cers(ref_str = "Nope"), "must be one of the strategies")
   expect_error(toy_cers(ref_str = c("Ref", "More")), "single strategy name")
   expect_error(toy_cers(wtp = c(100, 200)), "single non-negative number")
   expect_error(toy_cers(wtp = -1), "single non-negative number")
   expect_error(toy_cers(nhb = TRUE), "requires `wtp`")
-  expect_error(calculate_cers_ref(1:2, 1:3, c("a", "b"), ref_str = "a"), "same length")
-  expect_error(calculate_cers_ref(1:2, 1:2, c("a", "a"), ref_str = "a"), "unique")
+  expect_error(calculate_ce_ref(1:2, 1:3, c("a", "b"), ref_str = "a"), "same length")
+  expect_error(calculate_ce_ref(1:2, 1:2, c("a", "a"), ref_str = "a"), "unique")
 })
 
 test_that("print() names the reference and formats the table", {
@@ -111,7 +111,6 @@ test_that("print() names the reference and formats the table", {
 test_that("calculate_icers() has no reference strategy", {
   expect_false("ref_str" %in% names(formals(calculate_icers)))
   expect_false("ref_str" %in% names(formals(calculate_icers_psa)))
-  expect_false("ref_str" %in% names(formals(summary.psa)))
   x <- calculate_icers(df_toy$cost, df_toy$effect, df_toy$strategy)
   expect_identical(names(x), c("Strategy", "Cost", "Effect", "Inc_Cost", "Inc_Effect", "ICER", "Status"))
   y <- calculate_icers(df_toy$cost, df_toy$effect, df_toy$strategy, wtp = 150, nhb = TRUE)
@@ -134,16 +133,46 @@ df_cost <- data.frame(Ref = c(1000, 1000, 1000, 1000), New = c(1100, 950, 950, 1
 df_eff <- data.frame(Ref = c(1, 1, 1, 1), New = c(1.2, 1.2, 0.9, 0.9))
 psa_q <- make_psa_obj(df_cost, df_eff, strategies = c("Ref", "New"), currency = "€")
 
-test_that("calculate_cers_ref_psa() uses the means of the PSA and keeps its currency", {
+test_that("summary.psa() with ref_str gives the mean differences from the reference", {
+  s <- summary(psa_q, ref_str = "Ref")
+  expect_identical(names(s), c("Strategy", "meanCost", "meanEffect", "meanIncCost", "meanIncEffect"))
+  expect_equal(s$meanIncCost, c(NA, 25))
+  expect_equal(s$meanIncEffect, c(NA, 0.05))
+  # the same as the difference of the means
+  s0 <- summary(psa_q)
+  expect_equal(s$meanIncCost[2], s0$meanCost[2] - s0$meanCost[1])
+  # without ref_str, the summary is unchanged
+  expect_identical(names(s0), c("Strategy", "meanCost", "meanEffect"))
+  expect_error(summary(psa_q, ref_str = "Other"), "must be one of the strategies")
+})
+
+test_that("summary.psa() with ref_str and calc_sds gives the SDs of the differences", {
+  s <- summary(psa_q, calc_sds = TRUE, ref_str = "Ref")
+  expect_identical(names(s), c("Strategy", "meanCost", "meanEffect", "sdCost", "sdEffect",
+                               "meanIncCost", "meanIncEffect", "sdIncCost", "sdIncEffect"))
+  expect_equal(s$sdIncCost, c(NA, sd(c(100, -50, -50, 100))))
+  expect_equal(s$sdIncEffect, c(NA, sd(c(0.2, 0.2, -0.1, -0.1))))
+  # computed sample by sample: a strategy that always costs 100 more than the reference
+  # has a difference with SD 0, although both costs vary
+  psa_shift <- make_psa_obj(data.frame(Ref = c(1000, 2000, 3000), New = c(1100, 2100, 3100)),
+                            data.frame(Ref = c(1, 2, 3), New = c(1.5, 2.5, 3.5)),
+                            strategies = c("Ref", "New"))
+  s_shift <- summary(psa_shift, calc_sds = TRUE, ref_str = "Ref")
+  expect_equal(s_shift$sdCost, c(1000, 1000))
+  expect_equal(s_shift$sdIncCost, c(NA, 0))
+  expect_equal(s_shift$sdIncEffect, c(NA, 0))
+})
+
+test_that("calculate_ce_ref_psa() uses the means of the PSA and keeps its currency", {
   s <- summary(psa_q)
-  expected <- calculate_cers_ref(s$meanCost, s$meanEffect, s$Strategy, ref_str = "Ref",
-                                 wtp = 1000, currency = "€")
-  expect_equal(calculate_cers_ref_psa(psa_q, ref_str = "Ref", wtp = 1000), expected)
+  expected <- calculate_ce_ref(s$meanCost, s$meanEffect, s$Strategy, ref_str = "Ref",
+                               wtp = 1000, currency = "€")
+  expect_equal(calculate_ce_ref_psa(psa_q, ref_str = "Ref", wtp = 1000), expected)
   expect_identical(attr(expected, "currency"), "€")
 })
 
 test_that("uncertainty = TRUE gives quadrant shares and the share of cost-effective samples", {
-  x <- calculate_cers_ref_psa(psa_q, ref_str = "Ref", wtp = 1000, uncertainty = TRUE)
+  x <- calculate_ce_ref_psa(psa_q, ref_str = "Ref", wtp = 1000, uncertainty = TRUE)
   r_new <- row_of(x, "New")
   expect_equal(unlist(r_new[, c("Prop_NE", "Prop_SE", "Prop_SW", "Prop_NW")], use.names = FALSE),
                rep(0.25, 4))
@@ -156,14 +185,14 @@ test_that("uncertainty = TRUE gives quadrant shares and the share of cost-effect
   v_names <- names(x)
   expect_equal(match("Lower_95_Inc_Cost", v_names), match("Inc_Cost", v_names) + 1)
   expect_identical(attr(x, "ref_str"), "Ref")
-  expect_s3_class(x, "cers_ref")
+  expect_s3_class(x, "ce_ref")
 })
 
 test_that("uncertainty = TRUE gives intervals of the sample-by-sample differences", {
   data("cancer_psa_data")
   psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
                           cancer_psa_data$parameters, cancer_psa_data$strategies)
-  x <- calculate_cers_ref_psa(psa_big, ref_str = "Surgery", wtp = 50000, uncertainty = TRUE)
+  x <- calculate_ce_ref_psa(psa_big, ref_str = "Surgery", wtp = 50000, uncertainty = TRUE)
   i_chemo <- which(cancer_psa_data$strategies == "Chemo")
   i_surg <- which(cancer_psa_data$strategies == "Surgery")
   r <- row_of(x, "Chemo")

@@ -66,5 +66,5 @@ calculate_icers_psa(l_psa, wtp = 1e5)
 
 \code{\link{calculate_icers}}
 
-\code{\link{calculate_cers_ref_psa}} to compare every strategy with a reference strategy
+\code{\link{calculate_ce_ref_psa}} to compare every strategy with a reference strategy
 }

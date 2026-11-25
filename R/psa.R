@@ -104,13 +104,26 @@ check_df_and_coerce <- function(obj) {
 #'
 #' @param object the psa object
 #' @param calc_sds whether or not to calculate the standard deviations. Defaults to FALSE
+#' @param ref_str name of a reference strategy, one of the strategies in \code{object}. If
+#' given, the cost and effect of each strategy are compared with those of the reference in every
+#' PSA sample (see Value). Defaults to \code{NULL}.
 #' @param ... further arguments to summary (not used)
 #'
 #' @importFrom stats sd
 #' @return a \code{data.frame} containing the mean cost and effectiveness for each strategy and, if requested,
 #' the standard deviations of the cost and effectiveness for each strategy.
 #'
-#' @seealso \code{\link{make_psa_obj}}, \code{\link{calculate_icers}}
+#' With \code{ref_str}, it also contains \code{meanIncCost} and \code{meanIncEffect}, the mean
+#' differences in cost and effect from the reference strategy, and, with \code{calc_sds = TRUE},
+#' \code{sdIncCost} and \code{sdIncEffect}, the standard deviations of these differences across
+#' the PSA samples. These columns are \code{NA} for the reference strategy. The mean difference is
+#' the difference of the means, but the standard deviation of the difference is not the difference
+#' of the standard deviations: it is computed sample by sample, so it reflects how the costs and
+#' effects of the two strategies vary together.
+#' @seealso \code{\link{make_psa_obj}}, \code{\link{calculate_icers}}, \code{\link{plot.psa}},
+#' which with \code{ref_str} plots the same differences on the incremental cost-effectiveness plane,
+#' and \code{\link{calculate_ce_ref_psa}}, which adds cost-effectiveness ratios, 95\% intervals,
+#' and quadrant proportions.
 #'
 #' @examples
 #' data("cancer_psa_data")
@@ -127,8 +140,12 @@ check_df_and_coerce <- function(obj) {
 #' calculate_icers(cost = df_psa_sum$meanCost,
 #'                 effect = df_psa_sum$meanEffect,
 #'                 strategies = df_psa_sum$Strategy)
+#'
+#' # mean differences from a reference strategy, with their standard deviations
+#' summary(l_psa, calc_sds = TRUE, ref_str = "Radio")
 #' @export
-summary.psa <- function(object, calc_sds = FALSE, ...) {
+summary.psa <- function(object, calc_sds = FALSE, ref_str = NULL, ...) {
+  ref_str <- check_ref_str(ref_str, object$strategies)
 
   v_mean_cost <- colMeans(object$cost)
   v_mean_effect <- colMeans(object$effectiveness)
@@ -142,6 +159,22 @@ summary.psa <- function(object, calc_sds = FALSE, ...) {
     v_sd_effect <- apply(object$effectiveness, 2, sd)
     df_sum_psa[, "sdCost"] <- v_sd_cost
     df_sum_psa[, "sdEffect"] <- v_sd_effect
+  }
+  if (!is.null(ref_str)) {
+    # differences from the reference strategy in every PSA sample
+    m_inc_cost <- as.matrix(object$cost) - object$cost[[ref_str]]
+    m_inc_effect <- as.matrix(object$effectiveness) - object$effectiveness[[ref_str]]
+    v_is_ref <- v_strat == ref_str
+    na_ref <- function(v) {
+      v[v_is_ref] <- NA_real_
+      unname(v)
+    }
+    df_sum_psa[, "meanIncCost"] <- na_ref(colMeans(m_inc_cost))
+    df_sum_psa[, "meanIncEffect"] <- na_ref(colMeans(m_inc_effect))
+    if (calc_sds) {
+      df_sum_psa[, "sdIncCost"] <- na_ref(apply(m_inc_cost, 2, sd))
+      df_sum_psa[, "sdIncEffect"] <- na_ref(apply(m_inc_effect, 2, sd))
+    }
   }
   rownames(df_sum_psa) <- seq_len(nrow(df_sum_psa))
   df_sum_psa

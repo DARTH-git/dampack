@@ -56,10 +56,10 @@ reference:
       the standard of care, where guidelines allow it alongside the fully
       incremental analysis.
     contents:
-      - calculate_cers_ref
-      - calculate_cers_ref_psa
-      - print.cers_ref
-      - plot.cers_ref
+      - calculate_ce_ref
+      - calculate_ce_ref_psa
+      - print.ce_ref
+      - plot.ce_ref
 
   - title: Probabilistic sensitivity analysis (PSA) objects
     desc: >

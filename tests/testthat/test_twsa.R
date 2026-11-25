@@ -1,4 +1,3 @@
-context("twsa")
 library(dampack)
 
 # test the class
@@ -17,8 +16,8 @@ psa_big <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
 
 test_that("twsa object has correct classes", {
   t <- twsa(psa_big, "pFailChemo", "muDieCancer", outcome = "eff")
-  expect_is(t, "twsa")
-  expect_is(t, "data.frame")
+  expect_s3_class(t, "twsa")
+  expect_s3_class(t, "data.frame")
 })
 
 test_that("parameters we expect to vary are varying", {
@@ -34,7 +33,7 @@ test_that("parameters we expect to vary are varying", {
 test_that("plot.twsa returns a ggplot object", {
   t <- twsa(psa_big, "pFailChemo", "muDieCancer", outcome = "eff")
   g <- plot(t)
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
 })
 
 
@@ -43,12 +42,12 @@ test_that("plot.twsa basecase argument", {
   t <- twsa(psa_big, "pFailChemo", "muDieCancer", outcome = "eff")
   g <- plot(t,
             basecase = list(pFailChemo = 0.37, muDieCancer = 0.09))
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
 
   t2 <- twsa(psa_big, "pFailChemo", "muDieCancer", outcome = "eff")
   g2 <- plot(t,
              basecase = list(muDieCancer = 0.09, pFailChemo = 0.37))
-  expect_is(g2, "ggplot")
+  expect_s3_class(g2, "ggplot")
 
   # test error when wrong parameter is supplied
   expect_error(plot(t,

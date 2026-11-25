@@ -1,7 +1,5 @@
-context("run_dsa")
 library(dampack)
 
-source("util_models_detfun.R")
 
 state_name <- c("S", "IS", "IA", "T")
 cycle <- 100
@@ -59,8 +57,8 @@ test_that("check output of run_owsa_det", {
                     strategies = NULL,
                     state_name = state_name, cycle = cycle,
                     progress = FALSE)
-  expect_is(o, "owsa")
-  expect_is(o, "data.frame")
+  expect_s3_class(o, "owsa")
+  expect_s3_class(o, "data.frame")
 
   params_range2 <- params_range[-2, ]
   o <- run_owsa_det(params_range2, params_basecase, nsamp = 10,
@@ -98,7 +96,7 @@ test_that("check output from run_owsa_det with other dampack functions", {
                     state_name = state_name, cycle = cycle,
                     progress = FALSE)
   g <- plot(o)
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   expect_silent(g)
 })
 
@@ -211,8 +209,8 @@ test_that("check output from run_twsa_det", {
                      strategies = strategy,
                      state_name = state_name, cycle = cycle,
                      progress = FALSE)
-  expect_is(tw, "twsa")
-  expect_is(tw, "data.frame")
+  expect_s3_class(tw, "twsa")
+  expect_s3_class(tw, "data.frame")
 
   expect_equal(min(tw[, params_range[1, 1]]), params_range[1, ]$min)
   expect_equal(max(tw[, params_range[1, 1]]), params_range[1, ]$max)

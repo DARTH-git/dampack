@@ -1,16 +1,19 @@
 #' Calculate Expected Value of Sample Information (EVSI)
 #'
 #' @inheritParams calc_evppi
-#' @param n additional sample size
-#' @param n0 initial sample size
-#' @param n_by_param if \code{TRUE}, each parameter in the metamodel can have a unique
-#' initial and additional sample size. \code{n} and \code{n0} must be numerical
-#' vectors of equal length to \code{params}, with each value corresponding to the
-#' initial and additional sample sizes for each parameter in the metamodel. By default,
-#' \code{n_by_param = FALSE}, and each value of \code{n} and \code{n0} is shared by
-#' each parameter in the model. When \code{n_by_param = FALSE}, \code{n0} must be a single
-#' numeric value, and \code{n} must be a numerical vector of additional sample sizes for
-#' which EVSI is calculated from the metamodel.
+#' @param n sample size of the proposed study (the additional sample size).
+#' @param n0 effective prior sample size: the number of observations that the
+#' current information about each parameter is worth (see Details).
+#' @param n_by_param if \code{TRUE}, each parameter in the metamodel can have its
+#' own effective prior sample size and additional sample size. \code{n} and
+#' \code{n0} must then be numeric vectors with one value per parameter in
+#' \code{params}. By default, \code{n_by_param = FALSE}, and each value of
+#' \code{n} and \code{n0} is shared by all the parameters in the model. Named
+#' vectors of \code{n} and \code{n0} are matched to \code{params} by name;
+#' unnamed vectors follow the order of \code{params}. When
+#' \code{n_by_param = FALSE}, \code{n0} must be a single numeric value, and
+#' \code{n} must be a numeric vector of additional sample sizes for which EVSI is
+#' calculated from the metamodel.
 #' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
 #' should be displayed in console.
 #'
@@ -19,11 +22,68 @@
 #' for the selected parameters and 2) a list of metamodels used to estimate EVSI for each
 #' strategy at each willingness to pay threshold.
 #'
+#' @details
+#' The expected value of sample information (EVSI) is the expected value of a
+#' study of \eqn{n} observations that informs the parameters of interest,
+#' \eqn{\theta_I}, of a cost-effectiveness analysis of \eqn{D} strategies with
+#' net benefits \eqn{B_d}. If \eqn{X_n} are the data the study would collect,
+#' \deqn{EVSI = E_{X_n}\left[\max_d E(B_d \mid X_n)\right] - \max_d E(B_d).}{
+#' EVSI = E_X[max_d E(B_d | X)] - max_d E(B_d).}
+#' \code{calc_evsi} estimates it from the PSA sample alone, with the Gaussian
+#' approximation (GA) of Jalal and Alarid-Escudero (2018):
+#' \enumerate{
+#' \item Determine the optimal strategy with current information,
+#' \eqn{d^* = argmax_d \{\bar{B}_d\}}{d* = argmax_d mean(B_d)}, and the opportunity loss of each strategy,
+#' \eqn{L_d = B_d - B_{d^*}}{L_d = B_d - B_d*}.
+#' \item Fit a metamodel of the loss of each strategy on \eqn{\theta_I}, as in
+#' \code{\link{calc_evppi}}, which is a linear combination of basis functions,
+#' \deqn{L_d = \beta_0 + \sum_j \beta_j x_j(\theta_I) + \epsilon.}
+#' \item Approximate the preposterior distribution, the distribution of
+#' \eqn{E(\theta \mid X_n)}{E(theta | X_n)} over the studies that could be observed, by
+#' shrinking each PSA sample of a parameter toward its mean by a factor that
+#' depends only on \eqn{n} and the effective prior sample size, \eqn{n_0}:
+#' \deqn{\tilde{\theta} = E(\theta) + \sqrt{\frac{n}{n + n_0}} \left(\theta - E(\theta)\right).}{
+#' theta~ = E(theta) + sqrt(n / (n + n0)) (theta - E(theta)).}
+#' This is exact for a normal mean with a conjugate normal prior, whose
+#' preposterior variance is \eqn{n / (n + n_0)} times the prior variance, and an
+#' approximation otherwise. The GA applies the shrinkage to each basis function
+#' of the metamodel,
+#' \eqn{\tilde{x}_j = \bar{x}_j + \sqrt{n / (n + n_0)} (x_j - \bar{x}_j)}{
+#' x~_j = mean(x_j) + sqrt(n / (n + n0)) (x_j - mean(x_j))};
+#' for an interaction, it shrinks the basis of each parameter with that
+#' parameter's \eqn{n} and \eqn{n_0} before forming their tensor product.
+#' \item Compute the expected conditional loss of each strategy,
+#' \eqn{\tilde{L}_d = \beta_0 + \sum_j \beta_j \tilde{x}_j}{L~_d = beta_0 + sum_j beta_j x~_j}, and
+#' \deqn{EVSI = \frac{1}{K}\sum_{i=1}^{K}\max_d(\tilde{L}_{d,i}),}{
+#' EVSI = (1/K) sum_i max_d(L~_d,i),}
+#' where \eqn{K} is the number of PSA samples.
+#' }
+#' EVSI is 0 for \eqn{n = 0} and tends to the EVPPI of \eqn{\theta_I}
+#' (\code{\link{calc_evppi}}) as \eqn{n} grows.
+#'
+#' The effective prior sample size, \eqn{n_0}, is the number of observations
+#' that the current information about a parameter is worth, so that a study of
+#' \eqn{n} observations reduces its variance by the factor \eqn{n_0 / (n + n_0)}.
+#' With a conjugate prior it can be read from the prior: \eqn{n_0 = \alpha + \beta}
+#' for a probability with a beta(\eqn{\alpha}, \eqn{\beta}) prior and binomial
+#' data; \eqn{n_0 = \sigma^2 / \sigma_0^2} for a normal mean with prior variance
+#' \eqn{\sigma_0^2} and data with variance \eqn{\sigma^2}; and, for a rate
+#' with a gamma prior of rate parameter \eqn{\beta} and Poisson counts, the
+#' person-time \eqn{\beta}. When no conjugate prior applies, Jalal and
+#' Alarid-Escudero (2018, Appendix C) show how to estimate \eqn{n_0} with a
+#' summary statistic or by Markov chain Monte Carlo. \eqn{n} and \eqn{n_0} must
+#' be in the same units (for example, patients or person-years).
+#'
+#' Use \code{n_by_param = TRUE} when the study would inform the parameters with
+#' different sample sizes, or when they have different effective prior sample
+#' sizes. Each parameter is then shrunk with its own factor, which ignores how
+#' data on one parameter would also update the parameters correlated with it.
+#'
 #' @export
 calc_evsi <- function(psa,
                       wtp,
                       params = NULL,
-                      outcome = c("nhb", "nmb"),
+                      outcome = c("nmb", "nhb"),
                       k = -1,
                       n = 100,
                       n0 = 10,
@@ -32,6 +92,7 @@ calc_evsi <- function(psa,
                       progress = TRUE) {
   # define parameter values and make sure they correspond to a valid option
   outcome <- match.arg(outcome)
+  outcome_input <- outcome
 
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
@@ -52,18 +113,27 @@ calc_evsi <- function(psa,
 
   l_mms <- vector(mode = "list", length = n_wtps)
 
+  # warn about the metamodel specification once, not at every WTP
+  n_params <- length(if (is.null(params)) psa$parnames else params)
+  if (n_params > 1) {
+    mm_gam_spec(k, n_params)
+  }
+
   # calculate evppi at each wtp and new sample size
   for (l in seq_len(n_wtps)) {
 
     # run the metamodels
-    mms <- metamodel(analysis = "multiway",
-                     psa = psa,
-                     params = params,
-                     outcome = outcome,
-                     wtp = wtp[l],
-                     type = "gam",
-                     poly.order = 2,
-                     k = k)
+    mms <- withCallingHandlers(
+      metamodel(analysis = "multiway",
+                psa = psa,
+                params = params,
+                outcome = outcome,
+                wtp = wtp[l],
+                type = "gam",
+                poly.order = 2,
+                k = k),
+      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning")
+    )
 
     l_mms[[l]] <- mms
 
@@ -86,7 +156,7 @@ calc_evsi <- function(psa,
     } else {
       for (i in seq_len(n_n)) {
         # predict from the regression models
-        l_predicted_loss <- lapply(mms$mods, function(m) predict_ga(m, n[i], n0))
+        l_predicted_loss <- lapply(mms$mods, function(m) predict_ga(m, unname(n[i]), n0))
 
         # bind the columns to get a dataframe
         df_predicted_loss <- bind_cols(l_predicted_loss)
@@ -108,6 +178,8 @@ calc_evsi <- function(psa,
   }
   evsi_ls <- list(df_evsi = df_evsi, metamodel_ls = l_mms)
   class(evsi_ls) <- c("evsi")
+  attr(evsi_ls, "currency") <- psa$currency
+  attr(evsi_ls, "outcome") <- outcome_input
   evsi_ls
 }
 
@@ -117,76 +189,99 @@ calc_evsi <- function(psa,
 #'
 #' @keywords internal
 #'
-#' @param object gam object
-#' @param n scalar or vector of new sample size to compute evsi on
-#' @param n0 scalar or vector of effective prior sample size
+#' @param object gam object with an intercept and smooth terms only
+#' (\code{s()} of one parameter, \code{ti()} or \code{te()}).
+#' @param n scalar or vector of new sample size to compute evsi on. A vector
+#' has one value per parameter; a named vector is matched to the parameters by
+#' name, and an unnamed vector follows the order of the parameters in the model.
+#' @param n0 scalar or vector of effective prior sample size, in the same
+#' format as \code{n}.
 #' @return the conditional loss associated with a gam, effective prior sample size,
 #' and new sample size
 #' @importFrom stats coef
 predict_ga <- function(object, n, n0) {
-  # Name of parameters
-  v_param_names <- colnames(object$model)
+  # Parameter values (all model frame columns but the response)
+  df_param_vals <- object$model[, -1, drop = FALSE]
+  v_param_names <- colnames(df_param_vals)
 
-  # Create dataframe with parameter values
-  df_param_vals <- data.frame(object$model[, -1])
-
-  # Name columns of dataframe
-  colnames(df_param_vals) <- v_param_names[-1]
-
-  # Number of parameters
-  n_params <- ncol(df_param_vals)
-
-  # Sanity checks
-  if (!(length(n) == 1 || length(n) == n_params)) {
-    stop("Variable 'n' should be either a scalar or a vector
-         the same size as the number of parameters")
-  }
-  if (!(length(n0) == 1 || length(n0) == n_params)) {
-    stop("Variable 'n0' should be either a scalar or a vector
-         the same size as the number of parameters")
+  # The Gaussian approximation is defined for an intercept plus smooth terms
+  if (object$nsdf != 1) {
+    stop("predict_ga() supports GAMs with an intercept and smooth terms only.",
+         call. = FALSE)
   }
 
-  # Make n & n0 consistent with the number of parameters
-  if (length(n) == 1) {
-    n <- rep(n, n_params)
-  }
-  if (length(n0) == 1) {
-    n0 <- rep(n0, n_params)
-  }
+  # One value of n and n0 per parameter, in the order of v_param_names
+  v_n <- match_to_params(n, v_param_names, "n")
+  v_n0 <- match_to_params(n0, v_param_names, "n0")
 
-  # Compute variance reduction factor
-  v_vrf <- sqrt(n / (n + n0))
-
-  # Number of smoothers
-  n_smooth <- length(object$smooth)
-
-  # Number of total basis functions
-  n_col_x <- length(object$coefficients)
-
-  # Number of observations
-  n_row_x <- nrow(object$model)
+  # Variance reduction factor, by parameter name
+  v_vrf <- sqrt(v_n / (v_n + v_n0))
+  names(v_vrf) <- v_param_names
 
   # Initialize matrix for preposterior of total basis functions
-  m_x <- matrix(NA, n_row_x, n_col_x)
+  m_x <- matrix(NA, nrow(object$model), length(object$coefficients))
   m_x[, 1] <- 1
 
-  for (k in seq_len(n_smooth)) {
-    klab <- substr(object$smooth[[k]]$label, 1, 1)
-    if (klab == "s") {
-      m_x_frag <- predict_smooth_ga(object$smooth[[k]], df_param_vals, v_vrf[k])
+  for (sm in object$smooth) {
+    if (inherits(sm, "tensor.smooth")) {
+      # one factor per margin, matched by the margin's parameter name
+      v_vrf_margin <- vapply(sm$margin, function(mg) {
+        if (length(mg$term) != 1) {
+          stop("predict_ga() supports tensor smooths with one parameter per margin only.",
+               call. = FALSE)
+        }
+        v_vrf[[mg$term]]
+      }, numeric(1))
+      m_x_frag <- predict_matrix_tensor_smooth_ga(sm, df_param_vals, v_vrf_margin)
     } else {
-      m_x_frag <- predict_matrix_tensor_smooth_ga(object$smooth[[k]], df_param_vals, v_vrf)
+      if (length(sm$term) != 1 || inherits(sm, "t2.smooth")) {
+        stop("predict_ga() supports s() smooths of one parameter, ti() and te() only; ",
+             "found ", sm$label, ".", call. = FALSE)
+      }
+      m_x_frag <- predict_smooth_ga(sm, df_param_vals, v_vrf[[sm$term]])
     }
-    m_x[, object$smooth[[k]]$first.para:object$smooth[[k]]$last.para] <- m_x_frag
+    m_x[, sm$first.para:sm$last.para] <- m_x_frag
   }
 
-  # Coefficients of GAM model
-  v_beta <- coef(object)
+  # Compute conditional loss
+  m_x %*% coef(object)
+}
 
-  # Compute conditional Loss
-  m_tilde <- m_x %*% v_beta
-
-  m_tilde
+#' Match a sample size to the parameters of a metamodel
+#'
+#' Expands a scalar, or reorders a named vector, so that it has one value per
+#' parameter in the order of \code{v_param_names}.
+#'
+#' @param x scalar, vector with one value per parameter, or named vector.
+#' @param v_param_names names of the parameters in the metamodel.
+#' @param arg name of the argument, for error messages.
+#' @return a numeric vector with one value per parameter.
+#' @keywords internal
+match_to_params <- function(x, v_param_names, arg) {
+  n_params <- length(v_param_names)
+  if (!is.numeric(x) || length(x) == 0 || anyNA(x) || any(x < 0)) {
+    stop("'", arg, "' must be a non-negative number or a vector of them.", call. = FALSE)
+  }
+  if (!is.null(names(x))) {
+    v_unknown <- setdiff(names(x), v_param_names)
+    v_missing <- setdiff(v_param_names, names(x))
+    if (length(v_unknown) > 0 || length(v_missing) > 0) {
+      stop("The names of '", arg, "' must be the parameters in the metamodel (",
+           paste(v_param_names, collapse = ", "), ").",
+           if (length(v_unknown) > 0) paste0(" Unknown: ", paste(v_unknown, collapse = ", "), "."),
+           if (length(v_missing) > 0) paste0(" Missing: ", paste(v_missing, collapse = ", "), "."),
+           call. = FALSE)
+    }
+    return(unname(x[v_param_names]))
+  }
+  if (length(x) == 1) {
+    return(rep(x, n_params))
+  }
+  if (length(x) != n_params) {
+    stop("'", arg, "' should be either a scalar or a vector with one value per parameter (",
+         n_params, ": ", paste(v_param_names, collapse = ", "), ").", call. = FALSE)
+  }
+  x
 }
 
 #' Function to compute the preposterior for each of the
@@ -237,7 +332,7 @@ predict_matrix_tensor_smooth_ga <- function(object,
     for (j in seq_along(term)) {
       dat[[term[j]]] <- param_vals[[term[j]]]
     }
-    x[[i]] <- if (!is.null(object$mc[i])) {
+    x[[i]] <- if (isTRUE(object$mc[i])) {
       PredictMat(object$margin[[i]], dat, n = length(dat[[1]]))
     } else {
       Predict.matrix(object$margin[[i]], dat)
@@ -282,8 +377,11 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #' @param x object of class \code{evsi}, produced by function
 #'  \code{\link{calc_evsi}}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#'  Default: the currency of the PSA the results were computed from (or $), but it could be any
+#'  currency symbol or word (e.g., £, €, peso)
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @inheritParams add_common_aes
 #' @keywords expected value of sample information
 #' @return A \code{ggplot2} plot with the EVSI
@@ -293,8 +391,8 @@ predict_matrix_tensor_smooth_ga <- function(object,
 #' @export
 plot.evsi <- function(x,
                       txtsize = 12,
-                      currency = "$",
-                      effect_units = "QALY",
+                      currency = NULL,
+                      effect_units = "QALYs",
                       n_y_ticks = 8,
                       n_x_ticks = 20,
                       xbreaks = NULL,
@@ -305,13 +403,15 @@ plot.evsi <- function(x,
                       ...) {
   # Select EVSI data.frame, discarding metamodel list
   EVSI <- WTP_thou <- NULL
+  currency <- resolve_currency(currency, x)
+  v_units <- voi_units(x, currency, effect_units)
   x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   col <- match.arg(col)
   if (length(unique(x$WTP)) == 1) {
     col <- "bw"
   }
-  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", effect_units, ")", sep = "")
+  scale_text <- paste("Willingness to Pay\n(Thousand ", currency, "/", per_unit(effect_units), ")", sep = "")
 
   if (length(unique(x$WTP)) == 1 && "n" %in% names(x)) {
     g <- ggplot(data = x,
@@ -332,7 +432,7 @@ plot.evsi <- function(x,
 
   g <- g +
     geom_line() +
-    ylab(paste("EVSI (", currency, ")", sep = ""))
+    ylab(paste("EVSI (", v_units, ")", sep = ""))
   add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,

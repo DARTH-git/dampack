@@ -79,6 +79,33 @@ Exported function and argument names are part of the public API that users' scri
 
 New exported functions start with a verb (`calculate_`, `make_`, `plot_`, ...), and new arguments follow the names already used elsewhere in the package (`psa`, `wtp`, `currency`, `effect_units`, `txtsize`, `col`).
 
+### API style (decision record, #214)
+
+Adopted for dampack 1.1.0 (November 2026). It records the names the package uses now, so new code follows them, and the targets for 2.0 that the group still has to agree on. Nothing below renames an existing function or argument in 1.x except through soft deprecation.
+
+**Argument order.** The data object comes first, then the threshold: `calc_exp_loss(psa, wtp)`, `calc_evpi(psa, wtp)`, `calc_evppi(psa, wtp, ...)`, `calc_evsi(psa, wtp, ...)`, `owsa(sa_obj, ...)`, `twsa(sa_obj, ...)`. Since 1.1.0 `ceac(psa, wtp)` does too; the old positional `ceac(wtp, psa)` still works with a soft deprecation warning.
+
+**Plot arguments.** A plot method uses these names whenever it has the option, with these meanings:
+
+| Argument | Meaning |
+|---|---|
+| `txtsize` | base text size |
+| `col` | `c("access", "full", "bw")`: accessible (viridis), full color, or black and white. Only where strategies or groups are told apart by color; `plot.icers()` (shape and line type), `plot.evpi()` and `plot.evppi()` (one line) have none |
+| `currency` | `NULL` uses the currency stored in the object (from `make_psa_obj()` or `calculate_icers()`), otherwise `"$"` |
+| `effect_units` | units of effectiveness in the plural, default `"QALYs"`; labels that mean "per unit" use the singular (`"$/QALY"`) |
+| `n_x_ticks`, `n_y_ticks`, `xbreaks`, `ybreaks` | approximate number of ticks, or exact breaks |
+| `xlim`, `ylim` | limits of each continuous axis (`NULL` sets them automatically) |
+| `xtrans`, `ytrans` | axis transformations such as `"log10"` (`plot.psa()`) |
+| `linewidth` | line width, as in ggplot2. `plot.owsa(size)` and `plot.exp_loss(lsize)` are deprecated in its favor |
+
+**Open questions for 2.0** (meeting decision 3; no aliases are added in 1.1.0):
+
+- Verb prefixes: the package has both `calc_` (`calc_evpi()`, `calc_exp_loss()`) and `calculate_` (`calculate_icers()`, `calculate_icers_psa()`).
+- `effect` (`calculate_icers()`) versus `effectiveness` (`make_psa_obj()` and the `psa` object).
+- Column case: most result tables use capitalized columns (`Strategy`, `Cost`, `WTP`, `Proportion`), while `owsa` and `twsa` objects use lower case (`strategy`, `parameter`, `outcome_val`). Until this is decided, new columns follow the existing style of their object.
+
+**Accepted minor break in 1.1.0.** `summary.ceac()` renames its third column from `cost_eff_strat` to `optimal_strategy` (#173), as recorded in NEWS.md.
+
 ### Files and tests
 
 - Source files live in `R/`, one family of functions per file.

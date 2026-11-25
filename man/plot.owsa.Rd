@@ -11,10 +11,13 @@
   facet_scales = c("free_x", "free_y", "free", "fixed"),
   facet_nrow = NULL,
   facet_ncol = NULL,
-  size = 1,
+  linewidth = 1,
   n_x_ticks = 6,
   n_y_ticks = 6,
   basecase = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  size = deprecated(),
   ...
 )
 }
@@ -35,7 +38,7 @@ more details.}
 The default (NULL) is passed to \code{\link[ggplot2]{facet_wrap}},
 which determines the number of rows and columns automatically.}
 
-\item{size}{either point size (ptype = "point") and/or line size (ptype = "line")}
+\item{linewidth}{width of the lines. Defaults to 1.}
 
 \item{n_x_ticks}{number of x-axis ticks}
 
@@ -44,6 +47,11 @@ which determines the number of rows and columns automatically.}
 \item{basecase}{named list of specific values for each parameter to highlight
 on the returned plot. Each list element must have the same name as the corresponding
 parameter in the \code{owsa} object.}
+
+\item{xlim, ylim}{limits of the x (parameter values) and y (outcome) axes, applied to every
+panel, or \code{NULL} (the default) to set them automatically.}
+
+\item{size}{deprecated; use \code{linewidth} instead.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

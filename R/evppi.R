@@ -13,7 +13,9 @@
 #' @param type either generalized additive models (\code{"gam"}) or
 #' polynomial models (\code{"poly"})
 #' @param poly.order order of the polynomial, if \code{type == "poly"}
-#' @param k basis dimension, if \code{type == "gam"}
+#' @param k basis dimension, if \code{type == "gam"}. The default, \code{-1}, uses
+#' the defaults of \code{mgcv}: 10 for the smooth of each parameter and 5 for each
+#' margin of the interaction between parameters.
 #' @param pop scalar that corresponds to the total population
 #' @param progress \code{TRUE} or \code{FALSE} for whether or not function progress
 #' should be displayed in console.
@@ -23,11 +25,11 @@
 #' strategy at each willingness to pay threshold.
 #'
 #' @details
-#' The expected value of partial pefect information (EVPPI) is the expected
+#' The expected value of partial perfect information (EVPPI) is the expected
 #' value of perfect information from a subset of parameters of interest,
 #' \eqn{\theta_I}, of a cost-effectiveness analysis (CEA) of \eqn{D} different
 #' strategies with parameters \eqn{\theta = \{ \theta_I, \theta_C\}}, where
-#' \eqn{\theta_C} is the set of complimenatry parameters of the CEA. The
+#' \eqn{\theta_C} is the set of complementary parameters of the CEA. The
 #' function \code{calc_evppi} computes the EVPPI of \eqn{\theta_I} from a
 #' matrix of net monetary benefits \eqn{B} of the CEA. Each column of \eqn{B}
 #' corresponds to the net benefit \eqn{B_d} of strategy \eqn{d}. The function
@@ -52,10 +54,25 @@
 #' \deqn{EVPPI_{\theta_I} = \frac{1}{K}\sum_{i=1}^{K}\max_d(\hat{L}_d)}
 #' The spline model in step 3 is fitted using the `mgcv` package.
 #' }
+#'
+#' For \code{type = "gam"}, the metamodel has a smooth, \code{s()}, of each
+#' parameter in \eqn{\theta_I} and a tensor-product interaction, \code{ti()}, of
+#' every subset of two or more of them. For two parameters, \eqn{a} and \eqn{b},
+#' this is \code{s(a) + s(b) + ti(a, b)}, the metamodel of Jalal and
+#' Alarid-Escudero (2018). For more parameters, it spans the same functions as a
+#' full tensor-product smooth, \code{te()}, with a separate smoothing penalty for
+#' each interaction. Its number of coefficients grows quickly with the number of
+#' parameters. When it would exceed 500, interactions among three or more
+#' parameters are left out, with a warning, and if the metamodel with pairwise
+#' interactions only is still too large with the default \code{k}, \code{k = 3}
+#' is used. For \code{type = "poly"}, the metamodel is a polynomial with all
+#' terms up to total degree \code{poly.order}, including the interactions between
+#' parameters; it is biased when the expected loss is not a polynomial of that
+#' order.
 
 #' @references
 #' \enumerate{
-#' \item Jalal H, Alarid-Escudero F. A General Gaussian Approximation Approach
+#' \item Jalal H, Alarid-Escudero F. A Gaussian Approximation Approach
 #' for Value of Information Analysis. Med Decis Making. 2018;38(2):174-188.
 #' \item Strong M, Oakley JE, Brennan A. Estimating Multiparameter Partial
 #' Expected Value of Perfect Information from a Probabilistic Sensitivity
@@ -78,6 +95,7 @@ calc_evppi <- function(psa,
   # define parameter values and make sure they correspond to a valid option
   type <- match.arg(type)
   outcome <- match.arg(outcome)
+  outcome_input <- outcome
 
   # adjust outcome type
   outcome <- paste0(outcome, "_loss_voi")
@@ -89,18 +107,27 @@ calc_evppi <- function(psa,
 
   l_mms <- vector(mode = "list", length = n_wtps)
 
+  # warn about the metamodel specification once, not at every WTP
+  n_params <- length(if (is.null(params)) psa$parnames else params)
+  if (type == "gam" && n_params > 1) {
+    mm_gam_spec(k, n_params)
+  }
+
   # calculate evppi at each wtp
   for (l in seq_len(n_wtps)) {
 
     # run the metamodels
-    mms <- metamodel(analysis = "multiway",
-                     psa = psa,
-                     params = params,
-                     outcome = outcome,
-                     wtp = wtp[l],
-                     type = type,
-                     poly.order = poly.order,
-                     k = k)
+    mms <- withCallingHandlers(
+      metamodel(analysis = "multiway",
+                psa = psa,
+                params = params,
+                outcome = outcome,
+                wtp = wtp[l],
+                type = type,
+                poly.order = poly.order,
+                k = k),
+      dampack_metamodel_spec = function(w) invokeRestart("muffleWarning")
+    )
 
     l_mms[[l]] <- mms
 
@@ -127,6 +154,8 @@ calc_evppi <- function(psa,
 
   evppi_ls <- list(df_evppi = df_evppi, metamodel_ls = l_mms)
   class(evppi_ls) <- c("evppi")
+  attr(evppi_ls, "currency") <- psa$currency
+  attr(evppi_ls, "outcome") <- outcome_input
   evppi_ls
 }
 
@@ -138,8 +167,11 @@ calc_evppi <- function(psa,
 #' @param x object of class \code{evppi}, produced by function
 #'  \code{\link{calc_evppi}}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., £, €, peso)
-#' @param effect_units units of effectiveness. Default: QALY
+#'  Default: the currency of the PSA the results were computed from (or $), but it could be any
+#'  currency symbol or word (e.g., £, €, peso)
+#' @param effect_units units of effectiveness, in the plural (for example \code{"QALYs"} or
+#' \code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+#' ("$/QALY"), and a value already in the singular is used as given.
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPPI
@@ -149,8 +181,8 @@ calc_evppi <- function(psa,
 #' @export
 plot.evppi <- function(x,
                        txtsize = 12,
-                       currency = "$",
-                       effect_units = "QALY",
+                       currency = NULL,
+                       effect_units = "QALYs",
                        n_y_ticks = 8,
                        n_x_ticks = 20,
                        xbreaks = NULL,
@@ -159,13 +191,15 @@ plot.evppi <- function(x,
                        ylim = NULL,
                        ...) {
   WTP_thou <- EVPPI <- NULL
+  currency <- resolve_currency(currency, x)
+  v_units <- voi_units(x, currency, effect_units)
   x <- x[[1]]
   x$WTP_thou <- x$WTP / 1000
   g <- ggplot(data = x,
               aes(x = WTP_thou, y = EVPPI)) +
     geom_line() +
-    xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
-    ylab(paste("EVPPI (", currency, ")", sep = ""))
+    xlab(paste("Willingness to Pay (Thousand ", currency, "/", per_unit(effect_units), ")", sep = "")) +
+    ylab(paste("EVPPI (", v_units, ")", sep = ""))
   add_common_aes(g, txtsize, continuous = c("x", "y"),
                  n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
                  xbreaks = xbreaks, ybreaks = ybreaks,

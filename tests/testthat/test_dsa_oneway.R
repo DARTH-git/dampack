@@ -1,4 +1,3 @@
-context("dsa oneway")
 library(dampack)
 
 # creation of example data

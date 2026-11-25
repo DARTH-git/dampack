@@ -4,7 +4,14 @@
 \alias{calculate_icers}
 \title{Calculate incremental cost-effectiveness ratios (ICERs)}
 \usage{
-calculate_icers(cost, effect, strategies)
+calculate_icers(
+  cost,
+  effect,
+  strategies,
+  wtp = NULL,
+  nhb = FALSE,
+  currency = NULL
+)
 }
 \arguments{
 \item{cost}{vector of cost for each strategy}
@@ -12,10 +19,29 @@ calculate_icers(cost, effect, strategies)
 \item{effect}{vector of effect for each strategy}
 
 \item{strategies}{string vector of strategy names}
+
+\item{wtp}{a single willingness-to-pay threshold (currency per unit of effect). If given,
+the net monetary benefit (\code{NMB}) of each strategy is added. The default (\code{NULL})
+adds no net-benefit columns.}
+
+\item{nhb}{if \code{TRUE}, also add the net health benefit (\code{NHB}). Requires \code{wtp}.}
+
+\item{currency}{currency symbol used when printing and plotting the results, for example
+\code{"€"}. The default (\code{NULL}) uses \code{"$"}.}
 }
 \value{
 A data frame and \code{icers} object of strategies and their associated
-status, incremental cost, incremental effect, and ICER.
+status, incremental cost, incremental effect, and ICER, computed sequentially along the
+cost-effectiveness frontier.
+
+If \code{wtp} is given, \code{NMB} (\code{wtp * Effect - Cost}) is added. With
+\code{nhb = TRUE}, \code{NHB} (\code{Effect - Cost / wtp}) is added too.
+
+The ICERs are always sequential: each strategy on the frontier is compared with the next less
+costly one, after removing dominated and extendedly dominated strategies. This is the fully
+incremental analysis that health technology assessment guidelines require when more than two
+strategies are compared. To compare every strategy with a single reference strategy instead,
+use \code{\link{calculate_ce_ref}}.
 }
 \description{
 This function takes in strategies and their associated cost and effect, assigns them
@@ -24,7 +50,7 @@ calculates the incremental cost-effectiveness ratios for the non-dominated strat
 
 The cost-effectiveness frontier can be visualized with \code{plot}, which calls \code{\link{plot.icers}}.
 
-An efficent way to get from a probabilistic sensitivity analysis to an ICER table
+An efficient way to get from a probabilistic sensitivity analysis to an ICER table
 is by using \code{summary} on the PSA object and then using its columns as
 inputs to \code{calculate_icers}.
 }
@@ -60,7 +86,15 @@ plot(icers)
 # if using a small number of strategies, you can label all the points
 # note that longer strategy names will get truncated
 plot(icers, label = "all")
+
+# the incremental cost-effectiveness plane, with the least costly strategy on the
+# frontier at the origin
+plot(icers, incremental = TRUE)
+
+## Net monetary benefit at a willingness-to-pay threshold
+calculate_icers(sum_cdiff$meanCost, sum_cdiff$meanEffect, sum_cdiff$Strategy,
+                wtp = 50000)
 }
 \seealso{
-\code{\link{plot.icers}}
+\code{\link{plot.icers}}, \code{\link{calculate_ce_ref}}
 }

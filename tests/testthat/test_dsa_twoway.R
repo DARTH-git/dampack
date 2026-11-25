@@ -1,4 +1,3 @@
-context("dsa twoway")
 library(dampack)
 
 # create of example data
@@ -15,8 +14,8 @@ strategies <- c("s1", "s2")
 # class creation
 test_that("dsa class creation", {
   dsa <- create_dsa_twoway(params, effect, strategies, cost)
-  expect_is(dsa, "dsa_twoway")
-  expect_is(dsa, "sa")
+  expect_s3_class(dsa, "dsa_twoway")
+  expect_s3_class(dsa, "sa")
 })
 
 # members within class
@@ -43,6 +42,6 @@ test_that("dsa prints", {
 test_that("twsa() on a dsa_twoway object works with the default outcome", {
   dsa <- create_dsa_twoway(params, effect, strategies, cost)
   tw <- twsa(dsa)
-  expect_is(tw, "twsa")
+  expect_s3_class(tw, "twsa")
   expect_equal(tw$outcome_val[tw$strategy == "s1"], effect$s1)
 })

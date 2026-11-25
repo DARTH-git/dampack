@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 173.2 200" width="173.2" height="200">
+<title>dampack</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&amp;display=swap');</style>
+<defs><clipPath id="hex"><polygon points="86.6,0 173.2,50 173.2,150 86.6,200 0,150 0,50"/></clipPath></defs>
+<g clip-path="url(#hex)">
+<polygon points="86.6,0 173.2,50 173.2,150 86.6,200 0,150 0,50" fill="#eff5f2"/>
+<path d="M34,46 H139 M34,83 H139 M34,120 H139" stroke="#440154" stroke-opacity="0.14" stroke-width="0.7"/>
+<path d="M34.0 66.9 L36.6 67.9 L39.2 68.8 L41.9 69.6 L44.5 70.3 L47.1 70.8 L49.8 71.1 L52.4 71.4 L55.0 71.5 L57.6 71.5 L60.2 71.4 L62.9 71.2 L65.5 71.0 L68.1 70.7 L70.8 70.4 L73.4 70.0 L76.0 69.6 L78.6 69.2 L81.2 68.8 L83.9 68.4 L86.5 68.0 L89.1 67.6 L91.8 67.1 L94.4 66.7 L97.0 66.3 L99.6 65.8 L102.2 65.4 L104.9 65.0 L107.5 64.6 L110.1 64.1 L112.8 63.7 L115.4 63.3 L118.0 62.9 L120.6 62.5 L123.2 62.1 L125.9 61.7 L128.5 61.4 L131.1 61.0 L133.8 60.6 L136.4 60.2 L139.0 59.9" fill="none" stroke="#3b528b" stroke-opacity="0.8" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M34.0 120.0 L36.6 117.1 L39.2 113.0 L41.9 108.4 L44.5 103.8 L47.1 99.3 L49.8 95.1 L52.4 91.3 L55.0 87.8 L57.6 84.6 L60.2 81.7 L62.9 79.1 L65.5 76.7 L68.1 74.5 L70.8 72.5 L73.4 70.6 L76.0 68.8 L78.6 67.2 L81.2 65.7 L83.9 64.3 L86.5 63.0 L89.1 61.7 L91.8 60.5 L94.4 59.4 L97.0 58.3 L99.6 57.3 L102.2 56.3 L104.9 55.4 L107.5 54.5 L110.1 53.6 L112.8 52.8 L115.4 52.0 L118.0 51.3 L120.6 50.5 L123.2 49.8 L125.9 49.1 L128.5 48.5 L131.1 47.8 L133.8 47.2 L136.4 46.6 L139.0 46.0" fill="none" stroke="#21908c" stroke-opacity="0.8" stroke-width="1.2" stroke-linejoin="round" stroke-dasharray="3 2"/>
+<path d="M34.0 75.8 L36.6 76.4 L39.2 76.9 L41.9 77.1 L44.5 77.0 L47.1 76.8 L49.8 76.3 L52.4 75.7 L55.0 74.9 L57.6 74.1 L60.2 73.2 L62.9 72.2 L65.5 71.2 L68.1 70.2 L70.8 69.3 L73.4 68.3 L76.0 67.4 L78.6 66.4 L81.2 65.5 L83.9 64.7 L86.5 63.8 L89.1 63.0 L91.8 62.2 L94.4 61.4 L97.0 60.7 L99.6 59.9 L102.2 59.2 L104.9 58.5 L107.5 57.9 L110.1 57.2 L112.8 56.6 L115.4 56.0 L118.0 55.4 L120.6 54.8 L123.2 54.2 L125.9 53.7 L128.5 53.1 L131.1 52.6 L133.8 52.1 L136.4 51.6 L139.0 51.1" fill="none" stroke="#5dc863" stroke-opacity="0.8" stroke-width="1.2" stroke-linejoin="round" stroke-dasharray="1 2"/>
+<path d="M34.0 120.0 L36.6 117.1 L39.2 113.0 L41.9 108.4 L44.5 103.8 L47.1 99.3 L49.8 95.1 L52.4 91.3 L55.0 87.8 L57.6 84.6 L60.2 81.7 L62.9 79.1 L65.5 76.7 L68.1 74.5 L70.8 72.5 L73.4 70.6 L76.0 69.6 L78.6 69.2 L81.2 68.8 L83.9 68.4 L86.5 68.0 L89.1 67.6 L91.8 67.1 L94.4 66.7 L97.0 66.3 L99.6 65.8 L102.2 65.4 L104.9 65.0 L107.5 64.6 L110.1 64.1 L112.8 63.7 L115.4 63.3 L118.0 62.9 L120.6 62.5 L123.2 62.1 L125.9 61.7 L128.5 61.4 L131.1 61.0 L133.8 60.6 L136.4 60.2 L139.0 59.9" fill="none" stroke="#440154" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="31.2" y="117.2" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="44.4" y="96.5" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="57.5" y="79.0" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="70.6" y="67.8" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="83.8" y="65.2" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="96.9" y="63.1" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="110.0" y="61.0" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="123.1" y="59.0" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<rect x="136.2" y="57.1" width="5.5" height="5.5" fill="#5dc863" stroke="#440154" stroke-width="1"/>
+<text x="139" y="129" text-anchor="end" fill="#440154" font-family="'JetBrains Mono', ui-monospace, Menlo, monospace" font-weight="700" font-size="6">WTP →</text>
+<text x="86.6" y="153" text-anchor="middle" fill="#440154" font-family="'JetBrains Mono', ui-monospace, Menlo, monospace" font-weight="700" font-size="24" letter-spacing="-0.6">dampack</text>
+<polygon points="86.6,0 173.2,50 173.2,150 86.6,200 0,150 0,50" fill="none" stroke="#31688e" stroke-width="9"/>
+</g>
+</svg>

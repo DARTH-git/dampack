@@ -10,7 +10,7 @@ lnorm_params(m = 1, v = 1)
 \item{m}{Scalar with the mean of the random variable.}
 
 \item{v}{Scalar with the variance of the random variable.
-(i.e., squared standar error).}
+(i.e., squared standard error).}
 }
 \value{
 A list containing the following:
@@ -21,7 +21,7 @@ sigma Scale parameter of log-normal distribution
 }
 \description{
 Function to calculate the location, \eqn{\mu}, and scale, \eqn{\sigma},
-parameteres of a log-normal distribution based on the method of moments (MoM)
+parameters of a log-normal distribution based on the method of moments (MoM)
 using the mean \eqn{m} and variance \eqn{v} of the non-logarithmized random
 variable of interest.
 }
@@ -29,7 +29,7 @@ variable of interest.
 
 Based on method of moments. If \eqn{m} is the mean and
 \eqn{v} is the variance of the random variable, then the
-the location, \eqn{\mu}, and scale, \eqn{\sigma}, parameteres are computed
+the location, \eqn{\mu}, and scale, \eqn{\sigma}, parameters are computed
 as follows
 \deqn{\mu = \ln{(\frac{m}{\sqrt{(1 + \frac{v}{m^2})}})}}
 and

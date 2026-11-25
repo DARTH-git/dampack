@@ -9,10 +9,10 @@
   log_y = TRUE,
   frontier = TRUE,
   points = TRUE,
-  lsize = 1,
+  linewidth = 1,
   txtsize = 12,
-  currency = "$",
-  effect_units = "QALY",
+  currency = NULL,
+  effect_units = "QALYs",
   n_y_ticks = 8,
   n_x_ticks = 20,
   xbreaks = NULL,
@@ -20,6 +20,7 @@
   xlim = c(0, NA),
   ylim = NULL,
   col = c("access", "full", "bw"),
+  lsize = deprecated(),
   ...
 )
 }
@@ -34,14 +35,17 @@ To only plot the EVPI see \code{\link{calc_evpi}}.}
 
 \item{points}{whether to plot points on the curve (TRUE) or not (FALSE)}
 
-\item{lsize}{line size. defaults to 1.}
+\item{linewidth}{width of the lines. Defaults to 1.}
 
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., £, €, peso)}
+Default: the currency of the PSA the results were computed from (or $), but it could be any
+currency symbol or word (e.g., £, €, peso)}
 
-\item{effect_units}{units of effectiveness. Default: QALY}
+\item{effect_units}{units of effectiveness, in the plural (for example \code{"QALYs"} or
+\code{"life-years"}). Default: \code{"QALYs"}. The willingness-to-pay axis uses the singular
+("$/QALY"), and a value already in the singular is used as given.}
 
 \item{n_y_ticks}{number of y-axis ticks}
 
@@ -58,6 +62,8 @@ will override \code{n_y_ticks} if provided.}
 \item{ylim}{vector of y-axis limits, or NULL, which sets limits automatically}
 
 \item{col}{either none, full color, accessible colors, or black and white}
+
+\item{lsize}{deprecated; use \code{linewidth} instead.}
 
 \item{...}{further arguments to plot.
 This is not used by \code{dampack} but required for generic consistency.}

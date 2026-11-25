@@ -1,26 +1,15 @@
-## R package reference generated from DESCRIPTION metadata
-citation(auto = meta)
+## Citation for the dampack R package. Built from the DESCRIPTION file, so the authors,
+## title, and version stay current. Once the JOSS article is published, add its entry here.
+pub_date <- meta$`Date/Publication`
+year <- if (is.null(pub_date)) format(Sys.Date(), "%Y") else substr(pub_date, 1, 4)
+authors <- eval(parse(text = meta$`Authors@R`))
+authors <- authors[vapply(seq_along(authors), function(i) "aut" %in% authors[[i]]$role, logical(1))]
 
 bibentry(
-  bibtype    = "Manual",
-  title    = "dampack: Decision Analytic Modeling Package",
-  author   = c(person(given = "Fernando",
-                      family = "Alarid-Escudero",
-                      role = "aut",
-                      email = "fernando.alarid@cide.edu"),
-               person(given = "Greg",
-                      family = "Knowlton",
-                      role = c("aut", "cre"),
-                      email = "knowl193@umn.edu"),
-               person(given = "Caleb",
-                      family = "Easterly",
-                      role = "aut",
-                      email = "easte080@umn.edu"),
-               person(given = "Eva",
-                      family = "Enns",
-                      role = "aut",
-                      email = "eenns@umn.edu")),
-  year     = "2024",
-  note     = "R package version 1.0.1",
-  url      = "https://github.com/DARTH-git/dampack"
+  bibtype = "Manual",
+  title   = paste0(meta$Package, ": ", meta$Title),
+  author  = authors,
+  year    = year,
+  note    = paste("R package version", meta$Version),
+  url     = "https://github.com/DARTH-git/dampack"
 )

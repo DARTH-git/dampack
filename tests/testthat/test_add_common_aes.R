@@ -1,5 +1,3 @@
-context("add_common_aes")
-
 # The accessible palette is chosen from the number of groups in the first layer when no
 # strategy names (v_str) are given. That used ggplot_build(p)@data, which exists only in
 # ggplot2 >= 4.0 and failed on older versions with "no applicable method for `@`" (#198).

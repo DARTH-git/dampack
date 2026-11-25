@@ -15,7 +15,7 @@ gamma_params(mu, sigma, scale = TRUE)
 (Default is TRUE). If FALSE, rate parameterization is retrieved}
 }
 \value{
-A list contianing the following:
+A list containing the following:
 
 shape Shape parameter of gamma distribution
 

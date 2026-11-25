@@ -1,5 +1,3 @@
-context("bundled datasets")
-
 test_that("cancer_psa_data has the documented structure", {
   data("cancer_psa_data")
   expect_named(cancer_psa_data, c("strategies", "cost", "effectiveness", "parameters"))
@@ -21,7 +19,7 @@ test_that("superseded example_psa still loads and matches cancer_psa_data", {
 test_that("superseded example_psa_obj still loads as a psa object", {
   data("cancer_psa_data")
   data("example_psa_obj")
-  expect_is(example_psa_obj, "psa")
+  expect_s3_class(example_psa_obj, "psa")
   expect_equal(example_psa_obj$strategies, cancer_psa_data$strategies)
   expect_equal(unname(as.matrix(example_psa_obj$cost)),
                unname(as.matrix(cancer_psa_data$cost)))

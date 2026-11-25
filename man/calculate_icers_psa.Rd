@@ -4,19 +4,28 @@
 \alias{calculate_icers_psa}
 \title{Calculate incremental cost-effectiveness ratios from a \code{psa} object.}
 \usage{
-calculate_icers_psa(psa, uncertainty = FALSE)
+calculate_icers_psa(psa, uncertainty = FALSE, wtp = NULL, nhb = FALSE)
 }
 \arguments{
 \item{psa}{\code{psa} object from \code{link{make_psa_object}}}
 
-\item{uncertainty}{whether or not 95% quantiles for the cost and QALY outcomes should be included
+\item{uncertainty}{whether or not 95\% quantiles for the cost and QALY outcomes should be included
 in the resulting ICER table. Defaults to \code{FALSE}.}
+
+\item{wtp}{a single willingness-to-pay threshold (currency per unit of effect). If given,
+the net monetary benefit (\code{NMB}) of each strategy is added. The default (\code{NULL})
+adds no net-benefit columns.}
+
+\item{nhb}{if \code{TRUE}, also add the net health benefit (\code{NHB}). Requires \code{wtp}.}
 }
 \value{
 A data frame and \code{icers} object of strategies and their associated
 status, cost, effect, incremental cost, incremental effect, and ICER. If \code{uncertainty} is
 set to \code{TRUE}, four additional columns are provided for the 2.5th and 97.5th quantiles for
 each strategy's cost and effect.
+
+With \code{wtp} or \code{nhb}, the net-benefit columns described in
+\code{\link{calculate_icers}} are added.
 }
 \description{
 The mean costs and QALYs for each strategy in a PSA are used
@@ -37,4 +46,6 @@ even if present in the ICER table.
 \code{\link{plot.icers}}
 
 \code{\link{calculate_icers}}
+
+\code{\link{calculate_ce_ref_psa}} to compare every strategy with a reference strategy
 }

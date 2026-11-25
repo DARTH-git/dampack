@@ -1,5 +1,3 @@
-context("converting between BCEA and dampack objects (#204)")
-
 # a minimal object with the structure of BCEA::bcea() output, so bcea_to_psa() can be tested
 # without BCEA installed
 fake_bcea <- function() {
@@ -13,7 +11,7 @@ fake_bcea <- function() {
 test_that("bcea_to_psa() builds a psa object with the intervention names and outcomes", {
   m <- fake_bcea()
   p <- bcea_to_psa(m, currency = "£")
-  expect_is(p, "psa")
+  expect_s3_class(p, "psa")
   expect_identical(p$strategies, c("Status Quo", "Vaccination"))
   expect_equal(unname(as.matrix(p$cost)), m$c)
   expect_equal(unname(as.matrix(p$effectiveness)), m$e)
@@ -38,7 +36,7 @@ test_that("BCEA and dampack round-trip, and their EVPI agree", {
   expect_identical(p$strategies, m$interventions)
 
   m2 <- psa_to_bcea(p, ref_str = "Vaccination", Kmax = 50000)
-  expect_is(m2, "bcea")
+  expect_s3_class(m2, "bcea")
   expect_equal(unname(m2$e), unname(m$e))
   expect_equal(unname(m2$c), unname(m$c))
   expect_equal(m2$ref, m$ref)

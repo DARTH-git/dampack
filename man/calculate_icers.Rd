@@ -41,7 +41,7 @@ The ICERs are always sequential: each strategy on the frontier is compared with 
 costly one, after removing dominated and extendedly dominated strategies. This is the fully
 incremental analysis that health technology assessment guidelines require when more than two
 strategies are compared. To compare every strategy with a single reference strategy instead,
-use \code{\link{calculate_cers_ref}}.
+use \code{\link{calculate_ce_ref}}.
 }
 \description{
 This function takes in strategies and their associated cost and effect, assigns them
@@ -96,5 +96,5 @@ calculate_icers(sum_cdiff$meanCost, sum_cdiff$meanEffect, sum_cdiff$Strategy,
                 wtp = 50000)
 }
 \seealso{
-\code{\link{plot.icers}}, \code{\link{calculate_cers_ref}}
+\code{\link{plot.icers}}, \code{\link{calculate_ce_ref}}
 }

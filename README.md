@@ -41,7 +41,7 @@ scientists, health economists, and students.
   dominated and extendedly dominated strategies and computes ICERs along
   the efficient frontier; `plot()` draws the frontier on absolute or
   incremental axes. Where guidelines allow it alongside this fully
-  incremental analysis, `calculate_cers_ref()` also compares every
+  incremental analysis, `calculate_ce_ref()` also compares every
   strategy with a single reference strategy, such as the standard of
   care.
 - **Probabilistic sensitivity analysis.** `make_psa_obj()` stores the

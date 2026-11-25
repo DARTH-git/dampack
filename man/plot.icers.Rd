@@ -76,7 +76,7 @@ and effects of every strategy are shown relative to those of the first non-domin
 (the least costly strategy on the frontier), which is placed at the origin (0, 0). The frontier
 and the status of each strategy do not change. Defaults to \code{FALSE} (absolute costs and
 effects). To compare every strategy with a reference strategy of your choice, use
-\code{\link{calculate_cers_ref}} and its \code{plot} method.}
+\code{\link{calculate_ce_ref}} and its \code{plot} method.}
 
 \item{wtp}{a willingness-to-pay threshold. If given, a dotted line with slope \code{wtp} is
 drawn through the least costly strategy on the frontier. Strategies below the line are

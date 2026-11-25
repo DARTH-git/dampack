@@ -1,4 +1,4 @@
-# incremental plane and WTP lines in plot.icers(), plot.psa() and plot.cers_ref() (#209, #202)
+# incremental plane and WTP lines in plot.icers(), plot.psa() and plot.ce_ref() (#209, #202)
 
 df_toy <- data.frame(strategy = c("Standard of care", "New drug (A)", "Cheaper", "Worse"),
                      cost = c(100, 200, 50, 300),
@@ -90,14 +90,14 @@ test_that("plot.psa(wtp = ) without ref_str draws the line through the least cos
   expect_match(p$labels$caption, "WTP = $2,000/QALY", fixed = TRUE)
 })
 
-# plot.cers_ref(): the star around the reference strategy
+# plot.ce_ref(): the star around the reference strategy
 segment_layers <- function(p) {
   which(vapply(p$layers, function(l) inherits(l$geom, "GeomSegment"), logical(1)))
 }
 
-test_that("plot.cers_ref() centers the plane at the reference and draws the star", {
-  x_ref <- calculate_cers_ref(df_toy$cost, df_toy$effect, df_toy$strategy,
-                              ref_str = "Standard of care", wtp = 150)
+test_that("plot.ce_ref() centers the plane at the reference and draws the star", {
+  x_ref <- calculate_ce_ref(df_toy$cost, df_toy$effect, df_toy$strategy,
+                            ref_str = "Standard of care", wtp = 150)
   p <- plot(x_ref)
   expect_s3_class(p, "ggplot")
   d <- point_layer(p)
@@ -115,9 +115,9 @@ test_that("plot.cers_ref() centers the plane at the reference and draws the star
   expect_no_warning(ggplot2::ggplot_build(plot(x_ref, col = "bw", label = "none")))
 })
 
-test_that("plot.cers_ref() leaves out the segments for many strategies", {
+test_that("plot.ce_ref() leaves out the segments for many strategies", {
   data(hund_strat)
-  x_hund <- calculate_cers_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy, ref_str = "1")
+  x_hund <- calculate_ce_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy, ref_str = "1")
   p <- plot(x_hund, label = "none")
   expect_length(segment_layers(p), 0)
   expect_length(segment_layers(plot(x_hund, label = "none", lines = TRUE)), 1)

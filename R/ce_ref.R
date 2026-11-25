@@ -32,7 +32,7 @@
 #' @param currency currency symbol used when printing and plotting the results, for example
 #' \code{"€"}. The default (\code{NULL}) uses \code{"$"}.
 #'
-#' @return A data frame of class \code{cers_ref}, with the reference strategy in the first row
+#' @return A data frame of class \code{ce_ref}, with the reference strategy in the first row
 #' and the other strategies by increasing cost, and these columns:
 #' \describe{
 #'   \item{Strategy, Cost, Effect}{as given.}
@@ -72,16 +72,16 @@
 #' Diemen: Zorginstituut Nederland; 2024.
 #' \url{https://english.zorginstituutnederland.nl/documents/2024/01/16/guideline-for-economic-evaluations-in-healthcare}
 #'
-#' @seealso \code{\link{plot.cers_ref}}, \code{\link{calculate_cers_ref_psa}} for the same
+#' @seealso \code{\link{plot.ce_ref}}, \code{\link{calculate_ce_ref_psa}} for the same
 #' comparison from a PSA, and \code{\link{calculate_icers}} for the fully incremental analysis.
 #'
 #' @examples
 #' # three strategies; "Standard of care" is neither the cheapest nor the least effective
-#' df_ref <- calculate_cers_ref(cost = c(12000, 9000, 20000),
-#'                              effect = c(8.0, 7.6, 8.5),
-#'                              strategies = c("Standard of care", "Generic drug", "New drug"),
-#'                              ref_str = "Standard of care",
-#'                              wtp = 50000)
+#' df_ref <- calculate_ce_ref(cost = c(12000, 9000, 20000),
+#'                            effect = c(8.0, 7.6, 8.5),
+#'                            strategies = c("Standard of care", "Generic drug", "New drug"),
+#'                            ref_str = "Standard of care",
+#'                            wtp = 50000)
 #' df_ref
 #' plot(df_ref)
 #'
@@ -90,8 +90,8 @@
 #'                 effect = c(8.0, 7.6, 8.5),
 #'                 strategies = c("Standard of care", "Generic drug", "New drug"))
 #' @export
-calculate_cers_ref <- function(cost, effect, strategies, ref_str, wtp = NULL, nhb = FALSE,
-                               currency = NULL) {
+calculate_ce_ref <- function(cost, effect, strategies, ref_str, wtp = NULL, nhb = FALSE,
+                             currency = NULL) {
   if (length(cost) != length(effect) || length(effect) != length(strategies)) {
     stop("cost, effect, and strategies must all be vectors of the same length", call. = FALSE)
   }
@@ -138,7 +138,7 @@ calculate_cers_ref <- function(cost, effect, strategies, ref_str, wtp = NULL, nh
     }
   }
 
-  structure(df_ref, class = c("cers_ref", "data.frame"), ref_str = ref_str, wtp = wtp,
+  structure(df_ref, class = c("ce_ref", "data.frame"), ref_str = ref_str, wtp = wtp,
             currency = currency)
 }
 
@@ -148,19 +148,19 @@ calculate_cers_ref <- function(cost, effect, strategies, ref_str, wtp = NULL, nh
 #'
 #' @description
 #' Compares each strategy with a reference strategy using the mean costs and effects of a
-#' probabilistic sensitivity analysis (PSA), as \code{\link{calculate_cers_ref}} does for a base
+#' probabilistic sensitivity analysis (PSA), as \code{\link{calculate_ce_ref}} does for a base
 #' case. With \code{uncertainty = TRUE}, it also summarizes the uncertainty in each comparison
-#' across the PSA samples. See \code{\link{calculate_cers_ref}} for when a comparison with a
+#' across the PSA samples. See \code{\link{calculate_ce_ref}} for when a comparison with a
 #' single reference is appropriate, and \code{\link{calculate_icers_psa}} for the fully
 #' incremental analysis.
 #'
 #' @param psa \code{psa} object from \code{\link{make_psa_obj}}.
 #' @param uncertainty if \code{TRUE}, add the 95\% intervals and quadrant proportions described
 #' in Value. Defaults to \code{FALSE}.
-#' @inheritParams calculate_cers_ref
+#' @inheritParams calculate_ce_ref
 #'
-#' @return A \code{cers_ref} object with the columns described in
-#' \code{\link{calculate_cers_ref}}, computed from the mean cost and effect of each strategy. The
+#' @return A \code{ce_ref} object with the columns described in
+#' \code{\link{calculate_ce_ref}}, computed from the mean cost and effect of each strategy. The
 #' currency of \code{psa} is kept.
 #'
 #' With \code{uncertainty = TRUE}, the differences from the reference are computed in every PSA
@@ -177,8 +177,8 @@ calculate_cers_ref <- function(cost, effect, strategies, ref_str, wtp = NULL, nh
 #'   cost-effective compared with the reference (it has a higher net monetary benefit).
 #' }
 #'
-#' @inherit calculate_cers_ref references
-#' @seealso \code{\link{calculate_cers_ref}}, \code{\link{plot.cers_ref}}, and
+#' @inherit calculate_ce_ref references
+#' @seealso \code{\link{calculate_ce_ref}}, \code{\link{plot.ce_ref}}, and
 #' \code{\link{plot.psa}} with \code{ref_str} for the PSA samples on the incremental plane.
 #'
 #' @examples
@@ -187,34 +187,34 @@ calculate_cers_ref <- function(cost, effect, strategies, ref_str, wtp = NULL, nh
 #'                       effectiveness = cancer_psa_data$effectiveness,
 #'                       parameters = cancer_psa_data$parameters,
 #'                       strategies = cancer_psa_data$strategies)
-#' df_ref <- calculate_cers_ref_psa(l_psa, ref_str = "Radio", wtp = 50000,
-#'                                  uncertainty = TRUE)
+#' df_ref <- calculate_ce_ref_psa(l_psa, ref_str = "Radio", wtp = 50000,
+#'                                uncertainty = TRUE)
 #' df_ref
 #' plot(df_ref)
 #' @export
-calculate_cers_ref_psa <- function(psa, ref_str, wtp = NULL, nhb = FALSE, uncertainty = FALSE) {
+calculate_ce_ref_psa <- function(psa, ref_str, wtp = NULL, nhb = FALSE, uncertainty = FALSE) {
   check_psa_object(psa)
   if (!isTRUE(uncertainty) && !isFALSE(uncertainty)) {
     stop("`uncertainty` must be TRUE or FALSE.", call. = FALSE)
   }
   df_sum <- summary(psa)
-  df_ref <- calculate_cers_ref(cost = df_sum$meanCost, effect = df_sum$meanEffect,
-                               strategies = df_sum$Strategy, ref_str = ref_str, wtp = wtp,
-                               nhb = nhb, currency = psa$currency)
+  df_ref <- calculate_ce_ref(cost = df_sum$meanCost, effect = df_sum$meanEffect,
+                             strategies = df_sum$Strategy, ref_str = ref_str, wtp = wtp,
+                             nhb = nhb, currency = psa$currency)
   if (uncertainty) {
-    df_ref <- add_cers_ref_uncertainty(df_ref, psa, wtp, nhb)
+    df_ref <- add_ce_ref_uncertainty(df_ref, psa, wtp, nhb)
   }
   df_ref
 }
 
-#' Add PSA intervals and quadrant proportions to a \code{cers_ref} object
+#' Add PSA intervals and quadrant proportions to a \code{ce_ref} object
 #'
-#' @param df_ref a \code{cers_ref} object computed from the means of \code{psa}.
+#' @param df_ref a \code{ce_ref} object computed from the means of \code{psa}.
 #' @param psa the \code{psa} object.
-#' @inheritParams calculate_cers_ref
-#' @return \code{df_ref} with the columns described in \code{\link{calculate_cers_ref_psa}}.
+#' @inheritParams calculate_ce_ref
+#' @return \code{df_ref} with the columns described in \code{\link{calculate_ce_ref_psa}}.
 #' @keywords internal
-add_cers_ref_uncertainty <- function(df_ref, psa, wtp, nhb) {
+add_ce_ref_uncertainty <- function(df_ref, psa, wtp, nhb) {
   ref_str <- attr(df_ref, "ref_str")
   v_strat <- df_ref$Strategy
   is_ref <- v_strat == ref_str
@@ -302,10 +302,10 @@ status_vs_reference <- function(v_inc_cost, v_inc_effect) {
 
 #' Print a comparison with a reference strategy
 #'
-#' Prints the table of a \code{\link{calculate_cers_ref}} object with formatted numbers and
+#' Prints the table of a \code{\link{calculate_ce_ref}} object with formatted numbers and
 #' headers that name the reference strategy.
 #'
-#' @param x a \code{cers_ref} object.
+#' @param x a \code{ce_ref} object.
 #' @param currency currency symbol. Defaults to the currency stored in \code{x}, or \code{"$"}.
 #' @param dig_cost number of digits to round costs and net monetary benefits to.
 #' @param dig_eff number of digits to round effects and net health benefits to.
@@ -314,8 +314,8 @@ status_vs_reference <- function(v_inc_cost, v_inc_effect) {
 #' @param ... further arguments (not used).
 #' @return the formatted table, invisibly.
 #' @export
-print.cers_ref <- function(x, currency = NULL, dig_cost = 0, dig_eff = 2, dig_cer = 0,
-                           dig_prop = 3, ...) {
+print.ce_ref <- function(x, currency = NULL, dig_cost = 0, dig_eff = 2, dig_cer = 0,
+                         dig_prop = 3, ...) {
   currency <- resolve_currency(currency, x)
   vs <- paste0(" vs ", attr(x, "ref_str"))
   cat("Comparison of each strategy with the reference strategy, ", attr(x, "ref_str"),
@@ -356,8 +356,8 @@ print.cers_ref <- function(x, currency = NULL, dig_cost = 0, dig_eff = 2, dig_ce
 #' optional willingness-to-pay line goes through the origin: strategies below the line are
 #' cost-effective compared with the reference at that threshold.
 #'
-#' @param x a \code{cers_ref} object from \code{\link{calculate_cers_ref}} or
-#' \code{\link{calculate_cers_ref_psa}}.
+#' @param x a \code{ce_ref} object from \code{\link{calculate_ce_ref}} or
+#' \code{\link{calculate_ce_ref_psa}}.
 #' @param wtp a willingness-to-pay threshold for the dotted line through the origin. Defaults to
 #' the threshold stored in \code{x}, if any; \code{NULL} draws no line.
 #' @param lines whether to draw a segment from the reference to each strategy. The default
@@ -379,43 +379,43 @@ print.cers_ref <- function(x, currency = NULL, dig_cost = 0, dig_eff = 2, dig_ce
 #' @param ... further arguments (not used).
 #'
 #' @return a \code{ggplot2} object, which can be modified by adding further layers.
-#' @seealso \code{\link{calculate_cers_ref}}
+#' @seealso \code{\link{calculate_ce_ref}}
 #' @examples
-#' df_ref <- calculate_cers_ref(cost = c(12000, 9000, 20000),
-#'                              effect = c(8.0, 7.6, 8.5),
-#'                              strategies = c("Standard of care", "Generic drug", "New drug"),
-#'                              ref_str = "Standard of care")
+#' df_ref <- calculate_ce_ref(cost = c(12000, 9000, 20000),
+#'                            effect = c(8.0, 7.6, 8.5),
+#'                            strategies = c("Standard of care", "Generic drug", "New drug"),
+#'                            ref_str = "Standard of care")
 #' plot(df_ref, wtp = 50000)
 #'
 #' # many strategies: no segments, no labels
 #' data(hund_strat)
-#' df_hund <- calculate_cers_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy,
-#'                               ref_str = "1")
+#' df_hund <- calculate_ce_ref(hund_strat$Cost, hund_strat$QALYs, hund_strat$Strategy,
+#'                             ref_str = "1")
 #' plot(df_hund, label = "none")
 #' @importFrom ggrepel geom_label_repel
 #' @export
-plot.cers_ref <- function(x,
-                          wtp = attr(x, "wtp"),
-                          lines = NULL,
-                          label = c("all", "none"),
-                          label_max_char = NULL,
-                          ref_axis = TRUE,
-                          ref_caption = TRUE,
-                          currency = NULL,
-                          effect_units = "QALYs",
-                          col = c("access", "full", "bw"),
-                          alpha = 1,
-                          txtsize = 12,
-                          n_x_ticks = 6,
-                          n_y_ticks = 6,
-                          xbreaks = NULL,
-                          ybreaks = NULL,
-                          xlim = NULL,
-                          ylim = NULL,
-                          xexpand = expansion(0.1),
-                          yexpand = expansion(0.1),
-                          max.iter = 20000,
-                          ...) {
+plot.ce_ref <- function(x,
+                        wtp = attr(x, "wtp"),
+                        lines = NULL,
+                        label = c("all", "none"),
+                        label_max_char = NULL,
+                        ref_axis = TRUE,
+                        ref_caption = TRUE,
+                        currency = NULL,
+                        effect_units = "QALYs",
+                        col = c("access", "full", "bw"),
+                        alpha = 1,
+                        txtsize = 12,
+                        n_x_ticks = 6,
+                        n_y_ticks = 6,
+                        xbreaks = NULL,
+                        ybreaks = NULL,
+                        xlim = NULL,
+                        ylim = NULL,
+                        xexpand = expansion(0.1),
+                        yexpand = expansion(0.1),
+                        max.iter = 20000,
+                        ...) {
   Inc_Effect <- Inc_Cost <- Status <- Strategy <- NULL
   label <- match.arg(label)
   col <- match.arg(col)

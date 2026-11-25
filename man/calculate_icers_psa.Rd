@@ -47,5 +47,5 @@ even if present in the ICER table.
 
 \code{\link{calculate_icers}}
 
-\code{\link{calculate_cers_ref_psa}} to compare every strategy with a reference strategy
+\code{\link{calculate_ce_ref_psa}} to compare every strategy with a reference strategy
 }

@@ -32,7 +32,8 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
 
     params <- c(param1, param2)
 
-    if (!is.null(sa_obj$other_outcome)) {
+    # Use other_outcome when there is no effectiveness, as in the psa objects from run_psa()
+    if (is.null(sa_obj$effectiveness) && !is.null(sa_obj$other_outcome)) {
       sa_obj$effectiveness <- sa_obj$other_outcome
     }
 
@@ -42,7 +43,7 @@ twsa <- function(sa_obj, param1 = NULL, param2 = NULL, ranges = NULL,
     tw <- predict(mm, ranges, nsamp)
   } else if (inherits(sa_obj, "dsa_twoway")) {
     params <- sa_obj$parameters
-    if (!is.null(sa_obj$other_outcome)) {
+    if (is.null(sa_obj$effectiveness) && !is.null(sa_obj$other_outcome)) {
       df_eff <- sa_obj$other_outcome
     } else {
       df_eff <- sa_obj$effectiveness

@@ -33,6 +33,7 @@
 
 ## Bug fixes
 
+- `owsa()` and `twsa()` now use `effectiveness` when a `psa` or DSA object also has an `other_outcome`. They used to replace `effectiveness` with `other_outcome` whenever it was present, so `outcome = "eff"` returned the other outcome, and `"nmb"`, `"nhb"` and the losses combined the costs with it. `other_outcome` is still used when there is no `effectiveness`, as in the objects returned by `run_psa()`, `run_owsa_det()` and `run_twsa_det()`. (#273)
 - The `calc_evsi()` help page now describes the Gaussian approximation method in a Details section, and calls `n0` the effective prior sample size (the number of observations that the current information about a parameter is worth) instead of the initial sample size, with how to obtain it from conjugate priors. The title of Jalal and Alarid-Escudero (2018) is corrected in the `calc_evppi()` help page and the value of information vignette (#270).
 - EVPPI and EVSI computed from net health benefit (`outcome = "nhb"`) are in health units, and their plots are now labeled with `effect_units` (e.g., "EVSI (QALY)") instead of a currency (#203).
 - `plot.psa(ref_str = )` now works when there are only two strategies; it used to fail with "'dims' cannot be of length 0" (#209).

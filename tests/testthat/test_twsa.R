@@ -54,3 +54,13 @@ test_that("plot.twsa basecase argument", {
                     basecase = list(pFailChemo = 0.37, non_existent = .050)),
                "Some parameter names in the basecase argument do not match param1 or param2 of twsa")
 })
+
+# a psa object with both effectiveness and other_outcome must keep using effectiveness
+test_that("twsa() uses effectiveness, not other_outcome, when both are given", {
+  psa_other <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                            cancer_psa_data$parameters, cancer_psa_data$strategies,
+                            other_outcome = cancer_psa_data$effectiveness * 10)
+  t_ref <- twsa(psa_big, "pFailChemo", "muDieCancer", outcome = "nmb", wtp = 100000)
+  t_other <- twsa(psa_other, "pFailChemo", "muDieCancer", outcome = "nmb", wtp = 100000)
+  expect_equal(t_other$outcome_val, t_ref$outcome_val)
+})

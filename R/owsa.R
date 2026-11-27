@@ -24,8 +24,8 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
                  poly.order = 2) {
   outcome <- match.arg(outcome)
   if (inherits(sa_obj, "psa")) {
-    # Use other_outcome if available
-    if (!is.null(sa_obj$other_outcome)) {
+    # Use other_outcome when there is no effectiveness, as in the psa objects from run_psa()
+    if (is.null(sa_obj$effectiveness) && !is.null(sa_obj$other_outcome)) {
       sa_obj$effectiveness <- sa_obj$other_outcome
     }
     # create metamodel
@@ -36,7 +36,7 @@ owsa <- function(sa_obj, params = NULL, ranges = NULL, nsamp = 100,
     ow <- predict(mm, ranges, nsamp)
   } else if (inherits(sa_obj, "dsa_oneway")) {
     params <- sa_obj$parameters
-    if (!is.null(sa_obj$other_outcome)) {
+    if (is.null(sa_obj$effectiveness) && !is.null(sa_obj$other_outcome)) {
       df_eff <- sa_obj$other_outcome
     } else {
       df_eff <- sa_obj$effectiveness

@@ -148,3 +148,15 @@ test_that("owsa_opt_strat(plot_const = FALSE) leaves out parameters with one opt
   expect_equal(length(unique(d_var$PANEL)), 1)
   expect_equal(nrow(d_var), 2)
 })
+
+# a psa object with both effectiveness and other_outcome must keep using effectiveness
+test_that("owsa() uses effectiveness, not other_outcome, when both are given", {
+  psa_other <- make_psa_obj(cancer_psa_data$cost, cancer_psa_data$effectiveness,
+                            cancer_psa_data$parameters, cancer_psa_data$strategies,
+                            other_outcome = cancer_psa_data$effectiveness * 10)
+  for (out in c("eff", "nmb")) {
+    o_ref <- owsa(psa_big, params = "pFailChemo", outcome = out, wtp = 100000)
+    o_other <- owsa(psa_other, params = "pFailChemo", outcome = out, wtp = 100000)
+    expect_equal(o_other$outcome_val, o_ref$outcome_val)
+  }
+})
